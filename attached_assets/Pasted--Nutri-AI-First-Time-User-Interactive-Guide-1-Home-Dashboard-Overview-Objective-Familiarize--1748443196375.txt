@@ -1,0 +1,107 @@
+🚀 Nutri AI: First-Time User Interactive Guide
+🧭 1. Home Dashboard Overview
+Objective: Familiarize users with the main dashboard.
+
+Features Highlighted:
+
+Daily Summary: Calorie intake, macro distribution, and meal logs.
+
+Quick Actions: Buttons for scanning meals, adding progress photos, and checking body metrics.
+
+User Prompt: "This is your daily hub. Here, you can track your meals, monitor your progress, and access personalized recommendations."
+
+📸 2. Meal Scanning Feature
+Objective: Introduce the AI-powered meal scanning capability.
+
+Steps:
+
+Tap the Scan Meal button.
+
+Point the camera at your meal.
+
+Confirm or adjust the detected items.
+
+Tips:
+
+Ensure good lighting for accurate detection.
+
+Separate foods on the plate for better recognition.
+
+User Prompt: "Quickly log your meals by scanning them. Our AI will identify the foods and provide nutritional information."
+TikTok
++2
+MyFitnessPal Help
++2
+MyFitnessPal.com
++2
+passio.ai
+
+🥗 3. Personalized Meal Plans
+Objective: Guide users to access and customize their meal plans.
+
+Features Highlighted:
+
+Daily Meal Suggestions: Breakfast, lunch, dinner, and snacks tailored to user goals.
+
+Customization Options: Swap meals, adjust portion sizes, and set dietary preferences.
+
+User Prompt: "Explore your personalized meal plan designed to help you achieve your health goals. Customize it to fit your preferences."
+
+🧊 4. Fridge Scan & Recipe Suggestions
+Objective: Show users how to get recipe ideas based on available ingredients.
+
+Steps:
+
+Tap the Fridge Scan feature.
+
+Scan available ingredients.
+
+Receive recipe suggestions utilizing scanned items.
+
+User Prompt: "Not sure what to cook? Scan your available ingredients, and we'll suggest delicious recipes you can make."
+MyFitnessPal Help
+YouTube
++5
+YouTube
++5
+passio.ai
++5
+
+🍳 5. Cooking Mode
+Objective: Introduce the step-by-step cooking guide.
+
+Features Highlighted:
+
+Step-by-Step Instructions: Clear directions with timers and tips.
+
+Voice Commands: Hands-free navigation through cooking steps.
+
+User Prompt: "Ready to cook? Enter Cooking Mode for guided instructions to prepare your meals effortlessly."
+Reddit
++2
+passio.ai
++2
+Wikipedia
++2
+
+📄 6. Meal Detail Page
+Objective: Educate users on accessing detailed nutritional information.
+
+Features Highlighted:
+
+Nutritional Breakdown: Calories, macros, vitamins, and minerals.
+
+Ingredient List: Detailed components of each meal.
+
+User Prompt: "Dive into the details of your meals to understand their nutritional value and make informed choices."
+
+📷 7. Progress Tracking
+Objective: Encourage users to monitor their health journey.
+
+Features Highlighted:
+
+Body Metrics: Weight, body fat percentage, and measurements.
+
+Progress Photos: Visual tracking of physical changes over time.
+
+User Prompt: "Track your progress by logging body metrics and uploading photos. Visualize your journey towards better health."

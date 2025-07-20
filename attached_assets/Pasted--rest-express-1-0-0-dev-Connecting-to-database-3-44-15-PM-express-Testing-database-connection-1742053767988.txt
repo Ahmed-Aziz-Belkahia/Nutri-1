@@ -1,0 +1,39 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+3:44:15 PM [express] Testing database connection...
+✅ Database connection established successfully
+3:44:17 PM [express] ✅ Database connection successful
+3:44:17 PM [express] ✅ Uploads directory created
+3:44:17 PM [express] Development server setup complete
+3:44:17 PM [express] Server running at http://0.0.0.0:5000
+3:44:21 PM [express] GET /api/user 401 in 4ms :: {"error":"Not authenticated"}
+3:44:25 PM [express] GET /api/user 401 in 0ms :: {"error":"Not authenticated"}
+3:46:52 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+3:46:57 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+3:46:57 PM [express] POST /api/login 200 in 2721ms :: {"ok":true}
+3:46:58 PM [express] GET /api/user 304 in 43ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+3:47:00 PM [express] GET /api/user 304 in 2135ms :: {"id":1,"email":"piotrekster1998@gmail.com","pas…
+Fetching meal plan for date: 2025-03-15
+Found meal plan: undefined
+3:47:00 PM [express] GET /api/meal-plans/today 304 in 2223ms :: {"hasPlan":false}
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-03-15T00:00:00.000Z',
+  end: '2025-03-16T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-15T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 850, protein: 35, carbs: 110, fat: 30 }
+3:47:01 PM [express] GET /api/food-logs 304 in 305ms :: {"logs":[{"id":1,"userId":1,"name":"Pasta wi…
+3:47:01 PM [express] GET /api/user/xp 304 in 2207ms :: {"totalXP":10,"level":1,"currentXPInLevel":10…
+3:48:18 PM [express] GET /api/user/xp 304 in 200ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,…
+3:48:18 PM [express] GET /api/recipes 304 in 293ms :: []
+3:48:18 PM [express] GET /api/recipes 304 in 465ms :: [{"id":1,"userId":1,"name":"Stuffed Red Bell P…
+3:48:21 PM [express] GET /api/user/xp 304 in 118ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,…
+3:48:51 PM [express] POST /api/progress-photos 400 in 156ms :: {"error":"No image file provided"}
+3:48:51 PM [express] POST /api/progress-photos 400 in 78ms :: {"error":"No image file provided"}
+3:48:51 PM [express] POST /api/progress-photos 400 in 78ms :: {"error":"No image file provided"}
+3:48:51 PM [express] POST /api/progress-photos 400 in 78ms :: {"error":"No image file provided"}
+3:48:52 PM [express] POST /api/progress-photos 400 in 4803ms :: {"error":"No image file provided"}
+3:49:11 PM [express] POST /api/progress-photos 400 in 245ms :: {"error":"No image file provided"}
+3:49:12 PM [express] POST /api/progress-photos 400 in 2168ms :: {"error":"No image file provided"}

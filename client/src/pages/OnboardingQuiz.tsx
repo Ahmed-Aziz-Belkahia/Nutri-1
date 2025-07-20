@@ -1,0 +1,845 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
+import { Camera, Upload, User, Target, Heart, Zap, Clock, Star } from 'lucide-react';
+
+type OnboardingData = {
+  perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change')[];
+  customGoal?: string;
+  gender: 'male' | 'female' | '';
+  age: number;
+  height: number;
+  weight: number;
+  goalWeight: number;
+  weightGoal: 'loss' | 'maintain' | 'gain' | '';
+  activityLevel: string;
+  dietaryRestrictions: string[];
+  allergies: string[];
+  mealBudget: 'low' | 'medium' | 'high';
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced';
+  preferredLanguage: 'en' | 'pl';
+  profileImage?: File;
+  energyPattern: 'morning' | 'afternoon' | 'evening' | 'consistent' | 'fluctuating';
+  flavorPreference: 'savory' | 'spicy' | 'sweet' | 'fresh';
+  firstVictory: 'energy' | 'sleep' | 'appearance' | 'clarity';
+  motivationLevel?: 'high' | 'medium' | 'low';
+  nutritionGoals?: string[];
+  extractedData?: {
+    hasAge: boolean;
+    hasGender: boolean;
+    hasWeight: boolean;
+    hasGoalWeight: boolean;
+    hasHeight: boolean;
+    hasGoal: boolean;
+  };
+};
+
+const initialFormData: OnboardingData = {
+  perfectGoal: [],
+  customGoal: '',
+  gender: '',
+  age: 0,
+  height: 0,
+  weight: 0,
+  goalWeight: 0,
+  weightGoal: '',
+  activityLevel: '',
+  dietaryRestrictions: [],
+  allergies: [],
+  mealBudget: 'medium',
+  experienceLevel: 'beginner',
+  preferredLanguage: 'pl',
+  energyPattern: 'consistent',
+  flavorPreference: 'fresh',
+  firstVictory: 'energy',
+  motivationLevel: 'high',
+  nutritionGoals: []
+};
+
+const calculateCalories = (data: OnboardingData) => {
+  if (!data.age || !data.height || !data.weight || !data.gender || !data.activityLevel) {
+    return 2000;
+  }
+
+  const activityMultipliers = {
+    sedentary: 1.2,
+    light: 1.375,
+    moderate: 1.55,
+    active: 1.725,
+    very_active: 1.9
+  };
+
+  let bmr;
+  if (data.gender === 'male') {
+    bmr = 88.362 + (13.397 * data.weight) + (4.799 * data.height) - (5.677 * data.age);
+  } else {
+    bmr = 447.593 + (9.247 * data.weight) + (3.098 * data.height) - (4.330 * data.age);
+  }
+
+  const tdee = bmr * (activityMultipliers[data.activityLevel as keyof typeof activityMultipliers] || 1.2);
+
+  const goalAdjustments = {
+    loss: -500,
+    maintain: 0,
+    gain: 500
+  };
+
+  return Math.round(tdee + (goalAdjustments[data.weightGoal as keyof typeof goalAdjustments] || 0));
+};
+
+export default function OnboardingQuiz() {
+  const [step, setStep] = useState(0);
+  const [formData, setFormData] = useState<OnboardingData>(initialFormData);
+  const [visionBoardPage, setVisionBoardPage] = useState(0);
+  const [visionBoardData, setVisionBoardData] = useState<any>(null);
+  const [isGeneratingVisionBoard, setIsGeneratingVisionBoard] = useState(false);
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Simple translation function for Polish
+  const t = (key: string) => {
+    const translations: Record<string, string> = {
+      'back': 'Wstecz',
+      'next': 'Dalej',
+      'complete': 'Zakończ',
+      'saving': 'Zapisywanie...'
+    };
+    return translations[key] || key;
+  };
+
+  const calculateTimeline = () => {
+    if (formData.weightGoal === 'maintain') {
+      return { weeks: 0, months: 0, weeklyProgress: 0 };
+    }
+
+    const weightDifference = Math.abs(formData.goalWeight - formData.weight);
+    const weeklyProgress = formData.weightGoal === 'loss' ? -0.5 : 0.5;
+    const weeks = Math.ceil(weightDifference / Math.abs(weeklyProgress));
+    const months = Math.round(weeks / 4.33);
+
+    return { weeks, months, weeklyProgress };
+  };
+
+  const generateVisionBoard = async () => {
+    // Use goals to generate motivation
+    const description = formData.perfectGoal.length > 0 ? `Chcę osiągnąć: ${formData.perfectGoal.join(', ')}` : 
+       formData.customGoal || 'Chcę poprawić swoje zdrowie i samopoczucie';
+
+    setIsGeneratingVisionBoard(true);
+    try {
+      const response = await fetch('/api/generate-motivation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dreamDescription: description,
+          goals: formData.perfectGoal,
+          customGoal: formData.customGoal,
+          currentWeight: formData.weight,
+          goalWeight: formData.goalWeight
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setVisionBoardData(data);
+        setVisionBoardPage(1);
+      }
+    } catch (error) {
+      console.error('Error generating vision board:', error);
+    } finally {
+      setIsGeneratingVisionBoard(false);
+    }
+  };
+
+  const mutation = useMutation({
+    mutationFn: async (data: OnboardingData) => {
+      const formDataToSend = new FormData();
+      
+      // Calculate nutrition values
+      const age = data.age;
+      const weight = data.weight;
+      const goalWeight = data.goalWeight;
+      const height = data.height;
+      
+      // Calculate daily calories and macros
+      const bmr = data.gender === 'male' 
+        ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+        : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+      
+      const activityMultiplier = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725,
+        extra: 1.9
+      }[data.activityLevel] || 1.2;
+      
+      const tdee = bmr * activityMultiplier;
+      const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
+                           data.weightGoal === 'gain' ? tdee + 500 : tdee;
+      
+      // Create profile data matching the backend expectation
+      const profileData = {
+        height: height,
+        weight: weight,
+        goalWeight: goalWeight,
+        weightGoal: data.weightGoal,
+        activityLevel: data.activityLevel,
+        calorieGoal: Math.round(dailyCalories),
+        proteinGoal: Math.round(dailyCalories * 0.3 / 4), // 30% of calories from protein
+        carbsGoal: Math.round(dailyCalories * 0.4 / 4),   // 40% of calories from carbs
+        fatGoal: Math.round(dailyCalories * 0.3 / 9),     // 30% of calories from fat
+        dietaryRestrictions: [],
+        allergies: [],
+        mealBudget: "medium",
+        experienceLevel: "beginner",
+        preferredLanguage: "pl",
+        energyPattern: "morning",
+        flavorPreference: "savory",
+        firstVictory: "energy",
+        motivationLevel: "medium",
+        nutritionGoals: []
+      };
+      
+      // Add profile data as JSON string
+      formDataToSend.append('profile', JSON.stringify(profileData));
+      
+      // Add profile image if exists
+      if (data.profileImage && data.profileImage instanceof File) {
+        formDataToSend.append('profileImage', data.profileImage);
+      }
+
+      const response = await fetch('/api/register/complete-onboarding', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Onboarding completion failed:', errorData);
+        throw new Error('Failed to complete onboarding');
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log('Onboarding completed successfully, redirecting to dashboard...');
+      toast({
+        title: 'Profil utworzony!',
+        description: 'Twój profil został pomyślnie utworzony.',
+      });
+      
+      // Invalidate user query to refresh auth state with updated onboarding status
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      
+      // Use setTimeout to ensure the toast is shown before navigation
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
+    },
+    onError: (error: Error) => {
+      console.error('Onboarding completion error:', error);
+      toast({
+        title: 'Błąd',
+        description: 'Wystąpił problem podczas zapisywania profilu. Spróbuj ponownie.',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleNext = () => {
+    if (step === 7 && !isGeneratingVisionBoard) {
+      generateVisionBoard();
+      setStep(8);
+    } else if (step === 8 && visionBoardPage < 3) {
+      setVisionBoardPage(prev => prev + 1);
+    } else if (step === 8 && visionBoardPage === 3) {
+      mutation.mutate(formData);
+    } else {
+      setStep(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 8 && visionBoardPage > 0) {
+      setVisionBoardPage(prev => prev - 1);
+    } else if (step > 0) {
+      setStep(prev => prev - 1);
+    }
+  };
+
+  const isNextDisabled = () => {
+    switch (step) {
+      case 0: return formData.perfectGoal.length === 0 && !formData.customGoal?.trim();
+      case 1: return !formData.gender;
+      case 2: return !formData.age || formData.age < 10;
+      case 3: return !formData.height || formData.height < 100;
+      case 4: return !formData.weight || formData.weight < 30;
+      case 5: return !formData.goalWeight || formData.goalWeight < 30;
+      case 6: return !formData.activityLevel;
+      case 7: return false;
+      case 8: return visionBoardPage === 0 && isGeneratingVisionBoard;
+      default: return false;
+    }
+  };
+
+  return (
+    <div className="h-screen bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 relative overflow-hidden">
+      {/* Enhanced Background decorations */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-400/10 to-indigo-400/10 filter blur-3xl -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-blue-400/8 to-cyan-400/8 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
+      <div className="absolute top-1/2 left-1/4 w-[350px] h-[350px] rounded-full bg-gradient-to-br from-emerald-400/8 to-teal-400/8 filter blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-gradient-to-tl from-pink-400/8 to-rose-400/8 filter blur-3xl" />
+      
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className={`absolute w-2 h-2 rounded-full bg-purple-300/20`}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [-20, 20, -20],
+              x: [-10, 10, -10],
+              opacity: [0.3, 0.8, 0.3],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 2,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-[600px] mx-auto relative z-10 p-4 h-screen flex items-center">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+            className="w-full"
+          >
+            <Card className="bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/30 mb-8 w-full">
+              {/* Question header */}
+              <div className="p-8 relative overflow-hidden rounded-t-3xl"
+                style={{
+                  background: `linear-gradient(135deg, 
+                    ${step % 4 === 0 ? '#667eea, #764ba2' : 
+                      step % 4 === 1 ? '#f093fb, #f5576c' : 
+                      step % 4 === 2 ? '#4facfe, #00f2fe' : '#ffecd2, #fcb69f'})`
+                }}
+              >
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                <div className="relative z-10 text-center text-white">
+                  <motion.div 
+                    className="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {step === 0 && <Target className="w-10 h-10 text-white" />}
+                    {step === 1 && <User className="w-10 h-10 text-white" />}
+                    {step === 2 && <Clock className="w-10 h-10 text-white" />}
+                    {step === 3 && <Zap className="w-10 h-10 text-white" />}
+                    {step === 4 && <Zap className="w-10 h-10 text-white" />}
+                    {step === 5 && <Target className="w-10 h-10 text-white" />}
+                    {step === 6 && <Zap className="w-10 h-10 text-white" />}
+                    {step === 7 && <Camera className="w-10 h-10 text-white" />}
+                    {step === 8 && <Star className="w-10 h-10 text-white" />}
+                  </motion.div>
+                  <h2 className="text-2xl font-bold mb-2">
+                    {step === 0 ? 'Jaki jest Twój główny cel?' :
+                     step === 1 ? 'Wybierz swoją płeć' :
+                     step === 2 ? 'Ile masz lat?' :
+                     step === 3 ? 'Jaki jest Twój wzrost?' :
+                     step === 4 ? 'Ile ważysz?' :
+                     step === 5 ? 'Jaka jest Twoja waga docelowa?' :
+                     step === 6 ? 'Jaki jest Twój poziom aktywności?' :
+                     step === 7 ? 'Dodaj zdjęcie profilowe' :
+                     step === 8 ? 'Twoja tablica wizji' : 'Gratulacje!'}
+                  </h2>
+                  <p className="text-white/90 text-sm">
+                    {step === 0 ? 'Wybierz to, co jest dla Ciebie najważniejsze' :
+                     step === 1 ? 'Pomaga nam lepiej dostosować plan' :
+                     step === 2 ? 'Potrzebujemy tego do obliczenia kalorii' :
+                     step === 3 ? 'Podaj wzrost w centymetrach' :
+                     step === 4 ? 'Aktualna waga w kilogramach' :
+                     step === 5 ? 'Do jakiej wagi dążysz?' :
+                     step === 6 ? 'Jak często ćwiczysz?' :
+                     step === 7 ? 'Dodaj swoje zdjęcie (opcjonalne)' :
+                     step === 8 ? 'Spersonalizowany plan dla Ciebie' : 'Twój profil jest gotowy!'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Content area */}
+              <div className="p-6">
+                {/* Step 0: Perfect Goal */}
+                {step === 0 && (
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      {[
+                        { value: 'weight_loss', label: 'Utrata wagi', icon: '', desc: 'Zdrowo' },
+                        { value: 'muscle_gain', label: 'Budowa mięśni', icon: '', desc: 'Masa' },
+                        { value: 'health_improve', label: 'Poprawa zdrowia', icon: '', desc: 'Zdrowie' }
+                      ].map((goal) => (
+                        <motion.div
+                          key={goal.value}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                            formData.perfectGoal.includes(goal.value as any)
+                              ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
+                              : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => {
+                            const currentGoals = formData.perfectGoal;
+                            const goalValue = goal.value as any;
+                            const newGoals = currentGoals.includes(goalValue)
+                              ? currentGoals.filter(g => g !== goalValue)
+                              : [...currentGoals, goalValue];
+                            setFormData(prev => ({ ...prev, perfectGoal: newGoals }));
+                          }}
+                        >
+                          <div className={`w-5 h-5 border-2 rounded-md flex items-center justify-center ${
+                            formData.perfectGoal.includes(goal.value as any)
+                              ? 'bg-purple-600 border-purple-600' 
+                              : 'border-gray-300'
+                          }`}>
+                            {formData.perfectGoal.includes(goal.value as any) && (
+                              <div className="w-2 h-2 bg-white rounded-sm"></div>
+                            )}
+                          </div>
+                          <div className="text-2xl">{goal.icon}</div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-lg text-gray-800">{goal.label}</div>
+                            <div className="text-sm text-gray-600">{goal.desc}</div>
+                          </div>
+                        </motion.div>
+                      ))}
+                      
+                      {/* Custom goal input */}
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          na przykład chcę
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="wpisz tutaj swój cel..."
+                          value={formData.customGoal || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
+                          className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 1: Gender */}
+                {step === 1 && (
+                  <div className="space-y-4">
+                    <RadioGroup 
+                      value={formData.gender} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value as any }))}
+                    >
+                      {[
+                        { value: 'male', label: 'Mężczyzna', icon: '' },
+                        { value: 'female', label: 'Kobieta', icon: '' }
+                      ].map((gender) => (
+                        <motion.div
+                          key={gender.value}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                            formData.gender === gender.value 
+                              ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
+                              : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => setFormData(prev => ({ ...prev, gender: gender.value as any }))}
+                        >
+                          <RadioGroupItem value={gender.value} id={gender.value} />
+                          <div className="text-2xl">{gender.icon}</div>
+                          <Label htmlFor={gender.value} className="font-semibold cursor-pointer">
+                            {gender.label}
+                          </Label>
+                        </motion.div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                )}
+
+                {/* Step 2: Age */}
+                {step === 2 && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <Input
+                        type="number"
+                        value={formData.age || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const age = value ? parseInt(value, 10) : 0;
+                          setFormData(prev => ({ ...prev, age: isNaN(age) ? 0 : age }));
+                        }}
+                        placeholder="Wiek"
+                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl focus:border-purple-400 focus:ring-purple-200 transition-all duration-300"
+                        min="10"
+                        max="100"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">lat</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Height */}
+                {step === 3 && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <Input
+                        type="number"
+                        value={formData.height || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const height = value ? parseInt(value, 10) : 0;
+                          setFormData(prev => ({ ...prev, height: isNaN(height) ? 0 : height }));
+                        }}
+                        placeholder="Wzrost"
+                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl focus:border-green-400 focus:ring-green-200 transition-all duration-300"
+                        min="100"
+                        max="250"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">cm</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Current Weight */}
+                {step === 4 && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <Input
+                        type="number"
+                        value={formData.weight || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const weight = value ? parseInt(value, 10) : 0;
+                          setFormData(prev => ({ ...prev, weight: isNaN(weight) ? 0 : weight }));
+                        }}
+                        placeholder="Aktualna waga"
+                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl focus:border-blue-400 focus:ring-blue-200 transition-all duration-300"
+                        min="30"
+                        max="300"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">kg</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 5: Goal Weight */}
+                {step === 5 && (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <Input
+                        type="number"
+                        value={formData.goalWeight || ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const goalWeight = value ? parseInt(value, 10) : 0;
+                          setFormData(prev => ({ ...prev, goalWeight: isNaN(goalWeight) ? 0 : goalWeight }));
+                        }}
+                        placeholder="Waga docelowa"
+                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl focus:border-amber-400 focus:ring-amber-200 transition-all duration-300"
+                        min="30"
+                        max="300"
+                      />
+                      <p className="text-sm text-gray-500 mt-2">kg</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 6: Activity Level */}
+                {step === 6 && (
+                  <div className="space-y-6">
+                    {/* Activity Level Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { value: 'sedentary', label: 'Mało aktywny' },
+                        { value: 'light', label: 'Lekko aktywny' },
+                        { value: 'moderate', label: 'Umiarkowany' },
+                        { value: 'active', label: 'Bardzo aktywny' }
+                      ].map((activity) => (
+                        <motion.button
+                          key={activity.value}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
+                          className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                            formData.activityLevel === activity.value
+                              ? 'bg-purple-600 text-white border-purple-600 shadow-lg'
+                              : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'
+                          }`}
+                        >
+                          <div className="font-medium">{activity.label}</div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 7: Profile Picture */}
+                {step === 7 && (
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <div className="mx-auto w-32 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full flex items-center justify-center border-4 border-dashed border-purple-300 mb-4">
+                        {formData.profileImage ? (
+                          <img 
+                            src={URL.createObjectURL(formData.profileImage)} 
+                            alt="Profile" 
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-12 h-12 text-purple-400" />
+                        )}
+                      </div>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFormData(prev => ({ ...prev, profileImage: file }));
+                          }
+                        }}
+                        className="hidden"
+                        id="profile-image"
+                      />
+                      <Label
+                        htmlFor="profile-image"
+                        className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 cursor-pointer transition-colors"
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        Wybierz zdjęcie
+                      </Label>
+                      <p className="text-sm text-gray-500 mt-2">Opcjonalne - możesz pominąć ten krok</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 8: Vision Board - 3 substeps */}
+                {step === 8 && (
+                  <div className="space-y-6">
+                    {/* Vision Board Page Indicators */}
+                    <div className="flex justify-center space-x-2 mb-6">
+                      {[1, 2, 3].map((page) => (
+                        <div
+                          key={page}
+                          className={`w-3 h-3 rounded-full transition-colors ${
+                            visionBoardPage >= page ? 'bg-purple-600' : 'bg-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Page 1: AI-Generated Motivational Content */}
+                    {visionBoardPage === 1 && visionBoardData && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center space-y-6"
+                      >
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                          Twoja wizja
+                        </h2>
+                        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
+                          <p className="text-xl text-gray-800 leading-relaxed font-medium">
+                            {typeof visionBoardData.motivation === 'string' ? visionBoardData.motivation : visionBoardData.motivation?.inspiration || 'Twoja podróż do zdrowszego życia się rozpoczyna!'}
+                          </p>
+                        </div>
+                        <div className="flex justify-center items-center">
+                          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                            <Star className="w-10 h-10 text-white fill-current" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Page 2: Macro Confirmation */}
+                    {visionBoardPage === 2 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center space-y-4"
+                      >
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                          Twój plan żywieniowy
+                        </h2>
+                        <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 border border-green-200">
+                          <div className="text-center mb-4">
+                            <div className="text-2xl font-bold text-green-600 mb-1">
+                              {calculateCalories(formData)} kcal
+                            </div>
+                            <p className="text-sm text-gray-700">dziennie</p>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-blue-600">
+                                {Math.round(calculateCalories(formData) * 0.3 / 4)}g
+                              </div>
+                              <div className="text-xs text-gray-600">Białko</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-orange-600">
+                                {Math.round(calculateCalories(formData) * 0.45 / 4)}g
+                              </div>
+                              <div className="text-xs text-gray-600">Węglowodany</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-lg font-bold text-purple-600">
+                                {Math.round(calculateCalories(formData) * 0.25 / 9)}g
+                              </div>
+                              <div className="text-xs text-gray-600">Tłuszcze</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-center">
+                          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+                            <Target className="w-8 h-8 text-white" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Page 3: Timeline with CTA */}
+                    {visionBoardPage === 3 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center space-y-4"
+                      >
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                          Twoja podróż
+                        </h2>
+                        
+                        {(() => {
+                          const timeline = calculateTimeline();
+                          
+                          return (
+                            <div className="space-y-4">
+                              {formData.weightGoal !== 'maintain' && (
+                                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-200">
+                                  <div className="grid grid-cols-2 gap-4 text-center">
+                                    <div>
+                                      <div className="text-xl font-bold text-orange-600">
+                                        {timeline.weeks}
+                                      </div>
+                                      <div className="text-xs text-gray-600">tygodni</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-xl font-bold text-red-600">
+                                        {timeline.months}
+                                      </div>
+                                      <div className="text-xs text-gray-600">miesięcy</div>
+                                    </div>
+                                  </div>
+                                  <div className="mt-3 pt-3 border-t border-orange-200">
+                                    <p className="text-xs text-gray-700">
+                                      {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/tydzień
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+                              
+                              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200">
+                                <h3 className="text-lg font-bold text-purple-800 mb-2">Rozpocznij teraz!</h3>
+                                <p className="text-sm text-gray-700 mb-3">
+                                  Twój plan jest gotowy
+                                </p>
+                                <div className="flex justify-center">
+                                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                                    <Star className="w-8 h-8 text-white fill-current" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </motion.div>
+                    )}
+
+                    {/* Loading State */}
+                    {visionBoardPage === 0 && (
+                      <div className="text-center space-y-6">
+                        <div className="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center">
+                          <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
+                        </div>
+                        <h2 className="text-2xl font-bold text-gray-800">Tworzenie Twojej tablicy wizji...</h2>
+                        <div className="flex justify-center">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="p-6 pt-0">
+                <div className="flex justify-between items-center">
+                  <Button
+                    variant="ghost"
+                    onClick={handleBack}
+                    disabled={step === 0 || (step === 8 && visionBoardPage === 0)}
+                    className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-6 py-3 rounded-2xl transition-all duration-300"
+                  >
+                    <span className="mr-2 text-lg">←</span>
+                    Wstecz
+                  </Button>
+
+                  <Button
+                    onClick={handleNext}
+                    disabled={isNextDisabled() || mutation.isPending}
+                    className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white px-6 py-4 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap"
+                  >
+                    {mutation.isPending ? (
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Zapisywanie...
+                      </div>
+                    ) : (
+                      step === 8 && visionBoardPage === 3 ? 'Start!' :
+                      step === 8 && visionBoardPage > 0 ? 'Dalej' :
+                      step === 8 && visionBoardPage === 0 ? 'Dalej' :
+                      step === 7 ? 'Dalej' :
+                      'Dalej'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

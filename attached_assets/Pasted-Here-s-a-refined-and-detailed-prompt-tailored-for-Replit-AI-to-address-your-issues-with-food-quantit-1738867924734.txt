@@ -1,0 +1,55 @@
+Here’s a refined and detailed prompt tailored for Replit AI to address your issues with food quantity, size recognition, and macronutrient calculations:
+
+Prompt for Replit AI:
+Analyze the provided image of food items and accurately determine the following details:
+	1.	Food Type Recognition:
+	•	Identify and name the type of food items in the image (e.g., apple, egg, burger).
+	2.	Quantity Detection:
+	•	Count the exact number of items for each identified food type.
+	•	For overlapping or partially obscured items, estimate the quantity using visible features.
+	3.	Size Estimation:
+	•	Determine the size of the food items (e.g., small, medium, large).
+	•	Base the size estimate on visual dimensions compared to standard sizes of the identified food.
+	4.	Calorie Calculation:
+	•	Reference a database of standard calorie values per unit for the identified food type. Examples:
+	•	Medium apple (182g): 95 kcal.
+	•	Large egg (50g): 70 kcal.
+	•	Multiply the base calorie value by the detected quantity.
+	•	Adjust calorie values based on size (e.g., small apple = ~77 kcal, large apple = ~116 kcal).
+	5.	Macronutrient Calculation:
+	•	Use standard macronutrient values for one unit of the identified food to calculate totals:
+	•	Example for a medium apple: 25g carbs, 0.5g protein, 0.3g fat.
+	•	Example for a large egg: 6g protein, 5g fat, <1g carbs.
+	•	Multiply by the detected quantity and adjust for size if necessary.
+	6.	Validation and Error Handling:
+	•	Cross-check the calculated values with typical ranges for the food type.
+	•	If the calculated values are significantly higher or lower than expected, flag the result for review.
+
+Output Format:
+Provide the result in a structured format like this:
+
+Food Type: [Type of Food]  
+Quantity: [Number of Items]  
+Size: [Small/Medium/Large]  
+Calories: [Total Estimated Calories]  
+Macronutrients:  
+   - Carbohydrates: [Value]g  
+   - Proteins: [Value]g  
+   - Fats: [Value]g  
+
+Example Output for 2 Apples:
+
+Food Type: Apple  
+Quantity: 2  
+Size: Medium  
+Calories: 190 (95 kcal per apple × 2)  
+Macronutrients:  
+   - Carbohydrates: 50g  
+   - Proteins: 1g  
+   - Fats: 0.6g  
+
+Additional Notes:
+	•	For composite foods (e.g., burgers), provide calorie and macronutrient estimates for each component and the total.
+	•	Ensure consistency between detected quantity, size, and calculated values.
+
+This prompt ensures Replit AI focuses on accurate food recognition, quantity detection, size scaling, and realistic calorie/macronutrient calculations. Let me know if you’d like any adjustments!

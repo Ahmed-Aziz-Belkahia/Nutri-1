@@ -1,0 +1,42 @@
+Prompt for Replit AI:
+
+Project: Gamified Progress Tracking Page for Diet & Calorie App
+
+Description:
+Create an engaging, visually appealing /progress page that keeps users addicted to improving their diet and nutrition. The system should be gamified—similar to Duolingo—encouraging users to reach higher levels.
+
+Key Features:
+	1.	XP & Level System
+	•	Users earn XP for logging meals, scanning food, staying within their calorie/macro goals, and completing challenges.
+	•	Levels unlock rewards like exclusive recipes, themes, or personalized diet tips.
+	•	Animated level-up effects (confetti, glowing progress bars, fun pop-ups).
+	2.	Daily & Weekly Streaks
+	•	A streak system rewards users for consistency.
+	•	Fire animations for active streaks, and subtle fading effects if the streak is close to breaking.
+	•	Breaks in the streak trigger gentle bouncing reminders to re-engage.
+	3.	Achievements & Badges
+	•	Users earn badges for milestones (e.g., “Logged 7 Days in a Row!”, “First Food Scan!”, “Hit Macro Goals 10x!”).
+	•	Badge unlock animation with a satisfying pop & glow effect when earned.
+	4.	Leaderboards & Social Engagement
+	•	Users can compare progress with friends or the global community.
+	•	Categories include XP earned, best streaks, and challenges completed.
+	•	Smooth leaderboard scrolling & animated rank transitions when moving up or down.
+	5.	Challenges & Missions
+	•	Daily/weekly challenges to keep users engaged (e.g., “Eat 3 Green Vegetables Today!”).
+	•	Completing challenges earns XP and special rewards.
+	•	Mission completion animation (e.g., checkmarks sliding in, celebratory burst effect).
+	6.	Visual Design & Animations:
+	•	Modern, clean UI with playful animations to make progress tracking exciting.
+	•	Soft bounce animations when interacting with buttons or elements.
+	•	Framer Motion (or CSS animations) for smooth transitions & engaging micro-interactions.
+	•	Encouraging notifications and celebrations for achievements.
+	•	Optional mascot animations for motivation, similar to Duolingo’s owl.
+
+Tech Stack (If Needed):
+	•	Frontend: React, Next.js, Tailwind CSS, Framer Motion for animations
+	•	Backend: Firebase or Node.js
+	•	Database: PostgreSQL or MongoDB
+
+Goal:
+
+Make this page so engaging that users are addicted to tracking their diet progress, feel rewarded for every action, and always want to level up! 🚀

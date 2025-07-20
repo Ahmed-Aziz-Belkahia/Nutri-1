@@ -1,0 +1,109 @@
+[Recipe Analysis] Successfully parsed OpenAI response
+[Recipe Analysis] Validating response structure...
+[Recipe Analysis] Validation successful
+[Recipe Analysis] Generated recipes: {
+  "recipes": [
+    {
+      "name": "Tropical Fruit Breakfast Omelet",
+      "ingredients": [
+        "2 eggs",
+        "1/4 cup diced pineapple",
+        "1/4 cup diced bananas",
+        "1/4 cup diced apples",
+        "1 tablespoon mayonnaise",
+        "Lime zest",
+        "Salt and pepper to taste"
+      ],
+      "instructions": [
+        "In a bowl, whisk the eggs with a pinch of salt and pepper until well combined.",
+        "Add a tablespoon of mayonnaise and whisk again until smooth.",
+        "Heat a non-stick skillet over medium heat and pour in the egg mixture.",
+        "Cook the eggs gently, stirring occasionally, until they begin to set.",
+        "Add the pineapple, bananas, and apples evenly over one half of the omelet.",
+        "Fold the opposite half over the fruit, cover the skillet, and let it cook for another minute.",
+        "Remove from heat, sprinkle lime zest on top, and serve warm."
+      ],
+      "cooking_time": "10 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 250,
+        "protein": "10g",
+        "carbs": "30g",
+        "fat": "10g"
+      }
+    },
+    {
+      "name": "Bell Pepper and Broccoli Fruit Salad",
+      "ingredients": [
+        "1 cup chopped broccoli",
+        "1 bell pepper, sliced",
+        "1/2 cup diced pineapple",
+        "1/2 cup diced apples",
+        "Juice of 1 lime",
+        "Salt and pepper to taste"
+      ],
+      "instructions": [
+        "Blanch the broccoli in boiling water for 2 minutes, then transfer to an ice bath to cool.",
+        "In a large bowl, combine the broccoli, bell pepper, pineapple, and apples.",
+        "Drizzle with lime juice and season with salt and pepper.",
+        "Toss gently to combine and serve chilled or at room temperature."
+      ],
+      "cooking_time": "15 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 150,
+        "protein": "4g",
+        "carbs": "35g",
+        "fat": "1g"
+      }
+    },
+    {
+      "name": "Nutella and Lime Fruit Dip",
+      "ingredients": [
+        "1/2 cup Nutella",
+        "Juice of 1 lime",
+        "1/4 cup diced bananas",
+        "1/4 cup diced apples"
+      ],
+      "instructions": [
+        "In a small bowl, combine Nutella with lime juice until smooth.",
+        "Arrange bananas and apples on a serving plate.",
+        "Serve with the Nutella lime dip on the side."
+      ],
+      "cooking_time": "5 minutes",
+      "difficulty_level": "Very Easy",
+      "nutritional_information": {
+        "calories": 200,
+        "protein": "2g",
+        "carbs": "35g",
+        "fat": "8g"
+      }
+    },
+    {
+      "name": "Sweet and Savory Veggie Stir-fry with Nutella Sauce",
+      "ingredients": [
+        "1 bell pepper, sliced",
+        "1 cup broccoli florets",
+        "1/4 cup pineapple, chopped",
+        "2 tablespoons pasta sauce",
+        "2 tablespoons Nutella",
+        "1 tablespoon lime juice",
+        "Salt and pepper to taste"
+      ],
+      "instructions": [
+        "In a medium skillet over medium heat, sauté the bell pepper and broccoli until tender-crisp.",
+        "Add the pineapple and pasta sauce, stirring to combine.",
+        "In a small bowl, mix Nutella with lime juice until smooth and add to the skillet.",
+        "Stir everything together until the sauce is well distributed and everything is heated through.",
+        "Season with salt and pepper, and serve hot."
+      ],
+      "cooking_time": "20 minutes",
+      "difficulty_level": "Medium",
+      "nutritional_information": {
+        "calories": 300,
+        "protein": "5g",
+        "carbs": "40g",
+        "fat": "15g"
+      }
+    }
+  ]

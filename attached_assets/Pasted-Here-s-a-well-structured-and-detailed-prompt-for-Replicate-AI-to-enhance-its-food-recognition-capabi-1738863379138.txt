@@ -1,0 +1,59 @@
+Here’s a well-structured and detailed prompt for Replicate AI to enhance its food recognition capabilities:
+
+Prompt for Replicate AI:
+Analyze the image provided and accurately determine the following details about the food items visible:
+	1.	Food Type Identification:
+	•	Identify and name each type of food in the image (e.g., apple, egg, burger, etc.).
+	2.	Quantity Recognition:
+	•	Count the number of individual food items present. For example:
+	•	If there are multiple items of the same type (e.g., 3 apples), count them accurately.
+	•	If there are multiple components (e.g., a burger with multiple layers), identify them individually.
+	3.	Size Estimation:
+	•	Estimate the size of the food items (e.g., small, medium, large) based on their visual dimensions compared to standard food sizes.
+	4.	Calorie Calculation:
+	•	Calculate the total calorie count for the identified food items by:
+	•	Multiplying the calorie value of one unit of food by the detected quantity.
+	•	Adjusting calorie estimates based on size (e.g., a large apple has more calories than a small apple).
+	5.	Macronutrient Breakdown (Optional):
+	•	If possible, provide an approximate breakdown of macronutrients (carbohydrates, proteins, fats) for the detected food items.
+
+Output Format:
+Provide the result in a structured format like this:
+
+Food Type: [Type of Food]  
+Quantity: [Number of Items]  
+Size: [Small/Medium/Large]  
+Calories: [Estimated Total Calories]  
+Macronutrients (Optional):  
+   - Carbohydrates: [Value]g  
+   - Proteins: [Value]g  
+   - Fats: [Value]g  
+
+Example Output:
+For an image with three apples:
+
+Food Type: Apple  
+Quantity: 3  
+Size: Medium  
+Calories: 285 (95 calories per apple × 3)  
+Macronutrients:  
+   - Carbohydrates: 75g  
+   - Proteins: 1g  
+   - Fats: 0.5g  
+
+For a burger:
+
+Food Type: Burger  
+Quantity: 1  
+Size: Large  
+Calories: 800  
+Macronutrients:  
+   - Carbohydrates: 50g  
+   - Proteins: 35g  
+   - Fats: 45g  
+
+Additional Notes:
+	•	If there is ambiguity in size or quantity, estimate based on typical values and provide a confidence score.
+	•	For composite foods (e.g., a burger with multiple layers), estimate calories and macronutrients for each component and sum them up.
+
+This prompt ensures Replicate AI understands your requirements for detailed food recognition, scaling, and calorie calculations.

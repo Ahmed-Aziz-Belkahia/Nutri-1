@@ -1,0 +1,1043 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+10:39:01 AM [express] Testing database connection...
+✅ Database connection established successfully
+10:39:01 AM [express] ✅ Database connection successful
+10:39:01 AM [express] ✅ Uploads directory created
+10:39:01 AM [express] Development server setup complete
+10:39:01 AM [express] Server running at http://0.0.0.0:5000
+10:39:13 AM [express] Request aborted: GET /src/index.css
+10:39:13 AM [express] Request aborted: GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-KBTYAULA.js
+10:39:13 AM [express] Request aborted: GET /@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js
+10:39:13 AM [express] Request aborted: GET /@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js
+10:39:16 AM [express] GET /api/user 401 in 7ms :: {"error":"Not authenticated"}
+10:39:31 AM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:40:04 AM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:47:14 AM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+10:47:26 AM [express] POST /api/login 200 in 741ms :: {"ok":true}
+10:47:26 AM [express] GET /api/user 304 in 36ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+Fetching meal plan for date: 2025-03-10
+Found meal plan: undefined
+10:47:27 AM [express] GET /api/meal-plans/today 304 in 176ms :: {"hasPlan":false}
+10:47:27 AM [express] GET /api/user 304 in 33ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:47:27 AM [express] GET /api/user/xp 304 in 98ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"xp…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-10T00:00:00.000Z',
+  end: '2025-03-11T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-03-10T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+10:47:27 AM [express] GET /api/food-logs 304 in 103ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  preferredIngredients: [],
+  excludedIngredients: []
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Saved preferences: {
+  id: 3,
+  userId: 3,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  calorieGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  updatedAt: 2025-03-10T10:47:35.164Z
+}
+10:47:35 AM [express] POST /api/user/dietary-preferences 200 in 269ms :: {"id":3,"userId":3,"currentW…
+Received meal plan request with preferences: { maxCookingTime: 60, budgetPreference: 'medium' }
+Using meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+Created recipes for plan: [
+  {
+    id: 43,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:35.642Z,
+    updatedAt: 2025-03-10T10:47:35.642Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 44,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:35.642Z,
+    updatedAt: 2025-03-10T10:47:35.642Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 45,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:35.642Z,
+    updatedAt: 2025-03-10T10:47:35.642Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 16,
+  userId: 3,
+  date: '2025-03-11',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.880Z,
+  updatedAt: 2025-03-10T10:47:35.880Z
+}
+Created recipes for plan: [
+  {
+    id: 48,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:35.926Z,
+    updatedAt: 2025-03-10T10:47:35.926Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 46,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:35.926Z,
+    updatedAt: 2025-03-10T10:47:35.926Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 47,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:35.926Z,
+    updatedAt: 2025-03-10T10:47:35.926Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 17,
+  userId: 3,
+  date: '2025-03-12',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:36.048Z,
+  updatedAt: 2025-03-10T10:47:36.048Z
+}
+Created recipes for plan: [
+  {
+    id: 49,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:36.099Z,
+    updatedAt: 2025-03-10T10:47:36.099Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 50,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:36.099Z,
+    updatedAt: 2025-03-10T10:47:36.099Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 51,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:36.099Z,
+    updatedAt: 2025-03-10T10:47:36.099Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 18,
+  userId: 3,
+  date: '2025-03-13',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:36.275Z,
+  updatedAt: 2025-03-10T10:47:36.275Z
+}
+Created recipes for plan: [
+  {
+    id: 53,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:36.322Z,
+    updatedAt: 2025-03-10T10:47:36.322Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 54,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:36.322Z,
+    updatedAt: 2025-03-10T10:47:36.322Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 52,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:36.322Z,
+    updatedAt: 2025-03-10T10:47:36.322Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 19,
+  userId: 3,
+  date: '2025-03-14',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:36.464Z,
+  updatedAt: 2025-03-10T10:47:36.464Z
+}
+Created recipes for plan: [
+  {
+    id: 55,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:36.516Z,
+    updatedAt: 2025-03-10T10:47:36.516Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 56,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:36.516Z,
+    updatedAt: 2025-03-10T10:47:36.516Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 57,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:36.516Z,
+    updatedAt: 2025-03-10T10:47:36.516Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 20,
+  userId: 3,
+  date: '2025-03-15',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:36.694Z,
+  updatedAt: 2025-03-10T10:47:36.694Z
+}
+Created recipes for plan: [
+  {
+    id: 58,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:36.741Z,
+    updatedAt: 2025-03-10T10:47:36.741Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 60,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:36.741Z,
+    updatedAt: 2025-03-10T10:47:36.741Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 59,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:36.741Z,
+    updatedAt: 2025-03-10T10:47:36.741Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Using meal plan: {
+  id: 21,
+  userId: 3,
+  date: '2025-03-16',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:36.853Z,
+  updatedAt: 2025-03-10T10:47:36.853Z
+}
+Created recipes for plan: [
+  {
+    id: 61,
+    userId: 3,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-10T10:47:36.898Z,
+    updatedAt: 2025-03-10T10:47:36.898Z,
+    imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 62,
+    userId: 3,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-10T10:47:36.898Z,
+    updatedAt: 2025-03-10T10:47:36.898Z,
+    imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 63,
+    userId: 3,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-10T10:47:36.898Z,
+    updatedAt: 2025-03-10T10:47:36.898Z,
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop',
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+10:47:36 AM [express] POST /api/meal-plans 200 in 1499ms :: {"weekStart":"2025-03-10","plans":[{"id":…
+Fetching meal plan for date: 2025-03-10
+Found meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+10:47:37 AM [express] GET /api/meal-plans/today 200 in 127ms :: {"hasPlan":true,"plan":{"id":15,"date…
+10:47:39 AM [express] GET /api/user/xp 304 in 94ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"xp…
+10:47:41 AM [express] GET /api/user/xp 304 in 95ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"xp…
+[Food Recognition] Starting image analysis...
+[Food Recognition] Initializing food analysis...
+[Food Recognition] Received response from OpenAI
+[Food Recognition] Successfully parsed OpenAI response
+[Food Recognition] Validating response structure...
+[Food Recognition] Validation successful
+[Food Recognition] Analysis completed successfully
+Final food recognition result: {
+  ingredients: [
+    {
+      name: 'potatoes',
+      quantity: 3,
+      unit: 'pieces',
+      estimatedWeight: 300,
+      freshness: 'fresh',
+      quality: 'firm and smooth'
+    },
+    {
+      name: 'ground beef',
+      quantity: 200,
+      unit: 'grams',
+      estimatedWeight: 200,
+      freshness: 'fresh',
+      quality: 'lean'
+    },
+    {
+      name: 'red bell pepper',
+      quantity: 1,
+      unit: 'piece',
+      estimatedWeight: 150,
+      freshness: 'fresh',
+      quality: 'crisp'
+    },
+    {
+      name: 'tomato sauce',
+      quantity: 1,
+      unit: 'cup',
+      estimatedWeight: 240,
+      freshness: 'fresh',
+      quality: 'smooth'
+    },
+    {
+      name: 'smoothie',
+      quantity: 1,
+      unit: 'glass',
+      estimatedWeight: 350,
+      freshness: 'fresh',
+      quality: 'creamy'
+    }
+  ],
+  confidence: 0.85,
+  recipes: [
+    {
+      name: 'Beef and Potato Stew',
+      description: 'A hearty stew with ground beef, potatoes, and bell peppers in a tomato sauce.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 15,
+      cookTime: 25,
+      difficulty: 'easy',
+      servings: 4,
+      nutritionInfo: [Object]
+    },
+    {
+      name: 'Berry Smoothie',
+      description: 'A refreshing smoothie made with mixed berries and yogurt.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 5,
+      cookTime: 0,
+      difficulty: 'easy',
+      servings: 1,
+      nutritionInfo: [Object]
+    }
+  ]
+}
+10:48:06 AM [express] POST /api/analyze-food 200 in 19530ms :: {"ingredients":[{"name":"potatoes","qu…
+[Food Logs API] Processing food log request: {
+  userId: 3,
+  name: 'Unknown Food',
+  hasImage: true,
+  hasAnalysis: true,
+  date: '2025-03-10T10:47:45.704Z'
+}
+10:48:07 AM [express] POST /api/food-logs 200 in 616ms :: {"log":{"id":7,"userId":3,"name":"Unknown F…
+[XP Route] Processing XP award request: { action: 'LOG_MEAL', amount: 10, userId: 3 }
+[XP Route] Found user: {
+  id: 3,
+  email: 'John@Mac.com',
+  password: '70975d52df3e75dbe8dd45b41d20a171907477be7c46ceaa0aee53fc98e22810ecece7a260e9e3c32b25d48aeb3e22c49dea62d7e4e2602228dec184a83abba2.82968c73bc23f6562a10ad638a9871ae',
+  hasCompletedOnboarding: false,
+  currentStreak: 0,
+  longestStreak: 0,
+  lastActivityDate: '2025-03-10',
+  experiencePoints: 0,
+  level: 1,
+  profileImage: null
+}
+[XP Route] Same day activity, maintaining streak
+[XP Route] XP/Level calculation: {
+  currentXP: 0,
+  newXP: 10,
+  currentLevel: 1,
+  newLevel: 1,
+  userId: 3,
+  currentStreak: 0,
+  longestStreak: 0
+}
+[XP Route] Successfully updated XP, level, and streak in database
+[XP Route] Sending success response: {
+  amount: 10,
+  message: 'Earned 10 XP for LOG_MEAL!',
+  totalXP: 10,
+  level: 1,
+  currentXPInLevel: 10,
+  xpNeededForNextLevel: 100,
+  streak: 0,
+  longestStreak: 0
+}
+10:48:08 AM [express] POST /api/xp/award 200 in 126ms :: {"amount":10,"message":"Earned 10 XP for LOG…
+10:48:08 AM [express] GET /api/user/xp 200 in 93ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:48:08 AM [express] GET /api/user 200 in 34ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:48:09 AM [express] GET /api/user/xp 304 in 93ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:48:10 AM [express] GET /api/user 304 in 32ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:48:10 AM [express] GET /api/user/xp 304 in 99ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:48:13 AM [express] GET /api/user/xp 304 in 94ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:48:41 AM [vite] hmr update /src/App.tsx, /src/index.css
+10:48:41 AM [vite] hmr update /src/components/TodaysMealPlans.tsx, /src/index.css
+10:48:41 AM [vite] hmr update /src/pages/MealDetail.tsx, /src/index.css, /src/pages/Dashboard.tsx, /src/pages/AddFood.tsx
+10:48:41 AM [vite] hmr update /src/pages/AllMeals.tsx, /src/index.css
+10:48:41 AM [vite] hmr update /src/pages/Dashboard.tsx, /src/index.css
+10:48:41 AM [vite] hmr update /src/pages/MealDetail.tsx, /src/index.css
+10:48:41 AM [vite] hmr update /src/pages/Progress.tsx, /src/index.css
+10:48:41 AM [vite] page reload src/pages/settings/goals.tsx
+10:48:45 AM [express] Request aborted: GET /src/components/TodaysMealPlans.tsx
+10:48:45 AM [express] Request aborted: GET /src/pages/MealDetail.tsx
+10:48:45 AM [express] Request aborted: GET /src/components/TodaysMealPlans.tsx
+10:48:45 AM [express] Request aborted: GET /src/index.css
+10:48:47 AM [express] Request aborted: GET /src/pages/AuthPage.tsx
+10:48:52 AM [express] GET /api/user 200 in 31ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:48:52 AM [express] GET /api/user 304 in 31ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:48:52 AM [express] GET /api/user 304 in 30ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+Fetching meal plan for date: 2025-03-10
+Found meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+10:48:52 AM [express] GET /api/user/xp 200 in 89ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:48:52 AM [express] GET /api/meal-plans/today 200 in 122ms :: {"hasPlan":true,"plan":{"id":15,"date…
+10:48:52 AM [express] GET /api/user 304 in 36ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+Fetching meal plan for date: 2025-03-10
+Found meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+10:48:52 AM [express] GET /api/user/xp 304 in 109ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,…
+10:48:52 AM [express] GET /api/meal-plans/today 304 in 122ms :: {"hasPlan":true,"plan":{"id":15,"date…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-10T00:00:00.000Z',
+  end: '2025-03-11T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-10T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+10:48:52 AM [express] GET /api/food-logs 200 in 209ms :: {"logs":[{"id":7,"userId":3,"name":"Unknown …
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-10T00:00:00.000Z',
+  end: '2025-03-11T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-10T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+10:48:53 AM [express] GET /api/food-logs 200 in 141ms :: {"logs":[{"id":7,"userId":3,"name":"Unknown …
+10:48:56 AM [express] GET /api/user/xp 304 in 92ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+[Food Recognition] Starting image analysis...
+[Food Recognition] Initializing food analysis...
+[Food Recognition] Received response from OpenAI
+[Food Recognition] Successfully parsed OpenAI response
+[Food Recognition] Validating response structure...
+[Food Recognition] Validation successful
+[Food Recognition] Analysis completed successfully
+Final food recognition result: {
+  ingredients: [
+    {
+      name: 'potatoes',
+      quantity: 3,
+      unit: 'pieces',
+      estimatedWeight: 300,
+      freshness: 'fresh',
+      quality: 'firm and well-cooked'
+    },
+    {
+      name: 'ground beef',
+      quantity: 200,
+      unit: 'grams',
+      estimatedWeight: 200,
+      freshness: 'fresh',
+      quality: 'well-cooked'
+    },
+    {
+      name: 'red bell pepper',
+      quantity: 1,
+      unit: 'piece',
+      estimatedWeight: 150,
+      freshness: 'fresh',
+      quality: 'crisp and vibrant'
+    },
+    {
+      name: 'tomato sauce',
+      quantity: 1,
+      unit: 'cup',
+      estimatedWeight: 240,
+      freshness: 'fresh',
+      quality: 'smooth and rich'
+    },
+    {
+      name: 'smoothie',
+      quantity: 1,
+      unit: 'glass',
+      estimatedWeight: 300,
+      freshness: 'fresh',
+      quality: 'creamy and fruity'
+    }
+  ],
+  confidence: 0.85,
+  recipes: [
+    {
+      name: 'Beef and Potato Stew',
+      description: 'A hearty stew with tender potatoes and savory ground beef.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 15,
+      cookTime: 30,
+      difficulty: 'medium',
+      servings: 4,
+      nutritionInfo: [Object]
+    },
+    {
+      name: 'Berry Smoothie',
+      description: 'A refreshing and creamy berry smoothie.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 5,
+      cookTime: 0,
+      difficulty: 'easy',
+      servings: 1,
+      nutritionInfo: [Object]
+    }
+  ]
+}
+10:49:09 AM [express] POST /api/analyze-food 200 in 10137ms :: {"ingredients":[{"name":"potatoes","qu…
+[Food Logs API] Processing food log request: {
+  userId: 3,
+  name: undefined,
+  hasImage: true,
+  hasAnalysis: false,
+  date: '2025-03-10T10:48:58.940Z'
+}
+10:49:10 AM [express] POST /api/food-logs 400 in 183ms :: {"error":"Missing required fields","message…
+10:49:45 AM [vite] hmr update /src/App.tsx, /src/index.css
+10:49:45 AM [vite] page reload src/components/ActionButtons.tsx
+10:49:45 AM [vite] page reload src/components/RecipeScanner.tsx
+10:49:45 AM [vite] page reload src/components/ScanningTutorial.tsx
+10:49:45 AM [vite] hmr update /src/index.css, /src/pages/Dashboard.tsx
+10:49:45 AM [vite] hmr update /src/components/TodaysMealPlans.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/MealDetail.tsx, /src/index.css, /src/pages/Dashboard.tsx, /src/pages/AddFood.tsx
+10:49:45 AM [vite] hmr update /src/index.css, /src/pages/Progress.tsx
+10:49:45 AM [vite] hmr update /src/pages/AddFood.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/AllMeals.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/Dashboard.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/MealDetail.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/Progress.tsx, /src/index.css
+10:49:45 AM [vite] hmr update /src/pages/RecipeScanner.tsx, /src/index.css
+10:49:45 AM [vite] page reload src/pages/RecipeSuggestions.tsx
+10:49:45 AM [vite] hmr update /src/pages/settings/goals.tsx, /src/index.css
+10:49:47 AM [express] Request aborted: GET /src/components/TodaysMealPlans.tsx
+10:49:52 AM [express] GET /api/user 304 in 31ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:49:52 AM [express] GET /api/user 304 in 33ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+10:49:52 AM [express] GET /api/user/xp 304 in 95ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-10T00:00:00.000Z',
+  end: '2025-03-11T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-10T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+10:49:53 AM [express] GET /api/food-logs 304 in 201ms :: {"logs":[{"id":7,"userId":3,"name":"Unknown …
+Fetching meal plan for date: 2025-03-10
+10:49:55 AM [express] GET /api/user 304 in 30ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+Found meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+10:49:55 AM [express] GET /api/user/xp 304 in 90ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+10:49:55 AM [express] GET /api/meal-plans/today 304 in 126ms :: {"hasPlan":true,"plan":{"id":15,"date…
+10:49:55 AM [express] GET /api/user 304 in 31ms :: {"id":3,"email":"John@Mac.com","password":"70975d5…
+Fetching meal plan for date: 2025-03-10
+Found meal plan: {
+  id: 15,
+  userId: 3,
+  date: '2025-03-10',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-10T10:47:35.586Z,
+  updatedAt: 2025-03-10T10:47:35.586Z
+}
+10:49:55 AM [express] GET /api/meal-plans/today 304 in 127ms :: {"hasPlan":true,"plan":{"id":15,"date…
+10:49:55 AM [express] GET /api/user/xp 304 in 94ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,"…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-10T00:00:00.000Z',
+  end: '2025-03-11T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-10T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+10:49:56 AM [express] GET /api/food-logs 304 in 201ms :: {"logs":[{"id":7,"userId":3,"name":"Unknown …
+10:50:02 AM [express] GET /api/user/xp 304 in 229ms :: {"totalXP":10,"level":1,"currentXPInLevel":10,…
+[Food Recognition] Starting image analysis...
+[Food Recognition] Initializing food analysis...
+[Food Recognition] Received response from OpenAI
+[Food Recognition] Successfully parsed OpenAI response
+[Food Recognition] Validating response structure...
+[Food Recognition] Validation successful
+[Food Recognition] Analysis completed successfully
+Final food recognition result: {
+  ingredients: [
+    {
+      name: 'potatoes',
+      quantity: 3,
+      unit: 'pieces',
+      estimatedWeight: 300,
+      freshness: 'fresh',
+      quality: 'firm and well-cooked'
+    },
+    {
+      name: 'ground beef',
+      quantity: 200,
+      unit: 'grams',
+      estimatedWeight: 200,
+      freshness: 'fresh',
+      quality: 'well-cooked'
+    },
+    {
+      name: 'red bell pepper',
+      quantity: 1,
+      unit: 'piece',
+      estimatedWeight: 150,
+      freshness: 'fresh',
+      quality: 'crisp and vibrant'
+    },
+    {
+      name: 'tomato sauce',
+      quantity: 1,
+      unit: 'cup',
+      estimatedWeight: 240,
+      freshness: 'fresh',
+      quality: 'smooth and rich'
+    },
+    {
+      name: 'smoothie',
+      quantity: 1,
+      unit: 'glass',
+      estimatedWeight: 350,
+      freshness: 'fresh',
+      quality: 'creamy and fruity'
+    }
+  ],
+  confidence: 0.85,
+  recipes: [
+    {
+      name: 'Beef and Potato Stew',
+      description: 'A hearty stew with tender potatoes and savory ground beef.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 15,
+      cookTime: 25,
+      difficulty: 'easy',
+      servings: 4,
+      nutritionInfo: [Object]
+    },
+    {
+      name: 'Berry Smoothie',
+      description: 'A refreshing and creamy berry smoothie.',
+      ingredients: [Array],
+      instructions: [Array],
+      prepTime: 5,
+      cookTime: 0,
+      difficulty: 'easy',
+      servings: 1,
+      nutritionInfo: [Object]
+    }
+  ]
+}
+10:50:18 AM [express] POST /api/analyze-food 200 in 13641ms :: {"ingredients":[{"name":"potatoes","qu…
+[Food Logs API] Processing food log request: {
+  userId: 3,
+  name: undefined,
+  hasImage: true,
+  hasAnalysis: false,
+  date: '2025-03-10T10:50:04.300Z'
+}

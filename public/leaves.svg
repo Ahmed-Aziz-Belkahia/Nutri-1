@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
+  <!-- Small Leaf 1 -->
+  <path d="M30,30 C50,10 80,15 90,40 C95,55 85,70 65,75 C40,80 20,65 15,45 C12,30 15,40 30,30 Z" fill="#2ecc71" fill-opacity="0.8" />
+  
+  <!-- Small Leaf 2 -->
+  <path d="M80,50 C100,35 125,40 135,60 C140,75 130,90 110,95 C85,100 65,85 60,65 C57,50 65,60 80,50 Z" fill="#27ae60" fill-opacity="0.7" />
+  
+  <!-- Small Leaf 3 -->
+  <path d="M40,80 C55,65 75,70 82,85 C85,95 78,105 65,108 C48,112 35,100 32,85 C30,75 30,90 40,80 Z" fill="#2ecc71" fill-opacity="0.9" />
+  
+  <!-- Stem 1 -->
+  <path d="M50,40 C60,60 70,80 80,100" stroke="#27ae60" stroke-width="2" fill="none" />
+  
+  <!-- Stem 2 -->
+  <path d="M90,70 C100,85 110,100 120,115" stroke="#27ae60" stroke-width="2" fill="none" />
+  
+  <!-- Small Leaf 4 -->
+  <path d="M120,90 C135,75 155,80 162,95 C165,105 158,115 145,118 C128,122 115,110 112,95 C110,85 110,100 120,90 Z" fill="#2ecc71" fill-opacity="0.8" />
+</svg>

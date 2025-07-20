@@ -1,0 +1,95 @@
+
+[Food Logs API] Processing image analysis
+[Food Recognition] Starting image analysis...
+[Food Recognition] Valid base64 image data verified, size: 105.2 KB
+[Food Recognition] Using format jpeg for OpenAI analysis
+[Food Recognition] Starting image analysis with format: jpeg...
+[Food Recognition] Received response from OpenAI
+[Food Recognition] Successfully parsed OpenAI response
+[Food Recognition] Validating response structure...
+[Food Recognition] Validation successful
+[Food Recognition] Analysis result: {
+  "name": "Snack with soda and chocolate bar",
+  "calories": 450,
+  "protein": 5,
+  "carbs": 60,
+  "fat": 20,
+  "confidence": 0.9,
+  "components": [
+    {
+      "name": "Coca-Cola can",
+      "calories": 140,
+      "protein": 0,
+      "carbs": 39,
+      "fat": 0,
+      "servingSize": "355 ml",
+      "quantity": 1,
+      "details": {
+        "type": "Beverage",
+        "preparation": "Carbonated",
+        "texture": "Liquid",
+        "color": "Dark brown",
+        "estimatedWeight": "355 grams",
+        "cookingMethod": "None",
+        "doneness": "N/A",
+        "temperature": "Cold",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Served in a can"
+      }
+    },
+    {
+      "name": "Kinder Bueno White",
+      "calories": 310,
+      "protein": 5,
+      "carbs": 21,
+      "fat": 20,
+      "servingSize": "39 grams",
+      "quantity": 1,
+      "details": {
+        "type": "Chocolate bar",
+        "preparation": "Packaged",
+        "texture": "Creamy and crunchy",
+        "color": "White and brown",
+        "estimatedWeight": "39 grams",
+        "cookingMethod": "None",
+        "doneness": "N/A",
+        "temperature": "Room temperature",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Individually wrapped"
+      }
+    }
+  ]
+}
+[Food Logs API] Image analysis completed: { componentsFound: 2 }
+[Food Logs API] Using analyzed components: {
+  count: 2,
+  totals: { totalCalories: 450, totalProtein: 5, totalCarbs: 60, totalFat: 20 }
+}
+[Food Logs API] Inserting food log into database: { userId: 4, name: 'Banana', componentsCount: 2 }
+[Food Logs API] Food log inserted successfully: { logId: 8, date: 2025-04-19T12:00:00.000Z }
+[Food Logs API] Fetching daily totals for range: { start: '2025-04-19T00:00:00.000Z', end: '2025-04-20T00:00:00.000Z' }
+[Food Logs API] Retrieved day logs: { count: 3 }
+[Food Logs API] Calculated daily totals: { calories: 1700, protein: 40, carbs: 220, fat: 65 }
+[Food Logs API] Sending response: {
+  logId: 8,
+  componentsCount: 2,
+  totals: { calories: 1700, protein: 40, carbs: 220, fat: 65 }
+}
+12:51:42 PM [express] POST /api/food-logs 200 in 9190ms :: {"log":{"id":8,"userId":4,"name":"Banana",…
+12:51:51 PM [express] GET /api/recipes/8 404 in 420ms :: {"error":"Recipe not found"}
+12:51:52 PM [express] GET /api/recipes/8 404 in 183ms :: {"error":"Recipe not found"}
+[Food Logs API] Processing food log request: { userId: 4, name: 'Banana', hasImage: true, hasComponents: false }
+[Food Logs API] Using log date: {
+  original: '2025-04-19T12:51:59.097Z',
+  normalized: '2025-04-19T12:00:00.000Z',
+  dateString: '2025-04-19'
+}
+[Food Logs API] Processing image analysis
+[Food Recognition] Starting image analysis...
+[Food Recognition] Valid base64 image data verified, size: 48.7 KB

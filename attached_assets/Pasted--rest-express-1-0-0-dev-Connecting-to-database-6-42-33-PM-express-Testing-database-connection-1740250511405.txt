@@ -1,0 +1,178 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+6:42:33 PM [express] Testing database connection...
+6:42:36 PM [express] ✅ Database connection successful
+✅ Database connection established successfully
+6:42:38 PM [express] ✅ Database schema updated
+6:42:38 PM [express] ✅ Uploads directory created
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+6:42:38 PM [express] Development server setup complete
+6:42:38 PM [express] Server running at http://0.0.0.0:5000
+[Auth] User check request, authenticated: false
+6:42:41 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+6:42:48 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+6:42:48 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+6:54:27 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+6:54:27 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] Processing login request...
+[Auth] Attempting login for: piotrekster1998@gmail.com
+[Auth] Login successful for: piotrekster1998@gmail.com
+[Auth] Serializing user: 1
+[Auth] Login successful for user: 1
+6:54:37 PM [express] POST /api/login 200 in 1111ms :: {"ok":true}
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] User check request, authenticated: true
+6:54:37 PM [express] GET /api/user 304 in 27ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-02-22T00:00:00.000Z',
+  end: '2025-02-23T00:00:00.000Z'
+}
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:38 PM [express] GET /api/user/xp 304 in 112ms :: {"totalXP":190,"level":2,"currentXPInLevel":90…
+[Food Logs API] Retrieved logs: { count: 6, date: '2025-02-22T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 2780, protein: 86, carbs: 405, fat: 96 }
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:40 PM [express] GET /api/user/xp 304 in 48ms :: {"totalXP":190,"level":2,"currentXPInLevel":90,…
+6:54:41 PM [express] GET /api/food-logs 200 in 3820ms :: {"logs":[{"id":19,"userId":1,"name":"Fruit …
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:41 PM [express] GET /api/recipes 200 in 63ms :: [{"id":12,"userId":1,"name":"Salmon with Quinoa…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:41 PM [express] GET /api/user/xp 304 in 50ms :: {"totalXP":190,"level":2,"currentXPInLevel":90,…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:41 PM [express] GET /api/recipes/top 200 in 49ms :: [{"id":1,"userId":1,"name":"Grilled Chicken…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  preferredIngredients: [],
+  excludedIngredients: []
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Saved preferences: {
+  id: 23,
+  userId: 1,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  calorieGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  updatedAt: 2025-02-22T18:54:44.682Z
+}
+6:54:44 PM [express] POST /api/user/dietary-preferences 200 in 60ms :: {"id":23,"userId":1,"currentW…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:44 PM [express] POST /api/recipes 200 in 51ms :: {"id":13,"userId":1,"name":"Healthy Breakfast …
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:45 PM [express] POST /api/recipes 200 in 52ms :: {"id":14,"userId":1,"name":"Grilled Chicken Sa…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:45 PM [express] POST /api/recipes 200 in 97ms :: {"id":15,"userId":1,"name":"Salmon with Quinoa…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Meal Plan API] Creating meal plan with recipes: [
+  {
+    id: 13,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: null,
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: '2025-02-22T18:54:44.907Z',
+    updatedAt: '2025-02-22T18:54:44.907Z',
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    mealType: 'breakfast',
+    servingSize: 1
+  },
+  {
+    id: 14,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: null,
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: '2025-02-22T18:54:45.131Z',
+    updatedAt: '2025-02-22T18:54:45.131Z',
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    mealType: 'lunch',
+    servingSize: 1
+  },
+  {
+    id: 15,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: null,
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: '2025-02-22T18:54:45.396Z',
+    updatedAt: '2025-02-22T18:54:45.396Z',
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    mealType: 'dinner',
+    servingSize: 1
+  }
+]
+[Meal Plan API] Created meal plan: {
+  id: 19,
+  userId: 1,
+  date: '2025-02-22',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-02-22T18:54:45.611Z,
+  updatedAt: 2025-02-22T18:54:45.611Z
+}
+[Meal Plan API] Adding recipe to meal plan: { mealPlanId: 19, recipeId: 13, mealType: 'breakfast', servingSize: 1 }
+[Meal Plan API] Adding recipe to meal plan: { mealPlanId: 19, recipeId: 14, mealType: 'lunch', servingSize: 1 }
+[Meal Plan API] Adding recipe to meal plan: { mealPlanId: 19, recipeId: 15, mealType: 'dinner', servingSize: 1 }
+[Meal Plan API] Successfully created meal plan with recipes
+6:54:45 PM [express] POST /api/meal-plans 200 in 131ms :: {"id":19,"userId":1,"date":"2025-02-22","t…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+6:54:45 PM [express] GET /api/meal-plans 200 in 75ms :: {"id":3,"date":"2025-02-22","totalCalories":…

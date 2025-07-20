@@ -1,0 +1,50 @@
+The error message "Unexpected token '<', "<!DOCTYPE "... is not valid JSON" typically occurs when a web application expects a JSON response from an API, but instead receives an HTML document. This often happens when the server encounters an error (like a 404 Not Found or 500 Internal Server Error) and returns an HTML error page instead of the expected JSON payload.
+
+Here's how you can address this issue:
+
+### Steps to Diagnose and Fix the Issue
+
+1. **Check API Endpoint:**
+   - Verify that the API endpoint URL you're calling when trying to add new food is correct.
+   - Ensure you're sending the request to the right environment (development, staging, production).
+
+2. **Inspect Request and Response:**
+   - Use the browser's developer tools (usually accessible with `F12`) to inspect the network requests.
+   - Look at the request headers to ensure they're set correctly, particularly the `Content-Type` and `Accept` headers if you're expecting JSON.
+   - Check the response status code. A status code in the 400s or 500s indicates an error on the client or server side, respectively.
+
+3. **Server Logs:**
+   - If you have access to server logs, check them for any errors or issues related to the request. This can provide insights if there's a server-side problem.
+
+4. **Handle HTML Responses:**
+   - If your app can receive HTML instead of JSON, implement error handling to gracefully fail and provide informative feedback to the user.
+
+5. **Review Server Configuration:**
+   - Ensure that your server is configured to handle requests correctly and to return JSON responses.
+   - If the server should return JSON but is returning HTML, check the server-side code for error handling and API endpoint code paths.
+
+6. **Error Handling:**
+   - Improve the error handling in your client-side code to capture and log unexpected responses:
+
+   ```javascript
+   fetch('your-api-endpoint', options)
+     .then(response => {
+       if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+       }
+       return response.json();
+     })
+     .then(data => {
+       // Process your JSON data here
+     })
+     .catch(error => {
+       console.error('There was an error!', error);
+     });
+   ```
+
+### Additional Considerations
+
+- **Cross-Origin Resource Sharing (CORS):** Check if CORS might be affecting the request if your API is hosted on a different domain.
+- **API Documentation:** Review any API documentation to ensure your request conforms to expected input formats, endpoints, and authentication procedures.
+
+By following these steps, you can identify why the server is returning an HTML document instead of the expected JSON, and adjust your application or server configuration accordingly to troubleshoot the error. If additional information about server configurations or responses is needed, please provide those details

@@ -1,0 +1,228 @@
+import { Express } from "express";
+import { db } from "@db";
+import {
+  mealPlans,
+  recipes,
+  recipesInMealPlan
+} from "@db/schema";
+import { eq, desc, and } from "drizzle-orm";
+
+// Export function to register meal plan routes
+export function registerMealPlanRoutes(app: Express) {
+  // Get today's meal plan - This endpoint must be defined before the :date route
+  app.get("/api/meal-plans/today", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      console.log('Fetching meal plan for today');
+      console.log('User ID:', req.user.id);
+      
+      // Get today's date in YYYY-MM-DD format
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      
+      // Get the meal plan for today
+      const todayPlan = await db
+        .select({
+          id: mealPlans.id,
+          date: mealPlans.date,
+          totalCalories: mealPlans.totalCalories,
+          status: mealPlans.status,
+          createdAt: mealPlans.createdAt,
+          updatedAt: mealPlans.updatedAt
+        })
+        .from(mealPlans)
+        .where(
+          and(
+            eq(mealPlans.userId, req.user.id),
+            eq(mealPlans.date, todayStr)
+          )
+        )
+        .orderBy(desc(mealPlans.createdAt))
+        .limit(1);
+      
+      if (!todayPlan.length) {
+        console.log(`No meal plan found for today (${todayStr})`);
+        return res.json({ hasPlan: false });
+      }
+      
+      console.log(`Found meal plan with ID: ${todayPlan[0].id} for today (${todayStr})`);
+      
+      // Get associated recipes for today's meal plan
+      const mealRecipes = await db
+        .select({
+          id: recipes.id,
+          name: recipes.name,
+          mealType: recipesInMealPlan.mealType,
+          order: recipesInMealPlan.order,
+          servingSize: recipesInMealPlan.servingSize,
+          isFrozen: recipesInMealPlan.isFrozen,
+          isCompleted: recipesInMealPlan.isCompleted,
+          nutritionInfo: recipes.nutritionInfo,
+          instructions: recipes.instructions,
+          ingredients: recipes.ingredients,
+          imageUrl: recipes.imageUrl
+        })
+        .from(recipesInMealPlan)
+        .innerJoin(recipes, eq(recipes.id, recipesInMealPlan.recipeId))
+        .where(eq(recipesInMealPlan.mealPlanId, todayPlan[0].id))
+        .orderBy(recipesInMealPlan.order);
+      
+      // Log the number of recipes found
+      console.log(`Found ${mealRecipes.length} recipes for meal plan ID ${todayPlan[0].id}`);
+      
+      // Return the meal plan with meals
+      return res.json({
+        hasPlan: true,
+        plan: {
+          ...todayPlan[0],
+          meals: mealRecipes
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching meal plan for today:', error);
+      res.status(500).json({ error: 'Failed to fetch meal plan' });
+    }
+  });
+
+  // Get meal plan by specific date - This endpoint handles date-specific meal plan requests
+  app.get("/api/meal-plans/:date", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const dateRequested = req.params.date;
+      console.log('Fetching meal plan for date:', dateRequested);
+      console.log('User ID:', req.user.id);
+      
+      // Special handling for "all" which should return all meal plans
+      if (dateRequested === 'all') {
+        // Get all meal plans for the user
+        const allUserMealPlans = await db
+          .select({
+            id: mealPlans.id,
+            date: mealPlans.date,
+            totalCalories: mealPlans.totalCalories,
+            status: mealPlans.status,
+            createdAt: mealPlans.createdAt,
+            updatedAt: mealPlans.updatedAt
+          })
+          .from(mealPlans)
+          .where(eq(mealPlans.userId, req.user.id))
+          .orderBy(mealPlans.date);
+          
+        if (allUserMealPlans.length === 0) {
+          return res.json({ 
+            weekStart: new Date().toISOString().split('T')[0],
+            plans: [] 
+          });
+        }
+        
+        // Store plans with their associated recipes
+        const plans = [];
+        
+        // Process each plan to get its recipes
+        for (const plan of allUserMealPlans) {
+          const mealRecipes = await db
+            .select({
+              id: recipes.id,
+              name: recipes.name,
+              mealType: recipesInMealPlan.mealType,
+              order: recipesInMealPlan.order,
+              servingSize: recipesInMealPlan.servingSize,
+              isFrozen: recipesInMealPlan.isFrozen,
+              isCompleted: recipesInMealPlan.isCompleted,
+              nutritionInfo: recipes.nutritionInfo,
+              instructions: recipes.instructions,
+              ingredients: recipes.ingredients,
+              imageUrl: recipes.imageUrl
+            })
+            .from(recipesInMealPlan)
+            .innerJoin(recipes, eq(recipes.id, recipesInMealPlan.recipeId))
+            .where(eq(recipesInMealPlan.mealPlanId, plan.id))
+            .orderBy(recipesInMealPlan.order);
+            
+          plans.push({
+            ...plan,
+            meals: mealRecipes
+          });
+        }
+        
+        // Find the start of the week for the first plan
+        const firstPlanDate = new Date(plans[0].date);
+        const weekStart = new Date(firstPlanDate);
+        weekStart.setDate(firstPlanDate.getDate() - firstPlanDate.getDay()); // Go back to previous Sunday
+        
+        return res.json({
+          weekStart: weekStart.toISOString().split('T')[0],
+          plans
+        });
+      }
+      
+      // For specific date, handle as before
+      const datePlan = await db
+        .select({
+          id: mealPlans.id,
+          date: mealPlans.date,
+          totalCalories: mealPlans.totalCalories,
+          status: mealPlans.status,
+          createdAt: mealPlans.createdAt,
+          updatedAt: mealPlans.updatedAt
+        })
+        .from(mealPlans)
+        .where(
+          and(
+            eq(mealPlans.userId, req.user.id),
+            eq(mealPlans.date, dateRequested)
+          )
+        )
+        .orderBy(desc(mealPlans.createdAt))
+        .limit(1);
+      
+      if (!datePlan.length) {
+        console.log(`No meal plan found for date ${dateRequested}`);
+        return res.json({ hasPlan: false });
+      }
+      
+      console.log(`Found meal plan with ID: ${datePlan[0].id} for date ${dateRequested}`);
+      
+      // Get associated recipes for this date's meal plan
+      const mealRecipes = await db
+        .select({
+          id: recipes.id,
+          name: recipes.name,
+          mealType: recipesInMealPlan.mealType,
+          order: recipesInMealPlan.order,
+          servingSize: recipesInMealPlan.servingSize,
+          isFrozen: recipesInMealPlan.isFrozen,
+          isCompleted: recipesInMealPlan.isCompleted,
+          nutritionInfo: recipes.nutritionInfo,
+          instructions: recipes.instructions,
+          ingredients: recipes.ingredients,
+          imageUrl: recipes.imageUrl
+        })
+        .from(recipesInMealPlan)
+        .innerJoin(recipes, eq(recipes.id, recipesInMealPlan.recipeId))
+        .where(eq(recipesInMealPlan.mealPlanId, datePlan[0].id))
+        .orderBy(recipesInMealPlan.order);
+
+      // Log the number of recipes found
+      console.log(`Found ${mealRecipes.length} recipes for meal plan ID ${datePlan[0].id}`);
+      
+      // Return the meal plan with meals
+      return res.json({
+        hasPlan: true,
+        plan: {
+          ...datePlan[0],
+          meals: mealRecipes
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching meal plan by date:', error);
+      res.status(500).json({ error: 'Failed to fetch meal plan' });
+    }
+  });
+}

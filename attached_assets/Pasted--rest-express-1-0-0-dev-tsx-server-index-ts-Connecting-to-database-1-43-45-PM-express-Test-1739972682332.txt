@@ -1,0 +1,193 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+1:43:45 PM [express] Testing database connection...
+✅ Database connection established successfully
+1:43:45 PM [express] ✅ Database connection successful
+1:43:45 PM [express] ✅ Database schema updated
+1:43:45 PM [express] ✅ Uploads directory created
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+Re-optimizing dependencies because lockfile has changed
+1:43:45 PM [express] Development server setup complete
+1:43:45 PM [express] Server running at http://0.0.0.0:5000
+[Auth] User check request, authenticated: false
+1:43:52 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+1:43:57 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+[Auth] Processing login request...
+[Auth] Attempting login for: piotrekster1998@gmail.com
+[Auth] Login successful for: piotrekster1998@gmail.com
+[Auth] Serializing user: 1
+[Auth] Login successful for user: 1
+1:44:08 PM [express] POST /api/login 200 in 131ms :: {"ok":true}
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] User check request, authenticated: true
+1:44:08 PM [express] GET /api/user 304 in 27ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-02-19T00:00:00.000Z',
+  end: '2025-02-20T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-02-19T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+1:44:09 PM [express] GET /api/food-logs 304 in 98ms :: {"logs":[],"totals":{"calories":0,"protein":0…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+1:44:09 PM [express] GET /api/user/xp 304 in 53ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"xp…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+1:44:13 PM [express] GET /api/user/xp 304 in 139ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Food Recognition] Starting image analysis...
+[Food Recognition] Initializing food analysis...
+[Food Recognition] Analysis error: BadRequestError: 400 'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.
+    at Function.generate (/home/runner/workspace/node_modules/openai/src/error.ts:72:14)
+    at OpenAI.makeStatusError (/home/runner/workspace/node_modules/openai/src/core.ts:443:21)
+    at OpenAI.makeRequest (/home/runner/workspace/node_modules/openai/src/core.ts:507:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:79:22)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:179:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22) {
+  status: 400,
+  headers: {
+    'access-control-expose-headers': 'X-Request-ID',
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '9146b0f60d51a242-ORD',
+    connection: 'keep-alive',
+    'content-length': '219',
+    'content-type': 'application/json',
+    date: 'Wed, 19 Feb 2025 13:44:23 GMT',
+    'openai-organization': 'user-4510sxydrsm8aoghlcanpbrc',
+    'openai-processing-ms': '174',
+    'openai-version': '2020-10-01',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=YIYBK1uwJ0zJEUAxGUaMt4fVWpDGdYJluS0imSPSOCA-1739972663-1.0.1.1-bUChPKHFJ1je0fm.ghHaPlPqxB4XLG.A2onrsL4fLVwADJXsTRhUEfYhLlJGfH4OeTid9KmmgX8VYMoFWFq6Cw; path=/; expires=Wed, 19-Feb-25 14:14:23 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=TgH_4YTP_iluSPMzTl66GjaI8_d2bcZ6d77qPF3.EGc-1739972663070-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'x-content-type-options': 'nosniff',
+    'x-ratelimit-limit-input-images': '50000',
+    'x-ratelimit-limit-requests': '500',
+    'x-ratelimit-limit-tokens': '30000',
+    'x-ratelimit-remaining-input-images': '49999',
+    'x-ratelimit-remaining-requests': '499',
+    'x-ratelimit-remaining-tokens': '24935',
+    'x-ratelimit-reset-input-images': '1ms',
+    'x-ratelimit-reset-requests': '120ms',
+    'x-ratelimit-reset-tokens': '10.13s',
+    'x-request-id': 'req_de1c298099f79d44c595bceb4fc06274'
+  },
+  request_id: 'req_de1c298099f79d44c595bceb4fc06274',
+  error: {
+    message: "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+    type: 'invalid_request_error',
+    param: 'messages',
+    code: null
+  },
+  code: null,
+  param: 'messages',
+  type: 'invalid_request_error'
+}
+[Food Recognition] Error: BadRequestError: 400 'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.
+    at Function.generate (/home/runner/workspace/node_modules/openai/src/error.ts:72:14)
+    at OpenAI.makeStatusError (/home/runner/workspace/node_modules/openai/src/core.ts:443:21)
+    at OpenAI.makeRequest (/home/runner/workspace/node_modules/openai/src/core.ts:507:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:79:22)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:179:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22) {
+  status: 400,
+  headers: {
+    'access-control-expose-headers': 'X-Request-ID',
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '9146b0f60d51a242-ORD',
+    connection: 'keep-alive',
+    'content-length': '219',
+    'content-type': 'application/json',
+    date: 'Wed, 19 Feb 2025 13:44:23 GMT',
+    'openai-organization': 'user-4510sxydrsm8aoghlcanpbrc',
+    'openai-processing-ms': '174',
+    'openai-version': '2020-10-01',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=YIYBK1uwJ0zJEUAxGUaMt4fVWpDGdYJluS0imSPSOCA-1739972663-1.0.1.1-bUChPKHFJ1je0fm.ghHaPlPqxB4XLG.A2onrsL4fLVwADJXsTRhUEfYhLlJGfH4OeTid9KmmgX8VYMoFWFq6Cw; path=/; expires=Wed, 19-Feb-25 14:14:23 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=TgH_4YTP_iluSPMzTl66GjaI8_d2bcZ6d77qPF3.EGc-1739972663070-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'x-content-type-options': 'nosniff',
+    'x-ratelimit-limit-input-images': '50000',
+    'x-ratelimit-limit-requests': '500',
+    'x-ratelimit-limit-tokens': '30000',
+    'x-ratelimit-remaining-input-images': '49999',
+    'x-ratelimit-remaining-requests': '499',
+    'x-ratelimit-remaining-tokens': '24935',
+    'x-ratelimit-reset-input-images': '1ms',
+    'x-ratelimit-reset-requests': '120ms',
+    'x-ratelimit-reset-tokens': '10.13s',
+    'x-request-id': 'req_de1c298099f79d44c595bceb4fc06274'
+  },
+  request_id: 'req_de1c298099f79d44c595bceb4fc06274',
+  error: {
+    message: "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+    type: 'invalid_request_error',
+    param: 'messages',
+    code: null
+  },
+  code: null,
+  param: 'messages',
+  type: 'invalid_request_error'
+}
+Food analysis error: BadRequestError: 400 'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.
+    at Function.generate (/home/runner/workspace/node_modules/openai/src/error.ts:72:14)
+    at OpenAI.makeStatusError (/home/runner/workspace/node_modules/openai/src/core.ts:443:21)
+    at OpenAI.makeRequest (/home/runner/workspace/node_modules/openai/src/core.ts:507:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:79:22)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:179:20)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22) {
+  status: 400,
+  headers: {
+    'access-control-expose-headers': 'X-Request-ID',
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '9146b0f60d51a242-ORD',
+    connection: 'keep-alive',
+    'content-length': '219',
+    'content-type': 'application/json',
+    date: 'Wed, 19 Feb 2025 13:44:23 GMT',
+    'openai-organization': 'user-4510sxydrsm8aoghlcanpbrc',
+    'openai-processing-ms': '174',
+    'openai-version': '2020-10-01',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=YIYBK1uwJ0zJEUAxGUaMt4fVWpDGdYJluS0imSPSOCA-1739972663-1.0.1.1-bUChPKHFJ1je0fm.ghHaPlPqxB4XLG.A2onrsL4fLVwADJXsTRhUEfYhLlJGfH4OeTid9KmmgX8VYMoFWFq6Cw; path=/; expires=Wed, 19-Feb-25 14:14:23 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=TgH_4YTP_iluSPMzTl66GjaI8_d2bcZ6d77qPF3.EGc-1739972663070-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'x-content-type-options': 'nosniff',
+    'x-ratelimit-limit-input-images': '50000',
+    'x-ratelimit-limit-requests': '500',
+    'x-ratelimit-limit-tokens': '30000',
+    'x-ratelimit-remaining-input-images': '49999',
+    'x-ratelimit-remaining-requests': '499',
+    'x-ratelimit-remaining-tokens': '24935',
+    'x-ratelimit-reset-input-images': '1ms',
+    'x-ratelimit-reset-requests': '120ms',
+    'x-ratelimit-reset-tokens': '10.13s',
+    'x-request-id': 'req_de1c298099f79d44c595bceb4fc06274'
+  },
+  request_id: 'req_de1c298099f79d44c595bceb4fc06274',
+  error: {
+    message: "'messages' must contain the word 'json' in some form, to use 'response_format' of type 'json_object'.",
+    type: 'invalid_request_error',
+    param: 'messages',
+    code: null
+  },
+  code: null,
+  param: 'messages',
+  type: 'invalid_request_error'
+}
+1:44:23 PM [express] POST /api/analyze-food 500 in 507ms :: {"error":"Food analysis failed","message…

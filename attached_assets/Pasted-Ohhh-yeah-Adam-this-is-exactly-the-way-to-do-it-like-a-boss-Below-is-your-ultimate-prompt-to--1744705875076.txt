@@ -1,0 +1,83 @@
+Ohhh yeah Adam — this is exactly the way to do it like a boss 💼🔥
+Below is your ultimate prompt to give Replit AI (or GPT inside Replit), so it will inject all the needed NutriAIAndroid.updateState(...) calls for your WebView Android app.
+
+This prompt covers food logs, recipes, weight/physique updates, meal plan completions, and more.
+
+⸻
+
+🧠 💥 Copy-paste this to Replit AI:
+
+⸻
+
+Prompt:
+
+I’m building a nutrition app that runs inside a WebView. The Android wrapper listens for data via a JavaScript interface called NutriAIAndroid and a method named updateState(jsonString).
+
+I need you to inject a NutriAIAndroid.updateState(JSON.stringify({...})) call every time the user interacts with the following core features, so that my Android code can collect and store state for personal push notifications.
+
+Each updateState call should contain this JSON structure:
+
+{
+  "goal": "cutting" or "bulking",
+  "caloriesTarget": number, 
+  "caloriesEaten": number, 
+  "mealsLoggedToday": number, 
+  "weightTrend": "gaining" or "losing", 
+  "streakDays": number, 
+  "lastActiveDate": "YYYY-MM-DD", 
+  "userName": string (if available)
+}
+
+👉 WHEN TO CALL IT:
+	•	After a food item is logged (manual or by scanning)
+	•	After a meal plan is generated
+	•	After the user marks a meal as “completed” or “skipped”
+	•	After scanning a recipe from ingredients/fridge
+	•	After the user scans their physique / updates weight
+	•	After checking body fat estimate
+	•	After skipping or completing a day
+	•	When streak or adherence is calculated
+
+✅ Example:
+
+NutriAIAndroid.updateState(JSON.stringify({
+  goal: "cutting",
+  caloriesTarget: 2200,
+  caloriesEaten: 1700,
+  mealsLoggedToday: 3,
+  weightTrend: "losing",
+  streakDays: 5,
+  lastActiveDate: "2025-04-15",
+  userName: "Adam"
+}));
+
+Please also call NutriAIAndroid.updateState(...) each time values change in the app UI (such as when the user updates their weight, goal, or meal log).
+
+This is how the Android side keeps state in sync and uses it to schedule smart notifications. You don’t need to show anything to the user — just silently call this method after every key action.
+
+Let’s go!
+
+⸻
+
+🎯 Pro Tips:
+
+You don’t need to find where all values live manually. Replit AI will understand where and how to place those updateState(...) calls inside your frontend code, if your data is stored in state/variables or a DB.
+
+If not, tell it something like:
+
+“My calorie intake is stored in userData.caloriesToday, weight is user.weight, and goal is user.goal.”
+
+And it’ll plug the right values into that JSON update.
+
+⸻
+
+✅ Final Result?
+
+With these updateState calls wired into all key actions:
+	•	Android gets live updates without needing API calls
+	•	You can build savage, smart, and personalized notifications
+	•	The app feels alive — just like Duolingo or Fitatu
+
+⸻
+
+Let me know when you paste it — and I can help test the Android bridge side or start writing your notification logic 😎📲

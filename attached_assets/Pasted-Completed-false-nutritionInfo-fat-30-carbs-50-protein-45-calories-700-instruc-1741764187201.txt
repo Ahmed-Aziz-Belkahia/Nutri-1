@@ -1,0 +1,75 @@
+Completed: false,
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    imageUrl: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop'
+  }
+]
+7:22:29 AM [express] GET /api/meal-plans/today 304 in 131ms :: {"hasPlan":true,"plan":{"id":17,"date…
+7:22:29 AM [express] GET /api/user/xp 304 in 106ms :: {"totalXP":40,"level":1,"currentXPInLevel":40,…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-12T00:00:00.000Z',
+  end: '2025-03-13T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-12T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 850, protein: 35, carbs: 110, fat: 30 }
+7:22:30 AM [express] GET /api/food-logs 304 in 205ms :: {"logs":[{"id":11,"userId":3,"name":"Pasta w…
+7:22:30 AM [express] GET /api/user/xp 304 in 96ms :: {"totalXP":40,"level":1,"currentXPInLevel":40,"…
+7:22:30 AM [express] GET /api/recipes 304 in 96ms :: [{"id":62,"userId":3,"name":"Grilled Chicken Sa…
+7:22:30 AM [express] GET /api/recipes 304 in 102ms :: []
+[Recipe Analysis] Initializing ingredient analysis...
+[Recipe Analysis] Received response from OpenAI
+[Recipe Analysis] Successfully parsed OpenAI response
+[Recipe Analysis] Validating response structure...
+[Recipe Analysis] Validation successful
+[Recipe Analysis] Generated quiz: {
+  "questions": [
+    {
+      "question": "Which vitamin is most abundant in oranges?",
+      "options": [
+        "Vitamin A",
+        "Vitamin C",
+        "Vitamin D",
+        "Vitamin B12"
+      ],
+      "correctAnswer": "Vitamin C",
+      "explanation": "Oranges are renowned for their high vitamin C content, which is essential for immune function and skin health."
+    },
+    {
+      "question": "What is the ideal cooking method to retain the most nutrients in oranges?",
+      "options": [
+        "Boiling",
+        "Grilling",
+        "Microwaving",
+        "Raw consumption"
+      ],
+      "correctAnswer": "Raw consumption",
+      "explanation": "Consuming oranges raw helps retain the maximum amount of nutrients, especially vitamin C, which can be sensitive to heat."
+    },
+    {
+      "question": "Which of the following is a classic flavor combination with orange in desserts?",
+      "options": [
+        "Orange and mint",
+        "Orange and vanilla",
+        "Orange and rosemary",
+        "Orange and garlic"
+      ],
+      "correctAnswer": "Orange and vanilla",
+      "explanation": "Orange and vanilla complement each other well, often used in desserts for a harmonious and sweet flavor profile."
+    },
+    {
+      "question": "What is a common culinary use for orange zest?",
+      "options": [
+        "Thickening agents",
+        "Coloring",
+        "Flavor enhancement",
+        "Preservative"
+      ],
+      "correctAnswer": "Flavor enhancement",
+      "explanation": "Orange zest is used to enhance flavor by adding a concentrated citrus aroma and taste to dishes."
+    }
+  ],
+  "difficulty": "easy",
+  "topic": "Culinary Uses and Nutrition of Oranges"
+}

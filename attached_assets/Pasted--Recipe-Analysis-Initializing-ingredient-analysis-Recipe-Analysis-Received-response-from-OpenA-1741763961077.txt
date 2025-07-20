@@ -1,0 +1,179 @@
+[Recipe Analysis] Initializing ingredient analysis...
+[Recipe Analysis] Received response from OpenAI
+[Recipe Analysis] Successfully parsed OpenAI response
+[Recipe Analysis] Validating response structure...
+[Recipe Analysis] Validation successful
+[Recipe Analysis] Generated quiz: {
+  "questions": [
+    {
+      "question": "Which cooking method helps retain the most nutrients in potatoes?",
+      "options": [
+        "Boiling",
+        "Frying",
+        "Steaming",
+        "Roasting"
+      ],
+      "correctAnswer": "Steaming",
+      "explanation": "Steaming retains more nutrients in potatoes compared to boiling or frying, as it minimizes nutrient loss typically caused by leaching into water or degradation through high heat."
+    },
+    {
+      "question": "What is a common benefit of consuming red bell peppers?",
+      "options": [
+        "High in protein",
+        "Rich in vitamin C",
+        "Good source of fats",
+        "Low in fiber"
+      ],
+      "correctAnswer": "Rich in vitamin C",
+      "explanation": "Red bell peppers are exceptionally rich in vitamin C, containing more than twice the amount of vitamin C found in citrus fruits."
+    },
+    {
+      "question": "What is a healthy food combination with ground meat for a balanced meal?",
+      "options": [
+        "Ground meat and fries",
+        "Ground meat and pasta",
+        "Ground meat with a smoothie",
+        "Ground meat with vegetables"
+      ],
+      "correctAnswer": "Ground meat with vegetables",
+      "explanation": "Combining ground meat with vegetables provides a more balanced meal, offering protein from the meat and essential vitamins, minerals, and fiber from the vegetables."
+    },
+    {
+      "question": "What is a key nutritional benefit of drinking smoothies?",
+      "options": [
+        "High in sodium",
+        "Good source of fiber",
+        "High calorie content",
+        "Rich in trans fats"
+      ],
+      "correctAnswer": "Good source of fiber",
+      "explanation": "Smoothies, especially those made with whole fruits and vegetables, are a good source of dietary fiber, which aids in digestion and helps maintain healthy weight."
+    }
+  ],
+  "difficulty": "medium",
+  "topic": "Nutrition and Cooking Methods"
+}
+xxxxxxx[Recipe Analysis] Generated recipes: {
+  "recipes": [
+    {
+      "name": "Loaded Potato and Ground Meat Stuffed Peppers",
+      "difficulty": "Medium",
+      "cooking_time": "45 minutes",
+      "nutritional_info": {
+        "calories": 350,
+        "protein": 25,
+        "carbohydrates": 30,
+        "fats": 15
+      },
+      "ingredients": [
+        "2 large red bell peppers",
+        "2 medium potatoes, peeled and cubed",
+        "250 grams ground meat (beef, pork, or turkey)",
+        "1 small onion, diced",
+        "2 cloves garlic, minced",
+        "1 teaspoon paprika",
+        "Salt and pepper to taste",
+        "1 tablespoon olive oil",
+        "1/2 cup shredded cheese (optional)",
+        "Your choice of smoothie (as a base for sauce or dip)"
+      ],
+      "instructions": [
+        "Preheat the oven to 375°F (190°C).",
+        "Slice the tops off the red bell peppers and remove the seeds and membranes.",
+        "Boil the cubed potatoes in salted water for 10 minutes, or until tender. Drain and set aside.",
+        "In a skillet, heat olive oil over medium heat. Add diced onion and garlic, sauté until translucent.",
+        "Add the ground meat to the skillet, season with paprika, salt, and pepper. Cook until browned.",
+        "Mash the boiled potatoes and add them to the skillet with the meat, mixing thoroughly.",
+        "Stuff each red bell pepper with the potato and meat mixture.",
+        "If using cheese, sprinkle it on top of the stuffed peppers.",
+        "Place the stuffed peppers in a baking dish and bake for 20-25 minutes, or until the peppers are tender.",
+        "Serve with your smoothie on the side. Optionally, use the smoothie as a base for a creamy sauce or dip by thickening it with a little cornstarch over low heat and drizzling it over the peppers."
+      ]
+    },
+    {
+      "name": "Deconstructed Shepherd’s Pie with Smoothie Drizzle",
+      "difficulty": "Easy",
+      "cooking_time": "40 minutes",
+      "nutritional_info": {
+        "calories": 400,
+        "protein": 30,
+        "carbohydrates": 40,
+        "fats": 18
+      },
+      "ingredients": [
+        "3 medium potatoes, peeled and cubed",
+        "300 grams ground meat",
+        "1 red bell pepper, diced",
+        "1 small carrot, diced",
+        "1/2 cup frozen peas",
+        "1 onion, diced",
+        "1 tablespoon olive oil",
+        "1/2 cup beef or vegetable broth",
+        "Salt and pepper to taste",
+        "Your choice of smoothie"
+      ],
+      "instructions": [
+        "Boil the potatoes in salted water until tender, about 15 minutes. Drain and mash with a pinch of salt.",
+        "In a large pan, heat olive oil over medium-high heat. Add onion, carrot, and red bell pepper. Sauté until soft.",
+        "Add ground meat to the pan and cook until browned.",
+        "Stir in the broth and frozen peas. Cook for an additional 5 minutes. Season with salt and pepper.",
+        "Spread the mashed potatoes on a serving dish or individual plates, leaving a well in the center.",
+        "Spoon the meat and vegetable mixture into the well.",
+        "Drizzle your choice of smoothie over the dish as a sweet contrast. If desired, reduce the smoothie over low heat to make it thicker.",
+        "Serve warm."
+      ]
+    }
+  ]
+}
+Ingredient analysis result: {
+  ingredients: [
+    {
+      name: 'potatoes',
+      quantity: 3,
+      unit: 'pieces',
+      estimatedWeight: 300,
+      freshness: 'moderate',
+      quality: 'good'
+    },
+    {
+      name: 'ground meat',
+      quantity: 200,
+      unit: 'grams',
+      estimatedWeight: 200,
+      freshness: 'moderate',
+      quality: 'good'
+    },
+    {
+      name: 'red bell pepper',
+      quantity: 1,
+      unit: 'piece',
+      estimatedWeight: 150,
+      freshness: 'moderate',
+      quality: 'good'
+    },
+    {
+      name: 'smoothie',
+      quantity: 1,
+      unit: 'glass',
+      estimatedWeight: 250,
+      freshness: 'fresh',
+      quality: 'good'
+    }
+  ],
+  quiz: {
+    questions: [ [Object], [Object], [Object], [Object] ],
+    difficulty: 'medium',
+    topic: 'Nutrition and Cooking Methods'
+  },
+  recipes: { recipes: [ [Object], [Object] ] }
+}
+7:19:06 AM [express] POST /api/analyze-ingredients 200 in 34816ms :: {"ingredients":[{"name":"potato…
+7:19:07 AM [express] GET /api/user/xp 304 in 219ms :: {"totalXP":40,"level":1,"currentXPInLevel":40,…
+[Food Logs API] Fetching logs for date range: {
+  userId: 3,
+  start: '2025-03-12T00:00:00.000Z',
+  end: '2025-03-13T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-03-12T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 850, protein: 35, carbs: 110, fat: 30 }
+7:19:07 AM [express] GET /api/food-logs 304 in 211ms :: {"logs":[{"id":11,"userId":3,"name":"Pasta w…

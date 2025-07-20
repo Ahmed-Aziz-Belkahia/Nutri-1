@@ -1,0 +1,113 @@
+# Tworzenie nowoczesnej aplikacji do monitorowania kalorii i posiłków
+# Framework: React Native (lub inny framework obsługujący platformy mobilne)
+# Style: Tailwind CSS (lub podobna biblioteka stylów)
+
+## Wygląd i funkcjonalności
+
+### 1. **Dashboard (Ekran główny)**
+- **Nagłówek:**
+  - Tekst: „Dashboard”
+  - Czcionka: Sans-serif, pogrubiona, 28 px, kolor ciemnoturkusowy (#008ECC).
+  - Tło: Delikatny gradient (od białego do jasnego błękitu, np. #E5F9FF → #FFFFFF).
+  - Po prawej stronie ikona „⚡” (energia/punkty) – 20 px, kolor neonowy zielony (#00FFB3).
+  
+- **Kalendarz dni tygodnia:**
+  - Układ: Pozioma belka z możliwością przewijania (scroll horizontal).
+  - Każdy dzień: Koło z datą, aktywny dzień wyróżniony obramowaniem w kolorze cyjan (#00C9FF).
+  - Czcionka: 16 px, bold dla aktywnego dnia, regular dla pozostałych.
+  
+- **Podsumowanie kalorii (wykres okręgu):**
+  - Rozmiar: Duży okrąg o średnicy 180 px.
+  - Gradientowy pierścień: Cyjan (#00C9FF) → Zielony (#00FF85).
+  - Wewnątrz: Liczba kalorii (np. „1.5k kcal”), czcionka 24 px, bold.
+  - Procentowy wskaźnik realizacji celu (np. „75%”): 18 px, w osobnym kolorze (ciemnoszary #4A4A4A).
+  
+- **Makroskładniki:**
+  - Układ: Trzy poziome paski (Carbs, Protein, Fat).
+  - Kolory:
+    - Carbs: Żółty (#FFD700),
+    - Protein: Niebieski (#007BFF),
+    - Fat: Zielony (#28A745).
+  - Pasek postępu: Gradient dla każdego składnika.
+  - Pod spodem liczba gramów (np. „127g”).
+
+---
+
+### 2. **Sekcja „Today’s Meals”**
+- **Nagłówek sekcji:**
+  - Tekst: „Today’s Meals”
+  - Czcionka: Sans-serif, bold, 20 px, kolor czarny (#000000).
+  - Ikonka: Mały talerz z widelcem i nożem po lewej stronie.
+
+- **Karty posiłków:**
+  - Układ: Siatka kart w dwóch kolumnach.
+  - Karta:
+    - Tło: Gradient pastelowy błękit (#E5F9FF → #FFFFFF).
+    - Zdjęcie posiłku: Kwadratowe (zajmuje 60% szerokości karty).
+    - Nazwa potrawy (np. „Sałatka Cezar”): Bold, 16 px, ciemnoszary (#333333).
+    - Liczba kalorii (np. „350 kcal”): 14 px, szary (#666666).
+    - Ikonka serca (ulubione): Czerwony (#FF4D4D), umieszczony w prawym górnym rogu.
+  - Rozmiar karty: Zaokrąglone rogi (20 px), cień (2 px), padding (16 px).
+
+---
+
+### 3. **Pasek nawigacyjny (Bottom Navigation Bar)**
+- **Układ:**
+  - 3 ikony: 
+    - Domek (Overview),
+    - Wykres ze strzałką (Progress),
+    - Ustawienia (Settings).
+  - Aktywna ikona: Powiększona (28 px), kolor gradientowy cyjan (#00C9FF → #00FF85).
+  - Nieaktywne ikony: Mniejsze (24 px), kolor ciemnoszary z przezroczystością 60%.
+
+- **Kolor tła:** Gradient biały → jasnoszary (#F2F2F2 → #E0E0E0).
+
+---
+
+### 4. **Przycisk „Add” (Floating Action Button)**
+- **Wygląd:**
+  - Ikona: Plus (+) w środku, kolor biały.
+  - Rozmiar: 60 px średnicy.
+  - Kolor tła: Gradient neonowy niebieski → pastelowy fiolet (#00C9FF → #D586FF).
+  - Animacja: Przy wczytywaniu aplikacji delikatne „bounce”.
+
+---
+
+### 5. **Ogólne proporcje i wielkości**
+- **Czcionki:**
+  - Nagłówki: 24–28 px, bold.
+  - Tekst opisowy: 14–16 px, szary (#666666).
+- **Ikony:** Rozmiary od 20 px (małe) do 28 px (aktywne elementy).
+- **Odstępy:**
+  - Między sekcjami: 16 px.
+  - Wewnątrz sekcji: 12 px.
+
+---
+
+### Funkcjonalności
+1. **Dashboard:**
+   - Wyświetlanie bieżącego dnia i tygodnia.
+   - Interaktywne kliknięcie na makroskładnik (Carbs, Protein, Fat) otwiera szczegóły.
+
+2. **Today’s Meals:**
+   - Możliwość przesuwania kart (swipe) w lewo/prawo, np. „Dodaj do ulubionych”.
+   - Zdjęcia w wysokiej rozdzielczości (możliwość powiększenia).
+
+3. **Floating Action Button:**
+   - Otwiera modal do dodania posiłku (nazwa, liczba kalorii, zdjęcie).
+
+4. **Statystyki:**
+   - Widok historyczny kalorii (linia trendu).
+   - Wykres słupkowy makroskładników z podziałem tygodniowym.
+
+---
+
+### Kolorystyka (Paleta kolorów)
+- **Akcenty:** Cyjan (#00C9FF), Zielony (#00FF85), Żółty (#FFD700).
+- **Tło:** Gradient biały → jasny błękit (#FFFFFF → #E5F9FF).
+- **Tekst:** Czarny (#000000), szary (#666666).
+- **Cienie:** Subtelne (RGBA 0, 0, 0, 0.1).
+
+---
+
+Stwórz aplikację według powyższego projektu w React Native z Tailwind CSS dla stylów i skonfiguruj domyślne funkcjonalności oraz animacje.

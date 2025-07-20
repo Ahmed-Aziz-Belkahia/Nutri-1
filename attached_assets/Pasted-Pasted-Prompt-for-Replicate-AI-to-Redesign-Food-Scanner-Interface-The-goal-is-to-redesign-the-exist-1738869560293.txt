@@ -1,0 +1,41 @@
+Pasted--Prompt-for-Replicate-AI-to-Redesign-Food-Scanner-Interface-The-goal-is-to-redesign-the-existing-f-1738869360009.txt
+# Prompt for Replicate AI to Redesign Food Scanner Interface
+
+The goal is to redesign the existing food scanner interface to align visually and stylistically with the overall app aesthetic while keeping all current functionalities intact. The new design should prioritize simplicity, usability, and a polished, modern look.
+
+## Current Functionalities to Retain
+1. **Scan Food**: Allows the user to scan food items with their camera.
+2. **Barcode Scanning**: A feature to scan food barcodes.
+3. **Label Input**: Users can input or capture text labels manually.
+4. **Gallery Access**: Enables users to upload images from their gallery.
+
+## Design Requirements
+1. **Header**:
+   - Include a visually appealing title or label (e.g., "Food Scanner") with a clean, minimal font.
+   - Add an optional back button or close button in the top-left corner for easy navigation.
+
+2. **Camera View**:
+   - The camera view should be full-screen or centered within the interface.
+   - Add a scanning frame overlay (e.g., a rounded rectangle with subtle animations to guide the user).
+   - Include subtle instructions such as "Align the item within the frame" below the scanning area.
+
+3. **Functional Buttons**:
+   - Position the action buttons (Scan Food, Barcode, Label, Gallery) in a clean, horizontal or vertical layout beneath the camera view.
+   - Use icons with text labels for clarity.
+   - Highlight the main action button (e.g., "Scan Food") with a distinct color or animation to draw attention.
+
+4. **Capture Button**:
+   - Center the capture button prominently at the bottom.
+   - Use a sleek circular design with a vibrant color and subtle shadowing.
+   - Include a small animation when pressed (e.g., ripple effect).
+
+5. **Styling**:
+   - Match the app’s color palette, typography, and spacing guidelines.
+   - Use soft shadows, rounded corners, and gradients where appropriate.
+   - Ensure all elements are responsive and visually balanced.
+
+6. **Optional Enhancements**:
+   - Add a progress indicator or confirmation animation when scanning is successful.
+   - Provide tooltips or microcopy for first-time users.
+
+The result should be an intuitive, visually cohesive food scanner interface that seamlessly integrates with the app. Focus on delivering an engaging user experience while ensuring accessibility and clarity.

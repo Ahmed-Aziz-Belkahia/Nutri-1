@@ -1,0 +1,48 @@
+Here’s a detailed prompt you can use for Replit AI to generate your updated CreateRecipe meal-planning system:
+
+Prompt:
+I am developing a meal-planning feature for my nutrition-focused app called Nutri AI. The feature, called CreateRecipe, currently generates a single recipe based on user preferences. However, I want to upgrade it into a personalized meal-planning system that generates a full daily meal plan instead of a single recipe. Here’s how it should work in detail:
+
+1. User Input (Quiz System)
+
+The system should ask users a series of questions to tailor the meal plan to their needs. These questions should include:
+	•	Allergies – Users should be able to specify foods they cannot eat (e.g., nuts, gluten, dairy).
+	•	Dietary Preferences – Users should choose from options like vegetarian, vegan, keto, paleo, high-protein, low-carb, etc.
+	•	Caloric Intake – Users should enter how many calories they want to consume per day.
+	•	Meal Frequency – Users can select how many meals per day they want (e.g., 3 main meals + 2 snacks).
+	•	Ingredient Preferences – Optionally, users can specify favorite ingredients or ingredients to avoid.
+	•	Cooking Time – Users can select their preferred cooking time (e.g., under 15 minutes, 30 minutes max).
+	•	Budget Sensitivity – Users can indicate if they want budget-friendly meals.
+
+2. Meal Plan Generation
+
+Based on user input, the system should generate a complete daily meal plan, including:
+	•	Breakfast
+	•	Brunch (optional, based on user selection)
+	•	Lunch
+	•	Dinner
+	•	Snack(s)
+
+Each meal should be carefully balanced and varied so that users don’t get the same meals every day. Meals should rotate daily while still fitting the user’s dietary restrictions and caloric intake.
+
+3. Meal Plan Overview (Frozen State System)
+	•	Once the meal plan is generated, it should appear in the user’s meal overview in a frozen state.
+	•	Users cannot edit or complete the meal until they actually prepare and eat it.
+	•	When the user marks a meal as eaten, it will be unfrozen and saved as a completed meal.
+
+4. Additional Features (Optional but Preferred)
+	•	Meal Swapping – Users can swap a suggested meal for an alternative that fits their diet.
+	•	Shopping List Generator – Based on the meal plan, the system should generate a shopping list with ingredients categorized by food type (e.g., vegetables, protein, grains).
+	•	Portion Adjustments – Users should be able to adjust portion sizes dynamically to fit their exact calorie needs.
+	•	Recipe Details – Each meal should come with a full recipe, including ingredients, step-by-step instructions, and estimated cooking time.
+
+5. Technical Considerations
+	•	The system should use AI to optimize meal plans dynamically based on user feedback.
+	•	It should be efficient and generate meal plans quickly without unnecessary processing time.
+	•	The UI should be intuitive and user-friendly, ensuring that users can easily understand and follow their meal plans.
+
+Goal of This AI Task:
+
+I need Replit AI to generate Python code for a meal-planning system that integrates all these features into my app. The system should be modular, allowing easy updates and improvements in the future. Please ensure the generated code is structured properly and scalable.
+
+This prompt is super detailed and should help Replit AI generate exactly what you need. Let me know if you want any adjustments! 🚀

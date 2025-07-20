@@ -1,0 +1,174 @@
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 5 steps
+Using direct meal.ingredients array with 8 items
+Saving recipe with instructions: {
+  name: 'Obiad - Pollo alla Cacciatore (Day 1)',
+  ingredientsCount: 8,
+  instructionsCount: 5,
+  sampleInstructions: [
+    'Podsmaż pokrojoną cebulę i czosnek na oliwie',
+    'Dodaj pokrojonego kurczaka i pieczarki, smaż aż się zarumienią'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 5 steps
+Using direct meal.ingredients array with 8 items
+Saving recipe with instructions: {
+  name: 'Kolacja - Domowa Pizza z Salsiccią (Day 1)',
+  ingredientsCount: 8,
+  instructionsCount: 5,
+  sampleInstructions: [
+    'Z mąki, wody i oliwy zagnieć ciasto, rozwałkuj',
+    'Kiełbasę pokrój w plasterki, paprykę i cebulę w paski'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 4, date: '2025-04-18', recipeCount: 3 }
+Day 2 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Śniadanie - Jajecznica z Awokado i Bekonem (Day 2)',
+    mealType: undefined,
+    mealProps: [ 'name', 'description', 'ingredients', 'instructions', 'recipe' ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Zrób chrupiący bekon na patelni. Wyjmij i odłóż na bok. Rozmiksuj jajka z masłem, dodaj sól i pieprz',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":2,"meals":[{"name":"Śniadanie - Jajecznica z Awokado i Bekonem (Day 2)","description":"Kremowa jajecznica z awokado, chrupiącym bekonem i przyprawami.","ingredients":["2 jajka","1 awokado","2 plastry bekonu","łyżka masła","sól i pieprz do smaku"],"instructions":"Zrób chrupiący bekon na patelni. Wyjmij i odłóż na bok. Rozmiksuj jajka z masłem, dodaj sól i pieprz. Usmaż jajecznicę na patelni po bekonie. Podawaj z plasterkami awokado i bekonem.","recipe":{"ingredients":[],"instructions":[],"...'
+}
+Creating meal plan with calories: 2000 date: 2025-04-19
+Using meal plan: 5 for date: 2025-04-19
+Using direct meal.instructions string, split into 5 steps
+Using direct meal.ingredients array with 5 items
+Saving recipe with instructions: {
+  name: 'Śniadanie - Jajecznica z Awokado i Bekonem (Day 2)',
+  ingredientsCount: 5,
+  instructionsCount: 5,
+  sampleInstructions: [ 'Zrób chrupiący bekon na patelni', 'Wyjmij i odłóż na bok' ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 8 items
+Saving recipe with instructions: {
+  name: 'Obiad - Amerykański Burger z Wołowiny i Dipem BBQ (Day 2)',
+  ingredientsCount: 8,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Uformuj mięso w kotlet, posól i popieprz',
+    'Usmaż na patelni grillowej'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 5 steps
+Using direct meal.ingredients array with 8 items
+Saving recipe with instructions: {
+  name: 'Kolacja - Risotto z Grzybami i Zielonym Groszkiem (Day 2)',
+  ingredientsCount: 8,
+  instructionsCount: 5,
+  sampleInstructions: [
+    'Podsmaż cebulę na maśle, dodaj grzyby, smaż kilka minut',
+    'Dodaj ryż, chwilę smaż'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 5, date: '2025-04-19', recipeCount: 3 }
+Day 3 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Śniadanie - Naleśniki z Twarogiem i Miodem (Day 3)',
+    mealType: undefined,
+    mealProps: [ 'name', 'description', 'ingredients', 'instructions', 'recipe' ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Wymieszaj mąkę, mleko, jajko i szczyptę soli. Smaż cienkie naleśniki na masle. Nadziewaj twarogiem, ',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":3,"meals":[{"name":"Śniadanie - Naleśniki z Twarogiem i Miodem (Day 3)","description":"Delikatne naleśniki wypełnione twarogiem i polane miodem kwiatu lipy.","ingredients":["100g mąki pszennej","150ml mleka","1 jajko","100g twarogu","łyżka miodu","łyżka masła","sól do smaku"],"instructions":"Wymieszaj mąkę, mleko, jajko i szczyptę soli. Smaż cienkie naleśniki na masle. Nadziewaj twarogiem, skrop miodem. Zawijaj i serwuj ciepłe.","recipe":{"ingredients":[],"instructions":[],"nutritionInfo"...'
+}
+Creating meal plan with calories: 2000 date: 2025-04-20
+Using meal plan: 6 for date: 2025-04-20
+Using direct meal.instructions string, split into 4 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Śniadanie - Naleśniki z Twarogiem i Miodem (Day 3)',
+  ingredientsCount: 7,
+  instructionsCount: 4,
+  sampleInstructions: [
+    'Wymieszaj mąkę, mleko, jajko i szczyptę soli',
+    'Smaż cienkie naleśniki na masle'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Obiad - Pieczeń Wołowa w Ziołach z Warzywami Korzeniowymi (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Natrzyj mięso oliwą, ziołami, posól, popieprz',
+    'Odstaw na godzinę'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 5 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Kolacja - Kluski Śląskie z Kapustą i Kiełbasą (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 5,
+  sampleInstructions: [
+    'Ugotuj ziemniaki, przeciśnij przez praskę, dodaj mąkę, sól',
+    'Uformuj kluski, gotuj do wypłynięcia'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 6, date: '2025-04-20', recipeCount: 3 }
+7:25:31 PM [express] POST /api/meal-plans 200 in 38094ms :: {"weekStart":"2025-04-18","plans":[{"id"…
+Fetching created recipes for user 8
+Found 0 created recipes
+7:25:33 PM [express] GET /api/recipes 200 in 252ms :: []
+Fetching saved recipes for user 8
+Found 0 saved recipes
+7:25:35 PM [express] GET /api/recipes 304 in 239ms :: []
+Fetching meal plan for today
+User ID: 8
+Found meal plan with ID: 4 for today (2025-04-18)
+7:25:41 PM [express] GET /api/shopping-list/2025-04-18 200 in 353ms :: {"items":[],"groupedItems":{}…
+Fetching meal plan for date: all
+User ID: 8
+Found 3 recipes for meal plan ID 4
+7:25:41 PM [express] GET /api/meal-plans/today 200 in 366ms :: {"hasPlan":true,"plan":{"id":4,"date"…
+Error fetching meal plan by date: NeonDbError: invalid input syntax for type date: "all"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/meal-plans.routes.ts:102:24) {
+  severity: 'ERROR',
+  code: '22007',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: "unnamed portal parameter $2 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'datetime.c',
+  line: '4026',
+  routine: 'DateTimeParseError',
+  sourceError: undefined
+}
+7:25:41 PM [express] GET /api/meal-plans/all 500 in 435ms :: {"error":"Failed to fetch meal plan"}

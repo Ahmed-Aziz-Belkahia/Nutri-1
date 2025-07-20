@@ -1,0 +1,79 @@
+Here’s a prompt you can use to fix and enhance the badge display on the profile picture:
+
+Prompt for Replit AI:
+
+Task: Fix and enhance the design of the badge displaying the user’s level on the profile picture in the app header.
+
+Current Issue:
+
+The badge showing the user’s level is partially hidden under the profile picture, making it hard to see.
+
+Requirements:
+	1.	Badge Positioning:
+	•	The badge should be placed slightly outside the bottom-right corner of the profile picture for full visibility.
+	•	Use absolute positioning to achieve this.
+	2.	Badge Design:
+	•	Circular badge with a clean and modern look.
+	•	Add a subtle shadow to make it stand out.
+	•	Use contrasting colors (e.g., green for the badge background and white for the number).
+	3.	Responsiveness:
+	•	Ensure the badge scales properly with the profile picture across different screen sizes.
+	4.	Optional Animations:
+	•	Add a small pop-in animation for the badge when the level changes or when the page loads.
+
+Tech Stack:
+	•	HTML/CSS for layout and styling.
+	•	Optional: Tailwind CSS or another CSS framework if already in use.
+
+Example Styling:
+
+Here’s a suggestion for styling the badge:
+
+.profile-container {
+  position: relative;
+  width: 80px; /* Adjust as needed */
+  height: 80px;
+}
+
+.profile-picture {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-badge {
+  position: absolute;
+  bottom: -5px; /* Slightly outside the bottom-right corner */
+  right: -5px;
+  background-color: #4CAF50; /* Green background */
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.profile-badge.level-up {
+  animation: badge-pop 0.3s ease-out; /* Pop animation for new levels */
+}
+
+Goal:
+
+Make the level badge fully visible, visually appealing, and responsive, ensuring it enhances the user’s experience in the app.
+
+Let me know if you’d like adjustments or further details! 🚀

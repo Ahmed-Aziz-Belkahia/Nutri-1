@@ -1,0 +1,383 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+7:26:28 PM [express] Testing database connection...
+✅ Database connection established successfully
+7:26:28 PM [express] ✅ Database connection successful
+7:26:28 PM [express] ✅ Uploads directory created
+Re-optimizing dependencies because lockfile has changed
+7:26:28 PM [express] Development server setup complete
+7:26:28 PM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:26:58 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+7:27:04 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:28:07 PM [express] POST /api/login 200 in 2760ms :: {"ok":true}
+7:28:08 PM [express] GET /api/user 304 in 62ms :: {"id":8,"email":"piotrekster1998@gmail.comssnnsbs"…
+Fetching meal plan for today
+User ID: 8
+Found meal plan with ID: 4 for today (2025-04-18)
+Found 3 recipes for meal plan ID 4
+7:28:11 PM [express] GET /api/meal-plans/today 304 in 403ms :: {"hasPlan":true,"plan":{"id":4,"date"…
+7:28:11 PM [express] GET /api/user 304 in 65ms :: {"id":8,"email":"piotrekster1998@gmail.comssnnsbs"…
+7:28:11 PM [express] GET /api/user/profile 200 in 206ms :: {"id":13,"userId":8,"currentWeight":"75.0…
+[Food Logs API] Fetching logs for date range: {
+  userId: 8,
+  dateRequested: '2025-04-18',
+  start: '2025-04-18T00:00:00.000Z',
+  end: '2025-04-18T23:59:59.999Z'
+}
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-04-18T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+7:28:12 PM [express] GET /api/food-logs 304 in 226ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Fetching created recipes for user 8
+Found 0 created recipes
+7:28:24 PM [express] GET /api/recipes 304 in 2516ms :: []
+Fetching saved recipes for user 8
+Found 0 saved recipes
+7:28:25 PM [express] GET /api/recipes 304 in 243ms :: []
+Fetching meal plan for date: all
+User ID: 8
+Error fetching meal plan by date: NeonDbError: invalid input syntax for type date: "all"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/meal-plans.routes.ts:102:24) {
+  severity: 'ERROR',
+  code: '22007',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: "unnamed portal parameter $2 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'datetime.c',
+  line: '4026',
+  routine: 'DateTimeParseError',
+  sourceError: undefined
+}
+7:28:28 PM [express] GET /api/meal-plans/all 500 in 201ms :: {"error":"Failed to fetch meal plan"}
+Fetching meal plan for today
+User ID: 8
+Found meal plan with ID: 4 for today (2025-04-18)
+Found 3 recipes for meal plan ID 4
+7:28:28 PM [express] GET /api/meal-plans/today 304 in 254ms :: {"hasPlan":true,"plan":{"id":4,"date"…
+7:28:28 PM [express] GET /api/shopping-list/2025-04-18 304 in 255ms :: {"items":[],"groupedItems":{}…
+7:28:34 PM [express] POST /api/meal-plans/generate 200 in 376ms
+7:28:37 PM [express] POST /api/meal-plans/generate 200 in 129ms
+7:29:45 PM [express] GET /api/user 304 in 174ms :: {"id":8,"email":"piotrekster1998@gmail.comssnnsbs…
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  healthGoals: [ 'maintenance' ],
+  activityLevel: 'moderate',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  cuisinePreferences: [ 'italian', 'american' ],
+  preferredIngredients: [],
+  excludedIngredients: [],
+  cookingSkillLevel: 'intermediate',
+  mealPlanDuration: '3days',
+  specialRequirements: '',
+  weekdayVsWeekend: 'same',
+  cookingEquipment: [ 'stove', 'oven' ]
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Inserted nutrition preferences: {
+  id: 15,
+  userId: 8,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  height: null,
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  caloriesGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  bodyFatPercentage: null,
+  bodyType: null,
+  dietaryRestrictions: [],
+  allergies: [],
+  mealBudget: null,
+  experienceLevel: null,
+  updatedAt: 2025-04-18T19:29:46.001Z
+}
+Updated nutrition preferences with dietary data: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  allergies: [],
+  excludedIngredients: [],
+  preferredIngredients: [],
+  id: 13,
+  userId: 8
+}
+7:29:46 PM [express] POST /api/user/dietary-preferences 200 in 371ms :: {"nutritionPreferences":{"id…
+Received meal plan request with preferences: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  mealPlanDuration: '3days',
+  healthGoals: 1,
+  cuisinePreferences: 2
+}
+User profile structure for monthly meal plan: {
+  "id": 8,
+  "email": "piotrekster1998@gmail.comssnnsbs",
+  "password": "f4125784d9491446bc6781e2432a156057a7d381fd3c0eeb2b261f197d3319b377817a42709dfe3286b6437424faf078cdf73ab108c563821fb0b2f7cd8cac1f.85fde842363bd7c53f928c493ff18f5a",
+  "hasCompletedOnboarding": true,
+  "lastActivityDate": "2025-04-18",
+  "profileImage": null,
+  "preferred_language": "pl",
+  "resetToken": null,
+  "resetTokenExpiresAt": null,
+  "currentStreak": 0,
+  "longestStreak": 0,
+  "experiencePoints": 0,
+  "level": 1
+}
+Using language from direct query structure (preferred_language): pl
+Generating monthly meal plan in language: pl
+Generating 3 days of meal plans in 1 batches of 3 days
+Generating batch 1/1 with 3 days (days 1-3)
+Generating 3 days of meal plan in Polish language (batch 1/1)
+Generating monthly meal plan batch in Polish language
+Raw OpenAI response for batch 1, structure: [ 'plan' ]
+Processed batch 1, got 3 days
+Total progress: 3/3 days generated
+Final meal plan variety score: {
+  overallVarietyScore: 0.1,
+  mealTypeRepetition: { other: 9 },
+  ingredientRepetition: {},
+  cuisineVariety: 9
+}
+Low variety detected in meal plan - reordering days to maximize variety
+Processed OpenAI response: { requestedDays: 3, processedDays: 3 }
+Generated meal plan with AI: { daysGenerated: 3, firstDay: 'Unknown' }
+Day 1 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Śniadanie: Jajecznica z oscypkiem i grzybami leśnymi (Day 1)',
+    mealType: undefined,
+    mealProps: [
+      'name',
+      'description',
+      'calories',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Pokrój grzyby i smaż na maśle przez 3 minuty. Dodaj jajka i oscypek, mieszaj, aż jajka się zetną. Do',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":1,"meals":[{"name":"Śniadanie: Jajecznica z oscypkiem i grzybami leśnymi (Day 1)","description":"Tradycyjna jajecznica z dodaniem aromatycznego oscypka i świeżych grzybów leśnych, podawana z pełnoziarnistym pieczywem.","calories":500,"ingredients":["4 jajka","50 g oscypka","100 g grzybów leśnych","1 łyżka masła","Sól i pieprz do smaku","2 kromki pełnoziarnistego chleba"],"instructions":"Pokrój grzyby i smaż na maśle przez 3 minuty. Dodaj jajka i oscypek, mieszaj, aż jajka się zetną. Dopra...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-18
+Using meal plan: 4 for date: 2025-04-18
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Śniadanie: Jajecznica z oscypkiem i grzybami leśnymi (Day 1)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Pokrój grzyby i smaż na maśle przez 3 minuty',
+    'Dodaj jajka i oscypek, mieszaj, aż jajka się zetną'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Obiad: Grillowany kurczak z włoską salsą z pomidorów i mozzarelli (Day 1)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Kurczaka grilluj z solą i pieprzem',
+    'Pomidor i mozzarellę pokrój w kostkę, dodaj bazylię i oliwę'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 2 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Kolacja: Sycący gulasz amerykański z wołowiny i fasoli czerwonej (Day 1)',
+  ingredientsCount: 6,
+  instructionsCount: 2,
+  sampleInstructions: [
+    'Podsmaż cebulę na oleju, dodaj wołowinę i przyprawy',
+    'Dusz przez 40 minut, dodaj paprykę i fasolę na ostatnie 10 minut'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 4, date: '2025-04-18', recipeCount: 3 }
+Day 2 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Śniadanie: Grzanki z awokado i jajkiem w koszulce (Day 2)',
+    mealType: undefined,
+    mealProps: [
+      'name',
+      'description',
+      'calories',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Awokado rozgnieć z sokiem z cytryny. Posmaruj na grzanki. Jajka gotuj w wodzie przez 3 minuty i połó',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":2,"meals":[{"name":"Śniadanie: Grzanki z awokado i jajkiem w koszulce (Day 2)","description":"Kremowe awokado z pożywnym jajkiem w koszulce na chrupiącej grzance.","calories":450,"ingredients":["2 kromki chleba","1 awokado","2 jajka","Sól, pieprz","Sok z 1/2 cytryny"],"instructions":"Awokado rozgnieć z sokiem z cytryny. Posmaruj na grzanki. Jajka gotuj w wodzie przez 3 minuty i połóż na grzanki.","recipe":{"ingredients":[],"instructions":[],"nutritionInfo":{"calories":0,"protein":0,"carbs...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-19
+Using meal plan: 5 for date: 2025-04-19
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 5 items
+Saving recipe with instructions: {
+  name: 'Śniadanie: Grzanki z awokado i jajkiem w koszulce (Day 2)',
+  ingredientsCount: 5,
+  instructionsCount: 3,
+  sampleInstructions: [ 'Awokado rozgnieć z sokiem z cytryny', 'Posmaruj na grzanki' ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Obiad: Polędwiczki wieprzowe w sosie musztardowym z puree ziemniaczanym (Day 2)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Polędwicę podsmaż z obu stron',
+    'Dodaj musztardę i śmietanę, gotuj 10 minut'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 2 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Kolacja: Sałatka grecka z fetą i oliwkami (Day 2)',
+  ingredientsCount: 7,
+  instructionsCount: 2,
+  sampleInstructions: [
+    'Pokrój warzywa i fetę',
+    'Wymieszaj wszystko z oliwkami, polej oliwą i posyp oregano'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 5, date: '2025-04-19', recipeCount: 3 }
+Day 3 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Śniadanie: Placuszki twarogowe z owocami leśnymi (Day 3)',
+    mealType: undefined,
+    mealProps: [
+      'name',
+      'description',
+      'calories',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Wymieszaj twaróg, jajko, mąkę i cukier. Smaż placuszki na średnim ogniu po 2 minuty z każdej strony.',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":3,"meals":[{"name":"Śniadanie: Placuszki twarogowe z owocami leśnymi (Day 3)","description":"Pyszne placuszki z twarogu podawane z sezonowymi owocami leśnymi.","calories":500,"ingredients":["200 g twarogu","1 jajko","3 łyżki mąki","1 łyżka cukru","100 g owoców leśnych","Olej do smażenia"],"instructions":"Wymieszaj twaróg, jajko, mąkę i cukier. Smaż placuszki na średnim ogniu po 2 minuty z każdej strony. Podaj z owocami.","recipe":{"ingredients":[],"instructions":[],"nutritionInfo":{"calor...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-20
+Using meal plan: 6 for date: 2025-04-20
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Śniadanie: Placuszki twarogowe z owocami leśnymi (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Wymieszaj twaróg, jajko, mąkę i cukier',
+    'Smaż placuszki na średnim ogniu po 2 minuty z każdej strony'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Obiad: Makaron penne z dynią i szałwią (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [ 'Dynię piecz w piekarniku przez 25 minut', 'Ugotuj makaron' ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 2 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Kolacja: Amerykański burger z wołowiny z sałatą i pomidorem (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 2,
+  sampleInstructions: [
+    'Uformuj kotleta z mięsa, grilluj po 5 minut z każdej strony',
+    'Podawaj w bułce z warzywami i serem'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 6, date: '2025-04-20', recipeCount: 3 }
+7:30:12 PM [express] POST /api/meal-plans 200 in 26058ms :: {"weekStart":"2025-04-18","plans":[{"id"…
+Fetching meal plan for today
+User ID: 8
+Fetching meal plan for date: all
+User ID: 8
+Found meal plan with ID: 4 for today (2025-04-18)
+Error fetching meal plan by date: NeonDbError: invalid input syntax for type date: "all"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/meal-plans.routes.ts:102:24) {
+  severity: 'ERROR',
+  code: '22007',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: "unnamed portal parameter $2 = '...'",
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'datetime.c',
+  line: '4026',
+  routine: 'DateTimeParseError',
+  sourceError: undefined
+}
+7:30:36 PM [express] GET /api/meal-plans/all 500 in 427ms :: {"error":"Failed to fetch meal plan"}
+Found 3 recipes for meal plan ID 4
+7:30:36 PM [express] GET /api/meal-plans/today 200 in 356ms :: {"hasPlan":true,"plan":{"id":4,"date"…

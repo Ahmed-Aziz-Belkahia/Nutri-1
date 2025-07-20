@@ -1,0 +1,24 @@
+You are tasked with creating a system that can recognize food items and provide nutritional details, such as calories, protein, fat, and carbs. Here's what you need to do:
+
+1. **Image Recognition**: Use OpenAI's image recognition capabilities to identify food items. The system should be able to recognize simple items like fruits (e.g., apples, oranges) as well as more complex items like cooked meals or packaged foods.
+    - If OpenAI's image recognition struggles to identify complex meals, you should integrate a specialized food recognition API like **Clarifai** or **FoodAI**.
+    - For packaged foods, you should use **OCR (Optical Character Recognition)** to extract any text from labels, and identify the product.
+
+2. **Nutrition Lookup**: Once the food is recognized, either by OpenAI or a specialized API, look up nutritional information using a database like **Nutritionix API**. For example, once an item is recognized as "banana", the system should retrieve its macronutrients (calories, carbs, protein, fat).
+
+3. **User Interface**: Build a simple user interface (UI) that allows users to upload images of food. The UI should show:
+    - The food item recognized.
+    - A breakdown of its nutritional information (calories, protein, fat, carbs).
+    - If the recognition isn't accurate, the system should request the user to try again or allow manual input.
+
+4. **Image Quality**: Provide guidelines for users to upload clear, well-lit images. The system should handle slightly imperfect images but aim to be accurate with well-captured ones.
+
+5. **Fallback Mechanism**: If OpenAI's model or the specialized recognition model fails to identify the food item, inform the user and allow for manual input (e.g., text search or selection from a list).
+
+### Key Libraries/APIs to Use:
+- **OpenAI API** (for general object recognition).
+- **Clarifai** or **FoodAI** API (for food-specific recognition).
+- **Tesseract OCR** (for extracting text from packaging).
+- **Nutritionix API** (for nutritional data).
+
+You can combine these APIs to improve recognition accuracy for complex meals or packaged foods. Let me know if you need help setting up these integrations.

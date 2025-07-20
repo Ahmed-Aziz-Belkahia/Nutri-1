@@ -1,0 +1,155 @@
+ rest-express@1.0.0 dev
+Connecting to database...
+4:54:31 PM [express] Testing database connection...
+4:54:32 PM [express] ✅ Database connection successful
+4:54:32 PM [express] ✅ Database schema updated
+4:54:32 PM [express] ✅ Uploads directory created
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+4:54:32 PM [express] Development server setup complete
+4:54:32 PM [express] Server running at http://0.0.0.0:5000
+✅ Database connection established successfully
+[Auth] User check request, authenticated: false
+4:54:36 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+4:54:42 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+4:55:16 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] Processing login request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+[Auth] Attempting login for: piotrekster1998@gmail.com
+[Auth] Login successful for: piotrekster1998@gmail.com
+[Auth] Serializing user: 1
+[Auth] Login successful for user: 1
+4:56:50 PM [express] POST /api/login 200 in 771ms :: {"ok":true}
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] User check request, authenticated: true
+4:56:50 PM [express] GET /api/user 304 in 34ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-03-02T00:00:00.000Z',
+  end: '2025-03-03T00:00:00.000Z'
+}
+4:56:52 PM [express] GET /api/user/xp 304 in 2145ms :: {"totalXP":20,"level":1,"currentXPInLevel":20…
+[Food Logs API] Retrieved logs: { count: 2, date: '2025-03-02T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 1300, protein: 50, carbs: 180, fat: 60 }
+4:56:54 PM [express] GET /api/food-logs 304 in 3083ms :: {"logs":[{"id":2,"userId":1,"name":"Chicken…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Fetching meal plan for date: 2025-03-02
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-02',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-02T00:47:34.710Z,
+  updatedAt: 2025-03-02T00:47:34.710Z
+}
+Found recipes: []
+4:56:54 PM [express] GET /api/meal-plans/today 304 in 120ms :: {"hasPlan":true,"plan":{"id":1,"date"…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  preferredIngredients: [],
+  excludedIngredients: []
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Saved preferences: {
+  id: 31,
+  userId: 1,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  calorieGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  updatedAt: 2025-03-02T16:56:58.536Z
+}
+4:56:58 PM [express] POST /api/user/dietary-preferences 200 in 73ms :: {"id":31,"userId":1,"currentW…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Received meal plan request with preferences: { maxCookingTime: 60, budgetPreference: 'medium' }
+Created weekly meal plans: [
+  {
+    id: 137,
+    date: '2025-03-02',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 138,
+    date: '2025-03-03',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 139,
+    date: '2025-03-04',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 140,
+    date: '2025-03-05',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 141,
+    date: '2025-03-06',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 142,
+    date: '2025-03-07',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  },
+  {
+    id: 143,
+    date: '2025-03-08',
+    totalCalories: 1700,
+    status: 'active',
+    meals: { breakfast: [Object], lunch: [Object], dinner: [Object] }
+  }
+]
+4:56:59 PM [express] POST /api/meal-plans 200 in 1107ms :: {"weekStart":"2025-03-02","plans":[{"id":…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Fetching meal plan for date: 2025-03-02
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-02',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-02T00:47:34.710Z,
+  updatedAt: 2025-03-02T00:47:34.710Z
+}
+Found recipes: []
+4:57:00 PM [express] GET /api/meal-plans/today 304 in 93ms :: {"hasPlan":true,"plan":{"id":1,"date":…

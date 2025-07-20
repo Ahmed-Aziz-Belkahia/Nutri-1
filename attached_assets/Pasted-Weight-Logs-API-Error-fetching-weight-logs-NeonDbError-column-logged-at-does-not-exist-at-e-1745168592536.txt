@@ -1,0 +1,66 @@
+Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5162:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+5:01:32 PM [express] GET /api/weight-logs 500 in 329ms :: {"error":"Failed to fetch weight logs","me…
+Fetching created recipes for user 4
+Fetching meal plan for today
+User ID: 4
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+5:01:33 PM [express] GET /api/progress-photos 304 in 260ms :: []
+Found meal plan with ID: 12 for today (2025-04-20)
+Found 3 recipes for meal plan ID 12
+5:01:33 PM [express] GET /api/meal-plans/today 304 in 265ms :: {"hasPlan":true,"plan":{"id":12,"date…
+Found 3 created recipes
+5:01:33 PM [express] GET /api/recipes 304 in 522ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+[Food Logs API] Fetching logs for date range: {
+  userId: 4,
+  dateRequested: '2025-04-20',
+  start: '2025-04-20T00:00:00.000Z',
+  end: '2025-04-20T23:59:59.999Z'
+}
+Fetching created recipes for user 4
+[Weight Logs API] Fetching weight logs for user: 4
+Found 3 created recipes
+5:01:33 PM [express] GET /api/recipes 304 in 245ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5162:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined

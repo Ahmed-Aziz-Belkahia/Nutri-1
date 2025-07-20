@@ -1,0 +1,100 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+4:12:32 PM [express] Testing database connection...
+✅ Database connection established successfully
+4:12:33 PM [express] ✅ Database connection successful
+4:12:33 PM [express] ✅ Database schema updated
+4:12:33 PM [express] ✅ Uploads directory created
+4:12:33 PM [express] Development server setup complete
+4:12:33 PM [express] Server running at http://0.0.0.0:5000
+4:12:38 PM [express] GET /api/user 401 in 7ms :: {"error":"Not authenticated"}
+4:12:43 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+4:12:43 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+4:13:08 PM [express] POST /api/login 200 in 530ms :: {"ok":true}
+4:13:08 PM [express] GET /api/user 200 in 150ms :: {"id":1,"email":"piotr@szacillo.coms","password":…
+4:13:09 PM [express] GET /api/user/xp 200 in 604ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+Fetching food logs between: 2025-02-12T00:00:00.000Z and 2025-02-13T00:00:00.000Z
+User ID: 1
+Retrieved logs: []
+4:13:10 PM [express] GET /api/food-logs 200 in 298ms :: {"logs":[],"totals":{"calories":0,"protein":…
+4:13:12 PM [express] GET /api/user/xp 304 in 297ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+OpenAI API Error: NotFoundError: 404 The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations
+    at Function.generate (/home/runner/workspace/node_modules/openai/src/error.ts:84:14)
+    at OpenAI.makeStatusError (/home/runner/workspace/node_modules/openai/src/core.ts:443:21)
+    at OpenAI.makeRequest (/home/runner/workspace/node_modules/openai/src/core.ts:507:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:91:22)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:139:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22) {
+  status: 404,
+  headers: {
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '910ddd8b0ec1ba18-SEA',
+    connection: 'keep-alive',
+    'content-encoding': 'gzip',
+    'content-type': 'application/json; charset=utf-8',
+    date: 'Wed, 12 Feb 2025 16:13:20 GMT',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=au41cz8tE.L93wi75NHxzqPn8w80g9RPTofCWvfW_1U-1739376800-1.0.1.1-UJI5x4xZUJUvi14ygXR4yY8bKqT3MgcYQqjGiveAKRIbXYTmNIZrUVNKhl47FKWKQDKBsTuTwvWW6oHYz42ynQ; path=/; expires=Wed, 12-Feb-25 16:43:20 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=AWQyZNHhXJNur8E34n4gel_X7BuKvGdY.DbZs8eQJa8-1739376800602-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    vary: 'Origin',
+    'x-content-type-options': 'nosniff',
+    'x-request-id': 'req_d630a2e3f12bdf23e81954192364bd02'
+  },
+  request_id: 'req_d630a2e3f12bdf23e81954192364bd02',
+  error: {
+    message: 'The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations',
+    type: 'invalid_request_error',
+    param: null,
+    code: 'model_not_found'
+  },
+  code: 'model_not_found',
+  param: null,
+  type: 'invalid_request_error'
+}
+Food recognition error: NotFoundError: 404 The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations
+    at Function.generate (/home/runner/workspace/node_modules/openai/src/error.ts:84:14)
+    at OpenAI.makeStatusError (/home/runner/workspace/node_modules/openai/src/core.ts:443:21)
+    at OpenAI.makeRequest (/home/runner/workspace/node_modules/openai/src/core.ts:507:24)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:91:22)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:139:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22) {
+  status: 404,
+  headers: {
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': '910ddd8b0ec1ba18-SEA',
+    connection: 'keep-alive',
+    'content-encoding': 'gzip',
+    'content-type': 'application/json; charset=utf-8',
+    date: 'Wed, 12 Feb 2025 16:13:20 GMT',
+    server: 'cloudflare',
+    'set-cookie': '__cf_bm=au41cz8tE.L93wi75NHxzqPn8w80g9RPTofCWvfW_1U-1739376800-1.0.1.1-UJI5x4xZUJUvi14ygXR4yY8bKqT3MgcYQqjGiveAKRIbXYTmNIZrUVNKhl47FKWKQDKBsTuTwvWW6oHYz42ynQ; path=/; expires=Wed, 12-Feb-25 16:43:20 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=AWQyZNHhXJNur8E34n4gel_X7BuKvGdY.DbZs8eQJa8-1739376800602-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    vary: 'Origin',
+    'x-content-type-options': 'nosniff',
+    'x-request-id': 'req_d630a2e3f12bdf23e81954192364bd02'
+  },
+  request_id: 'req_d630a2e3f12bdf23e81954192364bd02',
+  error: {
+    message: 'The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations',
+    type: 'invalid_request_error',
+    param: null,
+    code: 'model_not_found'
+  },
+  code: 'model_not_found',
+  param: null,
+  type: 'invalid_request_error'
+}
+Food analysis error: Error: 404 The model `gpt-4-vision-preview` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations
+    at analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:161:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+4:13:20 PM [express] POST /api/analyze-food 500 in 650ms :: {"error":"Food analysis failed","message…

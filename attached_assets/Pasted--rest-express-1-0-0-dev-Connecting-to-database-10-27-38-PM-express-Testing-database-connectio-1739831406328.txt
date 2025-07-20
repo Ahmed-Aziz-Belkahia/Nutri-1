@@ -1,0 +1,275 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+10:27:38 PM [express] Testing database connection...
+10:27:39 PM [express] ✅ Database connection successful
+✅ Database connection established successfully
+10:27:39 PM [express] ✅ Database schema updated
+10:27:39 PM [express] ✅ Uploads directory created
+10:27:39 PM [express] Development server setup complete
+10:27:39 PM [express] Server running at http://0.0.0.0:5000
+10:27:47 PM [express] GET /api/user 401 in 4ms :: {"error":"Not authenticated"}
+10:27:53 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:27:53 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:28:41 PM [express] POST /api/login 200 in 163ms :: {"ok":true}
+10:28:41 PM [express] GET /api/user 304 in 27ms :: {"id":1,"email":"piotr@szacillo.com","password":"a…
+10:28:42 PM [express] GET /api/food-logs 200 in 369ms :: {"logs":[{"id":44,"name":"Breakfast Meal","c…
+10:28:42 PM [express] GET /api/user/xp 304 in 56ms :: {"totalXP":440,"level":5,"currentXPInLevel":40,…
+10:28:46 PM [express] GET /api/user/xp 304 in 141ms :: {"totalXP":440,"level":5,"currentXPInLevel":40…
+10:28:49 PM [express] GET /api/user/xp 304 in 51ms :: {"totalXP":440,"level":5,"currentXPInLevel":40,…
+10:28:51 PM [express] GET /api/user/xp 304 in 48ms :: {"totalXP":440,"level":5,"currentXPInLevel":40,…
+Sending request to OpenAI Vision API...
+OpenAI Vision API response received: {
+  "name": "Breakfast Platter",
+  "calories": 800,
+  "protein": 25,
+  "carbs": 90,
+  "fat": 35,
+  "confidence": 0.9,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Waffle",
+      "calories": 350,
+      "protein": 8,
+      "carbs": 50,
+      "fat": 15,
+      "servingSize": "1 waffle",
+      "details": {
+        "type": "Breakfast",
+        "cut": "Round",
+        "cookingMethod": "Baked",
+        "doneness": "Golden brown",
+        "texture": "Crispy outside, soft inside",
+        "temperature": "Warm",
+        "color": "Golden",
+        "accompaniments": ["Strawberry", "Blueberries"],
+        "sauce": "Maple syrup",
+        "seasonings": [],
+        "garnishes": ["Powdered sugar"],
+        "presentation": "Whole",
+        "preparation": "Batter mixed and cooked in waffle iron",
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Scrambled Eggs",
+      "calories": 150,
+      "protein": 12,
+      "carbs": 2,
+      "fat": 10,
+      "servingSize": "1 portion",
+      "details": {
+        "type": "Eggs",
+        "cut": "N/A",
+        "cookingMethod": "Scrambled",
+        "doneness": "Soft",
+        "texture": "Fluffy",
+        "temperature": "Warm",
+        "color": "Yellow",
+        "accompaniments": [],
+        "sauce": "",
+        "seasonings": ["Salt", "Pepper"],
+        "garnishes": [],
+        "presentation": "Piled",
+        "preparation": "Eggs whisked and cooked on skillet",
+        "estimatedWeight": "100g"
+      }
+    },
+    {
+      "name": "Sausage Links",
+      "calories": 200,
+      "protein": 10,
+      "carbs": 2,
+      "fat": 18,
+      "servingSize": "2 links",
+      "details": {
+        "type": "Meat",
+        "cut": "Link",
+        "cookingMethod": "Grilled",
+        "doneness": "Cooked through",
+        "texture": "Juicy",
+        "temperature": "Warm",
+        "color": "Brown",
+        "accompaniments": [],
+        "sauce": "",
+        "seasonings": ["Herbs"],
+        "garnishes": [],
+        "presentation": "Side by side",
+        "preparation": "Grilled until browned",
+        "estimatedWeight": "80g"
+      }
+    },
+    {
+      "name": "Home Fries",
+      "calories": 100,
+      "protein": 2,
+      "carbs": 36,
+      "fat": 8,
+      "servingSize": "1 bowl",
+      "details": {
+        "type": "Potatoes",
+        "cut": "Cubed",
+        "cookingMethod": "Fried",
+        "doneness": "Crispy",
+        "texture": "Crispy outside, soft inside",
+        "temperature": "Warm",
+        "color": "Golden brown",
+        "accompaniments": [],
+        "sauce": "",
+        "seasonings": ["Salt", "Pepper", "Paprika"],
+        "garnishes": [],
+        "presentation": "In a small bowl",
+        "preparation": "Cubed and fried",
+        "estimatedWeight": "120g"
+      }
+    }
+  ]
+}
+Final food recognition result: {
+  name: 'Breakfast Platter',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 35,
+  confidence: 0.9,
+  servingSize: '1 plate',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Waffle',
+      calories: 350,
+      protein: 8,
+      carbs: 50,
+      fat: 15,
+      servingSize: '1 waffle',
+      details: [Object]
+    },
+    {
+      name: 'Scrambled Eggs',
+      calories: 150,
+      protein: 12,
+      carbs: 2,
+      fat: 10,
+      servingSize: '1 portion',
+      details: [Object]
+    },
+    {
+      name: 'Sausage Links',
+      calories: 200,
+      protein: 10,
+      carbs: 2,
+      fat: 18,
+      servingSize: '2 links',
+      details: [Object]
+    },
+    {
+      name: 'Home Fries',
+      calories: 100,
+      protein: 2,
+      carbs: 36,
+      fat: 8,
+      servingSize: '1 bowl',
+      details: [Object]
+    }
+  ]
+}
+Final food recognition result: {
+  name: 'Breakfast Platter',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 35,
+  confidence: 0.9,
+  servingSize: '1 plate',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Waffle',
+      calories: 350,
+      protein: 8,
+      carbs: 50,
+      fat: 15,
+      servingSize: '1 waffle',
+      details: [Object]
+    },
+    {
+      name: 'Scrambled Eggs',
+      calories: 150,
+      protein: 12,
+      carbs: 2,
+      fat: 10,
+      servingSize: '1 portion',
+      details: [Object]
+    },
+    {
+      name: 'Sausage Links',
+      calories: 200,
+      protein: 10,
+      carbs: 2,
+      fat: 18,
+      servingSize: '2 links',
+      details: [Object]
+    },
+    {
+      name: 'Home Fries',
+      calories: 100,
+      protein: 2,
+      carbs: 36,
+      fat: 8,
+      servingSize: '1 bowl',
+      details: [Object]
+    }
+  ]
+}
+10:29:16 PM [express] POST /api/analyze-food 200 in 14195ms :: {"name":"Breakfast Platter","calories"…
+Adding food log, received: {
+  name: 'Breakfast Platter',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 35,
+  quantity: 1,
+  components: undefined
+}
+10:29:16 PM [express] POST /api/food-logs 200 in 257ms :: {"log":{"id":45,"userId":1,"name":"Breakfas…
+[XP Route] Processing XP award request: { action: 'LOG_MEAL', amount: 10, userId: 1 }
+[XP Route] Found user: {
+  id: 1,
+  email: 'piotr@szacillo.com',
+  password: 'ac5e11490b832fd6a4b799fed57e64ad9a981cacf5e650a42eec82da02a6391465f06ec094e7bddf6860ccba0d2d833e9ec4005d0809d108c66092385de7427d.6a542e5a89c9928521e464a62c54a623',
+  hasCompletedOnboarding: false,
+  currentStreak: 2,
+  longestStreak: 2,
+  lastActivityDate: '2025-02-17',
+  experiencePoints: 440,
+  level: 5,
+  profileImage: null
+}
+[XP Route] Same day activity, maintaining streak
+[XP Route] XP/Level calculation: {
+  currentXP: 440,
+  newXP: 450,
+  currentLevel: 5,
+  newLevel: 5,
+  userId: 1,
+  currentStreak: 2,
+  longestStreak: 2
+}
+[XP Route] Successfully updated XP, level, and streak in database
+[XP Route] Sending success response: {
+  amount: 10,
+  message: 'Earned 10 XP for LOG_MEAL!',
+  totalXP: 450,
+  level: 5,
+  currentXPInLevel: 50,
+  xpNeededForNextLevel: 100,
+  streak: 2,
+  longestStreak: 2
+}
+10:29:17 PM [express] POST /api/xp/award 200 in 76ms :: {"amount":10,"message":"Earned 10 XP for LOG_…
+10:29:17 PM [express] GET /api/user/xp 200 in 48ms :: {"totalXP":450,"level":5,"currentXPInLevel":50,…
+10:29:17 PM [express] GET /api/user 200 in 25ms :: {"id":1,"email":"piotr@szacillo.com","password":"a…
+10:29:18 PM [express] GET /api/user/xp 304 in 47ms :: {"totalXP":450,"level":5,"currentXPInLevel":50,…
+10:29:30 PM [express] GET /api/user/xp 304 in 238ms :: {"totalXP":450,"level":5,"currentXPInLevel":50…

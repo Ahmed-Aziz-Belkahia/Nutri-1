@@ -1,0 +1,141 @@
+        "doneness": "Well-cooked",
+        "temperature": "Warm",
+        "accompaniments": [
+          "Basil leaves"
+        ],
+        "sauce": "Tomato-based meat sauce",
+        "seasonings": [
+          "Salt",
+          "Pepper",
+          "Garlic"
+        ],
+        "garnishes": [
+          "Basil leaves"
+        ],
+        "presentation": "Ladled over pasta"
+      }
+    }
+  ]
+}
+OpenAI food analysis complete
+11:29:54 AM [express] POST /api/analyze-food 200 in 9733ms :: {"name":"Spaghetti with Bolognese Sauce…
+[Food Logs API] Processing food log request: {
+  userId: 1,
+  name: 'Spaghetti with Bolognese Sauce',
+  hasImage: true,
+  hasComponents: false
+}
+[Food Logs API] Using log date: 2025-04-05T11:29:42.507Z
+[Food Logs API] Processing image analysis
+[Food Recognition] Starting image analysis...
+[Food Recognition] Valid base64 image data verified, size: 612238 bytes
+[Food Recognition] Starting image analysis...
+[Food Recognition] Received response from OpenAI
+[Food Recognition] Successfully parsed OpenAI response
+[Food Recognition] Validating response structure...
+[Food Recognition] Validation successful
+[Food Recognition] Analysis result: {
+  "name": "Spaghetti with Bolognese Sauce",
+  "calories": 650,
+  "protein": 25,
+  "carbs": 85,
+  "fat": 20,
+  "confidence": 0.95,
+  "components": [
+    {
+      "name": "Spaghetti",
+      "calories": 350,
+      "protein": 12,
+      "carbs": 70,
+      "fat": 2,
+      "servingSize": "1 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Pasta",
+        "preparation": "Boiled",
+        "texture": "Soft",
+        "color": "Light yellow",
+        "estimatedWeight": "150 grams",
+        "cookingMethod": "Boiling",
+        "doneness": "Al dente",
+        "temperature": "Warm",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Twisted into a mound"
+      }
+    },
+    {
+      "name": "Bolognese Sauce",
+      "calories": 300,
+      "protein": 13,
+      "carbs": 15,
+      "fat": 18,
+      "servingSize": "1/2 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Sauce",
+        "preparation": "Simmered",
+        "texture": "Chunky",
+        "color": "Red",
+        "estimatedWeight": "120 grams",
+        "cookingMethod": "Simmering",
+        "doneness": "Well-cooked",
+        "temperature": "Warm",
+        "accompaniments": [
+          "Basil leaves"
+        ],
+        "sauce": "Tomato-based with meat",
+        "seasonings": [
+          "Salt",
+          "Pepper",
+          "Garlic"
+        ],
+        "garnishes": [
+          "Basil"
+        ],
+        "presentation": "Ladled over pasta"
+      }
+    }
+  ]
+}
+[Food Logs API] Image analysis completed: { componentsFound: 2 }
+[Food Logs API] Using analyzed components: {
+  count: 2,
+  totals: {
+    totalCalories: 650,
+    totalProtein: 25,
+    totalCarbs: 85,
+    totalFat: 20
+  }
+}
+[Food Logs API] Inserting food log into database: {
+  userId: 1,
+  name: 'Spaghetti with Bolognese Sauce',
+  componentsCount: 2
+}
+[Food Logs API] Error adding food log: NeonDbError: relation "food_logs" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:3248:25) {
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '13',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable',
+  sourceError: undefined
+}
+11:30:06 AM [express] POST /api/food-logs 500 in 10766ms :: {"error":"Failed to add food log","messag…

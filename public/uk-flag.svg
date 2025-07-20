@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 60 30" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<g id="d">
+<g id="c">
+<g id="b">
+<path id="a" d="M-1 0h2v1h-1z" transform="translate(1 -1) rotate(45)"/>
+<use xlink:href="#a" transform="rotate(90)"/>
+<use xlink:href="#a" transform="rotate(180)"/>
+<use xlink:href="#a" transform="rotate(270)"/>
+</g>
+<use xlink:href="#b" transform="rotate(180)"/>
+</g>
+<use xlink:href="#c" transform="translate(0 -6)"/>
+<use xlink:href="#c" transform="translate(0 6)"/>
+<use xlink:href="#c" transform="translate(-6)"/>
+<use xlink:href="#c" transform="translate(6)"/>
+</g>
+</defs>
+<path fill="#00247d" d="M0 0h60v30H0z"/>
+<path stroke="#fff" stroke-width="6" d="M0 0l60 30M0 30L60 0"/>
+<path stroke="#cf142b" stroke-width="4" d="M0 0l60 30M0 30L60 0"/>
+<path stroke="#fff" stroke-width="10" d="M30 0v30M0 15h60"/>
+<path stroke="#cf142b" stroke-width="6" d="M30 0v30M0 15h60"/>
+<use xlink:href="#d" fill="#fff"/>
+</svg>

@@ -1,0 +1,52 @@
+Here’s a detailed prompt you can use to guide Replit AI for redesigning this interface:
+
+Prompt:
+
+“Design a clean and modern user interface for a nutrition tracking app. Ensure all elements are visually consistent and aligned. Here’s the detailed specification:**
+
+General Guidelines:
+	1.	Use a light theme with shades of blue as the primary color, complemented by neutral background tones (e.g., white or very light gray).
+	2.	All elements should be aligned to a 12px grid for consistency.
+	3.	Use a sans-serif font with proper hierarchy:
+	•	Headings: Bold, 20px.
+	•	Subheadings: Semi-bold, 16px.
+	•	Body text: Regular, 14px.
+	•	Labels or minor text: Regular, 12px.
+
+Header:
+	•	Display a welcome message with the user’s name and profile picture.
+	•	The profile picture should be a circular thumbnail, 40x40px in size.
+	•	Add a wave emoji or icon next to the welcome text for personalization.
+
+Date Navigation:
+	•	Create a horizontal date selector for the week with seven days displayed.
+	•	Each day block should be 50x50px, with the current day highlighted (use a blue background and white text).
+	•	Add rounded corners and a hover state (slight shadow effect).
+
+Nutrition Overview Card:
+	•	Use a card layout, width: 90% of the screen, height: 150px.
+	•	Include:
+	•	A progress circle (size: 80x80px) showing the percentage of the daily goal.
+	•	Clear numerical displays for “0 of 2.0k goal” and “0%”.
+	•	Break down macronutrients (Carbs, Protein, Fat) in a horizontal row, with each value displayed as 14px bold and labels below as 12px regular.
+
+Meals Section:
+	•	Include a heading: Today’s Meals (16px bold).
+	•	Below, display an empty state with an icon (plate and utensils, size 50x50px) and the text “No meals logged today” in 14px regular.
+
+Bottom Navigation:
+	•	A sticky bottom navigation bar with four icons:
+	•	Overview, Recipes, Progress, Add.
+	•	Icons should be 30x30px, spaced evenly.
+	•	Highlight the active tab with a blue icon and label.
+
+Add Button:
+	•	Place a prominent floating Add button at the bottom-right corner.
+	•	Use a circular button, size: 60x60px, with a plus (+) icon in the center.
+	•	Add a subtle shadow and use the primary blue color.
+
+Visual Enhancements:
+	•	Use soft shadows, rounded corners (8px), and subtle hover effects for all clickable elements.
+	•	Animate the progress circle for better user engagement.
+
+Feel free to adjust as needed!

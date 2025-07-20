@@ -1,0 +1,35 @@
+You are tasked with improving the accuracy of the nutritional information returned by the food recognition system. While the food recognition works well (e.g., recognizing "apple", "chicken"), the macronutrient data returned is not correct. Here’s how to address the issue:
+
+### 1. **Confirm Food Recognition Accuracy**:
+   - Ensure the food item recognized matches exactly with the data in the API (Nutritionix, Edamam, etc.). If there is any discrepancy, modify the system to allow for more refined search terms.
+   - If the recognized food is a meal or complex dish, break it down into individual ingredients (e.g., "pasta with tomato sauce" should be broken down into "pasta", "tomato", "olive oil", etc.).
+
+### 2. **Accurate Nutritional Data Lookup**:
+   - When querying the API (e.g., Nutritionix, Edamam), make sure you include specific details like:
+     - **Serving Size**: Ensure you are retrieving data for the correct portion size (e.g., 1 serving, 100g, etc.).
+     - **Preparation Method**: For complex dishes, it is important to clarify if the food is "raw", "cooked", or "processed" as this can impact macros (e.g., a raw vs. cooked chicken breast has different macros).
+   - **Cross-Check Database**: If you receive data that doesn't align with the food recognized, manually cross-check by searching for food names or checking the specific food category (e.g., "Chicken Salad" vs. "Chicken Caesar Salad").
+
+### 3. **Refine Matching Logic**:
+   - Implement additional logic to handle complex foods by allowing users to specify more details about the dish (e.g., "What type of pasta is this?" or "Does this meal contain dairy?").
+   - For foods that are packaged, use OCR to extract specific product names, which will help narrow down search results for the right product in the API database.
+
+### 4. **Improve API Integration**:
+   - Use APIs like **Nutritionix** or **Edamam** for better food-specific data, as they often provide more precise nutritional breakdowns. Make sure to parse the data correctly from the API (e.g., calories, protein, fat, carbs).
+   - If using **Clarifai** or **FoodAI**, be aware that they may not provide detailed macronutrient information directly. You’ll need to pass the recognized food to a nutritional database for accurate macro details.
+
+### 5. **Manual Overrides and User Feedback**:
+   - If the nutritional data seems wrong, provide a feature that allows the user to manually input or adjust the macros. Use this data to refine future requests and improve the model’s accuracy over time.
+
+---
+
+**Key Libraries/Systems to Review**:
+- **Nutritionix API** (ensure correct food data fetching with accurate queries for portion size and preparation method).
+- **Edamam API** (offers similar functionality with detailed macronutrient data).
+- **OCR System** (for reading labels on packaged foods and using the product name for accurate search).
+
+---
+
+This approach ensures the system checks for proper matching, accurate API queries, and allows for greater customization with user input if discrepancies arise.
+
+Would you like to proceed with implementing these suggestions, or do you need help fine-tuning the search logic further?

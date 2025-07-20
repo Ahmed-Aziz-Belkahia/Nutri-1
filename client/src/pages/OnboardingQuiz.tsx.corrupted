@@ -1,0 +1,2029 @@
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMutation } from "@tanstack/react-query";
+import { Loader2, Upload, ArrowLeft, ArrowRight, CheckCircle2, User, UserRound, Target, Heart, Zap, Lightbulb, Calendar } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { NumberWheelNew } from "../components/NumberWheelNew";
+import EnhancedSelectionButton from "../components/EnhancedSelectionButton";
+
+import { useTranslation } from "react-i18next";
+
+type OnboardingData = {
+  // New dream description field for conversational input
+  dreamDescription?: string;
+  // New perfect goal field
+  perfectGoal: 'weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change';
+  gender: 'male' | 'female' | '';
+  age: number;
+  height: number;
+  weight: number;
+  goalWeight: number;
+  weightGoal: 'loss' | 'maintain' | 'gain' | '';
+  activityLevel: string;
+  dietaryRestrictions: string[];
+  allergies: string[];
+  mealBudget: 'low' | 'medium' | 'high';
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced';
+  preferredLanguage: 'en' | 'pl';
+  profileImage?: File;
+  // New emotional journey fields
+  energyPattern: 'morning' | 'afternoon' | 'evening' | 'consistent' | 'fluctuating';
+  flavorPreference: 'savory' | 'spicy' | 'sweet' | 'fresh';
+  firstVictory: 'energy' | 'sleep' | 'appearance' | 'clarity';
+  motivationLevel?: 'high' | 'medium' | 'low';
+  nutritionGoals?: string[];
+  // Tracking what data was extracted from dream description
+  extractedData?: {
+    hasAge: boolean;
+    hasGender: boolean;
+    hasWeight: boolean;
+    hasGoalWeight: boolean;
+    hasHeight: boolean;
+    hasGoal: boolean;
+  };
+};
+
+const calculateCalories = (data: OnboardingData) => {
+  // Use Mifflin-St Jeor Equation for more accurate BMR calculation
+  let bmr;
+  if (data.gender === 'male') {
+    // BMR for men: (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5
+    bmr = (10 * data.weight) + (6.25 * data.height) - (5 * data.age) + 5;
+  } else {
+    // BMR for women: (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161
+    bmr = (10 * data.weight) + (6.25 * data.height) - (5 * data.age) - 161;
+  }
+  
+  // Apply activity multiplier
+  const activityMultipliers = {
+    '0-2': 1.2,  // Sedentary: little or no exercise
+    '3-5': 1.55, // Moderate: exercise 3-5 times/week
+    '6+': 1.725, // Active: daily exercise or intense exercise 3-5 times/week
+  };
+  
+  const tdee = bmr * activityMultipliers[data.activityLevel as keyof typeof activityMultipliers];
+  
+  // Apply goal adjustment
+  const adjustments = {
+    loss: -500,    // Caloric deficit for weight loss
+    maintain: 0,   // Maintenance calories
+    gain: 500,     // Caloric surplus for weight gain
+  };
+  
+  return Math.round(tdee + adjustments[data.weightGoal]);
+};
+
+const calculateMacros = (calories: number) => {
+  // Customize macros based on calorie levels
+  let proteinPct, carbsPct, fatPct;
+  
+  if (calories < 1500) {
+    // Lower calories: higher protein to preserve muscle mass
+    proteinPct = 0.35;
+    carbsPct = 0.35;
+    fatPct = 0.30;
+  } else if (calories > 2500) {
+    // Higher calories: more carbs for energy
+    proteinPct = 0.25;
+    carbsPct = 0.45;
+    fatPct = 0.30;
+  } else {
+    // Balanced macros for moderate calorie levels
+    proteinPct = 0.30;
+    carbsPct = 0.40;
+    fatPct = 0.30;
+  }
+  
+  return {
+    protein: Math.round((calories * proteinPct) / 4), // 4 calories per gram of protein
+    carbs: Math.round((calories * carbsPct) / 4),     // 4 calories per gram of carbs
+    fat: Math.round((calories * fatPct) / 9),         // 9 calories per gram of fat
+  };
+};
+
+export default function OnboardingQuiz() {
+  const [, setLocation] = useLocation();
+  const [step, setStep] = useState(0); // Start from perfect goal question (step 0)
+  const [isGeneratingVisionBoard, setIsGeneratingVisionBoard] = useState(false);
+  const [visionBoardPage, setVisionBoardPage] = useState(0); // 0: loading, 1: macro goals, 2: motivation, 3: timeline
+  const [visionBoardData, setVisionBoardData] = useState<any>(null); // Store generated vision board data
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState<OnboardingData>({
+    dreamDescription: '', // New field for conversational input
+    perfectGoal: 'weight_loss', // Default perfect goal
+    gender: '', // Empty by default - to be extracted or asked
+    age: 25, // Default age
+    height: 170, // Middle value between 100 and 250
+    weight: 70, // Default weight
+    goalWeight: 70, // Start with current weight
+    weightGoal: '', // Empty by default - to be extracted or asked
+    activityLevel: '',
+    dietaryRestrictions: [],
+    allergies: [],
+    mealBudget: 'medium',
+    experienceLevel: 'beginner',
+    preferredLanguage: 'pl', // Default to Polish
+    // New emotional journey fields with defaults
+    energyPattern: 'morning', 
+    flavorPreference: 'savory',
+    firstVictory: 'energy',
+    motivationLevel: 'medium',
+    nutritionGoals: [],
+    // Tracking extracted data
+    extractedData: {
+      hasAge: false,
+      hasGender: false,
+      hasWeight: false,
+      hasGoalWeight: false,
+      hasHeight: false,
+      hasGoal: false
+    }
+  });
+  
+  const [dailyCalories, setDailyCalories] = useState(0);
+  
+  // Initialize calories when all required data is available
+  useEffect(() => {
+    if (formData.gender && formData.age && formData.height && formData.weight && formData.weightGoal && formData.activityLevel) {
+      const calories = calculateCalories(formData);
+      setDailyCalories(calories);
+    }
+  }, [formData]);
+
+  const generateMotivationalContent = async (dreamDescription: string) => {
+    try {
+      const response = await fetch('/api/generate-motivation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dreamDescription }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate motivational content');
+      }
+      
+      const data = await response.json();
+      return data.motivationalContent;
+    } catch (error) {
+      console.error('Error generating motivational content:', error);
+      return null;
+    }
+  };
+
+  const savePreferences = async (data: OnboardingData) => {
+    const calorieGoal = calculateCalories(data);
+    const macros = calculateMacros(calorieGoal);
+
+    const formDataToSend = new FormData();
+
+    const profileData = {
+      height: data.height,
+      weight: data.weight,
+      goalWeight: data.goalWeight,
+      weightGoal: data.weightGoal,
+      activityLevel: data.activityLevel,
+      calorieGoal,
+      proteinGoal: macros.protein,
+      carbsGoal: macros.carbs,
+      fatGoal: macros.fat,
+      dietaryRestrictions: data.dietaryRestrictions,
+      allergies: data.allergies,
+      mealBudget: data.mealBudget,
+      experienceLevel: data.experienceLevel,
+      preferredLanguage: data.preferredLanguage,
+      // Add emotional journey fields
+      energyPattern: data.energyPattern,
+      flavorPreference: data.flavorPreference,
+      firstVictory: data.firstVictory,
+      motivationLevel: data.motivationLevel,
+      nutritionGoals: data.nutritionGoals
+    };
+
+    formDataToSend.append('profile', JSON.stringify(profileData));
+
+    if (data.profileImage) {
+      formDataToSend.append('profileImage', data.profileImage);
+    }
+
+    const response = await fetch('/api/register/complete-onboarding', {
+      method: 'POST',
+      body: formDataToSend,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Failed to save preferences');
+    }
+
+    return response.json();
+  };
+
+  const mutation = useMutation({
+    mutationFn: savePreferences,
+    onSuccess: () => {
+      toast({
+        title: t('onboarding.profile_completed'),
+        description: t('onboarding.preferences_saved'),
+      });
+      setLocation('/dashboard');
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        title: t('common.error'),
+        description: error.message || t('onboarding.save_error'),
+      });
+    },
+  });
+
+  // Calculate timeline for weight goal achievement
+  // Function to parse dream description and extract user data
+  const parseUserDream = (description: string) => {
+    const text = description.toLowerCase();
+    const extracted = {
+      age: null as number | null,
+      gender: '' as string,
+      weight: null as number | null,
+      goalWeight: null as number | null,
+      height: null as number | null,
+      goal: '' as string
+    };
+
+    // Extract age
+    const agePatterns = [
+      /(\d+)\s*(?:years?\s*old|lat|roku|lata)/,
+      /(?:i'?m|jestem|mam)\s*(\d+)/,
+      /age\s*:?\s*(\d+)/,
+      /wiek\s*:?\s*(\d+)/
+    ];
+    for (const pattern of agePatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        const age = parseInt(match[1]);
+        if (age >= 16 && age <= 100) {
+          extracted.age = age;
+          break;
+        }
+      }
+    }
+
+    // Extract gender - improved patterns for Polish (all variations)
+    const maleKeywords = ['male', 'man', 'guy', 'boy', 'mężczyzna', 'meżczyszna', 'mężczyzną', 'mężczyzn', 'mężczyzne', 'chłopak', 'facet', 'jestem mężczyzną', 'jestem meżczyszną', 'letnim mężczyzn', 'letni mężczyzna'];
+    const femaleKeywords = ['female', 'woman', 'girl', 'lady', 'kobieta', 'dziewczyna', 'pani', 'jestem kobietą', 'jestem dziewczyną', 'letnia kobieta', 'letnią kobietą'];
+    
+    for (const keyword of maleKeywords) {
+      if (text.includes(keyword)) {
+        extracted.gender = 'male';
+        console.log('Detected male gender with keyword:', keyword);
+        break;
+      }
+    }
+    if (!extracted.gender) {
+      for (const keyword of femaleKeywords) {
+        if (text.includes(keyword)) {
+          extracted.gender = 'female';
+          console.log('Detected female gender with keyword:', keyword);
+          break;
+        }
+      }
+    }
+
+    // Extract weight (current) - improved patterns for Polish
+    const weightPatterns = [
+      /(?:ważę|waga|weight|waże)\s*(?:około\s*)?(\d+(?:[.,]\d+)?)\s*(?:kg|kilograms?)/gi,
+      /(\d+(?:[.,]\d+)?)\s*kg(?:\s*(?:wag|aktualnie|obecnie))?/gi,
+      /(?:moja\s*waga|current.*weight)\s*(?:to\s*|jest\s*|wynosi\s*)?(\d+(?:[.,]\d+)?)/gi,
+      /(?:obecnie|aktualnie|teraz)\s*(?:ważę\s*)?(\d+(?:[.,]\d+)?)\s*kg/gi
+    ];
+    for (const pattern of weightPatterns) {
+      const match = pattern.exec(text);
+      if (match) {
+        const weightStr = match[1].replace(',', '.');
+        const weight = parseFloat(weightStr);
+        if (weight >= 30 && weight <= 300) {
+          extracted.weight = weight;
+          break;
+        }
+      }
+    }
+
+    // Extract goal weight - improved patterns for Polish
+    const goalWeightPatterns = [
+      /(?:chcę|cel|goal|target).*?(?:do\s*)?(\d+(?:[.,]\d+)?)\s*kg/gi,
+      /(?:schudnąć|zrzucić|lose).*?(?:do\s*)?(\d+(?:[.,]\d+)?)\s*kg/gi,
+      /(?:przytyć|nabierać|gain).*?(?:do\s*)?(\d+(?:[.,]\d+)?)\s*kg/gi,
+      /(?:osiągnąć|reach|target).*?(\d+(?:[.,]\d+)?)\s*kg/gi,
+      /do\s*(\d+(?:[.,]\d+)?)\s*kg/gi,
+      /(\d+(?:[.,]\d+)?)\s*kg.*(?:cel|goal|target)/gi
+    ];
+    for (const pattern of goalWeightPatterns) {
+      const match = pattern.exec(text);
+      if (match) {
+        const goalWeightStr = match[1].replace(',', '.');
+        const goalWeight = parseFloat(goalWeightStr);
+        if (goalWeight >= 30 && goalWeight <= 300) {
+          extracted.goalWeight = goalWeight;
+          break;
+        }
+      }
+    }
+
+    // Extract height
+    const heightPatterns = [
+      /(?:height|tall|wzrost)\s*:?\s*(\d+)\s*(?:cm|centimeters?)/,
+      /(\d+)\s*(?:cm|centimeters?)\s*(?:tall|high)/,
+      /(\d{3})\s*cm/, // 3-digit number followed by cm
+      /wzrost\s*(\d+)/
+    ];
+    for (const pattern of heightPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        const height = parseInt(match[1]);
+        if (height >= 100 && height <= 250) {
+          extracted.height = height;
+          break;
+        }
+      }
+    }
+
+    // Extract goal type - improved patterns for Polish
+    const loseKeywords = ['lose', 'losing', 'weight loss', 'schudnąć', 'zrzucić', 'odchudzanie', 'stracić wagę', 'stracić wage', 'chcę schudnąć', 'chce stracić', 'chce schudnąć'];
+    const gainKeywords = ['gain', 'gaining', 'muscle', 'bulk', 'przytyć', 'nabierać', 'mięśnie', 'masa', 'chcę przytyć', 'nabierać masy'];
+    const maintainKeywords = ['maintain', 'maintaining', 'utrzymać', 'zachować', 'utrzymać wagę'];
+
+    for (const keyword of loseKeywords) {
+      if (text.includes(keyword)) {
+        extracted.goal = 'loss';
+        console.log('Detected weight loss goal with keyword:', keyword);
+        break;
+      }
+    }
+    if (!extracted.goal) {
+      for (const keyword of gainKeywords) {
+        if (text.includes(keyword)) {
+          extracted.goal = 'gain';
+          console.log('Detected weight gain goal with keyword:', keyword);
+          break;
+        }
+      }
+    }
+    if (!extracted.goal) {
+      for (const keyword of maintainKeywords) {
+        if (text.includes(keyword)) {
+          extracted.goal = 'maintain';
+          console.log('Detected weight maintain goal with keyword:', keyword);
+          break;
+        }
+      }
+    }
+
+    return extracted;
+  };
+
+  const calculateTimeline = () => {
+    const weightDifference = Math.abs(formData.goalWeight - formData.weight);
+    const isWeightLoss = formData.weightGoal === 'loss';
+    const isWeightGain = formData.weightGoal === 'gain';
+    
+    if (formData.weightGoal === 'maintain') {
+      return {
+        weeks: 0,
+        months: 0,
+        weightChange: 0,
+        weeklyProgress: 0,
+        monthlyProgress: 0
+      };
+    }
+    
+    // Safe weight loss/gain rates
+    const weeklyRateKg = isWeightLoss ? 0.5 : 0.25; // 0.5kg/week loss, 0.25kg/week gain
+    const weeks = Math.ceil(weightDifference / weeklyRateKg);
+    const months = Math.ceil(weeks / 4.33); // Average weeks per month
+    
+    return {
+      weeks,
+      months,
+      weightChange: isWeightLoss ? -weightDifference : weightDifference,
+      weeklyProgress: weeklyRateKg * (isWeightLoss ? -1 : 1),
+      monthlyProgress: weeklyRateKg * 4.33 * (isWeightLoss ? -1 : 1)
+    };
+  };
+
+  const calculateMacros = (calories: number) => {
+    // Standard macro distribution for balanced nutrition
+    const proteinPercent = 0.25; // 25% protein
+    const carbsPercent = 0.45;   // 45% carbs  
+    const fatPercent = 0.30;     // 30% fat
+    
+    return {
+      protein: Math.round((calories * proteinPercent) / 4), // 4 calories per gram
+      carbs: Math.round((calories * carbsPercent) / 4),     // 4 calories per gram
+      fat: Math.round((calories * fatPercent) / 9)          // 9 calories per gram
+    };
+  };
+
+  // Handle dream description processing and smart step navigation
+  const processDreamAndAdvance = () => {
+    if (formData.dreamDescription) {
+      const extracted = parseUserDream(formData.dreamDescription);
+      
+      // Initialize extracted data structure if it doesn't exist
+      const updatedExtracted = {
+        hasAge: false,
+        hasGender: false,
+        hasWeight: false,
+        hasGoalWeight: false,
+        hasHeight: false,
+        hasGoal: false
+      };
+      
+      // Update form data with extracted information
+      const updatedData = { ...formData };
+      
+      if (extracted.age) {
+        updatedData.age = extracted.age;
+        updatedExtracted.hasAge = true;
+        console.log('Extracted age:', extracted.age);
+      }
+      if (extracted.gender) {
+        updatedData.gender = extracted.gender as 'male' | 'female';
+        updatedExtracted.hasGender = true;
+        console.log('Extracted gender:', extracted.gender);
+      }
+      if (extracted.weight) {
+        updatedData.weight = extracted.weight;
+        updatedExtracted.hasWeight = true;
+        console.log('Extracted weight:', extracted.weight);
+      }
+      if (extracted.goalWeight) {
+        updatedData.goalWeight = extracted.goalWeight;
+        updatedExtracted.hasGoalWeight = true;
+        console.log('Extracted goal weight:', extracted.goalWeight);
+      }
+      if (extracted.height) {
+        updatedData.height = extracted.height;
+        updatedExtracted.hasHeight = true;
+        console.log('Extracted height:', extracted.height);
+      }
+      if (extracted.goal) {
+        updatedData.weightGoal = extracted.goal as 'loss' | 'maintain' | 'gain';
+        updatedExtracted.hasGoal = true;
+        console.log('Extracted goal:', extracted.goal);
+        
+        // Also set perfectGoal based on the weight goal
+        if (extracted.goal === 'loss') {
+          updatedData.perfectGoal = 'weight_loss';
+        } else if (extracted.goal === 'gain') {
+          updatedData.perfectGoal = 'muscle_gain';
+        } else {
+          updatedData.perfectGoal = 'health_improve';
+        }
+      }
+      
+      updatedData.extractedData = updatedExtracted;
+      
+      // Update the form data
+      setFormData(updatedData);
+      
+      console.log('Updated form data:', updatedData);
+      console.log('Extracted data flags:', updatedExtracted);
+      
+      // Use setTimeout to ensure state update is complete before finding next step
+      setTimeout(() => {
+        findNextMissingStep(updatedExtracted);
+      }, 100);
+    } else {
+      // No dream description, go to step 1
+      setStep(1);
+    }
+  };
+
+  const findNextMissingStep = (extractedData?: any) => {
+    const extracted = extractedData || formData.extractedData;
+    
+    console.log('Finding next missing step with extracted data:', extracted);
+    console.log('Current form data age:', formData.age);
+    console.log('Current form data gender:', formData.gender);
+    console.log('Current form data height:', formData.height);
+    console.log('Current form data weightGoal:', formData.weightGoal);
+    console.log('Current form data weight:', formData.weight);
+    console.log('Current form data goalWeight:', formData.goalWeight);
+    console.log('Current form data activityLevel:', formData.activityLevel);
+    
+    // Check what's missing and go to the first missing step in the correct order
+    // Step 1: Age
+    if (!extracted?.hasAge && (!formData.age || formData.age <= 0)) {
+      console.log('Going to age step (1)');
+      setStep(1);
+      return;
+    }
+    
+    // Step 2: Gender
+    if (!extracted?.hasGender && (!formData.gender || formData.gender === '')) {
+      console.log('Going to gender step (2)');
+      setStep(2);
+      return;
+    }
+    
+    // Step 3: Height
+    if (!extracted?.hasHeight && (!formData.height || formData.height <= 0)) {
+      console.log('Going to height step (3)');
+      setStep(3);
+      return;
+    }
+    
+    // Step 4: Weight Goal
+    if (!extracted?.hasGoal && (!formData.weightGoal || formData.weightGoal === '')) {
+      console.log('Going to weight goal step (4)');
+      setStep(4);
+      return;
+    }
+    
+    // Step 5: Current Weight
+    if (!extracted?.hasWeight && (!formData.weight || formData.weight <= 0)) {
+      console.log('Going to current weight step (5)');
+      setStep(5);
+      return;
+    }
+    
+    // Step 6: Goal Weight
+    if (!extracted?.hasGoalWeight && (!formData.goalWeight || formData.goalWeight <= 0)) {
+      console.log('Going to goal weight step (6)');
+      setStep(6);
+      return;
+    }
+    
+    // Step 7: Activity Level
+    if (!formData.activityLevel || formData.activityLevel === '') {
+      console.log('Going to activity level step (7)');
+      setStep(7);
+      return;
+    }
+    
+    // Step 8: Profile picture 
+    console.log('Going to profile picture step (8)');
+    setStep(8);
+  };
+
+  // 10 steps for the onboarding process (0-9) with vision board at step 9
+  const handleNext = async () => {
+    if (step === 0) {
+      // Process dream description and advance to next missing step
+      processDreamAndAdvance();
+    } else if (step === 8) {
+      // Go to vision board step instead of completing immediately
+      setStep(9);
+      setIsGeneratingVisionBoard(true);
+      setVisionBoardPage(0);
+      
+      // Generate AI motivational content and vision board data
+      setTimeout(async () => {
+        try {
+          // Generate motivational content using OpenAI
+          const motivationalContent = await generateMotivationalContent(formData.dreamDescription);
+          const calories = calculateCalories(formData);
+          const macros = calculateMacros(calories);
+          setVisionBoardData({ 
+            calories, 
+            macros, 
+            motivationalContent 
+          });
+          setIsGeneratingVisionBoard(false);
+          setVisionBoardPage(1); // Start with motivational content
+        } catch (error) {
+          console.error('Error generating motivational content:', error);
+          // Fallback to basic data
+          const calories = calculateCalories(formData);
+          const macros = calculateMacros(calories);
+          setVisionBoardData({ calories, macros, motivationalContent: null });
+          setIsGeneratingVisionBoard(false);
+          setVisionBoardPage(1);
+        }
+      }, 2000);
+    } else if (step === 9) {
+      // Complete onboarding after vision board
+      mutation.mutate(formData);
+    } else {
+      setStep(step + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData(prev => ({ ...prev, profileImage: e.target.files![0] }));
+    }
+  };
+
+  const isNextDisabled = () => {
+    switch (step) {
+      case 0:
+        return !formData.dreamDescription || formData.dreamDescription.length < 10; // Dream description with minimum length
+      case 1:
+        return formData.age <= 0; // Age
+      case 2:
+        return !formData.gender; // Gender selection
+      case 3:
+        return formData.height <= 0; // Height
+      case 4:
+        return !formData.weightGoal; // Weight goal selection
+      case 5:
+        return formData.weight <= 0; // Current weight
+      case 6:
+        return formData.goalWeight <= 0; // Goal weight
+      case 7:
+        return !formData.activityLevel; // Activity level
+      case 8:
+        return false; // Profile picture is optional
+      case 9:
+        return false; // Confirmation step - always allow next
+      case 10:
+        return false; // Macro goals step - always allow next
+      case 11:
+        return false; // Timeline step - always allow next
+      case 12:
+        return visionBoardPage === 0 && isGeneratingVisionBoard; // Disable during generation only
+      default:
+        return false;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden">
+      {/* Abstract background pattern */}
+      <div className="absolute inset-0 opacity-5" style={{ 
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+      }}></div>
+      
+      {/* Colorful abstract shapes */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-purple-600/5 filter blur-3xl -translate-y-1/3 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-500/5 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
+      <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full bg-emerald-500/5 filter blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] rounded-full bg-pink-500/5 filter blur-3xl" />
+
+      <div className="max-w-[600px] mx-auto relative z-10 p-6 min-h-screen flex items-center">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+            className="w-full"
+          >
+            <Card className="bg-white rounded-2xl overflow-hidden shadow-xl p-2 border border-gray-100 mb-6 w-full">
+              {/* Question header with dynamic background */}
+              <div className="p-6 relative overflow-hidden rounded-xl"
+                style={{
+                  background: `linear-gradient(225deg, 
+                    ${step % 4 === 0 ? '#3B82F6, #8B5CF6' : 
+                      step % 4 === 1 ? '#EC4899, #8B5CF6' : 
+                        step % 4 === 2 ? '#10B981, #3B82F6' : 
+                          '#F59E0B, #EF4444'})`
+                }}
+              >
+                <div className="absolute inset-0 opacity-10">
+                  {/* Different pattern backgrounds based on question */}
+                  {step % 4 === 0 && (
+                    <div className="w-full h-full" style={{ 
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'52\' height=\'26\' viewBox=\'0 0 52 26\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z\' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+                    }} />
+                  )}
+                  {step % 4 === 1 && (
+                    <div className="w-full h-full" style={{ 
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E")',
+                    }} />
+                  )}
+                  {step % 4 === 2 && (
+                    <div className="w-full h-full" style={{ 
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'20\' viewBox=\'0 0 100 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M21.184 20c.357-.13.72-.264.888-.14 1.24-.874 1.414-.634 1.338-.085-.063.45.418-1.173.647-.824.318-.544 1.237-.763 2.02-.254.717-.455 1.314-1.12 1.84-1.824.344-.585.777-1.177 1.148-1.2.385-.048 1.27-.133 1.645-.31.373-.18.52.356.5.248-1.584 1.127-3.232 2.186-4.966 3.13-2.114 1.155-4.263 2.345-6.803 2.543-1.14.096-2.294-.01-3.41-.325-.83-.235-1.62-.604-2.1-1.28-.45-.632-.635-1.457-.58-2.25.16-2.33 1.25-3.56 2.15-5.526.66-1.445 1.304-2.973 1.884-4.542.33-.887.607-1.787.74-2.726.154-1.098-.024-2.23-.64-3.166-.744-1.117-1.96-1.97-3.307-2.264-1.223-.258-2.513-.025-3.587.642-.868.535-1.58 1.31-1.95 2.236-.32.81-.363 1.69-.306 2.56.072 1.116.338 2.206.785 3.22.553 1.262 1.32 2.44 2.252 3.44 1.03 1.085 2.236 1.986 3.518 2.728 1.236.715 2.58 1.292 3.926 1.85.485.2.886.504 1.273.824.306.254.604.52.85.83l.072.13c.167.216.334.347.486.472.234.19.42.464.314.692-.106.226-.393.307-.644.18-.298-.15-.484-.454-.64-.757-.244-.47-.524-.92-.955-1.252-.552-.42-1.273-.644-1.95-.712-.63-.06-1.284.072-1.884.27-.612.196-1.15.553-1.608.995-.726.694-1.344 1.493-1.794 2.383-.564 1.165-1.01 2.68-.354 3.832.406.71 1.106 1.177 1.864 1.416.875.278 1.835.264 2.734.103 4.32-.746 7.7-4.52 11.8-6.57 1.088-.533 2.16-.96 3.106-1.4.786-.366 1.566-.75 2.092-1.298l.12-.122c.87-.878.706-1.656.214-2.378-.7-1.03-1.287-2.117-1.732-3.282-.443-1.156-.804-2.37-.804-3.63 0-1.06.316-2.08 1.134-2.765.8-.677 1.956-.866 2.954-.58 1.2.346 2.32 1.185 2.856 2.307.564 1.166.574 2.48.274 3.698-.29 1.155-.804 2.288-1.168 3.435-.86 2.66-1.84 5.308-2.15 8.086z\' fill=\'%23ffffff\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+                    }} />
+                  )}
+                  {step % 4 === 3 && (
+                    <div className="w-full h-full" style={{ 
+                      backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'84\' height=\'48\' viewBox=\'0 0 84 48\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z\' fill=\'%23ffffff\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+                    }} />
+                  )}
+                </div>
+                  
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-white/80 mb-1 uppercase tracking-wide">{t('onboarding.step')} {step + 1} {t('onboarding.of')} 10</div>
+                    <h2 className="text-2xl font-black text-white tracking-tight">
+                      {step === 0 && "Opowiedz o swoim marzeniu"}
+                      {step === 1 && t('onboarding.age_question')}
+                      {step === 2 && t('onboarding.gender_question')}
+                      {step === 3 && t('onboarding.height_question')}
+                      {step === 4 && t('onboarding.goal_question')}
+                      {step === 5 && t('onboarding.current_weight')}
+                      {step === 6 && t('onboarding.target_weight')}                      
+                      {step === 7 && t('onboarding.activity_level')}
+                      {step === 8 && t('onboarding.profile_picture')}
+                      {step === 9 && "Twoja Tablica Wizji"}
+                    </h2>
+                  </div>
+                  
+                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-lg font-bold"
+                      style={{
+                        color: step % 4 === 0 ? '#3B82F6' : 
+                          step % 4 === 1 ? '#EC4899' : 
+                            step % 4 === 2 ? '#10B981' : 
+                              '#F59E0B'
+                      }}
+                    >
+                      {step + 1}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Progress Indicator */}
+                <div className="flex items-center gap-2 mt-4 flex-wrap">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className={`h-2 rounded-full transition-all duration-300 ${i <= step ? 'bg-white' : 'bg-white/20'}`}
+                      style={{ width: i === step ? '24px' : '8px' }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-6">
+
+                {/* Step 0: Dream Description Input */}
+                {step === 0 && (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <p className="text-gray-600 text-lg font-medium">
+                        Opowiedz nam o swoim marzeniu zdrowotnym
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        Napisz swobodnie o swoich celach. Możesz wspomnieć o swoim wieku, płci, wadze, wzroście, czy o tym co chcesz osiągnąć. 
+                        Na przykład: "Jestem 25-letnim mężczyzną, ważę 80kg i chcę schudnąć do 70kg" lub "Mam 30 lat, jestem kobietą 165cm wzrostu i chcę zbudować mięśnie"
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <textarea
+                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
+                        rows={6}
+                        placeholder="Opisz swoje marzenie zdrowotne..."
+                        value={formData.dreamDescription || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, dreamDescription: e.target.value }))}
+                      />
+                      <div className="text-right text-sm text-gray-400">
+                        {formData.dreamDescription?.length || 0} / 500 znaków
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.age.description')}</p>
+                    <div className="flex justify-center">
+                      <NumberWheelNew
+                        value={formData.age}
+                        onChange={(value: number) => setFormData(prev => ({ ...prev, age: value }))}
+                        min={16}
+                        max={100}
+                        unit={t('onboarding.questions.age.years')}
+                        gender={formData.gender}
+                        type="age"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.gender.description')}</p>
+                    <div className="flex flex-col items-center gap-5">
+                      <div className="grid grid-cols-2 gap-6 w-full max-w-lg">
+                        <motion.div
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setFormData(prev => ({ ...prev, gender: 'male' }))}
+                          className={`relative overflow-hidden rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                            formData.gender === 'male' 
+                              ? 'border-[#3B82F6] shadow-lg shadow-[#3B82F6]/20' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {/* Background gradient */}
+                          <div className={`absolute inset-0 ${
+                            formData.gender === 'male' 
+                              ? 'bg-gradient-to-br from-[#3B82F6]/10 to-[#8B5CF6]/10' 
+                              : 'bg-gray-50'
+                          }`}></div>
+                          
+                          {/* Selected indicator */}
+                          {formData.gender === 'male' && (
+                            <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#3B82F6] flex items-center justify-center"
+                            >
+                              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </motion.div>
+                          )}
+                          
+                          <div className="p-6 flex flex-col items-center relative z-10">
+                            <div className={`w-20 h-20 rounded-full mb-4 flex items-center justify-center ${
+                              formData.gender === 'male' 
+                                ? 'bg-[#3B82F6]/10' 
+                                : 'bg-gray-100'
+                            }`}>
+                              <User size={36} className={formData.gender === 'male' ? 'text-[#3B82F6]' : 'text-gray-400'} />
+                            </div>
+                            <h3 className={`text-xl font-bold ${formData.gender === 'male' ? 'text-[#3B82F6]' : 'text-gray-700'}`}>{t('onboarding.questions.gender.male')}</h3>
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div
+                          whileHover={{ scale: 1.03 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setFormData(prev => ({ ...prev, gender: 'female' }))}
+                          className={`relative overflow-hidden rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                            formData.gender === 'female' 
+                              ? 'border-[#EC4899] shadow-lg shadow-[#EC4899]/20' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {/* Background gradient */}
+                          <div className={`absolute inset-0 ${
+                            formData.gender === 'female' 
+                              ? 'bg-gradient-to-br from-[#EC4899]/10 to-[#8B5CF6]/10' 
+                              : 'bg-gray-50'
+                          }`}></div>
+                          
+                          {/* Selected indicator */}
+                          {formData.gender === 'female' && (
+                            <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#EC4899] flex items-center justify-center"
+                            >
+                              <svg width="10" height="8" viewBox="0 0 10 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                            </motion.div>
+                          )}
+                          
+                          <div className="p-6 flex flex-col items-center relative z-10">
+                            <div className={`w-20 h-20 rounded-full mb-4 flex items-center justify-center ${
+                              formData.gender === 'female' 
+                                ? 'bg-[#EC4899]/10' 
+                                : 'bg-gray-100'
+                            }`}>
+                              <UserRound size={36} className={formData.gender === 'female' ? 'text-[#EC4899]' : 'text-gray-400'} />
+                            </div>
+                            <h3 className={`text-xl font-bold ${formData.gender === 'female' ? 'text-[#EC4899]' : 'text-gray-700'}`}>{t('onboarding.questions.gender.female')}</h3>
+                          </div>
+                        </motion.div>
+                      </div>
+                      
+                      <motion.p 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-gray-500 text-sm text-center max-w-md mt-2"
+                      >
+                        {t('onboarding.questions.gender.help')}
+                      </motion.p>
+                    </div>
+                  </div>
+                )}
+                
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.height.description')}</p>
+                    <div className="flex justify-center">
+                      <NumberWheelNew
+                        value={formData.height}
+                        onChange={(value: number) => setFormData(prev => ({ ...prev, height: value }))}
+                        min={100}
+                        max={250}
+                        unit="cm"
+                        gender={formData.gender}
+                        type="height"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {step === 4 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.weightGoal.description')}</p>
+                    <div className="grid grid-cols-1 gap-4">
+                      {[
+                        { 
+                          value: 'loss', 
+                          label: t('onboarding.questions.weightGoal.options.loss.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#EC4899', '#8B5CF6']
+                        },
+                        { 
+                          value: 'maintain', 
+                          label: t('onboarding.questions.weightGoal.options.maintain.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#0CC5BA', '#3B82F6']
+                        },
+                        { 
+                          value: 'gain', 
+                          label: t('onboarding.questions.weightGoal.options.gain.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#10B981', '#3B82F6']
+                        }
+                      ].map((goal, index) => (
+                        <EnhancedSelectionButton
+                          key={goal.value}
+                          label={goal.label}
+                          description={goal.description}
+                          isSelected={formData.weightGoal === goal.value}
+                          onClick={() => setFormData(prev => ({ ...prev, weightGoal: goal.value as any }))}
+                          gradientFrom={goal.gradient[0]}
+                          gradientTo={goal.gradient[1]}
+                          animationDelay={index}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {step === 5 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.currentWeight.description')}</p>
+                    <div className="flex justify-center">
+                      <NumberWheelNew
+                        value={formData.weight}
+                        onChange={(value: number) => setFormData(prev => ({ ...prev, weight: value }))}
+                        min={30}
+                        max={300}
+                        unit="kg"
+                        gender={formData.gender}
+                        type="weight"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {step === 6 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.goalWeight.description')}</p>
+                    <div className="flex justify-center">
+                      <NumberWheelNew
+                        value={formData.goalWeight}
+                        onChange={(value: number) => setFormData(prev => ({ ...prev, goalWeight: value }))}
+                        min={30}
+                        max={300}
+                        unit="kg"
+                        gender={formData.gender}
+                        type="weight"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {step === 7 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.activityLevel.description')}</p>
+                    <div className="grid grid-cols-1 gap-4">
+                      {[
+                        { 
+                          value: '0-2', 
+                          label: t('onboarding.questions.activityLevel.options.light.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#F59E0B', '#EF4444']
+                        },
+                        { 
+                          value: '3-5', 
+                          label: t('onboarding.questions.activityLevel.options.moderate.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#0CC5BA', '#3B82F6']
+                        },
+                        { 
+                          value: '6+', 
+                          label: t('onboarding.questions.activityLevel.options.active.label'), 
+                          description: "", // Empty description to hide it
+                          gradient: ['#10B981', '#0CC5BA']
+                        },
+                      ].map((level, index) => (
+                        <EnhancedSelectionButton
+                          key={level.value}
+                          label={level.label}
+                          description={level.description}
+                          isSelected={formData.activityLevel === level.value}
+                          onClick={() => setFormData(prev => ({ ...prev, activityLevel: level.value }))}
+                          gradientFrom={level.gradient[0]}
+                          gradientTo={level.gradient[1]}
+                          animationDelay={index}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Profile Image - Step 8 */}
+                {step === 8 && (
+                  <div className="space-y-6">
+                    <p className="text-gray-600 text-lg">{t('onboarding.questions.profileImage.description')}</p>
+                    <div className="flex flex-col items-center gap-6">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ type: "spring", stiffness: 100 }}
+                        className="relative group"
+                      >
+                        {/* Decorative gradient rings */}
+                        <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-[#0CC5BA]/30 to-[#3B82F6]/30 blur-lg opacity-70 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        <div className="absolute -inset-1.5 rounded-full bg-gradient-to-r from-[#0CC5BA]/50 to-[#3B82F6]/50 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        {/* Interactive upload area */}
+                        <motion.div
+                          whileHover={{ scale: 1.05, rotate: 3 }}
+                          whileTap={{ scale: 0.95, rotate: -3 }}
+                          className="w-40 h-40 rounded-full border-4 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-white flex items-center justify-center cursor-pointer relative overflow-hidden shadow-lg z-10"
+                          onClick={() => document.getElementById('profileImageInput')?.click()}
+                        >
+                          <input 
+                            type="file" 
+                            id="profileImageInput" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={handleFileChange}
+                          />
+                          
+                          {formData.profileImage && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="absolute inset-0"
+                            >
+                              <img 
+                                src={URL.createObjectURL(formData.profileImage)} 
+                                alt="Profile preview" 
+                                className="w-full h-full object-cover"
+                              />
+                            </motion.div>
+                          )}
+                          
+                          {!formData.profileImage && (
+                            <div className="flex flex-col items-center">
+                              <div className="mb-2 rounded-full bg-[#3B82F6]/10 p-3">
+                                <Upload className="w-8 h-8 text-[#3B82F6]" />
+                              </div>
+                              <p className="text-sm font-medium text-gray-500">{t('onboarding.questions.profileImage.upload')}</p>
+                            </div>
+                          )}
+                        </motion.div>
+                      </motion.div>
+                      
+                      <motion.p 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-gray-500 text-sm text-center max-w-md mt-2"
+                      >
+                        {t('onboarding.questions.profileImage.hint')}
+                      </motion.p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 9: Vision Board Generation & Display */}
+                {step === 9 && (
+                  <div className="space-y-6">
+                    {/* Vision Board Generation Animation */}
+                    {isGeneratingVisionBoard && visionBoardPage === 0 && (
+                      <div className="text-center space-y-6">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center"
+                        >
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="w-16 h-16 border-4 border-white border-t-transparent rounded-full"
+                          />
+                        </motion.div>
+                        
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="space-y-2"
+                        >
+                          <h3 className="text-2xl font-bold text-gray-800">{t('visionBoard.creating')}</h3>
+                          <p className="text-gray-600">{t('visionBoard.analyzing')}</p>
+                          
+                          <motion.div className="flex justify-center space-x-1 mt-4">
+                            {[0, 1, 2].map((i) => (
+                              <motion.div
+                                key={i}
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                                className="w-3 h-3 bg-purple-500 rounded-full"
+                              />
+                            ))}
+                          </motion.div>
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* Vision Board Content */}
+                    {!isGeneratingVisionBoard && visionBoardData && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center space-y-4">
+                          <motion.div className="text-4xl">✨</motion.div>
+                          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                            Twoja Spersonalizowana Tablica Wizji
+                          </h2>
+                          <p className="text-gray-600">Oto Twój plan sukcesu</p>
+                        </div>
+
+                        {/* Macro Goals Display */}
+                        <div className="grid grid-cols-2 gap-4">
+                          {[
+                            { label: 'Dzienne kalorie', value: `${visionBoardData.calories}`, color: 'from-blue-500 to-purple-500', icon: '🔥' },
+                            { label: 'Białko', value: `${visionBoardData.macros.protein}g`, color: 'from-red-500 to-pink-500', icon: '🥩' },
+                            { label: 'Węglowodany', value: `${visionBoardData.macros.carbs}g`, color: 'from-green-500 to-emerald-500', icon: '🍞' },
+                            { label: 'Tłuszcze', value: `${visionBoardData.macros.fat}g`, color: 'from-yellow-500 to-orange-500', icon: '🥑' }
+                          ].map((macro, index) => (
+                            <motion.div
+                              key={macro.label}
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ delay: index * 0.2 }}
+                              className={`p-6 rounded-xl bg-gradient-to-br ${macro.color} text-white shadow-lg`}
+                            >
+                              <div className="text-center">
+                                <div className="text-3xl mb-2">{macro.icon}</div>
+                                <h3 className="font-bold text-lg mb-1">{macro.value}</h3>
+                                <p className="text-sm opacity-90">{macro.label}</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+
+                        {/* Timeline Display */}
+                        {(() => {
+                          const timeline = calculateTimeline();
+                          return (
+                            <motion.div
+                              initial={{ y: 20, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              transition={{ delay: 0.8 }}
+                              className="p-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl"
+                            >
+                              <div className="text-center space-y-3">
+                                <div className="text-3xl">⏰</div>
+                                <h3 className="text-xl font-bold text-purple-800">Przewidywany czas osiągnięcia celu</h3>
+                                <div className="grid grid-cols-2 gap-4 text-center">
+                                  <div>
+                                    <p className="text-2xl font-bold text-purple-600">{timeline.weeks}</p>
+                                    <p className="text-sm text-purple-500">tygodni</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-2xl font-bold text-purple-600">{timeline.months}</p>
+                                    <p className="text-sm text-purple-500">miesięcy</p>
+                                  </div>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-purple-200">
+                                  <p className="text-sm text-purple-700">
+                                    Tygodniowy postęp: {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/tydzień
+                                  </p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })()}
+
+                        {/* Motivational Message */}
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 1.0 }}
+                          className="p-6 bg-gradient-to-r from-emerald-100 to-blue-100 rounded-xl text-center"
+                        >
+                          <div className="text-2xl mb-3">💪</div>
+                          <p className="text-lg font-semibold text-gray-800 mb-2">
+                            Jesteś gotowy na rozpoczęcie swojej transformacji!
+                          </p>
+                          <p className="text-gray-600">
+                            Twoja tablica wizji będzie Cię motywować przez całą drogę do sukcesu.
+                          </p>
+                        </motion.div>
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+
+                {/* Step 10: Vision Board Generation & Multi-Page Display */}
+                {step === 10 && (
+                  <div className="space-y-6">
+                    {/* Vision Board Generation Animation */}
+                    {isGeneratingVisionBoard && visionBoardPage === 0 && (
+                      <div className="text-center space-y-6">
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center"
+                        >
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="w-16 h-16 border-4 border-white border-t-transparent rounded-full"
+                          />
+                        </motion.div>
+                        
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }}
+                          className="space-y-2"
+                        >
+                          <h3 className="text-2xl font-bold text-gray-800">{t('visionBoard.creating')}</h3>
+                          <p className="text-gray-600">{t('visionBoard.analyzing')}</p>
+                          
+                          <motion.div className="flex justify-center space-x-1 mt-4">
+                            {[0, 1, 2].map((i) => (
+                              <motion.div
+                                key={i}
+                                animate={{ y: [0, -10, 0] }}
+                                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                                className="w-3 h-3 bg-purple-500 rounded-full"
+                              />
+                            ))}
+                          </motion.div>
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* Page 1: AI-Generated Motivational Content */}
+                    {visionBoardPage === 1 && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.6 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center space-y-6">
+                          <motion.div
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+                          >
+                            <span className="text-3xl">✨</span>
+                          </motion.div>
+                          
+                          <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="space-y-4"
+                          >
+                            <h2 className="text-3xl font-bold text-gray-800">Twoja Wizja</h2>
+                            
+                            {/* Goal display */}
+                            <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                              <p className="text-lg text-gray-700 mb-4">
+                                Widzę, że chcesz{' '}
+                                <span className="font-bold text-purple-700">
+                                  {formData.perfectGoal === 'weight_loss' ? 'schudnąć' :
+                                   formData.perfectGoal === 'muscle_gain' ? 'zwiększyć masę mięśniową' :
+                                   formData.perfectGoal === 'energy_boost' ? 'zwiększyć energię' :
+                                   formData.perfectGoal === 'health_improve' ? 'poprawić zdrowie' :
+                                   formData.perfectGoal === 'confidence_boost' ? 'zwiększyć pewność siebie' :
+                                   'zmienić styl życia'}
+                                </span>
+                              </p>
+                              
+                              {/* AI-generated motivational content */}
+                              {visionBoardData?.motivationalContent && (
+                                <div className="p-4 bg-white rounded-xl border-l-4 border-purple-500">
+                                  <p className="text-purple-800 font-medium text-lg">
+                                    {visionBoardData.motivationalContent}
+                                  </p>
+                                </div>
+                              )}
+                              
+                              {!visionBoardData?.motivationalContent && (
+                                <div className="p-4 bg-white rounded-xl border-l-4 border-purple-500">
+                                  <p className="text-purple-800 font-medium text-lg">
+                                    Osiągniesz swój cel dzięki konsekwentnej pracy i zdrowemu odżywianiu, co przyniesie Ci więcej energii i pewności siebie.
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                          
+                          <motion.button
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.6 }}
+                            onClick={() => setVisionBoardPage(2)}
+                            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                          >
+                            Sprawdź swoje makroskładniki →
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Page 2: Macro Confirmation */}
+                    {visionBoardPage === 2 && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.6 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center space-y-6">
+                          <motion.div
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="mx-auto w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center"
+                          >
+                            <span className="text-3xl">📊</span>
+                          </motion.div>
+                          
+                          <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="space-y-4"
+                          >
+                            <h2 className="text-3xl font-bold text-gray-800">Twoje Makroskładniki</h2>
+                            <p className="text-gray-600">Spersonalizowany plan żywieniowy dopasowany do Twoich celów</p>
+                          </motion.div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            {(() => {
+                              const calories = visionBoardData?.calories || calculateCalories(formData);
+                              const macros = visionBoardData?.macros || calculateMacros(calories);
+                              return [
+                                { label: 'Dzienne kalorie', value: `${calories}`, color: 'from-blue-500 to-purple-500', icon: '🔥' },
+                                { label: 'Białko', value: `${macros.protein}g`, color: 'from-red-500 to-pink-500', icon: '🥩' },
+                                { label: 'Węglowodany', value: `${macros.carbs}g`, color: 'from-green-500 to-emerald-500', icon: '🍞' },
+                                { label: 'Tłuszcze', value: `${macros.fat}g`, color: 'from-yellow-500 to-orange-500', icon: '🥑' }
+                              ].map((macro, index) => (
+                                <motion.div
+                                  key={macro.label}
+                                  initial={{ scale: 0, opacity: 0 }}
+                                  animate={{ scale: 1, opacity: 1 }}
+                                  transition={{ delay: 0.6 + index * 0.1 }}
+                                  className={`p-6 rounded-xl bg-gradient-to-br ${macro.color} text-white shadow-lg`}
+                                >
+                                  <div className="text-center">
+                                    <div className="text-3xl mb-2">{macro.icon}</div>
+                                    <h3 className="font-bold text-lg mb-1">{macro.value}</h3>
+                                    <p className="text-sm opacity-90">{macro.label}</p>
+                                  </div>
+                                </motion.div>
+                              ));
+                            })()}
+                          </div>
+                          
+                          <motion.button
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 1.0 }}
+                            onClick={() => setVisionBoardPage(3)}
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                          >
+                            Zobacz plan czasowy →
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Page 3: Timeline with Call-to-Action */}
+                    {visionBoardPage === 3 && (
+                      <motion.div
+                        initial={{ opacity: 0, x: 100 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -100 }}
+                        transition={{ duration: 0.6 }}
+                        className="space-y-6"
+                      >
+                        <div className="text-center space-y-6">
+                          <motion.div
+                            initial={{ scale: 0.8 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="mx-auto w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center"
+                          >
+                            <span className="text-3xl">⏰</span>
+                          </motion.div>
+                          
+                          <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="space-y-4"
+                          >
+                            <h2 className="text-3xl font-bold text-gray-800">Twój Plan Czasowy</h2>
+                            <p className="text-gray-600">Osiągnij swój cel krok po kroku</p>
+                          </motion.div>
+
+                          {/* Timeline Display */}
+                          {(() => {
+                            const timeline = calculateTimeline();
+                            return (
+                              <motion.div
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: 0.6 }}
+                                className="p-6 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl"
+                              >
+                                <div className="text-center space-y-4">
+                                  <div className="text-3xl">🎯</div>
+                                  <h3 className="text-xl font-bold text-green-800">Przewidywany czas osiągnięcia celu</h3>
+                                  <div className="grid grid-cols-2 gap-6">
+                                    <div className="p-4 bg-white rounded-xl">
+                                      <p className="text-3xl font-bold text-green-600">{timeline.weeks}</p>
+                                      <p className="text-sm text-green-500">tygodni</p>
+                                    </div>
+                                    <div className="p-4 bg-white rounded-xl">
+                                      <p className="text-3xl font-bold text-green-600">{timeline.months}</p>
+                                      <p className="text-sm text-green-500">miesięcy</p>
+                                    </div>
+                                  </div>
+                                  <div className="mt-4 p-4 bg-white rounded-xl">
+                                    <p className="text-sm text-green-700">
+                                      Zdrowy postęp: <span className="font-bold">{Math.abs(timeline.weeklyProgress).toFixed(1)} kg/tydzień</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            );
+                          })()}
+
+                          {/* Motivational Message */}
+                          <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ delay: 0.8 }}
+                            className="p-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl text-center"
+                          >
+                            <div className="text-2xl mb-3">💪</div>
+                            <p className="text-lg font-semibold text-gray-800 mb-2">
+                              Jesteś gotowy na rozpoczęcie swojej transformacji!
+                            </p>
+                            <p className="text-gray-600">
+                              Twoja podróż ku zdrowiu zaczyna się teraz.
+                            </p>
+                          </motion.div>
+                          
+                          {/* Call to Action Button */}
+                          <motion.button
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 1.0 }}
+                            onClick={() => {
+                              // Complete onboarding
+                              setStep(9);
+                              handleNext();
+                            }}
+                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-6 rounded-2xl font-bold text-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                          >
+                            🚀 Rozpocznij swoją podróż!
+                          </motion.button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Navigation dots */}
+                    {!isGeneratingVisionBoard && visionBoardPage > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="flex justify-center space-x-2 mt-8"
+                      >
+                        {[1, 2, 3].map((page) => (
+                          <div
+                            key={page}
+                            className={`w-3 h-3 rounded-full transition-colors ${
+                              visionBoardPage === page ? 'bg-purple-600' : 'bg-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </motion.div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 10: Vision Board Complete - Redirect to App */}
+                {step === 10 && (
+                  <div className="text-center space-y-6">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.5 }}
+                      className="mx-auto w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center"
+                    >
+                      <span className="text-4xl">🎉</span>
+                    </motion.div>
+                    
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="space-y-4"
+                    >
+                      <h2 className="text-3xl font-bold text-gray-800">Gratulacje!</h2>
+                      <p className="text-gray-600">Twój profil został utworzony. Przekierowujemy Cię do aplikacji...</p>
+                    </motion.div>
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation buttons */}
+              <div className="p-6 pt-0">
+                <div className="flex justify-between items-center">
+                  <motion.button
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    onClick={handleBack}
+                    disabled={step === 0}
+                    className={`flex items-center px-6 py-3 rounded-xl font-semibold transition-all ${
+                      step === 0 
+                        ? 'text-gray-400 cursor-not-allowed' 
+                        : 'text-purple-600 hover:bg-purple-50 active:scale-95'
+                    }`}
+                  >
+                    <span className="mr-2">←</span>
+                    {t('back')}
+                  </motion.button>
+
+                  <motion.button
+                    initial={{ x: 20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    onClick={handleNext}
+                    disabled={isNextDisabled || mutation.isPending}
+                    className={`px-8 py-3 rounded-xl font-semibold transition-all transform ${
+                      isNextDisabled || mutation.isPending
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:shadow-lg active:scale-95'
+                    }`}
+                  >
+                    {mutation.isPending ? (
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        {t('saving')}
+                      </div>
+                    ) : (
+                      step === 10 ? t('complete') :
+                      step === 9 && visionBoardPage === 3 ? 'Rozpocznij!' :
+                      step === 9 && visionBoardPage > 0 ? 'Dalej' :
+                      step === 9 && visionBoardPage === 0 ? 'Generowanie...' :
+                      step === 8 ? 'Utwórz tablicę wizji' :
+                      t('next')
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+export default OnboardingQuiz;
+                            <h4 className="font-semibold text-blue-800">Białko</h4>
+                          </div>
+                          <div className="text-center mb-4">
+                            <div className="text-3xl font-bold text-blue-600 mb-1">
+                              {Math.round(dailyCalories * 0.3 / 4)}g
+                            </div>
+                            <div className="text-sm text-blue-600">
+                              {Math.round(dailyCalories * 0.3)} kcal
+                            </div>
+                          </div>
+                          <div className="flex justify-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newProtein = Math.max(50, Math.round(dailyCalories * 0.3 / 4) - 10);
+                                const proteinCalories = newProtein * 4;
+                                const adjustment = (Math.round(dailyCalories * 0.3) - proteinCalories);
+                                setDailyCalories(dailyCalories - adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              -10g
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newProtein = Math.min(300, Math.round(dailyCalories * 0.3 / 4) + 10);
+                                const proteinCalories = newProtein * 4;
+                                const adjustment = proteinCalories - Math.round(dailyCalories * 0.3);
+                                setDailyCalories(dailyCalories + adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              +10g
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Carbs */}
+                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200 shadow-sm">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                              <span className="text-white text-lg">🌾</span>
+                            </div>
+                            <h4 className="font-semibold text-green-800">Węglowodany</h4>
+                          </div>
+                          <div className="text-center mb-4">
+                            <div className="text-3xl font-bold text-green-600 mb-1">
+                              {Math.round(dailyCalories * 0.4 / 4)}g
+                            </div>
+                            <div className="text-sm text-green-600">
+                              {Math.round(dailyCalories * 0.4)} kcal
+                            </div>
+                          </div>
+                          <div className="flex justify-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newCarbs = Math.max(50, Math.round(dailyCalories * 0.4 / 4) - 15);
+                                const carbsCalories = newCarbs * 4;
+                                const adjustment = (Math.round(dailyCalories * 0.4) - carbsCalories);
+                                setDailyCalories(dailyCalories - adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              -15g
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newCarbs = Math.min(400, Math.round(dailyCalories * 0.4 / 4) + 15);
+                                const carbsCalories = newCarbs * 4;
+                                const adjustment = carbsCalories - Math.round(dailyCalories * 0.4);
+                                setDailyCalories(dailyCalories + adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              +15g
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Fat */}
+                        <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200 shadow-sm">
+                          <div className="flex items-center mb-4">
+                            <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
+                              <span className="text-white text-lg">🥑</span>
+                            </div>
+                            <h4 className="font-semibold text-yellow-800">Tłuszcze</h4>
+                          </div>
+                          <div className="text-center mb-4">
+                            <div className="text-3xl font-bold text-yellow-600 mb-1">
+                              {Math.round(dailyCalories * 0.3 / 9)}g
+                            </div>
+                            <div className="text-sm text-yellow-600">
+                              {Math.round(dailyCalories * 0.3)} kcal
+                            </div>
+                          </div>
+                          <div className="flex justify-center space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newFat = Math.max(20, Math.round(dailyCalories * 0.3 / 9) - 5);
+                                const fatCalories = newFat * 9;
+                                const adjustment = (Math.round(dailyCalories * 0.3) - fatCalories);
+                                setDailyCalories(dailyCalories - adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              -5g
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newFat = Math.min(150, Math.round(dailyCalories * 0.3 / 9) + 5);
+                                const fatCalories = newFat * 9;
+                                const adjustment = fatCalories - Math.round(dailyCalories * 0.3);
+                                setDailyCalories(dailyCalories + adjustment);
+                              }}
+                              className="px-3"
+                            >
+                              +5g
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Summary */}
+                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="text-sm text-gray-600">
+                          <span className="font-medium">Łączna liczba kalorii: </span>
+                          <span className="font-bold text-gray-800">{dailyCalories.toLocaleString()} kcal</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Dostosuj każdy makroskładnik osobno - kalorie będą automatycznie przeliczone
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+
+                {/* Step 12: Vision Board Creation */}
+                {step === 12 && (
+                  <div className="space-y-6">
+                    {isGeneratingVisionBoard ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="text-center py-20"
+                      >
+                        <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-indigo-600" />
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                          {t('visionBoard.generating')}
+                        </h3>
+                        <p className="text-gray-600">
+                          Tworzę spersonalizowaną tablicę wizji...
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        {visionBoardPage === 1 && visionBoardData && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="space-y-6"
+                          >
+                            <div className="text-center mb-6">
+                              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                                Twoja Tablica Wizji
+                              </h3>
+                              <p className="text-gray-600">
+                                Spersonalizowany plan żywieniowy dla Twoich celów
+                              </p>
+                            </div>
+
+                            {/* Macro Goals Display */}
+                            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                              <h4 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                                <Target className="w-5 h-5 mr-2" />
+                                Twoje Dzienne Makroskładniki
+                              </h4>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-orange-600">
+                                    {visionBoardData.macros.calories}
+                                  </div>
+                                  <div className="text-sm text-gray-600">Kalorie</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-blue-600">
+                                    {visionBoardData.macros.protein}g
+                                  </div>
+                                  <div className="text-sm text-gray-600">Białko</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-green-600">
+                                    {visionBoardData.macros.carbs}g
+                                  </div>
+                                  <div className="text-sm text-gray-600">Węglowodany</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-yellow-600">
+                                    {visionBoardData.macros.fat}g
+                                  </div>
+                                  <div className="text-sm text-gray-600">Tłuszcze</div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {visionBoardPage === 2 && visionBoardData && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="space-y-6"
+                          >
+                            <div className="text-center mb-6">
+                              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                                {visionBoardData.motivation.title}
+                              </h3>
+                              <p className="text-gray-600 italic">
+                                {visionBoardData.motivation.inspiration}
+                              </p>
+                            </div>
+
+                            {/* Tips */}
+                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                              <h4 className="text-lg font-semibold text-green-800 mb-4 flex items-center">
+                                <Lightbulb className="w-5 h-5 mr-2" />
+                                Wskazówki dla Sukcesu
+                              </h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {visionBoardData.motivation.tips.map((tip: string, index: number) => (
+                                  <div key={index} className="flex items-start">
+                                    <CheckCircle2 className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                                    <span className="text-green-700">{tip}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        {visionBoardPage === 3 && visionBoardData && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="space-y-6"
+                          >
+                            <div className="text-center mb-6">
+                              <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                                Twoja Ścieżka do Celu
+                              </h3>
+                              <p className="text-gray-600">
+                                Przewidywane kamienie milowe w Twojej podróży
+                              </p>
+                            </div>
+
+                            {/* Timeline */}
+                            <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                              <h4 className="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                                <Calendar className="w-5 h-5 mr-2" />
+                                Kamienie Milowe
+                              </h4>
+                              <div className="space-y-4">
+                                {visionBoardData.timeline.map((milestone: any, index: number) => (
+                                  <div key={index} className="flex items-center justify-between p-4 bg-white rounded-lg border border-purple-100">
+                                    <div className="flex items-center">
+                                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                        <span className="text-purple-600 font-semibold">{index + 1}</span>
+                                      </div>
+                                      <div>
+                                        <div className="font-semibold text-gray-800">Tydzień {milestone.week}</div>
+                                        <div className="text-sm text-gray-600">{milestone.goal}</div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="font-semibold text-purple-600">{milestone.weight}kg</div>
+                                      <div className="text-sm text-gray-600">Energia: {milestone.energy}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+
+              </div>
+
+              {/* Navigation buttons */}
+              <motion.div 
+                className="p-6 flex items-center justify-between border-t border-gray-100"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <motion.div
+                  whileHover={{ x: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBack}
+                    disabled={step === 1}
+                    className={`${
+                      step === 1 ? 'opacity-0 pointer-events-none' : ''
+                    } border-gray-200 shadow-sm bg-white hover:bg-gray-50 hover:border-gray-300 transition-all duration-200`}
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {t('common.back')}
+                  </Button>
+                </motion.div>
+                
+                <motion.div
+                  whileHover={{ x: 2, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={isNextDisabled() || mutation.isPending}
+                    className={`relative overflow-hidden ${
+                      isNextDisabled() || mutation.isPending 
+                        ? 'bg-gray-400 hover:bg-gray-400' 
+                        : 'bg-gradient-to-r from-[#0CC5BA] to-[#3B82F6]'
+                    } text-white hover:shadow-lg transition-all duration-300`}
+                  >
+                    {/* Animated gradient background that shifts on hover */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-[#0CC5BA] via-[#3B82F6] to-[#8B5CF6] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <span className="relative flex items-center z-10">
+                      {mutation.isPending ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t('common.loading')}
+                        </>
+                      ) : step === 8 ? (
+                        <>
+                          {t('common.next')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      ) : step === 9 ? (
+                        <>
+                          {t('common.next')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      ) : step === 10 ? (
+                        <>
+                          {t('common.next')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      ) : step === 11 ? (
+                        <>
+                          {t('common.next')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      ) : step === 12 ? (
+                        <>
+                          {visionBoardPage === 0 ? 'Generowanie...' : 
+                           visionBoardPage === 1 ? 'Dalej' : 
+                           visionBoardPage === 2 ? 'Dalej' : 
+                           'Zakończ Setup'}
+                          {visionBoardPage > 0 && <ArrowRight className="w-4 h-4 ml-2" />}
+                        </>
+                      ) : (
+                        <>
+                          {t('common.next')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      )}
+                    </span>
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </Card>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

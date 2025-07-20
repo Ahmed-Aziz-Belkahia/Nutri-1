@@ -1,0 +1,36 @@
+  longestStreak: 0,
+  experiencePoints: 0,
+  level: 1,
+  isAdmin: false
+}
+Error sending email: Error: Missing credentials for "PLAIN"
+    at SMTPConnection._formatError (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection.login (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:454:38)
+    at /home/runner/workspace/node_modules/nodemailer/lib/smtp-transport/index.js:272:32
+    at SMTPConnection.<anonymous> (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:215:17)
+    at Object.onceWrapper (node:events:632:28)
+    at SMTPConnection.emit (node:events:518:28)
+    at SMTPConnection._actionEHLO (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:1371:14)
+    at SMTPConnection._processResponse (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)
+    at SMTPConnection._onData (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)
+    at SMTPConnection._onSocketData (/home/runner/workspace/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)
+    at TLSSocket.emit (node:events:518:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at TLSWrap.onStreamRead (node:internal/stream_base_commons:191:23) {
+  code: 'EAUTH',
+  command: 'API'
+}
+Error sending verification email: Error: Failed to send email
+    at sendEmail (/home/runner/workspace/server/services/email.ts:82:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async sendVerificationEmail (/home/runner/workspace/server/services/email.ts:101:5)
+    at async <anonymous> (/home/runner/workspace/server/auth.ts:202:9)
+Error sending verification/welcome email: Error: Failed to send verification email
+    at sendVerificationEmail (/home/runner/workspace/server/services/email.ts:108:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/auth.ts:202:9)
+9:42:18 AM [express] POST /api/register 200 in 6225ms :: {"ok":true,"message":"Account created succe…
+9:42:18 AM [express] GET /api/user 200 in 74ms :: {"id":2,"email":"piotrekster1998@gmail.comsadassad…
+9:42:19 AM [expre

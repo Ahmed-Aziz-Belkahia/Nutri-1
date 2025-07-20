@@ -1,0 +1,173 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+WARNING: SENDGRID_API_KEY is not set. Email functionality will be disabled.
+12:50:18 PM [express] Testing database connection...
+12:50:18 PM [express] ✅ Database connection successful
+12:50:18 PM [express] ✅ Uploads directory created
+12:50:18 PM [express] Development server setup complete
+12:50:18 PM [express] Server running at http://0.0.0.0:5000
+✅ Database connection established successfully
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+12:50:31 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+12:50:43 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+Registration request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+Registration error: NeonDbError: column "is_admin" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/auth.ts:133:30) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '231',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+12:52:32 PM [express] POST /api/register 500 in 2797ms :: {"error":"Failed to register user","message…
+12:53:10 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+12:53:20 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+Registration request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+User created: {
+  id: 1,
+  email: 'piotrekster1998@gmail.com',
+  password: 'b52232a60287c020cc2cb6e53ea9667546a15079ab63763a57f59e86f775fd56cb8312e4cfee4e1c297cfff5588e57bcc4a92b1d9b942cf049f4105c4aa1ffa9.7c1e9d91fdafbbaea3567002517b1f48',
+  hasCompletedOnboarding: false,
+  lastActivityDate: '2025-05-20',
+  profileImage: null,
+  preferred_language: 'en',
+  resetToken: null,
+  resetTokenExpiresAt: null,
+  currentStreak: 0,
+  longestStreak: 0,
+  experiencePoints: 0,
+  level: 1,
+  isAdmin: false
+}
+[Email Service] MOCK EMAIL to: piotrekster1998@gmail.com, subject: "Verify Your Email Address - NutriAI"
+Verification email sent successfully
+[Email Service] MOCK EMAIL to: piotrekster1998@gmail.com, subject: "Welcome to NutriAI - Your Journey Begins!"
+Welcome email sent successfully
+12:54:09 PM [express] POST /api/register 200 in 2355ms :: {"ok":true,"message":"Account created succe…
+12:54:09 PM [express] GET /api/user 200 in 24ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+Error fetching user profile: NeonDbError: column "body_fat_percentage" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '198',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+12:54:10 PM [express] GET /api/user/profile 500 in 126ms :: {"error":"Failed to fetch profile"}
+Fetching meal plan for today
+User ID: 1
+No meal plan found for today (2025-05-20)
+12:54:10 PM [express] GET /api/meal-plans/today 200 in 207ms :: {"hasPlan":false}
+[Weight Logs API] Fetching weight logs for user: 1
+[Weight Logs API] Retrieved logs count: 0
+12:54:10 PM [express] GET /api/weight-logs 200 in 97ms :: []
+Fetching created recipes for user 1
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  dateRequested: '2025-05-20',
+  start: '2025-05-20T00:00:00.000Z',
+  end: '2025-05-20T23:59:59.999Z'
+}
+Fetching progress photos for user: 1
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-05-20T12:54:10.399Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+12:54:10 PM [express] GET /api/food-logs 200 in 180ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+12:54:10 PM [express] GET /api/progress-photos 200 in 165ms :: []
+Found 0 created recipes
+12:54:10 PM [express] GET /api/recipes 200 in 214ms :: []
+Error fetching user profile: NeonDbError: column "body_fat_percentage" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '198',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+12:54:10 PM [express] GET /api/user/profile 500 in 119ms :: {"error":"Failed to fetch profile"}
+Fetching created recipes for user 1
+Found 0 created recipes
+12:54:10 PM [express] GET /api/recipes 304 in 114ms :: []
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2230,"proteinGoal":167,"carbsGoal":223,"fatGoal":74,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"pl","energyPattern":"morning","flavorPreference":"savory","firstVictory":"energy","motivationLevel":"medium","nutritionGoals":[]}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "allergies" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:121:28) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '268',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+1:07:51 PM [express] 

@@ -1,0 +1,477 @@
+:54:31 PM [express] Testing database connection...
+3:54:32 PM [express] ✅ Database connection successful
+3:54:32 PM [express] ✅ Uploads directory created
+3:54:32 PM [express] Development server setup complete
+3:54:32 PM [express] Server running at http://0.0.0.0:5000
+✅ Database connection established successfully
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+3:54:42 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+3:54:55 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+User logged in successfully: {
+  userId: 4,
+  email: 'piotrekster1998@gmail.comss',
+  sessionID: 'Q_5saReDwYOABeR3rzd880pY-QicXBux'
+}
+4:05:31 PM [express] POST /api/login 200 in 973ms :: {"ok":true,"user":{"id":4,"email":"piotrekster1…
+4:05:32 PM [express] GET /api/user 304 in 63ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pas…
+Fetching meal plan for today
+User ID: 4
+Found meal plan with ID: 12 for today (2025-04-20)
+Found 3 recipes for meal plan ID 12
+4:05:32 PM [express] GET /api/meal-plans/today 304 in 405ms :: {"hasPlan":true,"plan":{"id":12,"date…
+4:05:33 PM [express] GET /api/user 304 in 62ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pas…
+Fetching created recipes for user 4
+[Weight Logs API] Fetching weight logs for user: 4
+[Food Logs API] Fetching logs for date range: {
+  userId: 4,
+  dateRequested: '2025-04-20',
+  start: '2025-04-20T00:00:00.000Z',
+  end: '2025-04-20T23:59:59.999Z'
+}
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5141:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+4:05:33 PM [express] GET /api/weight-logs 500 in 330ms :: {"error":"Failed to fetch weight logs","me…
+Fetching progress photos for user: 4
+Found 3 created recipes
+4:05:33 PM [express] GET /api/recipes 304 in 261ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+Fetching meal plan for today
+User ID: 4
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+4:05:33 PM [express] GET /api/progress-photos 304 in 330ms :: []
+Found meal plan with ID: 12 for today (2025-04-20)
+4:05:33 PM [express] GET /api/user/profile 200 in 447ms :: {"id":19,"userId":4,"currentWeight":"75.0…
+Found 3 recipes for meal plan ID 12
+4:05:33 PM [express] GET /api/meal-plans/today 304 in 279ms :: {"hasPlan":true,"plan":{"id":12,"date…
+Fetching created recipes for user 4
+Found 3 created recipes
+4:05:33 PM [express] GET /api/recipes 304 in 243ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+[Food Logs API] Retrieved logs: { count: 3, date: '2025-04-20T16:05:33.363Z' }
+[Food Logs API] Calculated totals: { calories: 1750, protein: 73, carbs: 225, fat: 55 }
+4:05:34 PM [express] GET /api/food-logs 304 in 958ms :: {"logs":[{"id":12,"userId":4,"name":"Pasta w…
+[Weight Logs API] Fetching weight logs for user: 4
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5141:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+4:05:34 PM [express] GET /api/weight-logs 500 in 208ms :: {"error":"Failed to fetch weight logs","me…
+Fetching meal plan for date: all
+User ID: 4
+Error fetching shopping list for date: NeonDbError: syntax error at or near "in"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:3836:17) {
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '190',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror',
+  sourceError: undefined
+}
+4:05:35 PM [express] GET /api/shopping-list/2025-04-20 500 in 242ms :: {"error":"Failed to fetch sho…
+4:05:35 PM [express] GET /api/meal-plans/all 304 in 450ms :: {"weekStart":"2025-04-13","plans":[{"id…
+Error fetching shopping list for date: NeonDbError: syntax error at or near "in"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:3836:17) {
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '190',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror',
+  sourceError: undefined
+}
+4:05:35 PM [express] GET /api/shopping-list/2025-04-20 500 in 244ms :: {"error":"Failed to fetch sho…
+4:06:10 PM [express] GET /api/user 304 in 181ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pa…
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  healthGoals: [ 'maintenance' ],
+  activityLevel: 'moderate',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  cuisinePreferences: [ 'italian', 'american' ],
+  preferredIngredients: [],
+  excludedIngredients: [],
+  cookingSkillLevel: 'intermediate',
+  mealPlanDuration: '3days',
+  specialRequirements: '',
+  weekdayVsWeekend: 'same',
+  cookingEquipment: [ 'stove', 'oven' ]
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Inserted nutrition preferences: {
+  id: 25,
+  userId: 4,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  height: null,
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  caloriesGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  bodyFatPercentage: null,
+  bodyType: null,
+  dietaryRestrictions: [],
+  allergies: [],
+  mealBudget: null,
+  experienceLevel: null,
+  updatedAt: 2025-04-20T16:06:10.942Z
+}
+Updated nutrition preferences with dietary data: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  allergies: [],
+  excludedIngredients: [],
+  preferredIngredients: [],
+  id: 19,
+  userId: 4
+}
+4:06:11 PM [express] POST /api/user/dietary-preferences 200 in 377ms :: {"nutritionPreferences":{"id…
+Received meal plan request with preferences: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  mealPlanDuration: '3days',
+  healthGoals: 1,
+  cuisinePreferences: 2
+}
+User profile structure for monthly meal plan: {
+  "id": 4,
+  "email": "piotrekster1998@gmail.comss",
+  "password": "8136ae00fbde341a7bb7085b1dafd8604c77dab9d6420b9812aff03ae07b45cc4cf122e91aab9a540cb02499337ddd16c0d3d9980ee2a618962250bca87fccc2.a27d25d4e832f7618f27370d80aa2f2d",
+  "hasCompletedOnboarding": true,
+  "lastActivityDate": "2025-04-18",
+  "profileImage": null,
+  "preferred_language": "pl",
+  "resetToken": null,
+  "resetTokenExpiresAt": null,
+  "currentStreak": 0,
+  "longestStreak": 0,
+  "experiencePoints": 0,
+  "level": 1
+}
+Using language from direct query structure (preferred_language): pl
+Generating monthly meal plan in language: pl
+Generating 3 days of meal plans in 1 batches of 3 days
+Generating batch 1/1 with 3 days (days 1-3)
+Generating 3 days of meal plan in Polish language (batch 1/1)
+Generating monthly meal plan batch in Polish language
+Raw OpenAI response for batch 1, structure: [ 'plan' ]
+Processed batch 1, got 3 days
+Total progress: 3/3 days generated
+Final meal plan variety score: {
+  overallVarietyScore: 0.1,
+  mealTypeRepetition: { other: 9 },
+  ingredientRepetition: {},
+  cuisineVariety: 9
+}
+Low variety detected in meal plan - reordering days to maximize variety
+Processed OpenAI response: { requestedDays: 3, processedDays: 3 }
+Generated meal plan with AI: { daysGenerated: 3, firstDay: 'Unknown' }
+Day 1 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Polenta z Grzybami i Ziołami (Day 1)',
+    mealType: undefined,
+    mealProps: [
+      'type',
+      'name',
+      'description',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Gotuj polentę w mleku na małym ogniu, mieszając, aż zgęstnieje. Podsmaż grzyby na maśle, dodaj do po',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":1,"meals":[{"type":"Breakfast","name":"Polenta z Grzybami i Ziołami (Day 1)","description":"Kremowa polenta gotowana z aromatycznymi grzybami leśnymi i świeżymi ziołami.","ingredients":["100 g polenty","250 ml mleka","50 g świeżych grzybów","1 łyżka masła","2 łyżki świeżych ziół (np. pietruszka, tymianek)","Sól i pieprz do smaku"],"instructions":"Gotuj polentę w mleku na małym ogniu, mieszając, aż zgęstnieje. Podsmaż grzyby na maśle, dodaj do polenty wraz z ziołami. Dopraw solą i pieprzem...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-20
+Using meal plan: 12 for date: 2025-04-20
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Polenta z Grzybami i Ziołami (Day 1)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Gotuj polentę w mleku na małym ogniu, mieszając, aż zgęstnieje',
+    'Podsmaż grzyby na maśle, dodaj do polenty wraz z ziołami'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 4 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Makaron Fusilli z Kurczakiem i Pesto (Day 1)',
+  ingredientsCount: 7,
+  instructionsCount: 4,
+  sampleInstructions: [ 'Ugotuj makaron', 'Grilluj kurczaka na patelni' ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 4 steps
+Using direct meal.ingredients array with 8 items
+Saving recipe with instructions: {
+  name: 'Chili con Carne z Kukurydzą (Day 1)',
+  ingredientsCount: 8,
+  instructionsCount: 4,
+  sampleInstructions: [
+    'Podsmaż cebulę na oleju, dodaj mieloną wołowinę',
+    'Włóż pomidory, fasolę i kukurydzę'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 12, date: '2025-04-20', recipeCount: 3 }
+Day 2 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Tosty z Awokado i Jajkiem w Koszulkach (Day 2)',
+    mealType: undefined,
+    mealProps: [
+      'type',
+      'name',
+      'description',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Ugotuj jajka w koszulkach. Rozgnieć awokado i połącz z sokiem z cytryny. Ułóż na tostach, dodaj jajk',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":2,"meals":[{"type":"Breakfast","name":"Tosty z Awokado i Jajkiem w Koszulkach (Day 2)","description":"Chrupiące tosty pełnoziarniste z kremowym awokado i jajkami w koszulkach.","ingredients":["2 kromki chleba pełnoziarnistego","1 dojrzałe awokado","2 jajka","1 łyżka soku z cytryny","Sól i pieprz do smaku"],"instructions":"Ugotuj jajka w koszulkach. Rozgnieć awokado i połącz z sokiem z cytryny. Ułóż na tostach, dodaj jajka, dopraw.","recipe":{"ingredients":[],"instructions":[],"nutritionIn...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-21
+Using meal plan: 13 for date: 2025-04-21
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 5 items
+Saving recipe with instructions: {
+  name: 'Tosty z Awokado i Jajkiem w Koszulkach (Day 2)',
+  ingredientsCount: 5,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Ugotuj jajka w koszulkach',
+    'Rozgnieć awokado i połącz z sokiem z cytryny'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 2 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Sałatka Cobb z Boczkiem i Niebieskim Serem (Day 2)',
+  ingredientsCount: 7,
+  instructionsCount: 2,
+  sampleInstructions: [
+    'Na talerzu ułóż mix sałat, pokrojony kurczak, boczek, ser, pomidor i jajko',
+    'Skrop sosem winegret'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Risotto Milanese z Szafranem (Day 2)',
+  ingredientsCount: 7,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Podsmaż cebulę na maśle, dodaj ryż i wino',
+    'Dodawaj bulion stopniowo, mieszając'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 13, date: '2025-04-21', recipeCount: 3 }
+Day 3 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  dailyPlanProps: [ 'day', 'meals' ],
+  mealsSample: {
+    name: 'Naleśniki z Twarogiem i Jagodami (Day 3)',
+    mealType: undefined,
+    mealProps: [
+      'type',
+      'name',
+      'description',
+      'ingredients',
+      'instructions',
+      'recipe'
+    ],
+    hasDirectInstructions: true,
+    directInstructionsType: 'string',
+    directInstructionsSample: 'Przygotuj ciasto na naleśniki, smaż na złoto. Wymieszaj twaróg z cukrem, nałóż na naleśniki, dodaj j',
+    hasNestedInstructions: true,
+    nestedInstructionsType: 'object'
+  },
+  fullStructure: '{"day":3,"meals":[{"type":"Breakfast","name":"Naleśniki z Twarogiem i Jagodami (Day 3)","description":"Cienkie naleśniki na słodko z twarożkiem i świeżymi jagodami.","ingredients":["100 g mąki pszennej","250 ml mleka","1 jajko","200 g twarogu","100 g jagód","Cukier do smaku"],"instructions":"Przygotuj ciasto na naleśniki, smaż na złoto. Wymieszaj twaróg z cukrem, nałóż na naleśniki, dodaj jagody.","recipe":{"ingredients":[],"instructions":[],"nutritionInfo":{"calories":0,"protein":0,"carbs":0,"f...'
+}
+Updating meal plan with calories: 2000 date: 2025-04-22
+Using meal plan: 14 for date: 2025-04-22
+Using direct meal.instructions string, split into 2 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Naleśniki z Twarogiem i Jagodami (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 2,
+  sampleInstructions: [
+    'Przygotuj ciasto na naleśniki, smaż na złoto',
+    'Wymieszaj twaróg z cukrem, nałóż na naleśniki, dodaj jagody'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 7 items
+Saving recipe with instructions: {
+  name: 'Tacos z Wołowiną i Guacamole (Day 3)',
+  ingredientsCount: 7,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Podsmaż wołowinę z przyprawami',
+    'Przygotuj guacamole z awokado, cebuli i soku z limonki'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Using direct meal.instructions string, split into 3 steps
+Using direct meal.ingredients array with 6 items
+Saving recipe with instructions: {
+  name: 'Smażony Dorsz z Puree Pietruszkowym (Day 3)',
+  ingredientsCount: 6,
+  instructionsCount: 3,
+  sampleInstructions: [
+    'Ugotuj i rozgnieć pietruszkę z mlekiem i masłem',
+    'Usmaż dorsza na maśle, skrop sokiem z cytryny'
+  ],
+  originalInstructionSource: 'meal.instructions (direct string)'
+}
+Created recipes for plan: { planId: 14, date: '2025-04-22', recipeCount: 3 }
+4:06:36 PM [express] POST /api/meal-plans 200 in 25650ms :: {"weekStart":"2025-04-20","plans":[{"id"…
+Error fetching shopping list for date: NeonDbError: syntax error at or near "in"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:3836:17) {
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '190',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror',
+  sourceError: undefined
+}
+4:06:37 PM [express] GET /api/shopping-list/2025-04-20 500 in 242ms :: {"error":"Failed to fetch sho…
+Error fetching shopping list for date: NeonDbError: syntax error at or near "in"
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:3836:17) {
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '190',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror',
+  sourceError: undefined
+}
+4:11:39 PM [express] GET /api/shopping-list/2025-04-20 500 in 1092ms :: {"error":"Failed to fetch sh…

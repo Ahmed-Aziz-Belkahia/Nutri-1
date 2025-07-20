@@ -1,0 +1,88 @@
+[Recipe Analysis] Validation successful
+[Recipe Analysis] Generated recipes: {
+  "recipes": [
+    {
+      "name": "Berry Burst Yogurt Parfait",
+      "ingredients": [
+        "1 cup yogurt",
+        "1/2 cup strawberries, sliced",
+        "1/2 cup blueberries",
+        "1/4 cup cherries, pitted and halved",
+        "1/4 cup granola",
+        "1 tablespoon honey"
+      ],
+      "instructions": [
+        "In a clear glass or mason jar, add a layer of yogurt at the bottom.",
+        "Add a layer of granola on top of the yogurt.",
+        "Layer the strawberries, blueberries, and cherries on top of the granola.",
+        "Drizzle with honey for sweetness.",
+        "Repeat the layers until the glass is full.",
+        "Chill in the refrigerator for at least 30 minutes before serving for best results."
+      ],
+      "cooking_time": "10 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 250,
+        "protein": "10g",
+        "fat": "5g",
+        "carbohydrates": "45g"
+      }
+    },
+    {
+      "name": "Zesty Apple Cucumber Salad",
+      "ingredients": [
+        "2 apples, cored and thinly sliced",
+        "1 cucumber, thinly sliced",
+        "3 radishes, thinly sliced",
+        "Juice of 1 lemon",
+        "1 tablespoon olive oil",
+        "Salt and pepper to taste"
+      ],
+      "instructions": [
+        "In a large bowl, combine the sliced apples, cucumbers, and radishes.",
+        "In a small bowl, whisk together lemon juice, olive oil, salt, and pepper.",
+        "Pour the dressing over the salad and toss to combine.",
+        "Let the salad sit for 10 minutes to allow the flavors to meld.",
+        "Serve chilled or at room temperature."
+      ],
+      "cooking_time": "15 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 150,
+        "protein": "2g",
+        "fat": "7g",
+        "carbohydrates": "22g"
+      }
+    },
+    {
+      "name": "Fruit-Infused Lemon Custard",
+      "ingredients": [
+        "2 cups milk",
+        "2 eggs",
+        "3 tablespoons sugar",
+        "Zest and juice of 1 lemon",
+        "1/2 cup strawberries, chopped",
+        "1/2 cup blueberries",
+        "1/4 cup cherries, pitted and chopped"
+      ],
+      "instructions": [
+        "Preheat the oven to 325°F (165°C).",
+        "In a saucepan, heat the milk over medium heat until just warm.",
+        "In a bowl, whisk together the eggs, sugar, lemon zest, and lemon juice.",
+        "Slowly add the warm milk to the egg mixture, whisking continuously to prevent curdling.",
+        "Stir in the chopped strawberries, blueberries, and cherries.",
+        "Pour the mixture into individual ramekins or a baking dish.",
+        "Place the ramekins in a baking pan and fill the pan with hot water until it reaches halfway up the sides of the ramekins.",
+        "Bake for 25-30 minutes or until the custard is set and slightly jiggles in the center.",
+        "Let cool before serving chilled or at room temperature."
+      ],
+      "cooking_time": "45 minutes",
+      "difficulty_level": "Medium",
+      "nutritional_information": {
+        "calories": 200,
+        "protein": "8g",
+        "fat": "7g",
+        "carbohydrates": "25g"
+      }
+    }
+  ]

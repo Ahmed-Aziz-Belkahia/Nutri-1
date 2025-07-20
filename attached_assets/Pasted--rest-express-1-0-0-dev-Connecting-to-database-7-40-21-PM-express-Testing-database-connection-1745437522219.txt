@@ -1,0 +1,181 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+7:40:21 PM [express] Testing database connection...
+7:40:22 PM [express] ✅ Database connection successful
+✅ Database connection established successfully
+7:40:22 PM [express] ✅ Uploads directory created
+7:40:22 PM [express] Development server setup complete
+7:40:22 PM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:40:34 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+7:40:43 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+User logged in successfully: {
+  userId: 1,
+  email: 'piotrekster1998@gmail.com',
+  sessionID: 'B0dHsSDNVYOR2qF3F9Jj32bLcMNehF3x'
+}
+7:44:41 PM [express] POST /api/login 200 in 721ms :: {"ok":true,"user":{"id":1,"email":"piotrekster1…
+7:44:41 PM [express] GET /api/user 304 in 36ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+Error fetching user profile: NeonDbError: column "calories_goal" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5140:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '101',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+7:44:41 PM [express] GET /api/user/profile 500 in 222ms :: {"error":"Failed to fetch profile"}
+Fetching meal plan for today
+User ID: 1
+Fetching progress photos for user: 1
+No meal plan found for today (2025-04-23)
+7:44:42 PM [express] GET /api/meal-plans/today 304 in 191ms :: {"hasPlan":false}
+Fetching created recipes for user 1
+[Weight Logs API] Fetching weight logs for user: 1
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+7:44:42 PM [express] GET /api/progress-photos 304 in 195ms :: []
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  dateRequested: '2025-04-23',
+  start: '2025-04-23T00:00:00.000Z',
+  end: '2025-04-23T23:59:59.999Z'
+}
+Found 0 created recipes
+7:44:42 PM [express] GET /api/recipes 304 in 227ms :: []
+[Weight Logs API] Retrieved logs count: 0
+7:44:42 PM [express] GET /api/weight-logs 304 in 200ms :: []
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-04-23T19:44:42.345Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+7:44:42 PM [express] GET /api/food-logs 304 in 184ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Error fetching user profile: NeonDbError: column "calories_goal" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5140:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '101',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+7:44:42 PM [express] GET /api/user/profile 500 in 104ms :: {"error":"Failed to fetch profile"}
+Fetching created recipes for user 1
+Found 0 created recipes
+7:44:42 PM [express] GET /api/recipes 304 in 140ms :: []
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2790,"proteinGoal":209,"carbsGoal":279,"fatGoal":93,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"en"}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "allergies" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:94:28) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '276',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+7:45:12 PM [express] POST /api/register/complete-onboarding 500 in 221ms :: {"error":"Failed to comp…
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2790,"proteinGoal":209,"carbsGoal":279,"fatGoal":93,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"en"}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "allergies" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:94:28) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '276',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+7:45:13 PM [express] POST /api/register/complete-onboarding 500 in 104ms :: {"error":"Failed to comp…
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2790,"proteinGoal":209,"carbsGoal":279,"fatGoal":93,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"en"}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "allergies" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:94:28) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '276',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+7:45:14 PM [express] POST /api/register/complete-onboarding 500 in 183ms :: {"error":"Failed to comp…

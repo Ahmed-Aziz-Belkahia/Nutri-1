@@ -1,0 +1,187 @@
+4:43 PM [express] Testing database connection...
+✅ Database connection established successfully
+2:54:43 PM [express] ✅ Database connection successful
+2:54:43 PM [express] ✅ Uploads directory created
+2:54:43 PM [express] Development server setup complete
+2:54:43 PM [express] Server running at http://0.0.0.0:5000
+2:54:49 PM [express] Request aborted: GET /src/index.css
+2:54:49 PM [express] Request aborted: GET /@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js
+2:54:52 PM [express] Request aborted: GET /src/hooks/use-auth.ts
+2:54:52 PM [express] Request aborted: GET /src/pages/AuthPage.tsx
+2:54:52 PM [express] Request aborted: GET /src/pages/Dashboard.tsx
+2:54:54 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+2:54:59 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+2:57:55 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+Registration request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+2:58:08 PM [express] POST /api/register 400 in 705ms :: {"error":"Email already registered"}
+2:58:15 PM [express] POST /api/login 200 in 165ms :: {"ok":true}
+2:58:15 PM [express] GET /api/user 304 in 43ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+Fetching meal plan for date: 2025-03-15
+Error fetching today's meal plan: NeonDbError: relation "meal_plans" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes/ai.ts:55:26) {
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '93',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable',
+  sourceError: undefined
+}
+2:58:16 PM [express] GET /api/meal-plans/today 500 in 210ms :: {"error":"Failed to fetch meal plan"}
+2:58:16 PM [express] GET /api/user 304 in 53ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-03-15T00:00:00.000Z',
+  end: '2025-03-16T00:00:00.000Z'
+}
+2:58:16 PM [express] GET /api/user/xp 304 in 204ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-03-15T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+2:58:16 PM [express] GET /api/food-logs 304 in 162ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Fetching meal plan for date: 2025-03-15
+Error fetching today's meal plan: NeonDbError: relation "meal_plans" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes/ai.ts:55:26) {
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '93',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable',
+  sourceError: undefined
+}
+2:58:17 PM [express] GET /api/meal-plans/today 500 in 118ms :: {"error":"Failed to fetch meal plan"}
+Fetching meal plan for date: 2025-03-15
+Error fetching today's meal plan: NeonDbError: relation "meal_plans" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes/ai.ts:55:26) {
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '93',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable',
+  sourceError: undefined
+}
+2:58:19 PM [express] GET /api/meal-plans/today 500 in 114ms :: {"error":"Failed to fetch meal plan"}
+2:58:19 PM [express] GET /api/user/xp 304 in 128ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+[Food Recognition] Starting image analysis...
+[Food Recognition] Error: Error: Invalid image format. Please provide an image in PNG, JPEG, GIF, or WEBP format.
+    at analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:197:13)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:190:28)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:646:15
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:265:14)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/runner/workspace/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:646:15
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:265:14)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/runner/workspace/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at /home/runner/workspace/node_modules/passport/lib/strategies/session.js:120:12
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:352:31)
+    at deserialized (/home/runner/workspace/node_modules/passport/lib/authenticator.js:364:7)
+    at <anonymous> (/home/runner/workspace/server/auth.ts:109:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+Food analysis error: Error: Invalid image format. Please provide an image in PNG, JPEG, GIF, or WEBP format.
+    at analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:197:13)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:190:28)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:646:15
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:265:14)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/runner/workspace/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:646:15
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:265:14)
+    at Function.handle (/home/runner/workspace/node_modules/express/lib/router/index.js:175:3)
+    at router (/home/runner/workspace/node_modules/express/lib/router/index.js:47:12)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at /home/runner/workspace/node_modules/passport/lib/strategies/session.js:120:12
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:352:31)
+    at deserialized (/home/runner/workspace/node_modules/passport/lib/authenticator.js:364:7)
+    at <anonymous> (/home/runner/workspace/server/auth.ts:109:14)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2:58:31 PM [express] POST /api/analyze-food 500 in 278ms :: {"error":"Food analysis failed","message…
+2:59:24 PM [express] GET /api/user 304 in 138ms :: {"id":1,"email":"piotrekster1998@gmail.com","pass…
+2:59:24 PM [express] GET /api/user/xp 304 in 279ms :: {"totalXP":0,"level":1,"currentXPInLevel":0,"x…
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-03-15T00:00:00.000Z',
+  end: '2025-03-16T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-03-15T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+2:59:24 PM [express] GET /api/food-logs 304 in 124ms :: {"logs":[],"totals":{"calories":0,"protein":…

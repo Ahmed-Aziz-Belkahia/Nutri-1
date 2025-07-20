@@ -1,0 +1,200 @@
+Processed OpenAI response: { originalStructure: [ 'meal_plan', 'note' ], processedDays: 2 }
+Generated meal plan with AI: { daysGenerated: 2, firstDay: 'Unknown' }
+Day 1 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 6,
+  mealsSample: { name: undefined, mealType: undefined, components: false },
+  fullStructure: '{"day":"2023-10-11","day_of_week":"Wednesday","meals":[{"meal_name":"Middle-Eastern Scrambled Eggs","meal_type":"breakfast","recipe":{"ingredients":["4 large eggs","1 tablespoon olive oil","1 small onion, chopped","2 tomatoes, diced","1/2 teaspoon cumin","Salt and pepper to taste","1/4 cup feta cheese, crumbled","2 gluten-free pita breads"],"instructions":["Heat olive oil in a skillet over medium heat.","Add chopped onions and sauté until translucent.","Add diced tomatoes and cumin, cook until t...'
+}
+Updating meal plan with calories: 0 date: 2025-03-23
+Using meal plan: 1 for date: 2025-03-23
+Created recipes for plan: { planId: 1, date: '2025-03-23', recipeCount: 6 }
+Day 2 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 6,
+  mealsSample: { name: undefined, mealType: undefined, components: false },
+  fullStructure: '{"day":"2023-10-12","day_of_week":"Thursday","meals":[{"meal_name":"African Peanut Porridge","meal_type":"breakfast","recipe":{"ingredients":["1 cup gluten-free oats","2 tablespoons peanut butter","1/4 cup coconut milk","1 tablespoon honey","1 banana, sliced"],"instructions":["Cook oats according to package instructions.","Stir in peanut butter and coconut milk until smooth.","Serve topped with banana slices and drizzled with honey."],"prep_time":"15 minutes"},"nutritional_info":{"calories":520,...'
+}
+Updating meal plan with calories: 0 date: 2025-03-24
+Using meal plan: 2 for date: 2025-03-24
+Created recipes for plan: { planId: 2, date: '2025-03-24', recipeCount: 6 }
+No AI-generated meal plan for day 3, skipping
+No AI-generated meal plan for day 4, skipping
+No AI-generated meal plan for day 5, skipping
+No AI-generated meal plan for day 6, skipping
+No AI-generated meal plan for day 7, skipping
+No AI-generated meal plan for day 8, skipping
+No AI-generated meal plan for day 9, skipping
+No AI-generated meal plan for day 10, skipping
+No AI-generated meal plan for day 11, skipping
+No AI-generated meal plan for day 12, skipping
+No AI-generated meal plan for day 13, skipping
+No AI-generated meal plan for day 14, skipping
+1:43:37 PM [express] POST /api/meal-plans 200 in 22705ms :: {"weekStart":"2025-03-23","plans":[{"id"…
+Fetching meal plan for date: 2025-03-23
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-23',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-23T11:19:31.884Z,
+  updatedAt: 2025-03-23T11:19:31.884Z
+}
+Found recipes: [
+  {
+    id: 149,
+    name: 'Breakfast eggs & oil & chopped',
+    mealType: 'breakfast',
+    order: 0,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Heat olive oil in a skillet over medium heat.\n' +
+      'Add chopped onions and sauté until translucent.\n' +
+      'Add diced tomatoes and cumin, cook until tomatoes soften.\n' +
+      'Beat the eggs with salt and pepper in a bowl.\n' +
+      'Pour eggs into the skillet and stir gently until scrambled to desired consistency.\n' +
+      'Serve with crumbled feta on top and gluten-free pita bread on the side.',
+    ingredients: [
+      '4 large eggs',
+      '1 tablespoon olive oil',
+      '1 small onion, chopped',
+      '2 tomatoes, diced',
+      '1/2 teaspoon cumin',
+      'Salt and pepper to taste',
+      '1/4 cup feta cheese, crumbled',
+      '2 gluten-free pita breads'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 154,
+    name: 'Morning snack sliced & diced & almonds',
+    mealType: 'morning snack',
+    order: 1,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Combine banana, papaya, and almonds in a bowl.\n' +
+      'Sprinkle shredded coconut on top.\n' +
+      'Drizzle with honey before serving.',
+    ingredients: [
+      '1 banana, sliced',
+      '1 cup papaya, diced',
+      '1/4 cup almonds',
+      '1 tablespoon shredded coconut',
+      '1 tablespoon honey'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1599165521233-4b5be3298345?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 150,
+    name: 'Lunch boneless & oil & minced',
+    mealType: 'lunch',
+    order: 2,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'In a bowl, mix olive oil, garlic, turmeric, coriander, cumin, paprika, salt, pepper, and lemon juice.\n' +
+      'Add chicken breasts and coat well. Marinate for at least 15 minutes.\n' +
+      'Preheat grill to medium-high. Grill chicken for 6-7 minutes per side until fully cooked.\n' +
+      'Serve chicken sliced over a bed of quinoa, with cucumber and roasted peppers on the side.',
+    ingredients: [
+      '2 chicken breasts, boneless',
+      '2 tablespoons olive oil',
+      '2 cloves garlic, minced',
+      '1 teaspoon turmeric',
+      '1 teaspoon ground coriander',
+      '1 teaspoon cumin',
+      '1/2 teaspoon paprika',
+      'Salt and pepper to taste',
+      '1 lemon, juiced',
+      '1 cup quinoa, cooked',
+      '1/2 cucumber, sliced',
+      '1/2 cup roasted red peppers'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 151,
+    name: 'Afternoon snack avocado & drained & mayonnaise',
+    mealType: 'afternoon snack',
+    order: 3,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Cut avocado in half, remove pit, and scoop flesh into a bowl.\n' +
+      'Add tuna, mayonnaise, lemon juice, salt, and pepper.\n' +
+      'Mix until well combined and creamy.',
+    ingredients: [
+      '1 ripe avocado',
+      '1 can tuna, drained',
+      '1 tablespoon mayonnaise',
+      '1 tablespoon lemon juice',
+      'Salt and pepper to taste'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 152,
+    name: 'Dinner cubed & rinsed & oil',
+    mealType: 'dinner',
+    order: 4,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Heat oil in a pot and brown goat meat, then set aside.\n' +
+      'In the same pot, sauté onions until soft.\n' +
+      'Add blended tomatoes, bell peppers, and tomato paste, cooking until paste is dissolved.\n' +
+      'Add spices and stir. Return goat to the pot.\n' +
+      'Pour in stock or water to cover, bring to boil, and simmer until meat is tender.\n' +
+      'Add rinsed rice and Scotch bonnet, reduce to low heat and cover until rice is cooked and all liquid is absorbed.',
+    ingredients: [
+      '1 pound goat meat, cubed',
+      '2 cups rice, rinsed',
+      '1/4 cup vegetable oil',
+      '1 onion, chopped',
+      '4 tomatoes, blended',
+      '2 bell peppers, blended',
+      '2 tablespoons tomato paste',
+      '1 teaspoon thyme',
+      '1 teaspoon curry powder',
+      '1 teaspoon garlic powder',
+      'Beef stock or water, as needed',
+      'Salt to taste',
+      '1 Scotch bonnet pepper'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 153,
+    name: 'Evening snack pitted & almonds & walnuts',
+    mealType: 'evening snack',
+    order: 5,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'In a food processor, combine dates, almonds, and walnuts; blend until a sticky dough forms.\n' +
+      'Roll mixture into small balls.\n' +
+      'Roll balls in shredded coconut to coat.\n' +
+      'Chill in the refrigerator for 30 minutes before serving.',
+    ingredients: [
+      '1 cup dates, pitted',
+      '1/2 cup almonds',
+      '1/2 cup walnuts',
+      '1/4 cup shredded coconut',
+      '1 tablespoon cocoa powder'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1599165521233-4b5be3298345?w=800&auto=format&fit=crop'
+  }
+]
+1:43:38 PM [express] GET /api/meal-plans/today 200 in 123ms :: {"hasPlan":true,"plan":{"id":1,"date"…
+1:43:38 PM [express] GET /api/meal-plans/all 200 in 150ms :: {"weekStart":"2025-03-23","plans":[{"id…
+f

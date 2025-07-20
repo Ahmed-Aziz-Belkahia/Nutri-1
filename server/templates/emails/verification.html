@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email Address - NutriAI</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .logo {
+      width: 120px;
+      height: auto;
+    }
+    .content {
+      padding: 30px 20px;
+    }
+    .verification-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .verification-button:hover {
+      background-color: #45a049;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+      font-size: 14px;
+      border-top: 1px solid #eaeaea;
+    }
+    .verification-link {
+      word-break: break-all;
+      color: #4CAF50;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>NutriAI</h1>
+    </div>
+    <div class="content">
+      <h2>Verify Your Email Address</h2>
+      <p>Thank you for registering with NutriAI. To complete your registration and access all features, please verify your email address by clicking the button below:</p>
+      
+      <div style="text-align: center;">
+        <a href="{{verificationLink}}" class="verification-button">Verify Email Address</a>
+      </div>
+      
+      <p>If the button above doesn't work, you can also copy and paste the following link into your browser:</p>
+      
+      <p class="verification-link">{{verificationLink}}</p>
+      
+      <p>This verification link will expire in 24 hours for security reasons.</p>
+      
+      <p>If you did not sign up for a NutriAI account, please disregard this email.</p>
+      
+      <p>Thank you,<br>The NutriAI Team</p>
+    </div>
+    
+    <div class="footer">
+      <p>&copy; 2025 NutriAI. All rights reserved.</p>
+      <p>This is an automated email, please do not reply.</p>
+    </div>
+  </div>
+</body>
+</html>

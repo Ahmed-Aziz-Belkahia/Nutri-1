@@ -1,0 +1,250 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+WARNING: SENDGRID_API_KEY is not set. Email functionality will be disabled.
+1:08:41 PM [express] Testing database connection...
+1:08:41 PM [express] ✅ Database connection successful
+1:08:41 PM [express] ✅ Uploads directory created
+1:08:42 PM [express] Development server setup complete
+1:08:42 PM [express] Server running at http://0.0.0.0:5000
+✅ Database connection established successfully
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:08:48 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+1:09:01 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+Registration request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+1:10:46 PM [express] POST /api/register 400 in 2910ms :: {"error":"Email already registered"}
+Registration request: {
+  email: 'piotrekster1998@gmail.comas',
+  password: 'piotrekster1998@gmail.com'
+}
+User created: {
+  id: 2,
+  email: 'piotrekster1998@gmail.comas',
+  password: '524b0b0e154ff805ba3488270a2959c081d5c5bf71827fad6490bf267577587c5604a50a2b3d26d8d168e1d02fb28df257a6393ea2ea48bd38f070a8796a87b3.deaf99738e02da9fa349d533d0d253c1',
+  hasCompletedOnboarding: false,
+  lastActivityDate: '2025-05-20',
+  profileImage: null,
+  preferred_language: 'en',
+  resetToken: null,
+  resetTokenExpiresAt: null,
+  currentStreak: 0,
+  longestStreak: 0,
+  experiencePoints: 0,
+  level: 1,
+  isAdmin: false
+}
+[Email Service] MOCK EMAIL to: piotrekster1998@gmail.comas, subject: "Verify Your Email Address - NutriAI"
+Verification email sent successfully
+[Email Service] MOCK EMAIL to: piotrekster1998@gmail.comas, subject: "Welcome to NutriAI - Your Journey Begins!"
+Welcome email sent successfully
+1:10:59 PM [express] POST /api/register 200 in 4316ms :: {"ok":true,"message":"Account created succe…
+1:10:59 PM [express] GET /api/user 200 in 32ms :: {"id":2,"email":"piotrekster1998@gmail.comas","pas…
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:11:00 PM [express] GET /api/user/profile 500 in 133ms :: {"error":"Failed to fetch profile"}
+Fetching meal plan for today
+User ID: 2
+No meal plan found for today (2025-05-20)
+1:11:00 PM [express] GET /api/meal-plans/today 304 in 126ms :: {"hasPlan":false}
+[Food Logs API] Fetching logs for date range: {
+  userId: 2,
+  dateRequested: '2025-05-20',
+  start: '2025-05-20T00:00:00.000Z',
+  end: '2025-05-20T23:59:59.999Z'
+}
+[Weight Logs API] Fetching weight logs for user: 2
+Fetching created recipes for user 2
+[Weight Logs API] Retrieved logs count: 0
+1:11:00 PM [express] GET /api/weight-logs 304 in 169ms :: []
+Fetching progress photos for user: 2
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-05-20T13:11:00.411Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+1:11:00 PM [express] GET /api/food-logs 304 in 219ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+1:11:00 PM [express] GET /api/progress-photos 304 in 120ms :: []
+Found 0 created recipes
+1:11:00 PM [express] GET /api/recipes 304 in 235ms :: []
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:11:00 PM [express] GET /api/user/profile 500 in 87ms :: {"error":"Failed to fetch profile"}
+Fetching created recipes for user 2
+Found 0 created recipes
+1:11:00 PM [express] GET /api/recipes 304 in 95ms :: []
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2633,"proteinGoal":165,"carbsGoal":296,"fatGoal":88,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"en","energyPattern":"morning","flavorPreference":"savory","firstVictory":"energy","motivationLevel":"medium","nutritionGoals":[]}'
+  },
+  file: 'No file'
+}
+User nutrition preferences inserted successfully
+Updated user 2 language to: en and completed onboarding status
+Verified user 2 onboarding status: true
+1:12:00 PM [express] POST /api/register/complete-onboarding 200 in 251ms :: {"ok":true}
+Fetching meal plan for today
+User ID: 2
+No meal plan found for today (2025-05-20)
+1:12:00 PM [express] GET /api/meal-plans/today 304 in 73ms :: {"hasPlan":false}
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:12:00 PM [express] GET /api/user/profile 500 in 74ms :: {"error":"Failed to fetch profile"}
+1:12:01 PM [express] GET /api/user 200 in 39ms :: {"id":2,"email":"piotrekster1998@gmail.comas","pas…
+[Food Logs API] Fetching logs for date range: {
+  userId: 2,
+  dateRequested: '2025-05-20',
+  start: '2025-05-20T00:00:00.000Z',
+  end: '2025-05-20T23:59:59.999Z'
+}
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-05-20T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+1:12:01 PM [express] GET /api/food-logs 200 in 150ms :: {"logs":[],"totals":{"calories":0,"protein":…
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:12:01 PM [express] GET /api/user/profile 500 in 155ms :: {"error":"Failed to fetch profile"}
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:13:57 PM [express] GET /api/user/profile 500 in 2907ms :: {"error":"Failed to fetch profile"}
+Error fetching user profile: NeonDbError: column "body_type" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5504:27) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '221',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+1:13:57 PM [express] GET /api/user/profile 500 in 103ms :: {"error":"Failed to fetch profile"}
+[Food Logs API] Processing food log request: { userId: 2, name: 'Banana', hasImage: true, hasComponents: false }
+[Food Logs API] Using log date: {
+  original: '2025-05-20T13:14:16.098Z',
+  normalized: '2025-05-20T12:00:00.000Z',
+  dateString: '2025-05-20'
+}
+[Food Logs API] Processing image analysis
+[Food Recognition] Starting image analysis...
+[Food Recognition] Valid base64 image data verified, size: 118.4 KB
+[Food Recognition] Using format jpeg for OpenAI analysis
+[Food Recognition] Starting image analysis with format: jpeg...

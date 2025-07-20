@@ -1,0 +1,97 @@
+[Food Recognition] Analysis result: {
+  "name": "Snack with soda and chocolate bar",
+  "calories": 450,
+  "protein": 5,
+  "carbs": 60,
+  "fat": 20,
+  "confidence": 0.9,
+  "components": [
+    {
+      "name": "Coca-Cola can",
+      "calories": 140,
+      "protein": 0,
+      "carbs": 39,
+      "fat": 0,
+      "servingSize": "355 ml",
+      "quantity": 1,
+      "details": {
+        "type": "Beverage",
+        "preparation": "Carbonated",
+        "texture": "Liquid",
+        "color": "Dark brown",
+        "estimatedWeight": "355 grams",
+        "cookingMethod": "None",
+        "doneness": "N/A",
+        "temperature": "Cold",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Served in a can"
+      }
+    },
+    {
+      "name": "Kinder Bueno White",
+      "calories": 310,
+      "protein": 5,
+      "carbs": 21,
+      "fat": 20,
+      "servingSize": "39 grams",
+      "quantity": 1,
+      "details": {
+        "type": "Chocolate bar",
+        "preparation": "Packaged",
+        "texture": "Creamy and crunchy",
+        "color": "White and brown",
+        "estimatedWeight": "39 grams",
+        "cookingMethod": "None",
+        "doneness": "N/A",
+        "temperature": "Room temperature",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Individually wrapped"
+      }
+    }
+  ]
+}
+[Food Logs API] Image analysis completed: { componentsFound: 2 }
+[Food Logs API] Using analyzed components: {
+  count: 2,
+  totals: { totalCalories: 450, totalProtein: 5, totalCarbs: 60, totalFat: 20 }
+}
+[Food Logs API] Inserting food log into database: { userId: 4, name: 'Banana', componentsCount: 2 }
+[Food Logs API] Food log inserted successfully: { logId: 7, date: 2025-04-19T12:00:00.000Z }
+[Food Logs API] Fetching daily totals for range: { start: '2025-04-19T00:00:00.000Z', end: '2025-04-20T00:00:00.000Z' }
+[Food Logs API] Retrieved day logs: { count: 2 }
+[Food Logs API] Calculated daily totals: { calories: 1250, protein: 35, carbs: 160, fat: 45 }
+[Food Logs API] Sending response: {
+  logId: 7,
+  componentsCount: 2,
+  totals: { calories: 1250, protein: 35, carbs: 160, fat: 45 }
+}
+12:48:49 PM [express] POST /api/food-logs 200 in 9889ms :: {"log":{"id":7,"userId":4,"name":"Banana",…
+12:49:02 PM [express] GET /api/recipes/7 404 in 413ms :: {"error":"Recipe not found"}
+12:49:02 PM [express] GET /api/recipes/7 404 in 176ms :: {"error":"Recipe not found"}
+12:49:25 PM [vite] hmr update /src/components/TodaysMealPlans.tsx, /src/index.css (x2)
+12:49:35 PM [express] GET /api/user 401 in 17ms :: {"error":"Not authenticated"}
+12:49:43 PM [express] GET /api/user 304 in 60ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pas…
+12:49:43 PM [express] GET /api/recipes/7 404 in 177ms :: {"error":"Recipe not found"}
+12:49:45 PM [express] GET /api/recipes/7 404 in 177ms :: {"error":"Recipe not found"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

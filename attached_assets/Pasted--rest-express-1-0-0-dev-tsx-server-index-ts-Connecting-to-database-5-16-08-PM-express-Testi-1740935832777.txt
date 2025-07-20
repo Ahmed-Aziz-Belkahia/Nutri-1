@@ -1,0 +1,659 @@
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+5:16:08 PM [express] Testing database connection...
+✅ Database connection established successfully
+5:16:10 PM [express] ✅ Database connection successful
+5:16:10 PM [express] ✅ Database schema updated
+5:16:10 PM [express] ✅ Uploads directory created
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+[Auth] Setting up authentication middleware...
+[Auth] Session configuration: { isProduction: false, cookieSecure: false, cookieSameSite: 'lax' }
+5:16:11 PM [express] Development server setup complete
+5:16:11 PM [express] Server running at http://0.0.0.0:5000
+[Auth] User check request, authenticated: false
+5:16:21 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+5:16:25 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+[Auth] User check request, authenticated: false
+5:16:37 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+[Auth] Processing login request: {
+  email: 'piotrekster1998@gmail.com',
+  password: 'piotrekster1998@gmail.com'
+}
+[Auth] Attempting login for: piotrekster1998@gmail.com
+[Auth] Login successful for: piotrekster1998@gmail.com
+[Auth] Serializing user: 1
+[Auth] Login successful for user: 1
+5:16:41 PM [express] POST /api/login 200 in 174ms :: {"ok":true}
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] User check request, authenticated: true
+5:16:42 PM [express] GET /api/user 304 in 34ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+[Food Logs API] Fetching logs for date range: {
+  userId: 1,
+  start: '2025-03-02T00:00:00.000Z',
+  end: '2025-03-03T00:00:00.000Z'
+}
+[Food Logs API] Retrieved logs: { count: 2, date: '2025-03-02T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 1300, protein: 50, carbs: 180, fat: 60 }
+5:16:43 PM [express] GET /api/food-logs 304 in 1036ms :: {"logs":[{"id":2,"userId":1,"name":"Chicken…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Fetching meal plan for date: 2025-03-02
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-02',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-02T00:47:34.710Z,
+  updatedAt: 2025-03-02T00:47:34.710Z
+}
+Found recipes: []
+5:16:44 PM [express] GET /api/meal-plans/today 304 in 108ms :: {"hasPlan":true,"plan":{"id":1,"date"…
+5:16:44 PM [express] GET /api/user/xp 304 in 2158ms :: {"totalXP":20,"level":1,"currentXPInLevel":20…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Received dietary preferences request: {
+  dietaryType: 'omnivore',
+  calorieTarget: 2000,
+  mealsPerDay: 3,
+  allergies: [],
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  preferredIngredients: [],
+  excludedIngredients: []
+}
+Calculated goals: { calorieTarget: 2000, proteinGoal: 150, carbsGoal: 200, fatGoal: 67 }
+Saved preferences: {
+  id: 34,
+  userId: 1,
+  currentWeight: '70.00',
+  goalWeight: '70.00',
+  weightGoal: 'maintain',
+  activityLevel: 'moderate',
+  calorieGoal: 2000,
+  proteinGoal: 150,
+  carbsGoal: 200,
+  fatGoal: 67,
+  updatedAt: 2025-03-02T17:16:50.601Z
+}
+5:16:52 PM [express] POST /api/user/dietary-preferences 200 in 2256ms :: {"id":34,"userId":1,"curren…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Received meal plan request with preferences: { maxCookingTime: 60, budgetPreference: 'medium' }
+Created meal plan: {
+  id: 158,
+  userId: 1,
+  date: '2025-03-02',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:52.978Z,
+  updatedAt: 2025-03-02T17:16:52.978Z
+}
+Created recipes for plan: [
+  {
+    id: 127,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:52.997Z,
+    updatedAt: 2025-03-02T17:16:52.997Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 129,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:52.997Z,
+    updatedAt: 2025-03-02T17:16:52.997Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 128,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:52.997Z,
+    updatedAt: 2025-03-02T17:16:52.997Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 159,
+  userId: 1,
+  date: '2025-03-03',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.166Z,
+  updatedAt: 2025-03-02T17:16:53.166Z
+}
+Created recipes for plan: [
+  {
+    id: 132,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.183Z,
+    updatedAt: 2025-03-02T17:16:53.183Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 130,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.183Z,
+    updatedAt: 2025-03-02T17:16:53.183Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 131,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.183Z,
+    updatedAt: 2025-03-02T17:16:53.183Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 160,
+  userId: 1,
+  date: '2025-03-04',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.350Z,
+  updatedAt: 2025-03-02T17:16:53.350Z
+}
+Created recipes for plan: [
+  {
+    id: 134,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.366Z,
+    updatedAt: 2025-03-02T17:16:53.366Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 135,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.366Z,
+    updatedAt: 2025-03-02T17:16:53.366Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 133,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.366Z,
+    updatedAt: 2025-03-02T17:16:53.366Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 161,
+  userId: 1,
+  date: '2025-03-05',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.515Z,
+  updatedAt: 2025-03-02T17:16:53.515Z
+}
+Created recipes for plan: [
+  {
+    id: 138,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.531Z,
+    updatedAt: 2025-03-02T17:16:53.531Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 136,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.531Z,
+    updatedAt: 2025-03-02T17:16:53.531Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 137,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.531Z,
+    updatedAt: 2025-03-02T17:16:53.531Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 162,
+  userId: 1,
+  date: '2025-03-06',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.613Z,
+  updatedAt: 2025-03-02T17:16:53.613Z
+}
+Created recipes for plan: [
+  {
+    id: 140,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.629Z,
+    updatedAt: 2025-03-02T17:16:53.629Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 139,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.629Z,
+    updatedAt: 2025-03-02T17:16:53.629Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 141,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.629Z,
+    updatedAt: 2025-03-02T17:16:53.629Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 163,
+  userId: 1,
+  date: '2025-03-07',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.716Z,
+  updatedAt: 2025-03-02T17:16:53.716Z
+}
+Created recipes for plan: [
+  {
+    id: 142,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.732Z,
+    updatedAt: 2025-03-02T17:16:53.732Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 143,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.732Z,
+    updatedAt: 2025-03-02T17:16:53.732Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 144,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.732Z,
+    updatedAt: 2025-03-02T17:16:53.732Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+Created meal plan: {
+  id: 164,
+  userId: 1,
+  date: '2025-03-08',
+  totalCalories: 1700,
+  status: 'active',
+  createdAt: 2025-03-02T17:16:53.815Z,
+  updatedAt: 2025-03-02T17:16:53.815Z
+}
+Created recipes for plan: [
+  {
+    id: 147,
+    userId: 1,
+    name: 'Healthy Breakfast Bowl',
+    description: 'A nutritious breakfast bowl perfect for energy',
+    ingredients: [ 'eggs', 'quinoa', 'avocado', 'tomatoes', 'spinach' ],
+    instructions: '1. Cook quinoa\n' +
+      '2. Poach eggs\n' +
+      '3. Arrange all ingredients\n' +
+      '4. Season and serve',
+    nutritionInfo: { fat: 15, carbs: 45, protein: 25, calories: 400 },
+    createdAt: 2025-03-02T17:16:53.831Z,
+    updatedAt: 2025-03-02T17:16:53.831Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'breakfast'
+  },
+  {
+    id: 145,
+    userId: 1,
+    name: 'Grilled Chicken Salad',
+    description: 'Light and protein-rich lunch option',
+    ingredients: [
+      'chicken breast',
+      'mixed greens',
+      'cherry tomatoes',
+      'olive oil'
+    ],
+    instructions: '1. Grill chicken\n2. Assemble salad\n3. Dress with olive oil',
+    nutritionInfo: { fat: 25, carbs: 35, protein: 40, calories: 600 },
+    createdAt: 2025-03-02T17:16:53.831Z,
+    updatedAt: 2025-03-02T17:16:53.831Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'lunch'
+  },
+  {
+    id: 146,
+    userId: 1,
+    name: 'Salmon with Quinoa',
+    description: 'Nutritious dinner with omega-3',
+    ingredients: [ 'salmon', 'quinoa', 'vegetables', 'lemon' ],
+    instructions: '1. Cook quinoa\n2. Bake salmon\n3. Steam vegetables',
+    nutritionInfo: { fat: 30, carbs: 50, protein: 45, calories: 700 },
+    createdAt: 2025-03-02T17:16:53.831Z,
+    updatedAt: 2025-03-02T17:16:53.831Z,
+    imageUrl: null,
+    rating: '0',
+    likesCount: 0,
+    commentsCount: 0,
+    isPublic: true,
+    isSaved: false,
+    source: 'created',
+    originalRecipeId: null,
+    mealType: 'dinner'
+  }
+]
+5:16:53 PM [express] POST /api/meal-plans 200 in 968ms :: {"weekStart":"2025-03-02","plans":[{"id":1…
+[Auth] Deserializing user: 1
+[Auth] User deserialized successfully: 1
+Fetching meal plan for date: 2025-03-02
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-02',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-02T00:47:34.710Z,
+  updatedAt: 2025-03-02T00:47:34.710Z
+}
+Found recipes: []
+5:16:54 PM [express] GET /api/meal-plans/today 304 in 97ms :: {"hasPlan":true,"plan":{"id":1,"date":…

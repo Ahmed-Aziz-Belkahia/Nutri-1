@@ -1,0 +1,238 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+7:18:19 AM [express] Testing database connection...
+✅ Database connection established successfully
+7:18:21 AM [express] ✅ Database connection successful
+7:18:21 AM [express] ✅ Uploads directory created
+7:18:22 AM [express] Development server setup complete
+7:18:22 AM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+7:19:01 AM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+7:19:20 AM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:19:24 AM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:25:45 AM [express] POST /api/login 200 in 862ms :: {"ok":true}
+7:25:45 AM [express] GET /api/user 304 in 65ms :: {"id":2,"email":"piotrekster1998@gmail.coms","pass…
+Fetching meal plan for date: 2025-04-17
+Found meal plan: undefined
+7:25:46 AM [express] GET /api/meal-plans/today 304 in 328ms :: {"hasPlan":false}
+7:25:46 AM [express] GET /api/user 304 in 61ms :: {"id":2,"email":"piotrekster1998@gmail.coms","pass…
+Fetching meal plan for date: 2025-04-17
+[Food Logs API] Fetching logs for date range: {
+  userId: 2,
+  dateRequested: '2025-04-17',
+  start: '2025-04-17T00:00:00.000Z',
+  end: '2025-04-17T23:59:59.999Z'
+}
+7:25:46 AM [express] GET /api/user/profile 304 in 317ms :: {"id":2,"userId":2,"currentWeight":"75.00…
+Found meal plan: undefined
+7:25:47 AM [express] GET /api/meal-plans/today 304 in 318ms :: {"hasPlan":false}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-04-17T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 350, protein: 18, carbs: 45, fat: 10 }
+7:25:47 AM [express] GET /api/food-logs 304 in 810ms :: {"logs":[{"id":2,"userId":2,"name":"Lentil s…
+Fetching saved recipes for user 2
+Fetching created recipes for user 2
+Found 0 saved recipes
+7:25:59 AM [express] GET /api/recipes 304 in 392ms :: []
+Found 0 created recipes
+7:26:00 AM [express] GET /api/recipes 304 in 486ms :: []
+Filtered to one meal plan per date: []
+7:26:04 AM [express] GET /api/meal-plans/all 200 in 182ms :: {"weekStart":"2025-04-17","plans":[]}
+Fetching meal plan for date: 2025-04-17
+Found meal plan: undefined
+7:26:04 AM [express] GET /api/meal-plans/today 304 in 306ms :: {"hasPlan":false}
+7:26:04 AM [express] GET /api/shopping-list/2025-04-17 200 in 182ms :: []
+7:26:32 AM [express] GET /api/user 304 in 60ms :: {"id":2,"email":"piotrekster1998@gmail.coms","pass…
+7:26:33 AM [express] GET /api/user 304 in 60ms :: {"id":2,"email":"piotrekster1998@gmail.coms","pass…
+Fetching meal plan for date: 2025-04-17
+Found meal plan: undefined
+7:26:33 AM [express] GET /api/meal-plans/today 304 in 178ms :: {"hasPlan":false}
+7:26:33 AM [express] GET /api/user/profile 304 in 179ms :: {"id":2,"userId":2,"currentWeight":"75.00…
+[Food Logs API] Fetching logs for date range: {
+  userId: 2,
+  dateRequested: '2025-04-17',
+  start: '2025-04-17T00:00:00.000Z',
+  end: '2025-04-17T23:59:59.999Z'
+}
+Fetching meal plan for date: 2025-04-17
+Found meal plan: undefined
+7:26:33 AM [express] GET /api/meal-plans/today 304 in 181ms :: {"hasPlan":false}
+[Food Logs API] Retrieved logs: { count: 1, date: '2025-04-17T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 350, protein: 18, carbs: 45, fat: 10 }
+7:26:34 AM [express] GET /api/food-logs 304 in 634ms :: {"logs":[{"id":2,"userId":2,"name":"Lentil s…
+Fetching saved recipes for user 2
+Fetching created recipes for user 2
+Found 0 saved recipes
+7:27:00 AM [express] GET /api/recipes 304 in 382ms :: []
+Found 0 created recipes
+7:27:00 AM [express] GET /api/recipes 304 in 472ms :: []
+[Recipe Analysis] Detected image format: jpeg
+[Recipe Analysis] Valid base64 image verified, size: 260241 bytes
+[Recipe Analysis] Initializing ingredient analysis...
+[Recipe Analysis] Received response from OpenAI
+[Recipe Analysis] Successfully parsed OpenAI response
+[Recipe Analysis] Validating response structure...
+[Recipe Analysis] Validation successful
+[Recipe Analysis] Generated recipes: {
+  "recipes": [
+    {
+      "name": "Lemon Yogurt Sauce Chicken",
+      "ingredients": [
+        "2 chicken breasts",
+        "1 cup plain yogurt",
+        "1 lemon (zested and juiced)",
+        "2 tablespoons butter",
+        "1 tablespoon olive oil",
+        "2 cloves garlic (minced)",
+        "Salt and pepper to taste",
+        "Fresh parsley for garnish"
+      ],
+      "instructions": [
+        "Step 1: In a bowl, mix together the yogurt, lemon zest, lemon juice, minced garlic, salt, and pepper.",
+        "Step 2: Coat the chicken breasts with the yogurt mixture. Let it marinate in the refrigerator for at least 30 minutes or up to 2 hours.",
+        "Step 3: Heat the olive oil and butter in a skillet over medium heat.",
+        "Step 4: Remove the chicken from the marinade, allowing excess to drip off, and place it in the skillet.",
+        "Step 5: Cook the chicken for about 6-7 minutes on each side, or until browned and cooked through.",
+        "Step 6: Pour the remaining marinade into the pan, let it simmer for 2-3 minutes to thicken.",
+        "Step 7: Serve the chicken with the sauce drizzled on top and garnish with fresh parsley."
+      ],
+      "cooking_time": "40 minutes",
+      "difficulty_level": "Medium",
+      "nutritional_information": {
+        "calories": 350,
+        "protein": "44g",
+        "carbohydrates": "8g",
+        "fat": "16g"
+      }
+    },
+    {
+      "name": "Citrus Butter Yogurt Dip",
+      "ingredients": [
+        "1 cup plain yogurt",
+        "1 tablespoon lemon juice",
+        "1 tablespoon melted butter",
+        "1 teaspoon honey",
+        "Salt to taste",
+        "Assorted vegetables for dipping (carrots, cucumbers, bell peppers)"
+      ],
+      "instructions": [
+        "Step 1: In a mixing bowl, combine the yogurt, lemon juice, melted butter, honey, and a pinch of salt.",
+        "Step 2: Whisk until smooth and creamy.",
+        "Step 3: Transfer the dip into a serving bowl.",
+        "Step 4: Serve with an assortment of fresh vegetables for dipping."
+      ],
+      "cooking_time": "10 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 150,
+        "protein": "6g",
+        "carbohydrates": "15g",
+        "fat": "8g"
+      }
+    },
+    {
+      "name": "Zesty Lemon Butter Sauce Pasta",
+      "ingredients": [
+        "200g pasta of your choice",
+        "2 tablespoons butter",
+        "1 lemon (zested and juiced)",
+        "1/2 cup plain yogurt",
+        "Salt and pepper to taste",
+        "1/4 cup grated Parmesan cheese",
+        "Fresh basil leaves for garnish"
+      ],
+      "instructions": [
+        "Step 1: Cook the pasta according to package instructions. Drain and set aside.",
+        "Step 2: In a saucepan, melt the butter over medium heat.",
+        "Step 3: Add lemon zest and juice, stir well.",
+        "Step 4: Lower the heat, add the yogurt and mix until smooth.",
+        "Step 5: Season with salt and pepper to taste.",
+        "Step 6: Add the cooked pasta to the sauce, tossing to coat evenly.",
+        "Step 7: Serve with grated Parmesan cheese and fresh basil on top."
+      ],
+      "cooking_time": "20 minutes",
+      "difficulty_level": "Easy",
+      "nutritional_information": {
+        "calories": 400,
+        "protein": "14g",
+        "carbohydrates": "60g",
+        "fat": "14g"
+      }
+    }
+  ]
+}
+Ingredient analysis result: {
+  ingredients: [
+    {
+      name: 'yogurt',
+      quantity: 4,
+      unit: 'cups',
+      estimatedWeight: 500,
+      freshness: 'fresh',
+      quality: 'good'
+    },
+    {
+      name: 'lemon',
+      quantity: 2,
+      unit: 'pieces',
+      estimatedWeight: 200,
+      freshness: 'fresh',
+      quality: 'good'
+    },
+    {
+      name: 'butter',
+      quantity: 2,
+      unit: 'sticks',
+      estimatedWeight: 200,
+      freshness: 'fresh',
+      quality: 'good'
+    },
+    {
+      name: 'juice',
+      quantity: 1,
+      unit: 'bottle',
+      estimatedWeight: 1000,
+      freshness: 'fresh',
+      quality: 'good'
+    },
+    {
+      name: 'sauce',
+      quantity: 2,
+      unit: 'bottles',
+      estimatedWeight: 500,
+      freshness: 'fresh',
+      quality: 'good'
+    }
+  ],
+  recipes: { recipes: [ [Object], [Object], [Object] ] }
+}
+7:27:36 AM [express] POST /api/analyze-ingredients 200 in 25964ms :: {"ingredients":[{"name":"yogurt…
+Generating recipes for ingredients: [ 'yogurt', 'lemon', 'butter', 'juice', 'sauce' ]
+Using preferences: {
+  difficulty: 'any',
+  timeNeeded: 60,
+  flavor: 'Use available ingredients creatively'
+}
+Extracted JSON object from response
+Unbalanced braces or brackets detected, attempting to fix
+Applied extensive JSON repairs
+Attempting to parse OpenAI response
+Initial JSON parse failed, attempting repairs
+Logged problematic JSON to /home/runner/workspace/logs/json-debug-1744874982924.json
+Parse error: SyntaxError: Expected ',' or ']' after array element in JSON at position 3911
+    at JSON.parse (<anonymous>)
+    at safeParseJson (/home/runner/workspace/server/services/recipe-generation.ts:101:21)
+    at generateRecipe (/home/runner/workspace/server/services/recipe-generation.ts:316:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:627:24)
+Initial JSON parse failed, attempting repairs
+Logged problematic JSON to /home/runner/workspace/logs/json-debug-1744874982940.json
+Second parse attempt failed: SyntaxError: Expected ',' or ']' after array element in JSON at position 3632
+    at JSON.parse (<anonymous>)
+    at safeParseJson (/home/runner/workspace/server/services/recipe-generation.ts:101:21)
+    at generateRecipe (/home/runner/workspace/server/services/recipe-generation.ts:336:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:627:24)
+7:29:42 AM [express] POST /api/generate-recipes 200 in 20360ms :: {"recipes":[{"name":"Ingredients M…

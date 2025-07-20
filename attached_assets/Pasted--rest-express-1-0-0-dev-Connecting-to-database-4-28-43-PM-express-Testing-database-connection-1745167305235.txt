@@ -1,0 +1,127 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+4:28:43 PM [express] Testing database connection...
+✅ Database connection established successfully
+4:28:43 PM [express] ✅ Database connection successful
+4:28:43 PM [express] ✅ Uploads directory created
+4:28:43 PM [express] Development server setup complete
+4:28:43 PM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+4:28:55 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+4:29:07 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+User logged in successfully: {
+  userId: 4,
+  email: 'piotrekster1998@gmail.comss',
+  sessionID: '355gYicafkVPjSOS49aL0cFN_d6SaBd2'
+}
+4:36:39 PM [express] POST /api/login 200 in 901ms :: {"ok":true,"user":{"id":4,"email":"piotrekster1…
+4:36:39 PM [express] GET /api/user 304 in 68ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pas…
+Fetching meal plan for today
+User ID: 4
+Found meal plan with ID: 12 for today (2025-04-20)
+Found 3 recipes for meal plan ID 12
+4:36:40 PM [express] GET /api/meal-plans/today 200 in 409ms :: {"hasPlan":true,"plan":{"id":12,"date…
+4:36:40 PM [express] GET /api/user 304 in 193ms :: {"id":4,"email":"piotrekster1998@gmail.comss","pa…
+Fetching progress photos for user: 4
+Fetching created recipes for user 4
+[Weight Logs API] Fetching weight logs for user: 4
+Found photos in database: { count: 0, photoUrls: [], types: [] }
+4:36:40 PM [express] GET /api/progress-photos 304 in 228ms :: []
+[Food Logs API] Fetching logs for date range: {
+  userId: 4,
+  dateRequested: '2025-04-20',
+  start: '2025-04-20T00:00:00.000Z',
+  end: '2025-04-20T23:59:59.999Z'
+}
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5152:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+4:36:40 PM [express] GET /api/weight-logs 500 in 337ms :: {"error":"Failed to fetch weight logs","me…
+4:36:40 PM [express] GET /api/user/profile 200 in 321ms :: {"id":19,"userId":4,"currentWeight":"75.0…
+Found 3 created recipes
+4:36:40 PM [express] GET /api/recipes 304 in 453ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+Fetching meal plan for today
+User ID: 4
+Found meal plan with ID: 12 for today (2025-04-20)
+Found 3 recipes for meal plan ID 12
+4:36:41 PM [express] GET /api/meal-plans/today 304 in 267ms :: {"hasPlan":true,"plan":{"id":12,"date…
+Fetching created recipes for user 4
+[Food Logs API] Retrieved logs: { count: 3, date: '2025-04-20T16:36:40.763Z' }
+[Food Logs API] Calculated totals: { calories: 1750, protein: 73, carbs: 225, fat: 55 }
+4:36:41 PM [express] GET /api/food-logs 304 in 930ms :: {"logs":[{"id":12,"userId":4,"name":"Pasta w…
+[Weight Logs API] Fetching weight logs for user: 4
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5152:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',
+  sourceError: undefined
+}
+4:36:41 PM [express] GET /api/weight-logs 500 in 207ms :: {"error":"Failed to fetch weight logs","me…
+Found 3 created recipes
+4:36:41 PM [express] GET /api/recipes 304 in 487ms :: [{"id":98,"userId":4,"name":"Egzotyczna Sałatk…
+Fetching meal plan for date: all
+User ID: 4
+Found 0 shopping list items for meal plans on date 2025-04-20
+4:40:03 PM [express] GET /api/shopping-list/2025-04-20 200 in 2431ms :: {"items":[],"groupedItems":{…
+[Weight Logs API] Fetching weight logs for user: 4
+[Weight Logs API] Error fetching weight logs: NeonDbError: column "logged_at" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async NeonHttpPreparedQuery.execute (/home/runner/workspace/node_modules/src/neon-http/session.ts:68:18)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:5152:20) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3722',
+  routine: 'errorMissingColumn',

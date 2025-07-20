@@ -1,0 +1,181 @@
+you format results before you gave it to the food log, when you format it you delte componets, so you need to go through with compontes, 
+
+What is it now -Final food recognition result: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  confidence: 0.9,
+  servingSize: '1 meal',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Latte',
+      calories: 180,
+      protein: 9,
+      carbs: 15,
+      fat: 9,
+      servingSize: 'Medium cup',
+      details: [Object]
+    },
+    {
+      name: 'Breakfast Sandwich',
+      calories: 450,
+      protein: 20,
+      carbs: 40,
+      fat: 25,
+      servingSize: '1 sandwich',
+      details: [Object]
+    },
+    {
+      name: 'French Fries',
+      calories: 170,
+      protein: 2,
+      carbs: 35,
+      fat: 6,
+      servingSize: 'Small pack',
+      details: [Object]
+    }
+  ]
+}
+Formatted food analysis result: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  confidence: 0.9,
+  servingSize: '1 meal',
+  quantity: 1
+}
+8:53:51 PM [express] POST /api/analyze-food 200 in 7100ms :: {"name":"Breakfast Meal","calories":800…
+Adding food log, received: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  quantity: 1,
+  components: undefined
+}
+
+What it should be - 
+Final food recognition result: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  confidence: 0.9,
+  servingSize: '1 meal',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Latte',
+      calories: 180,
+      protein: 9,
+      carbs: 15,
+      fat: 9,
+      servingSize: 'Medium cup',
+      details: [Object]
+    },
+    {
+      name: 'Breakfast Sandwich',
+      calories: 450,
+      protein: 20,
+      carbs: 40,
+      fat: 25,
+      servingSize: '1 sandwich',
+      details: [Object]
+    },
+    {
+      name: 'French Fries',
+      calories: 170,
+      protein: 2,
+      carbs: 35,
+      fat: 6,
+      servingSize: 'Small pack',
+      details: [Object]
+    }
+  ]
+}
+Formatted food analysis result: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  confidence: 0.9,
+  servingSize: '1 meal',
+  quantity: 1
+   components: [
+    {
+      name: 'Latte',
+      calories: 180,
+      protein: 9,
+      carbs: 15,
+      fat: 9,
+      servingSize: 'Medium cup',
+      details: [Object]
+    },
+    {
+      name: 'Breakfast Sandwich',
+      calories: 450,
+      protein: 20,
+      carbs: 40,
+      fat: 25,
+      servingSize: '1 sandwich',
+      details: [Object]
+    },
+    {
+      name: 'French Fries',
+      calories: 170,
+      protein: 2,
+      carbs: 35,
+      fat: 6,
+      servingSize: 'Small pack',
+      details: [Object]
+    }
+  ]
+}
+}
+8:53:51 PM [express] POST /api/analyze-food 200 in 7100ms :: {"name":"Breakfast Meal","calories":800…
+Adding food log, received: {
+  name: 'Breakfast Meal',
+  calories: 800,
+  protein: 25,
+  carbs: 90,
+  fat: 40,
+  quantity: 1,
+   components: [
+    {
+      name: 'Latte',
+      calories: 180,
+      protein: 9,
+      carbs: 15,
+      fat: 9,
+      servingSize: 'Medium cup',
+      details: [Object]
+    },
+    {
+      name: 'Breakfast Sandwich',
+      calories: 450,
+      protein: 20,
+      carbs: 40,
+      fat: 25,
+      servingSize: '1 sandwich',
+      details: [Object]
+    },
+    {
+      name: 'French Fries',
+      calories: 170,
+      protein: 2,
+      carbs: 35,
+      fat: 6,
+      servingSize: 'Small pack',
+      details: [Object]
+    }
+  ]
+}
+}

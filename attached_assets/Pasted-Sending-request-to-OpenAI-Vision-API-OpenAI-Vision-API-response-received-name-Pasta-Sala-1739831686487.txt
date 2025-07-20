@@ -1,0 +1,254 @@
+Sending request to OpenAI Vision API...
+OpenAI Vision API response received: {
+  "name": "Pasta Salad",
+  "calories": 450,
+  "protein": 15,
+  "carbs": 60,
+  "fat": 15,
+  "confidence": 0.85,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Fusilli Pasta",
+      "calories": 200,
+      "protein": 7,
+      "carbs": 40,
+      "fat": 1,
+      "servingSize": "1 cup",
+      "details": {
+        "type": "Pasta",
+        "cut": "Fusilli",
+        "cookingMethod": "Boiled",
+        "doneness": "Al dente",
+        "texture": "Firm",
+        "temperature": "Room temperature",
+        "color": "Pale yellow",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Mixed with other ingredients",
+        "preparation": "Boiled in salted water",
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Grated Cheese",
+      "calories": 100,
+      "protein": 7,
+      "carbs": 1,
+      "fat": 8,
+      "servingSize": "1/4 cup",
+      "details": {
+        "type": "Cheese",
+        "cut": "Grated",
+        "cookingMethod": "None",
+        "doneness": "N/A",
+        "texture": "Soft",
+        "temperature": "Room temperature",
+        "color": "Light yellow",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Sprinkled on top",
+        "preparation": "Grated",
+        "estimatedWeight": "30g"
+      }
+    },
+    {
+      "name": "Arugula",
+      "calories": 10,
+      "protein": 1,
+      "carbs": 2,
+      "fat": 0,
+      "servingSize": "1/2 cup",
+      "details": {
+        "type": "Leafy green",
+        "cut": "Whole leaves",
+        "cookingMethod": "None",
+        "doneness": "Raw",
+        "texture": "Crisp",
+        "temperature": "Room temperature",
+        "color": "Green",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": [],
+        "garnishes": [],
+        "presentation": "Mixed with pasta",
+        "preparation": "Washed",
+        "estimatedWeight": "15g"
+      }
+    },
+    {
+      "name": "Chicken",
+      "calories": 140,
+      "protein": 20,
+      "carbs": 0,
+      "fat": 6,
+      "servingSize": "1/2 cup",
+      "details": {
+        "type": "Poultry",
+        "cut": "Chunks",
+        "cookingMethod": "Grilled",
+        "doneness": "Cooked",
+        "texture": "Tender",
+        "temperature": "Room temperature",
+        "color": "Light brown",
+        "accompaniments": [],
+        "sauce": "None",
+        "seasonings": ["Salt", "Pepper"],
+        "garnishes": [],
+        "presentation": "Mixed with pasta",
+        "preparation": "Grilled and chopped",
+        "estimatedWeight": "75g"
+      }
+    }
+  ]
+}
+Final food recognition result: {
+  name: 'Pasta Salad',
+  calories: 450,
+  protein: 15,
+  carbs: 60,
+  fat: 15,
+  confidence: 0.85,
+  servingSize: '1 plate',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Fusilli Pasta',
+      calories: 200,
+      protein: 7,
+      carbs: 40,
+      fat: 1,
+      servingSize: '1 cup',
+      details: [Object]
+    },
+    {
+      name: 'Grated Cheese',
+      calories: 100,
+      protein: 7,
+      carbs: 1,
+      fat: 8,
+      servingSize: '1/4 cup',
+      details: [Object]
+    },
+    {
+      name: 'Arugula',
+      calories: 10,
+      protein: 1,
+      carbs: 2,
+      fat: 0,
+      servingSize: '1/2 cup',
+      details: [Object]
+    },
+    {
+      name: 'Chicken',
+      calories: 140,
+      protein: 20,
+      carbs: 0,
+      fat: 6,
+      servingSize: '1/2 cup',
+      details: [Object]
+    }
+  ]
+}
+Final food recognition result: {
+  name: 'Pasta Salad',
+  calories: 450,
+  protein: 15,
+  carbs: 60,
+  fat: 15,
+  confidence: 0.85,
+  servingSize: '1 plate',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Fusilli Pasta',
+      calories: 200,
+      protein: 7,
+      carbs: 40,
+      fat: 1,
+      servingSize: '1 cup',
+      details: [Object]
+    },
+    {
+      name: 'Grated Cheese',
+      calories: 100,
+      protein: 7,
+      carbs: 1,
+      fat: 8,
+      servingSize: '1/4 cup',
+      details: [Object]
+    },
+    {
+      name: 'Arugula',
+      calories: 10,
+      protein: 1,
+      carbs: 2,
+      fat: 0,
+      servingSize: '1/2 cup',
+      details: [Object]
+    },
+    {
+      name: 'Chicken',
+      calories: 140,
+      protein: 20,
+      carbs: 0,
+      fat: 6,
+      servingSize: '1/2 cup',
+      details: [Object]
+    }
+  ]
+}
+10:34:27 PM [express] POST /api/analyze-food 200 in 12274ms :: {"name":"Pasta Salad","calories":450,"…
+Adding food log, received: {
+  name: 'Pasta Salad',
+  calories: 450,
+  protein: 15,
+  carbs: 60,
+  fat: 15,
+  quantity: 1,
+  components: undefined
+}
+10:34:28 PM [express] POST /api/food-logs 200 in 331ms :: {"log":{"id":46,"userId":1,"name":"Pasta Sa…
+[XP Route] Processing XP award request: { action: 'LOG_MEAL', amount: 10, userId: 1 }
+[XP Route] Found user: {
+  id: 1,
+  email: 'piotr@szacillo.com',
+  password: 'ac5e11490b832fd6a4b799fed57e64ad9a981cacf5e650a42eec82da02a6391465f06ec094e7bddf6860ccba0d2d833e9ec4005d0809d108c66092385de7427d.6a542e5a89c9928521e464a62c54a623',
+  hasCompletedOnboarding: false,
+  currentStreak: 2,
+  longestStreak: 2,
+  lastActivityDate: '2025-02-17',
+  experiencePoints: 450,
+  level: 5,
+  profileImage: null
+}
+[XP Route] Same day activity, maintaining streak
+[XP Route] XP/Level calculation: {
+  currentXP: 450,
+  newXP: 460,
+  currentLevel: 5,
+  newLevel: 5,
+  userId: 1,
+  currentStreak: 2,
+  longestStreak: 2
+}
+[XP Route] Successfully updated XP, level, and streak in database
+[XP Route] Sending success response: {
+  amount: 10,
+  message: 'Earned 10 XP for LOG_MEAL!',
+  totalXP: 460,
+  level: 5,
+  currentXPInLevel: 60,
+  xpNeededForNextLevel: 100,
+  streak: 2,
+  longestStreak: 2
+}
+10:34:28 PM [express] POST /api/xp/award 200 in 84ms :: {"amount":10,"message":"Earned 10 XP for LOG_…
+10:34:29 PM [express] GET /api/user/xp 200 in 53ms :: {"totalXP":460,"level":5,"currentXPInLevel":60,…
+10:34:29 PM [express] GET /api/user 200 in 28ms :: {"id":1,"email":"piotr@szacillo.com","password":"a…
+10:34:29 PM [express] GET /api/user/xp 304 in 52ms :: {"totalXP":460,"level":5,"currentXPInLevel":60,…

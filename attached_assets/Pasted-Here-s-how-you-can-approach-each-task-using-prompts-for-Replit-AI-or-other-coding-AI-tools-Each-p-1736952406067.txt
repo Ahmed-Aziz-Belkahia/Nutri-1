@@ -1,0 +1,91 @@
+Here’s how you can approach each task using prompts for Replit AI (or other coding AI tools). Each prompt is tailored to clearly define the requirements and provide enough context for optimal code generation.
+
+1. Create Recipe (Quiz for Custom Recipes):
+
+Prompt for Replit AI:
+
+	Build a function for a “Create Recipe” feature in a meal-planning app.
+		•	The function should include a step-by-step quiz with the following questions:
+	1.	What type of meal? (Options: Breakfast, Lunch, Dinner, Snack, Dessert).
+	2.	How many calories should the meal have? (Slider: 0–5000).
+	3.	What is the budget per meal? (Slider in currency).
+	4.	How many days should the plan cover? (Range: 2–30 days).
+	•	After collecting the inputs, the function should generate a list of ingredients and an estimated price per meal.
+	•	Use a JSON object to simulate ingredient data with prices.
+	•	Make the interface user-friendly for a mobile app and return the data in a format suitable for a frontend (e.g., JSON or dictionary).
+
+2. Scan Recipe (Ingredient-Based Meal Suggestions):
+
+Prompt for Replit AI:
+
+	Create a function for a “Scan Recipe” feature in a meal-planning app:
+		•	Input: A list of scanned ingredients, meal type (Breakfast, Lunch, Dinner), and calorie target (integer).
+	•	Output: A recipe suggestion that fits the calorie target and uses the scanned ingredients as much as possible.
+	•	Include:
+	•	A fallback option if the ingredients do not meet the calorie requirements (e.g., suggest adding another ingredient).
+	•	Steps to prepare the meal.
+	•	An option to add the recipe to a daily meal plan.
+	•	Use Python dictionaries to simulate ingredient calorie data. Return results as JSON for easy frontend integration.
+
+3. Progress Tracking with Gamification (Duolingo-like):
+
+Prompt for Replit AI:
+
+	Build a progress-tracking system for a meal-planning app:
+		•	Features:
+	1.	Daily streaks system (e.g., track how many consecutive days the user logs meals).
+	2.	Calendar view to show historical data (max range: 2 years).
+	3.	Metrics: Calories consumed, streak length, weight progress, etc.
+	4.	Smart notifications (reminders based on user behavior).
+	•	Include a gamification element:
+	•	Award badges for streaks and milestones.
+	•	Provide motivational messages similar to Duolingo notifications.
+	•	The system should store user data in a database (e.g., SQLite or JSON for simplicity).
+	•	Ensure functions are modular and support easy integration with a mobile frontend.
+
+4. Notifications (Smart Reminder System):
+
+Prompt for Replit AI:
+
+	Develop a smart notification system for a meal-planning app:
+		•	Features:
+	1.	Send reminders based on the user’s activity (e.g., remind to log a meal if no activity is detected for a meal period).
+	2.	Allow customization of notification times.
+	3.	Provide engaging and motivational content in notifications (e.g., “You’re on a 5-day streak! Keep it up!”).
+	•	Include an example function that calculates the best time to send a notification based on user meal timings.
+	•	Write the code in Python, and ensure it is ready for integration with push notification APIs like Firebase.
+
+5. Integration of Ingredient Price Estimation (Optional):
+
+Prompt for Replit AI:
+
+	Create a feature for estimating the total cost of recipes in a meal-planning app:
+		•	Input: A list of ingredients with quantities.
+	•	Output: Estimated cost of the recipe based on ingredient prices.
+	•	Simulate ingredient prices using a Python dictionary.
+	•	Provide flexibility to update prices based on location (e.g., regional price differences).
+	•	Ensure the function is modular for easy use with both “Create Recipe” and “Scan Recipe” features.
+
+6. Backend Architecture Suggestion:
+
+Prompt for Replit AI:
+
+	Design a backend architecture for a meal-planning app with these features:
+		•	Endpoints for:
+	•	Creating custom recipes.
+	•	Scanning and generating recipes.
+	•	Tracking user progress (e.g., streaks, historical data).
+	•	Use Flask or FastAPI for the backend.
+	•	Store data (e.g., recipes, user preferences, progress) in a SQLite database.
+	•	Provide example API routes for each feature.
+	•	Write modular, clean, and reusable code, with a focus on scalability and integration with a frontend.
+
+Explanation for AI:
+
+For each task, ensure the AI understands:
+	1.	The context of the feature.
+	2.	Expected inputs and outputs.
+	3.	Integration points with the app (e.g., frontend, database).
+	4.	User-centric considerations (e.g., easy interaction, clear responses).
+
+These prompts give Replit AI clear instructions to build modular and scalable components. Let me know if you’d like further refinements!

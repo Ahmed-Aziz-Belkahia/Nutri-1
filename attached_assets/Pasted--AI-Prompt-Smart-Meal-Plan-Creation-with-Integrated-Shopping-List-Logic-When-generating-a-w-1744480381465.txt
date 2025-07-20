@@ -1,0 +1,85 @@
+
+⸻
+
+🧠 AI Prompt – Smart Meal Plan Creation with Integrated Shopping List Logic
+
+When generating a weekly meal plan, you must simultaneously generate an optimized shopping list.
+
+DO NOT create the meal plan first and the shopping list afterward.
+
+The shopping list and meal plan must be co-created, so you can make better decisions about ingredients, budgets, and waste reduction.
+
+⸻
+
+🎯 GOALS
+	•	Minimize food waste.
+	•	Optimize ingredient reuse (bulk usage).
+	•	Respect the user’s budget, dietary restrictions, and preferences.
+	•	Make the shopping list simple, affordable, and realistic.
+	•	Avoid unused leftover ingredients.
+
+⸻
+
+🧩 USER INPUTS TO CONSIDER (From Planning Quiz)
+
+When generating the plan and shopping list, always take into account:
+	•	Budget (low / medium / high)
+	•	Dietary preferences (e.g. vegetarian, high-protein, Mediterranean)
+	•	Allergies (e.g. nuts, dairy, gluten)
+	•	Disliked ingredients (e.g. “no mushrooms”)
+	•	Number of meals per day
+	•	Number of days in the plan
+
+⸻
+
+🧠 INTELLIGENT PLANNING LOGIC
+
+While generating meals:
+	1.	Ingredient Bulking
+	•	If one meal uses 2 eggs, prioritize adding other meals that also use eggs.
+	•	Same for common bulk ingredients like chicken, rice, onions, herbs, canned beans, etc.
+	2.	Recipe Substitution for Efficiency
+	•	If a planned recipe uses a unique ingredient (e.g. coriander) that won’t be reused elsewhere, either:
+	•	Suggest alternative recipes that use the same ingredient, or
+	•	Replace the ingredient with one that is already used across other meals.
+	3.	Budget-Aware Ingredient Selection
+	•	Low budget = avoid expensive meats, exotic produce, or rare spices.
+	•	Use staple foods (e.g. eggs, legumes, potatoes, frozen veggies).
+	•	Prefer cost-effective meals with fewer ingredients or common pantry items.
+	4.	Minimize Package Waste
+	•	Consider real-world packaging: if you only use 2 tortillas but they come in packs of 8, either:
+	•	Include more meals that use tortillas, or
+	•	Avoid the recipe unless it’s part of a bulk ingredient group.
+
+⸻
+
+🛒 SHOPPING LIST OUTPUT FORMAT
+
+Once the meal plan is finalized (with logic above):
+	•	Combine all ingredient quantities across meals.
+	•	Group ingredients into categories:
+	•	Produce, Meat/Fish, Dairy, Pantry, Frozen, Spices, etc.
+	•	Provide total estimated cost, based on average market prices or price tiers (budget/medium/premium).
+	•	Mark reused ingredients (e.g. “Eggs – used in 3 meals”).
+	•	Indicate quantities based on how items are usually sold (e.g. 1 dozen eggs, 500g rice).
+	•	Highlight any ingredient used only once and suggest replacements or secondary recipes if possible.
+
+⸻
+
+🧪 EXAMPLE SCENARIO
+
+User quiz results:
+	•	Budget: Low
+	•	Diet: No pork, no nuts
+	•	Duration: 5 days, 3 meals per day
+
+❌ BAD BEHAVIOR (to avoid):
+	•	Creates a fancy dinner with blue cheese (expensive, only used once)
+	•	Adds two meals that each need 2 eggs, but nothing else uses eggs (waste)
+	•	Uses coriander for one recipe, which goes to waste
+
+✅ GOOD BEHAVIOR (expected):
+	•	Selects affordable, repeating ingredients (rice, chicken, eggs, carrots, garlic)
+	•	Groups meals using overlapping ingredients
+	•	Creates 3–4 meals using eggs, making a 10-pack purchase logical
+	•	Final shopping list contains minimal variety, reused across meals

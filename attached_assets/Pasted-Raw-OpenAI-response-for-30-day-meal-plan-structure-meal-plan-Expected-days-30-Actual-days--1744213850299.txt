@@ -1,0 +1,93 @@
+Raw OpenAI response for 30 day meal plan, structure: [ 'meal_plan' ]
+Expected days: 30, Actual days: unknown
+Meal plan variety score: {
+  overallVarietyScore: 0.1,
+  mealTypeRepetition: { other: 6 },
+  ingredientRepetition: {
+    '4 eggs': 1,
+    'feta cheese': 1,
+    'chopped spinach': 1,
+    'cherry tomatoes': 2,
+    '1 chicken breast': 1,
+    'mixed greens': 1,
+    'sliced cucumber': 1,
+    '1/4 avocado, sliced': 1,
+    'pork shoulder': 1,
+    'small corn tortillas': 1,
+    'diced pineapple': 1,
+    'chopped cilantro': 1,
+    'rolled oats': 1,
+    '1 apple, diced': 1,
+    cinnamon: 1,
+    '2 cups almond milk': 1,
+    'maple syrup': 1,
+    'chopped walnuts': 1,
+    '1 block of firm tofu': 1,
+    'sesame seeds': 1,
+    'shredded cabbage': 1,
+    'grated carrot': 1,
+    honey: 1,
+    'arborio rice': 1,
+    '2 cups vegetable broth': 1,
+    'sliced mushrooms': 1,
+    'grated parmesan cheese': 1
+  },
+  cuisineVariety: 6
+}
+Processed OpenAI response: { originalStructure: [ 'meal_plan' ], processedDays: 2 }
+Generated meal plan with AI: { daysGenerated: 2, firstDay: '2023-10-23' }
+Day 1 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  mealsSample: {
+    name: 'Sunrise Veggie & Feta Frittata (Day 1)',
+    mealType: undefined,
+    components: false
+  },
+  fullStructure: '{"date":"2023-10-23","day_of_week":"Monday","meals":[{"name":"Sunrise Veggie & Feta Frittata (Day 1)","type":"breakfast","recipe":{"ingredients":["4 eggs","1/4 cup feta cheese","1/2 cup chopped spinach","1/4 cup cherry tomatoes","1/4 cup chopped onion","1 tbsp olive oil","Salt and pepper to taste"],"instructions":["Preheat oven to 350°F (175°C).","In a skillet, heat olive oil over medium heat and sauté onions until translucent.","Add spinach and tomatoes, cooking until spinach wilts.","Whisk egg...'
+}
+Creating meal plan with calories: 2000 date: 2025-04-09
+Using meal plan: 8 for date: 2025-04-09
+Created recipes for plan: { planId: 8, date: '2025-04-09', recipeCount: 3 }
+Day 2 meal plan structure: {
+  hasMeals: true,
+  mealsCount: 3,
+  mealsSample: {
+    name: 'Hearty Apple Cinnamon Oatmeal (Day 2)',
+    mealType: undefined,
+    components: false
+  },
+  fullStructure: '{"date":"2023-10-24","day_of_week":"Tuesday","meals":[{"name":"Hearty Apple Cinnamon Oatmeal (Day 2)","type":"breakfast","recipe":{"ingredients":["1 cup rolled oats","1 apple, diced","1 tsp cinnamon","2 cups almond milk","1 tbsp maple syrup","1/4 cup chopped walnuts"],"instructions":["In a pot, combine oats, almond milk, and diced apple.","Bring to a simmer, then reduce heat and cook until oatmeal thickens.","Stir in cinnamon and maple syrup, then top with walnuts before serving."],"prep_time":2...'
+}
+Creating meal plan with calories: 2000 date: 2025-04-10
+Using meal plan: 9 for date: 2025-04-10
+Created recipes for plan: { planId: 9, date: '2025-04-10', recipeCount: 3 }
+No AI-generated meal plan for day 3, skipping
+No AI-generated meal plan for day 4, skipping
+No AI-generated meal plan for day 5, skipping
+No AI-generated meal plan for day 6, skipping
+No AI-generated meal plan for day 7, skipping
+No AI-generated meal plan for day 8, skipping
+No AI-generated meal plan for day 9, skipping
+No AI-generated meal plan for day 10, skipping
+No AI-generated meal plan for day 11, skipping
+No AI-generated meal plan for day 12, skipping
+No AI-generated meal plan for day 13, skipping
+No AI-generated meal plan for day 14, skipping
+No AI-generated meal plan for day 15, skipping
+No AI-generated meal plan for day 16, skipping
+No AI-generated meal plan for day 17, skipping
+No AI-generated meal plan for day 18, skipping
+No AI-generated meal plan for day 19, skipping
+No AI-generated meal plan for day 20, skipping
+No AI-generated meal plan for day 21, skipping
+No AI-generated meal plan for day 22, skipping
+No AI-generated meal plan for day 23, skipping
+No AI-generated meal plan for day 24, skipping
+No AI-generated meal plan for day 25, skipping
+No AI-generated meal plan for day 26, skipping
+No AI-generated meal plan for day 27, skipping
+No AI-generated meal plan for day 28, skipping
+No AI-generated meal plan for day 29, skipping
+No AI-generated meal plan for day 30, skipping
+3:49:47 PM [express] POST /api/meal-plans 200 in 26541ms :: {"weekStart":"2025-04-09","plans":[{"id"…

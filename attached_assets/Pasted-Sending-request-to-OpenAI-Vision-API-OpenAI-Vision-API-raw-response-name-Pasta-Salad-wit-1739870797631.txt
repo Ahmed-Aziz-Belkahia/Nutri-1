@@ -1,0 +1,430 @@
+Sending request to OpenAI Vision API...
+OpenAI Vision API raw response: {
+  "name": "Pasta Salad with Cheese and Arugula",
+  "calories": 600,
+  "protein": 25,
+  "carbs": 75,
+  "fat": 25,
+  "confidence": 0.85,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Fusilli Pasta",
+      "calories": 350,
+      "protein": 12,
+      "carbs": 70,
+      "fat": 2,
+      "servingSize": "1 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Pasta",
+        "cookingMethod": "Boiled",
+        "texture": "Al dente",
+        "color": "Light yellow",
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Grated Cheese",
+      "calories": 150,
+      "protein": 10,
+      "carbs": 1,
+      "fat": 12,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Cheese",
+        "texture": "Grated",
+        "color": "Pale yellow",
+        "seasonings": ["Salt"],
+        "estimatedWeight": "30g"
+      }
+    },
+    {
+      "name": "Arugula",
+      "calories": 10,
+      "protein": 1,
+      "carbs": 2,
+      "fat": 0,
+      "servingSize": "Handful",
+      "quantity": 1,
+      "details": {
+        "type": "Leafy green",
+        "texture": "Fresh",
+        "color": "Green",
+        "estimatedWeight": "20g"
+      }
+    },
+    {
+      "name": "Chicken Pieces",
+      "calories": 90,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 3,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Poultry",
+        "cookingMethod": "Grilled",
+        "texture": "Tender",
+        "color": "Light brown",
+        "seasonings": ["Salt", "Pepper"],
+        "estimatedWeight": "50g"
+      }
+    }
+  ]
+}
+Parsed OpenAI response: {
+  "name": "Pasta Salad with Cheese and Arugula",
+  "calories": 600,
+  "protein": 25,
+  "carbs": 75,
+  "fat": 25,
+  "confidence": 0.85,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Fusilli Pasta",
+      "calories": 350,
+      "protein": 12,
+      "carbs": 70,
+      "fat": 2,
+      "servingSize": "1 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Pasta",
+        "cookingMethod": "Boiled",
+        "texture": "Al dente",
+        "color": "Light yellow",
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Grated Cheese",
+      "calories": 150,
+      "protein": 10,
+      "carbs": 1,
+      "fat": 12,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Cheese",
+        "texture": "Grated",
+        "color": "Pale yellow",
+        "seasonings": [
+          "Salt"
+        ],
+        "estimatedWeight": "30g"
+      }
+    },
+    {
+      "name": "Arugula",
+      "calories": 10,
+      "protein": 1,
+      "carbs": 2,
+      "fat": 0,
+      "servingSize": "Handful",
+      "quantity": 1,
+      "details": {
+        "type": "Leafy green",
+        "texture": "Fresh",
+        "color": "Green",
+        "estimatedWeight": "20g"
+      }
+    },
+    {
+      "name": "Chicken Pieces",
+      "calories": 90,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 3,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Poultry",
+        "cookingMethod": "Grilled",
+        "texture": "Tender",
+        "color": "Light brown",
+        "seasonings": [
+          "Salt",
+          "Pepper"
+        ],
+        "estimatedWeight": "50g"
+      }
+    }
+  ]
+}
+Validated food recognition result: {
+  "name": "Pasta Salad with Cheese and Arugula",
+  "calories": 600,
+  "protein": 25,
+  "carbs": 75,
+  "fat": 25,
+  "confidence": 0.85,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Fusilli Pasta",
+      "calories": 350,
+      "protein": 12,
+      "carbs": 70,
+      "fat": 2,
+      "servingSize": "1 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Pasta",
+        "cookingMethod": "Boiled",
+        "texture": "Al dente",
+        "color": "Light yellow",
+        "accompaniments": [],
+        "seasonings": [],
+        "garnishes": [],
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Grated Cheese",
+      "calories": 150,
+      "protein": 10,
+      "carbs": 1,
+      "fat": 12,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Cheese",
+        "texture": "Grated",
+        "color": "Pale yellow",
+        "accompaniments": [],
+        "seasonings": [
+          "Salt"
+        ],
+        "garnishes": [],
+        "estimatedWeight": "30g"
+      }
+    },
+    {
+      "name": "Arugula",
+      "calories": 10,
+      "protein": 1,
+      "carbs": 2,
+      "fat": 0,
+      "servingSize": "Handful",
+      "quantity": 1,
+      "details": {
+        "type": "Leafy green",
+        "texture": "Fresh",
+        "color": "Green",
+        "accompaniments": [],
+        "seasonings": [],
+        "garnishes": [],
+        "estimatedWeight": "20g"
+      }
+    },
+    {
+      "name": "Chicken Pieces",
+      "calories": 90,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 3,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Poultry",
+        "cookingMethod": "Grilled",
+        "texture": "Tender",
+        "color": "Light brown",
+        "accompaniments": [],
+        "seasonings": [
+          "Salt",
+          "Pepper"
+        ],
+        "garnishes": [],
+        "estimatedWeight": "50g"
+      }
+    }
+  ]
+}
+Final food recognition result: {
+  "name": "Pasta Salad with Cheese and Arugula",
+  "calories": 600,
+  "protein": 25,
+  "carbs": 75,
+  "fat": 25,
+  "confidence": 0.85,
+  "servingSize": "1 plate",
+  "platingStyle": "Casual",
+  "components": [
+    {
+      "name": "Fusilli Pasta",
+      "calories": 350,
+      "protein": 12,
+      "carbs": 70,
+      "fat": 2,
+      "servingSize": "1 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Pasta",
+        "cookingMethod": "Boiled",
+        "texture": "Al dente",
+        "color": "Light yellow",
+        "accompaniments": [],
+        "seasonings": [],
+        "garnishes": [],
+        "estimatedWeight": "150g"
+      }
+    },
+    {
+      "name": "Grated Cheese",
+      "calories": 150,
+      "protein": 10,
+      "carbs": 1,
+      "fat": 12,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Cheese",
+        "texture": "Grated",
+        "color": "Pale yellow",
+        "accompaniments": [],
+        "seasonings": [
+          "Salt"
+        ],
+        "garnishes": [],
+        "estimatedWeight": "30g"
+      }
+    },
+    {
+      "name": "Arugula",
+      "calories": 10,
+      "protein": 1,
+      "carbs": 2,
+      "fat": 0,
+      "servingSize": "Handful",
+      "quantity": 1,
+      "details": {
+        "type": "Leafy green",
+        "texture": "Fresh",
+        "color": "Green",
+        "accompaniments": [],
+        "seasonings": [],
+        "garnishes": [],
+        "estimatedWeight": "20g"
+      }
+    },
+    {
+      "name": "Chicken Pieces",
+      "calories": 90,
+      "protein": 15,
+      "carbs": 0,
+      "fat": 3,
+      "servingSize": "1/4 cup",
+      "quantity": 1,
+      "details": {
+        "type": "Poultry",
+        "cookingMethod": "Grilled",
+        "texture": "Tender",
+        "color": "Light brown",
+        "accompaniments": [],
+        "seasonings": [
+          "Salt",
+          "Pepper"
+        ],
+        "garnishes": [],
+        "estimatedWeight": "50g"
+      }
+    }
+  ]
+}
+Final food recognition result: {
+  name: 'Pasta Salad with Cheese and Arugula',
+  calories: 600,
+  protein: 25,
+  carbs: 75,
+  fat: 25,
+  confidence: 0.85,
+  servingSize: '1 plate',
+  platingStyle: 'Casual',
+  components: [
+    {
+      name: 'Fusilli Pasta',
+      calories: 350,
+      protein: 12,
+      carbs: 70,
+      fat: 2,
+      servingSize: '1 cup',
+      quantity: 1,
+      details: [Object]
+    },
+    {
+      name: 'Grated Cheese',
+      calories: 150,
+      protein: 10,
+      carbs: 1,
+      fat: 12,
+      servingSize: '1/4 cup',
+      quantity: 1,
+      details: [Object]
+    },
+    {
+      name: 'Arugula',
+      calories: 10,
+      protein: 1,
+      carbs: 2,
+      fat: 0,
+      servingSize: 'Handful',
+      quantity: 1,
+      details: [Object]
+    },
+    {
+      name: 'Chicken Pieces',
+      calories: 90,
+      protein: 15,
+      carbs: 0,
+      fat: 3,
+      servingSize: '1/4 cup',
+      quantity: 1,
+      details: [Object]
+    }
+  ]
+}
+9:24:53 AM [express] POST /api/analyze-food 200 in 8502ms :: {"name":"Pasta Salad with Cheese and Ar…
+[Food Logs API] Received food log request with components: {
+  "name": "Pasta Salad with Cheese and Arugula",
+  "calories": 600,
+  "protein": 25,
+  "carbs": 75,
+  "fat": 25,
+  "quantity": 1,
+  "components": []
+}
+[Food Logs API] Saved food log with components: {
+  "logId": 69,
+  "components": []
+}
+[Food Logs API] Retrieved logs for totals calculation: {
+  "logsCount": 15,
+  "sampleComponents": []
+}
+[Food Logs API] Sending response: {
+  "log": {
+    "id": 69,
+    "userId": 1,
+    "name": "Pasta Salad with Cheese and Arugula",
+    "calories": "600.00",
+    "protein": "25.00",
+    "carbs": "75.00",
+    "fat": "25.00",
+    "date": "2025-02-18T09:24:44.450Z",
+    "image": “image “link,
+    "components": []
+  },
+  "totals": {
+    "calories": 10250,
+    "protein": 370,
+    "carbs": 1200,
+    "fat": 455
+  }
+}

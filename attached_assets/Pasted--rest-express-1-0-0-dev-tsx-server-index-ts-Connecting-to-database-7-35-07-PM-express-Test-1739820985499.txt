@@ -1,0 +1,164 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+7:35:07 PM [express] Testing database connection...
+✅ Database connection established successfully
+7:35:10 PM [express] ✅ Database connection successful
+7:35:11 PM [express] ✅ Database schema updated
+7:35:11 PM [express] ✅ Uploads directory created
+7:35:11 PM [express] Development server setup complete
+7:35:11 PM [express] Server running at http://0.0.0.0:5000
+7:35:15 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+7:35:22 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:35:22 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:35:27 PM [express] POST /api/login 200 in 129ms :: {"ok":true}
+7:35:27 PM [express] GET /api/user 304 in 27ms :: {"id":1,"email":"piotr@szacillo.com","password":"a…
+7:35:30 PM [express] GET /api/user/xp 304 in 2844ms :: {"totalXP":320,"level":4,"currentXPInLevel":2…
+7:35:31 PM [express] GET /api/food-logs 200 in 3035ms :: {"logs":[{"id":32,"name":"Breakfast Plate",…
+7:35:37 PM [express] GET /api/user/xp 304 in 147ms :: {"totalXP":320,"level":4,"currentXPInLevel":20…
+Sending request to OpenAI Vision API...
+OpenAI Vision API response received: {
+    "name": "Fast Food Meal",
+    "calories": 4000,
+    "protein": 120,
+    "carbs": 500,
+    "fat": 180,
+    "confidence": 90,
+    "servingSize": "Large",
+    "platingStyle": "Fast Food",
+    "components": [
+        {
+            "name": "Big Mac",
+            "calories": 550,
+            "protein": 25,
+            "carbs": 45,
+            "fat": 30,
+            "servingSize": "1 sandwich",
+            "details": {
+                "type": "Burger",
+                "cut": "Ground Beef Patty",
+                "cookingMethod": "Grilled",
+                "doneness": "Well Done",
+                "texture": "Soft Bun, Juicy Patty",
+                "temperature": "Warm",
+                "color": "Golden Bun, Brown Patty",
+                "accompaniments": ["Lettuce", "Cheese", "Pickles", "Onions"],
+                "sauce": "Special Sauce",
+                "seasonings": ["Salt", "Pepper"],
+                "garnishes": [],
+                "presentation": "Stacked",
+                "preparation": "Assembled",
+                "estimatedWeight": "200g"
+            }
+        },
+        {
+            "name": "Cheeseburger",
+            "calories": 300,
+            "protein": 15,
+            "carbs": 30,
+            "fat": 15,
+            "servingSize": "1 sandwich",
+            "details": {
+                "type": "Burger",
+                "cut": "Ground Beef Patty",
+                "cookingMethod": "Grilled",
+                "doneness": "Well Done",
+                "texture": "Soft Bun, Juicy Patty",
+                "temperature": "Warm",
+                "color": "Golden Bun, Brown Patty",
+                "accompaniments": ["Cheese", "Pickles", "Ketchup", "Mustard"],
+                "sauce": "Ketchup, Mustard",
+                "seasonings": ["Salt", "Pepper"],
+                "garnishes": [],
+                "presentation": "Stacked",
+                "preparation": "Assembled",
+                "estimatedWeight": "150g"
+            }
+        },
+        {
+            "name": "Chicken McNuggets",
+            "calories": 250,
+            "protein": 10,
+            "carbs": 15,
+            "fat": 15,
+            "servingSize": "4 pieces",
+            "details": {
+                "type": "Chicken",
+                "cut": "Processed Chicken",
+                "cookingMethod": "Fried",
+                "doneness": "Well Done",
+                "texture": "Crispy Exterior, Tender Interior",
+                "temperature": "Warm",
+                "color": "Golden Brown",
+                "accompaniments": [],
+                "sauce": "None Visible",
+                "seasonings": ["Salt"],
+                "garnishes": [],
+                "presentation": "Boxed",
+                "preparation": "Fried",
+                "estimatedWeight": "100g"
+            }
+        },
+        {
+            "name": "French Fries",
+            "calories": 350,
+            "protein": 5,
+            "carbs": 45,
+            "fat": 15,
+            "servingSize": "1 medium",
+            "details": {
+                "type": "Potato",
+                "cut": "Shoestring",
+                "cookingMethod": "Fried",
+                "doneness": "Crispy",
+                "texture": "Crispy Exterior, Soft Interior",
+                "temperature": "Warm",
+                "color": "Golden Yellow",
+                "accompaniments": [],
+                "sauce": "None Visible",
+                "seasonings": ["Salt"],
+                "garnishes": [],
+                "presentation": "Bagged",
+                "preparation": "Fried",
+                "estimatedWeight": "150g"
+            }
+        },
+        {
+            "name": "Coca-Cola",
+            "calories": 150,
+            "protein": 0,
+            "carbs": 40,
+            "fat": 0,
+            "servingSize": "1 medium",
+            "details": {
+                "type": "Beverage",
+                "cut": "N/A",
+                "cookingMethod": "N/A",
+                "doneness": "N/A",
+                "texture": "Liquid",
+                "temperature": "Cold",
+                "color": "Dark Brown",
+                "accompaniments": ["Ice"],
+                "sauce": "N/A",
+                "seasonings": [],
+                "garnishes": [],
+                "presentation": "Cup",
+               
+OpenAI Vision API Error: SyntaxError: Expected double-quoted property name in JSON at position 4260
+    at JSON.parse (<anonymous>)
+    at analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:95:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:156:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+Food recognition error: Error: Expected double-quoted property name in JSON at position 4260
+    at analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:143:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:156:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+Food analysis error: Error: Expected double-quoted property name in JSON at position 4260
+    at analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:163:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+7:35:56 PM [express] POST /api/analyze-food 500 in 13803ms :: {"error":"Food analysis failed","messa…

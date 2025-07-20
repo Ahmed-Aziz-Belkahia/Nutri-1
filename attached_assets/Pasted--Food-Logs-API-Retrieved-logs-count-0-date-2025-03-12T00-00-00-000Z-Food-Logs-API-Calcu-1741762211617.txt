@@ -1,0 +1,61 @@
+[Food Logs API] Retrieved logs: { count: 0, date: '2025-03-12T00:00:00.000Z' }
+[Food Logs API] Calculated totals: { calories: 0, protein: 0, carbs: 0, fat: 0 }
+6:49:21 AM [express] GET /api/food-logs 304 in 93ms :: {"logs":[],"totals":{"calories":0,"protein":0…
+6:49:25 AM [express] GET /api/recipes 304 in 93ms :: [{"id":62,"userId":3,"name":"Grilled Chicken Sa…
+6:49:25 AM [express] GET /api/user/xp 304 in 153ms :: {"totalXP":30,"level":1,"currentXPInLevel":30,…
+6:49:25 AM [express] GET /api/recipes 304 in 151ms :: []
+6:49:28 AM [express] GET /api/user/xp 304 in 95ms :: {"totalXP":30,"level":1,"currentXPInLevel":30,"…
+6:49:30 AM [express] GET /api/user/xp 304 in 94ms :: {"totalXP":30,"level":1,"currentXPInLevel":30,"…
+[Food Recognition] Starting image analysis...
+[Food Recognition] Validating and converting image...
+[Food Recognition] Image processed successfully
+[Food Recognition] Initializing ingredient analysis...
+[Food Recognition] Raw response: {
+  ingredients: [
+    { name: 'smoothie', estimatedWeight: 400 },
+    { name: 'potatoes', estimatedWeight: 200 },
+    { name: 'ground meat', estimatedWeight: 150 },
+    { name: 'red bell peppers', estimatedWeight: 50 },
+    { name: 'sauce', estimatedWeight: 100 }
+  ],
+  confidence: 0.85
+}
+[Food Recognition] Analysis result: {
+  "ingredients": [
+    {
+      "name": "smoothie",
+      "estimatedWeight": 400
+    },
+    {
+      "name": "potatoes",
+      "estimatedWeight": 200
+    },
+    {
+      "name": "ground meat",
+      "estimatedWeight": 150
+    },
+    {
+      "name": "red bell peppers",
+      "estimatedWeight": 50
+    },
+    {
+      "name": "sauce",
+      "estimatedWeight": 100
+    }
+  ],
+  "confidence": 0.85
+}
+Final food recognition result: {
+  ingredients: [
+    { name: 'smoothie', estimatedWeight: 400 },
+    { name: 'potatoes', estimatedWeight: 200 },
+    { name: 'ground meat', estimatedWeight: 150 },
+    { name: 'red bell peppers', estimatedWeight: 50 },
+    { name: 'sauce', estimatedWeight: 100 }
+  ],
+  confidence: 0.85
+}
+6:49:39 AM [express] POST /api/analyze-food 200 in 3494ms :: {"ingredients":[{"name":"smoothie","est…
+[Food Logs API] Processing food log request: { userId: 3, name: undefined, hasImage: true, hasComponents: false }
+[Food Logs API] Missing required fields: { name: false, calories: false }
+6:49:41 AM [express] POST /api/food-logs 400 in 182ms :: {"error":"Missing required fields","message…

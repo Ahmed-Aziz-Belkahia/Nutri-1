@@ -1,0 +1,167 @@
+> rest-express@1.0.0 dev
+Connecting to database...
+7:37:30 PM [express] Testing database connection...
+✅ Database connection established successfully
+7:37:33 PM [express] ✅ Database connection successful
+7:37:33 PM [express] ✅ Database schema updated
+7:37:33 PM [express] ✅ Uploads directory created
+7:37:33 PM [express] Development server setup complete
+7:37:33 PM [express] Server running at http://0.0.0.0:5000
+7:37:37 PM [express] GET /api/user 401 in 3ms :: {"error":"Not authenticated"}
+7:37:46 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:37:47 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+7:38:26 PM [express] POST /api/login 200 in 137ms :: {"ok":true}
+7:38:26 PM [express] GET /api/user 304 in 27ms :: {"id":1,"email":"piotr@szacillo.com","password":"a…
+7:38:27 PM [express] GET /api/user/xp 304 in 104ms :: {"totalXP":320,"level":4,"currentXPInLevel":20…
+7:38:27 PM [express] GET /api/food-logs 304 in 235ms :: {"logs":[{"id":32,"name":"Breakfast Plate","…
+7:38:48 PM [express] GET /api/user/xp 304 in 3255ms :: {"totalXP":320,"level":4,"currentXPInLevel":2…
+7:38:49 PM [express] GET /api/user/xp 304 in 113ms :: {"totalXP":320,"level":4,"currentXPInLevel":20…
+7:38:52 PM [express] GET /api/user/xp 304 in 51ms :: {"totalXP":320,"level":4,"currentXPInLevel":20,…
+Sending request to OpenAI Vision API...
+7:39:05 PM [express] GET /api/user/xp 304 in 155ms :: {"totalXP":320,"level":4,"currentXPInLevel":20…
+OpenAI Vision API response received: {
+    "name": "Fast Food Meal",
+    "calories": 4000,
+    "protein": 150,
+    "carbs": 500,
+    "fat": 200,
+    "confidence": 90,
+    "servingSize": "Large Meal",
+    "platingStyle": "Casual Fast Food",
+    "components": [
+        {
+            "name": "Big Mac",
+            "calories": 550,
+            "protein": 25,
+            "carbs": 45,
+            "fat": 30,
+            "servingSize": "1 Burger",
+            "details": {
+                "type": "Burger",
+                "cut": "Ground Beef Patty",
+                "cookingMethod": "Grilled",
+                "doneness": "Well Done",
+                "texture": "Juicy, Soft Bun",
+                "temperature": "Warm",
+                "color": "Golden Brown Bun, Green Lettuce",
+                "accompaniments": ["Lettuce", "Cheese", "Pickles", "Onions"],
+                "sauce": "Special Sauce",
+                "seasonings": ["Salt", "Pepper"],
+                "garnishes": ["Sesame Seeds"],
+                "presentation": "Stacked",
+                "preparation": "Assembled",
+                "estimatedWeight": "200g"
+            }
+        },
+        {
+            "name": "Cheeseburger",
+            "calories": 300,
+            "protein": 15,
+            "carbs": 33,
+            "fat": 12,
+            "servingSize": "1 Burger",
+            "details": {
+                "type": "Burger",
+                "cut": "Ground Beef Patty",
+                "cookingMethod": "Grilled",
+                "doneness": "Well Done",
+                "texture": "Soft Bun, Melted Cheese",
+                "temperature": "Warm",
+                "color": "Golden Brown Bun, Yellow Cheese",
+                "accompaniments": ["Cheese", "Pickles", "Onions"],
+                "sauce": "Ketchup, Mustard",
+                "seasonings": ["Salt", "Pepper"],
+                "garnishes": [],
+                "presentation": "Stacked",
+                "preparation": "Assembled",
+                "estimatedWeight": "150g"
+            }
+        },
+        {
+            "name": "Chicken McNuggets",
+            "calories": 250,
+            "protein": 10,
+            "carbs": 15,
+            "fat": 15,
+            "servingSize": "4 Pieces",
+            "details": {
+                "type": "Chicken",
+                "cut": "Processed Chicken",
+                "cookingMethod": "Fried",
+                "doneness": "Well Done",
+                "texture": "Crispy Exterior, Tender Interior",
+                "temperature": "Warm",
+                "color": "Golden Brown",
+                "accompaniments": [],
+                "sauce": "None Visible",
+                "seasonings": ["Salt"],
+                "garnishes": [],
+                "presentation": "Boxed",
+                "preparation": "Fried",
+                "estimatedWeight": "100g"
+            }
+        },
+        {
+            "name": "French Fries",
+            "calories": 365,
+            "protein": 4,
+            "carbs": 48,
+            "fat": 17,
+            "servingSize": "1 Medium Serving",
+            "details": {
+                "type": "Potato",
+                "cut": "Shoestring",
+                "cookingMethod": "Fried",
+                "doneness": "Crispy",
+                "texture": "Crispy Exterior, Soft Interior",
+                "temperature": "Warm",
+                "color": "Golden Yellow",
+                "accompaniments": [],
+                "sauce": "None Visible",
+                "seasonings": ["Salt"],
+                "garnishes": [],
+                "presentation": "Bagged",
+                "preparation": "Fried",
+                "estimatedWeight": "150g"
+            }
+        },
+        {
+            "name": "Coca-Cola",
+            "calories": 210,
+            "protein": 0,
+            "carbs": 58,
+            "fat": 0,
+            "servingSize": "1 Medium Cup",
+            "details": {
+                "type": "Soft Drink",
+                "cut": "N/A",
+                "cookingMethod": "N/A",
+                "doneness": "N/A",
+                "texture": "Liquid, Fizzy",
+                "temperature": "Cold",
+                "color": "Dark Brown",
+                "accompaniments": ["Ice"],
+                "sauce": "N/A",
+                "seasonings": [],
+                "garnishes":
+Failed to parse OpenAI response: SyntaxError: Unexpected end of JSON input
+    at JSON.parse (<anonymous>)
+    at analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:97:21)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:169:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+OpenAI Vision API Error: Error: Invalid response format from OpenAI
+    at analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:100:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:169:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+Food recognition error: Error: Invalid response format from OpenAI
+    at analyzeWithOpenAI (/home/runner/workspace/server/services/food-recognition.ts:156:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:169:22)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+Food analysis error: Error: Invalid response format from OpenAI
+    at analyzeFoodImage (/home/runner/workspace/server/services/food-recognition.ts:176:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:146:22)
+7:39:16 PM [express] POST /api/analyze-food 500 in 18414ms :: {"error":"Food analysis failed","messa…

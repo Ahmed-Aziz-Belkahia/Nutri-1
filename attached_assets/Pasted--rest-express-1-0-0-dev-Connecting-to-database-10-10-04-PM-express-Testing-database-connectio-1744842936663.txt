@@ -1,0 +1,92 @@
+
+> rest-express@1.0.0 dev
+Connecting to database...
+10:10:04 PM [express] Testing database connection...
+✅ Database connection established successfully
+10:10:04 PM [express] ✅ Database connection successful
+10:10:04 PM [express] ✅ Uploads directory created
+10:10:04 PM [express] Development server setup complete
+10:10:04 PM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+10:11:10 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+10:11:49 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:12:00 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Connecting to database...
+10:10:04 PM [express] Testing database connection...
+✅ Database connection established successfully
+10:10:04 PM [express] ✅ Database connection successful
+10:10:04 PM [express] ✅ Uploads directory created
+10:10:04 PM [express] Development server setup complete
+10:10:04 PM [express] Server running at http://0.0.0.0:5000
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+10:11:10 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
+10:11:49 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:12:00 PM [express] GET /api/user 401 in 1ms :: {"error":"Not authenticated"}
+10:34:53 PM [express] POST /api/login 200 in 812ms :: {"ok":true}
+10:34:54 PM [express] GET /api/user 304 in 65ms :: {"id":1,"email":"piotrekster1998@gmail.com","passw…
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2790,"proteinGoal":209,"carbsGoal":279,"fatGoal":93,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"pl"}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "calorie_goal" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:87:7) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '136',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+10:35:15 PM [express] POST /api/register/complete-onboarding 500 in 470ms :: {"error":"Failed to comp…
+Received onboarding request: {
+  body: [Object: null prototype] {
+    profile: '{"height":175,"weight":75,"goalWeight":75,"weightGoal":"maintain","activityLevel":"3-5","calorieGoal":2790,"proteinGoal":209,"carbsGoal":279,"fatGoal":93,"dietaryRestrictions":[],"allergies":[],"mealBudget":"medium","experienceLevel":"beginner","preferredLanguage":"pl"}'
+  },
+  file: 'No file'
+}
+Error completing onboarding: NeonDbError: column "calorie_goal" of relation "user_nutrition_preferences" does not exist
+    at execute (file:///home/runner/workspace/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/server/routes.ts:87:7) {
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: undefined,
+  position: '136',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_target.c',
+  line: '1066',
+  routine: 'checkInsertTargets',
+  sourceError: undefined
+}
+10:35:16 PM [express] POST /api/register/complete-onboarding 500 in 212ms :: {"error":"Failed to comp…

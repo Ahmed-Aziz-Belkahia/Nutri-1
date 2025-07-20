@@ -1,0 +1,196 @@
+
+Updated nutrition preferences with dietary data: {
+  dietaryType: 'paleo',
+  calorieTarget: 2300,
+  mealsPerDay: 6,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  allergies: [ 'peanuts' ],
+  excludedIngredients: [ 'salad', 'sandwich' ],
+  preferredIngredients: [],
+  id: 1,
+  userId: 1
+}
+1:37:22 PM [express] POST /api/user/dietary-preferences 200 in 323ms :: {"nutritionPreferences":{"id…
+Received meal plan request with preferences: {
+  dietaryType: 'paleo',
+  calorieTarget: 2300,
+  mealsPerDay: 6,
+  maxCookingTime: 60,
+  budgetPreference: 'medium',
+  mealPlanDuration: 'week',
+  healthGoals: 1,
+  cuisinePreferences: 2
+}
+Processed OpenAI response: { originalStructure: [ 'meal_plan' ], processedDays: 6 }
+Generated meal plan with AI: { daysGenerated: 6, firstDay: '2023-10-10' }
+Updating meal plan with calories: 0 date: 2025-03-23
+Using meal plan: 1 for date: 2025-03-23
+Created recipes for plan: { planId: 1, date: '2025-03-23', recipeCount: 6 }
+Updating meal plan with calories: 0 date: 2025-03-24
+Using meal plan: 2 for date: 2025-03-24
+Created recipes for plan: { planId: 2, date: '2025-03-24', recipeCount: 6 }
+Updating meal plan with calories: 0 date: 2025-03-25
+Using meal plan: 3 for date: 2025-03-25
+Created recipes for plan: { planId: 3, date: '2025-03-25', recipeCount: 6 }
+Updating meal plan with calories: 0 date: 2025-03-26
+Using meal plan: 4 for date: 2025-03-26
+Created recipes for plan: { planId: 4, date: '2025-03-26', recipeCount: 6 }
+Updating meal plan with calories: 0 date: 2025-03-27
+Using meal plan: 5 for date: 2025-03-27
+Created recipes for plan: { planId: 5, date: '2025-03-27', recipeCount: 6 }
+Updating meal plan with calories: 0 date: 2025-03-28
+Using meal plan: 6 for date: 2025-03-28
+Created recipes for plan: { planId: 6, date: '2025-03-28', recipeCount: 6 }
+No AI-generated meal plan for day 7, skipping
+1:38:22 PM [express] POST /api/meal-plans 200 in 59345ms :: {"weekStart":"2025-03-23","plans":[{"id"…
+1:38:22 PM [express] GET /api/meal-plans/all 200 in 148ms :: {"weekStart":"2025-03-23","plans":[{"id…
+Fetching meal plan for date: 2025-03-23
+Found meal plan: {
+  id: 1,
+  userId: 1,
+  date: '2025-03-23',
+  totalCalories: 0,
+  status: 'active',
+  createdAt: 2025-03-23T11:19:31.884Z,
+  updatedAt: 2025-03-23T11:19:31.884Z
+}
+Found recipes: [
+  {
+    id: 113,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 0,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'In a saucepan, combine coconut milk, almond meal, and chia seeds.\n' +
+      'Cook over medium heat, stirring frequently, for about 10 minutes until thickened.\n' +
+      'Stir in cinnamon, cardamom, and honey.\n' +
+      'Serve warm.',
+    ingredients: [
+      '1 cup coconut milk',
+      '1/2 cup almond meal',
+      '1/4 cup chia seeds',
+      '1/2 tsp ground cinnamon',
+      '1/2 tsp ground cardamom',
+      '1 tbsp honey'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 116,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 1,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'In a bowl, mix yogurt, lemon juice, tandoori masala, and salt.\n' +
+      'Marinate chicken in the mixture for 30 minutes.\n' +
+      'Preheat grill to medium-high heat.\n' +
+      'Grill chicken for 5-7 minutes each side, until cooked through.\n' +
+      'Brush with olive oil while grilling.',
+    ingredients: [
+      '2 chicken breasts',
+      '1/2 cup Greek yogurt',
+      '2 tbsp lemon juice',
+      '2 tbsp tandoori masala',
+      '1 tbsp olive oil',
+      'Salt to taste'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 117,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 2,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'In a bowl, mix almond butter, cocoa powder, honey, and vanilla until combined.\n' +
+      'Roll into small balls.\n' +
+      'Coat balls in shredded coconut.\n' +
+      'Refrigerate until firm, about 15 minutes.',
+    ingredients: [
+      '1 cup almond butter',
+      '2 tbsp cocoa powder',
+      '1/4 cup honey',
+      '1/4 tsp vanilla extract',
+      '1 cup shredded coconut'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 114,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 3,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Preheat oven to 375°F (190°C).\n' +
+      'Slice tops off bell peppers and remove seeds.\n' +
+      'In a skillet, cook ground lamb with garlic until browned.\n' +
+      'Stir in cooked quinoa, pine nuts, tomato sauce, oregano, salt, and pepper.\n' +
+      'Stuff peppers with the mixture.\n' +
+      'Place in a baking dish and bake for 30-35 minutes until peppers are tender.',
+    ingredients: [
+      '4 bell peppers',
+      '1/2 lb ground lamb',
+      '1/2 cup cooked quinoa',
+      '1/4 cup pine nuts',
+      '2 cloves garlic, minced',
+      '1/2 cup tomato sauce',
+      'Salt and pepper to taste',
+      '1 tsp dried oregano'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 115,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 4,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Combine all ingredients in a small bowl.\nServe immediately.',
+    ingredients: [
+      '1/2 cup mixed berries',
+      '1/4 cup almonds',
+      '2 tbsp pumpkin seeds'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  },
+  {
+    id: 118,
+    name: 'Recipe for other',
+    mealType: 'other',
+    order: 5,
+    servingSize: '1.00',
+    isFrozen: false,
+    isCompleted: false,
+    nutritionInfo: { fat: 0, carbs: 0, protein: 0, calories: 0 },
+    instructions: 'Preheat grill to medium heat.\n' +
+      'Brush fish fillets with olive oil and season with salt and pepper.\n' +
+      'Grill fish for 5-7 minutes on each side, until cooked through.\n' +
+      'In a small bowl, mix lemon juice and dill.\n' +
+      'Drizzle lemon herb dressing over grilled fish before serving.',
+    ingredients: [
+      '2 fillets of white fish (e.g., tilapia or cod)',
+      '2 tbsp olive oil',
+      '1 lemon, juiced',
+      '1 tbsp fresh dill, chopped',
+      'Salt and pepper to taste'
+    ],
+    imageUrl: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=800&auto=format&fit=crop'
+  }
+]
+1:38:23 PM [express] GET /api/meal-plans/today 200 in 123ms :: {"hasPlan":true,"plan":{"id":1,"date"…
