@@ -254,7 +254,10 @@ export default function MealPlanningQuiz() {
       case "dietaryType":
         return !!formValues.dietaryType;
       case "healthGoals":
-        return !!formValues.healthGoals && typeof formValues.healthGoals === 'string' && formValues.healthGoals.trim().length > 0;
+        return !!formValues.healthGoals && (
+          (typeof formValues.healthGoals === 'string' && formValues.healthGoals.trim().length > 0) ||
+          (Array.isArray(formValues.healthGoals) && formValues.healthGoals.length > 0)
+        );
       case "calorieTarget":
         return !!formValues.calorieTarget && formValues.calorieTarget > 0;
       case "cuisinePreferences":
@@ -683,7 +686,7 @@ export default function MealPlanningQuiz() {
                             type="button"
                             onClick={() => {
                               setAgreed(true);
-                              field.onChange([currentGoal]);
+                              field.onChange(currentGoal);
                             }}
                             className={`flex-1 py-4 px-4 rounded-2xl font-medium transition-all duration-200 ${
                               agreed && !customGoal
@@ -726,7 +729,7 @@ export default function MealPlanningQuiz() {
                             value={customGoal}
                             onChange={(e) => {
                               setCustomGoal(e.target.value);
-                              field.onChange(e.target.value ? [e.target.value] : []);
+                              field.onChange(e.target.value);
                             }}
                             placeholder="Wpisz swój cel zdrowotny..."
                             className="text-base p-4 rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] focus:ring-2 focus:ring-[#0CC5BA]/20 bg-white placeholder:text-gray-400 transition-all duration-200"
