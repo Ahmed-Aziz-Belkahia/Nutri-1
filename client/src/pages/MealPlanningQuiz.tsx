@@ -133,14 +133,14 @@ export default function MealPlanningQuiz() {
   const { control, register, handleSubmit, setValue, watch, formState: { errors } } = useForm<MealPlanPreferencesForm>({
     defaultValues: {
       dietaryType: "omnivore",
-      healthGoals: "",
+      healthGoals: "schudnąć",
       activityLevel: "moderate",
       calorieTarget: 2000,
       mealsPerDay: 3,
-      allergies: "",
+      allergies: [],
       maxCookingTime: 60,
       budgetPreference: "medium",
-      cuisinePreferences: "",
+      cuisinePreferences: "polskie",
       preferredIngredients: [],
       excludedIngredients: [],
       cookingSkillLevel: "intermediate",
@@ -254,11 +254,11 @@ export default function MealPlanningQuiz() {
       case "dietaryType":
         return !!formValues.dietaryType;
       case "healthGoals":
-        return !!formValues.healthGoals && Array.isArray(formValues.healthGoals) && formValues.healthGoals.length > 0;
+        return !!formValues.healthGoals && typeof formValues.healthGoals === 'string' && formValues.healthGoals.trim().length > 0;
       case "calorieTarget":
         return !!formValues.calorieTarget && formValues.calorieTarget > 0;
       case "cuisinePreferences":
-        return !!formValues.cuisinePreferences && formValues.cuisinePreferences.trim().length > 0;
+        return !!formValues.cuisinePreferences && typeof formValues.cuisinePreferences === 'string' && formValues.cuisinePreferences.trim().length > 0;
       case "allergies":
         return true; // Optional field
       default:
