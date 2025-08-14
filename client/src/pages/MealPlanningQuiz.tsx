@@ -205,9 +205,7 @@ export default function MealPlanningQuiz() {
         });
 
         if (!mealPlanResponse.ok) {
-          const errorData = await mealPlanResponse.json().catch(() => ({}));
-          const errorMessage = errorData.message || errorData.error || "Failed to create meal plan";
-          throw new Error(errorMessage);
+          throw new Error("Failed to create meal plan");
         }
 
         const mealPlan = await mealPlanResponse.json();
@@ -1006,18 +1004,13 @@ export default function MealPlanningQuiz() {
             </div>
 
             {/* Question header */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`header-${currentStep}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ 
-                  duration: 0.4,
-                  ease: "easeInOut"
-                }}
-                className="text-center mb-4"
-              >
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="text-center mb-4"
+            >
               <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${currentQuestion.color} flex items-center justify-center shadow-lg`}>
                 <div className="text-white">
                   {currentQuestion.icon}
@@ -1030,8 +1023,7 @@ export default function MealPlanningQuiz() {
               <p className="text-gray-600 text-sm">
                 {currentQuestion.description}
               </p>
-              </motion.div>
-            </AnimatePresence>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -1039,21 +1031,16 @@ export default function MealPlanningQuiz() {
       {/* Content */}
       <div className="px-6 pb-6">
         <div className="max-w-lg mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`question-${currentStep}`}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ 
-                duration: 0.4,
-                ease: "easeInOut"
-              }}
-              className="bg-transparent mb-6"
-            >
-              {renderQuestionContent()}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="bg-transparent mb-6"
+          >
+            {renderQuestionContent()}
+          </motion.div>
 
           {/* Navigation buttons */}
           <motion.div
