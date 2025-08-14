@@ -1914,9 +1914,13 @@ export function registerRoutes(app: Express): Server {
 
         let weeklyMealPlan;
         
-        // Use fast template system for ALL meal plans (no more slow AI calls)
-        console.log('Generating FAST template-based meal plan...');
-        weeklyMealPlan = await generateFastPersonalizedMealPlan({
+        // Use optimized meal generation that handles dietary restrictions properly
+        console.log('Generating optimized meal plan...');
+        
+        // Import the optimized meal generator
+        const { generateOptimizedMealPlan } = await import('./services/optimized-meal-generator.js');
+        
+        weeklyMealPlan = await generateOptimizedMealPlan({
           dietaryType: currentPrefs.dietaryType,
           calorieTarget: currentPrefs.calorieTarget,
           mealsPerDay: currentPrefs.mealsPerDay,
