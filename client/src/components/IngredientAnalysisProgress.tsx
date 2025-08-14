@@ -10,10 +10,10 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
   if (!isVisible) return null;
 
   const steps = [
-    { icon: Eye, text: "Skanowanie obrazu", duration: 2 },
-    { icon: Search, text: "Identyfikacja składników", duration: 3 },
-    { icon: Sparkles, text: "Analiza jakości", duration: 2 },
-    { icon: ChefHat, text: "Generowanie przepisów", duration: 3 }
+    { icon: Eye, text: "Skanowanie obrazu", duration: 2, delay: 0 },
+    { icon: Search, text: "Identyfikacja składników", duration: 3, delay: 2 },
+    { icon: Sparkles, text: "Analiza jakości", duration: 2, delay: 5 },
+    { icon: ChefHat, text: "Generowanie przepisów", duration: 3, delay: 7 }
   ];
 
   return (
@@ -21,146 +21,185 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50"
+      className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50 px-6"
     >
-      {/* Main animation circle */}
-      <div className="relative w-40 h-40 mb-12">
-        {/* Outer rotating ring */}
+      {/* Main animation circle - matches screenshot design */}
+      <div className="relative w-48 h-48 mb-16">
+        {/* Background circle with subtle pattern */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#B8E5E5]/30 to-[#A8D8D8]/30" />
+        
+        {/* Animated progress ring */}
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#0E95A7] border-r-[#0CC5BA]"
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-2 rounded-full"
+          style={{
+            background: `conic-gradient(from 0deg, transparent 0deg, #4FD1C7 180deg, transparent 360deg)`,
+          }}
         />
         
-        {/* Inner pulsing circle */}
-        <motion.div
-          animate={{ scale: [1, 1.1, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-6 rounded-full bg-gradient-to-br from-[#0E95A7]/20 to-[#0CC5BA]/20 flex items-center justify-center"
-        >
+        {/* Inner circle with chef icon */}
+        <div className="absolute inset-8 rounded-full bg-white shadow-lg flex items-center justify-center">
           <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="text-[#0E95A7]"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ 
+              duration: 2, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="text-[#4FD1C7]"
           >
-            <ChefHat className="h-16 w-16" />
+            <ChefHat className="h-12 w-12" />
           </motion.div>
-        </motion.div>
+        </div>
 
-        {/* Floating particles */}
-        {[...Array(8)].map((_, i) => (
+        {/* Floating particles around the circle */}
+        {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-[#0E95A7] rounded-full"
+            className="absolute w-3 h-3 rounded-full"
             style={{
+              background: `linear-gradient(135deg, #4FD1C7, #7FDBDA)`,
               top: '50%',
               left: '50%',
-              transformOrigin: `0 ${60 + i * 5}px`,
+              transformOrigin: `0 ${80 + i * 8}px`,
             }}
             animate={{
               rotate: 360,
-              opacity: [0, 1, 0],
+              scale: [0.5, 1, 0.5],
+              opacity: [0.3, 0.8, 0.3]
             }}
             transition={{
-              duration: 3,
+              duration: 5,
               repeat: Infinity,
-              delay: i * 0.2,
+              delay: i * 0.3,
               ease: "linear"
             }}
           />
         ))}
       </div>
 
-      {/* Progress steps */}
-      <div className="space-y-6 w-full max-w-sm">
-        {steps.map((step, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.5 }}
-            className="flex items-center space-x-4"
-          >
+      {/* Progress steps - styled to match screenshot */}
+      <div className="space-y-4 w-full max-w-md">
+        {steps.map((step, index) => {
+          const isActive = true; // For continuous animation
+          const isCompleted = false; // Will be controlled by timing logic later
+          
+          return (
             <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.5, 1, 0.5]
-              }}
-              transition={{
-                duration: step.duration,
-                repeat: Infinity,
-                delay: index * 0.3
-              }}
-              className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0E95A7] to-[#0CC5BA] flex items-center justify-center"
+              key={index}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.2 }}
+              className="flex items-center space-x-4"
             >
-              <step.icon className="h-6 w-6 text-white" />
-            </motion.div>
-            
-            <div className="flex-1">
-              <motion.p
-                animate={{ opacity: [0.7, 1, 0.7] }}
+              {/* Icon circle */}
+              <motion.div
+                animate={isActive ? {
+                  scale: [1, 1.1, 1],
+                  backgroundColor: ['#4FD1C7', '#7FDBDA', '#4FD1C7']
+                } : {}}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  delay: index * 0.3
+                  delay: step.delay
                 }}
-                className="text-gray-800 font-medium"
+                className="w-14 h-14 rounded-full bg-[#4FD1C7] flex items-center justify-center shadow-md"
               >
-                {step.text}
-              </motion.p>
-            </div>
+                <motion.div
+                  animate={isActive ? {
+                    rotate: [0, 360]
+                  } : {}}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    delay: step.delay,
+                    ease: "linear"
+                  }}
+                >
+                  <step.icon className="h-7 w-7 text-white" />
+                </motion.div>
+              </motion.div>
+              
+              {/* Step text */}
+              <div className="flex-1">
+                <motion.p
+                  animate={isActive ? {
+                    opacity: [0.8, 1, 0.8]
+                  } : {}}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: step.delay
+                  }}
+                  className="text-gray-700 font-semibold text-lg"
+                >
+                  {step.text}
+                </motion.p>
+              </div>
 
-            {/* Progress bar */}
-            <div className="w-20 h-1 bg-gray-300 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{
-                  duration: step.duration,
-                  repeat: Infinity,
-                  delay: index * 0.5,
-                  ease: "easeInOut"
-                }}
-                className="h-full bg-gradient-to-r from-[#0E95A7] to-[#0CC5BA]"
-              />
-            </div>
-          </motion.div>
-        ))}
+              {/* Progress bar - matches screenshot style */}
+              <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{
+                    duration: step.duration,
+                    repeat: Infinity,
+                    delay: step.delay,
+                    ease: "easeOut"
+                  }}
+                  className="h-full bg-gradient-to-r from-[#4FD1C7] to-[#7FDBDA] rounded-full"
+                />
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Bottom text */}
+      {/* Bottom text - exactly matching screenshot */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="mt-12 text-center"
+        transition={{ delay: 1.5 }}
+        className="mt-16 text-center"
       >
-        <p className="text-gray-800 font-semibold text-lg mb-2">
+        <p className="text-gray-800 font-bold text-xl mb-3">
           Analiza AI w trakcie
         </p>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-500 text-base">
           Zwykle trwa 30-60 sekund
         </p>
       </motion.div>
 
-      {/* Animated progress indicator */}
-      <div className="flex space-x-1 mt-8">
+      {/* Animated dots indicator - matching screenshot */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className="flex space-x-2 mt-8"
+      >
         {[0, 1, 2, 3, 4].map((i) => (
           <motion.div
             key={i}
             animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 1, 0.3]
+              scale: [0.8, 1.2, 0.8],
+              opacity: [0.4, 1, 0.4],
+              backgroundColor: ['#4FD1C7', '#7FDBDA', '#4FD1C7']
             }}
             transition={{
-              duration: 1.5,
+              duration: 1.2,
               repeat: Infinity,
-              delay: i * 0.15
+              delay: i * 0.1,
+              ease: "easeInOut"
             }}
-            className="w-2 h-2 bg-[#0E95A7] rounded-full"
+            className="w-3 h-3 bg-[#4FD1C7] rounded-full"
           />
         ))}
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
