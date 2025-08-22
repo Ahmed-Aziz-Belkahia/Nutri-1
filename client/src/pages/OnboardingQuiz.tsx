@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -337,66 +336,39 @@ export default function OnboardingQuiz() {
             transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
             className="w-full"
           >
-            <Card className="bg-white/70 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl border border-white/50 mb-8 w-full">
-              {/* Question header */}
-              <div className="p-8 relative overflow-hidden rounded-t-3xl"
-                style={{
-                  background: `linear-gradient(135deg, 
-                    ${step % 4 === 0 ? '#667eea, #764ba2' : 
-                      step % 4 === 1 ? '#f093fb, #f5576c' : 
-                      step % 4 === 2 ? '#4facfe, #00f2fe' : '#ffecd2, #fcb69f'})`
-                }}
-              >
-                {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
-                <div className="relative z-10 text-center text-white">
-                  <motion.div 
-                    className="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {step === 0 && <Target className="w-10 h-10 text-white" />}
-                    {step === 1 && <User className="w-10 h-10 text-white" />}
-                    {step === 2 && <Clock className="w-10 h-10 text-white" />}
-                    {step === 3 && <Zap className="w-10 h-10 text-white" />}
-                    {step === 4 && <Zap className="w-10 h-10 text-white" />}
-                    {step === 5 && <Target className="w-10 h-10 text-white" />}
-                    {step === 6 && <Zap className="w-10 h-10 text-white" />}
-                    {step === 7 && <Camera className="w-10 h-10 text-white" />}
-                    {step === 8 && <Star className="w-10 h-10 text-white" />}
-                  </motion.div>
-                  <h2 className="text-2xl font-bold mb-2">
-                    {step === 0 ? 'What is your main goal?' :
-                     step === 1 ? 'Choose your gender' :
-                     step === 2 ? 'How old are you?' :
-                     step === 3 ? 'What is your height?' :
-                     step === 4 ? 'How much do you weigh?' :
-                     step === 5 ? 'What is your goal weight?' :
-                     step === 6 ? 'What is your activity level?' :
-                     step === 7 ? 'Add profile picture' :
-                     step === 8 ? 'Your vision board' : 'Congratulations!'}
-                  </h2>
-                  <p className="text-white/90 text-sm">
-                    {step === 0 ? 'Choose what matters most to you' :
-                     step === 1 ? 'Helps us better tailor your plan' :
-                     step === 2 ? 'We need this to calculate calories' :
-                     step === 3 ? 'Enter height in centimeters' :
-                     step === 4 ? 'Current weight in kilograms' :
-                     step === 5 ? 'What weight are you aiming for?' :
-                     step === 6 ? 'How often do you exercise?' :
-                     step === 7 ? 'Add your photo (optional)' :
-                     step === 8 ? 'Your personalized plan' : 'Your profile is ready!'}
-                  </p>
-                </div>
+            <div className="w-full">
+              {/* Minimalist header */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  {step === 0 ? 'What is your main goal?' :
+                   step === 1 ? 'Choose your gender' :
+                   step === 2 ? 'How old are you?' :
+                   step === 3 ? 'What is your height?' :
+                   step === 4 ? 'How much do you weigh?' :
+                   step === 5 ? 'What is your goal weight?' :
+                   step === 6 ? 'What is your activity level?' :
+                   step === 7 ? 'Add profile picture' :
+                   step === 8 ? 'Your vision board' : 'Congratulations!'}
+                </h2>
+                <p className="text-gray-600 text-sm">
+                  {step === 0 ? 'Choose what matters most to you' :
+                   step === 1 ? 'Helps us better tailor your plan' :
+                   step === 2 ? 'We need this to calculate calories' :
+                   step === 3 ? 'Enter height in centimeters' :
+                   step === 4 ? 'Current weight in kilograms' :
+                   step === 5 ? 'What weight are you aiming for?' :
+                   step === 6 ? 'How often do you exercise?' :
+                   step === 7 ? 'Add your photo (optional)' :
+                   step === 8 ? 'Your personalized plan' : 'Your profile is ready!'}
+                </p>
               </div>
 
               {/* Content area */}
-              <div className="p-6">
+              <div className="">
                 {/* Step 0: Perfect Goal - Modern Glassmorphic Design */}
                 {step === 0 && (
-                  <div className="py-8 px-2">
-                    <div className="space-y-6">
+                  <div className="">
+                    <div className="space-y-5">
                       {[
                         { value: 'weight_loss', label: 'Weight Loss', desc: 'Reach your ideal weight' },
                         { value: 'muscle_gain', label: 'Build Muscle', desc: 'Gain strength and mass' },
@@ -825,13 +797,13 @@ export default function OnboardingQuiz() {
               </div>
 
               {/* Navigation buttons */}
-              <div className="p-6 pt-0">
+              <div className="mt-12">
                 <div className="flex justify-between items-center">
                   <Button
                     variant="ghost"
                     onClick={handleBack}
                     disabled={step === 0 || (step === 8 && visionBoardPage === 0)}
-                    className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-6 py-3 rounded-2xl transition-all duration-300"
+                    className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-300"
                   >
                     <span className="mr-2 text-lg">←</span>
                     Back
@@ -840,7 +812,7 @@ export default function OnboardingQuiz() {
                   <Button
                     onClick={handleNext}
                     disabled={isNextDisabled() || mutation.isPending}
-                    className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white px-6 py-4 rounded-2xl text-base font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap"
+                    className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap"
                   >
                     {mutation.isPending ? (
                       <div className="flex items-center">
@@ -857,7 +829,7 @@ export default function OnboardingQuiz() {
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
