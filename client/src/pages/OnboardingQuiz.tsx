@@ -107,13 +107,13 @@ export default function OnboardingQuiz() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Simple translation function for Polish
+  // Simple translation function for English
   const t = (key: string) => {
     const translations: Record<string, string> = {
-      'back': 'Wstecz',
-      'next': 'Dalej',
-      'complete': 'Zakończ',
-      'saving': 'Zapisywanie...'
+      'back': 'Back',
+      'next': 'Next',
+      'complete': 'Complete',
+      'saving': 'Saving...'
     };
     return translations[key] || key;
   };
@@ -133,8 +133,8 @@ export default function OnboardingQuiz() {
 
   const generateVisionBoard = async () => {
     // Use goals to generate motivation
-    const description = formData.perfectGoal.length > 0 ? `Chcę osiągnąć: ${formData.perfectGoal.join(', ')}` : 
-       formData.customGoal || 'Chcę poprawić swoje zdrowie i samopoczucie';
+    const description = formData.perfectGoal.length > 0 ? `I want to achieve: ${formData.perfectGoal.join(', ')}` : 
+       formData.customGoal || 'I want to improve my health and well-being';
 
     setIsGeneratingVisionBoard(true);
     try {
@@ -236,8 +236,8 @@ export default function OnboardingQuiz() {
     onSuccess: (data) => {
       console.log('Onboarding completed successfully, redirecting to dashboard...');
       toast({
-        title: 'Profil utworzony!',
-        description: 'Twój profil został pomyślnie utworzony.',
+        title: 'Profile created!',
+        description: 'Your profile has been successfully created.',
       });
       
       // Invalidate user query to refresh auth state with updated onboarding status
@@ -251,8 +251,8 @@ export default function OnboardingQuiz() {
     onError: (error: Error) => {
       console.error('Onboarding completion error:', error);
       toast({
-        title: 'Błąd',
-        description: 'Wystąpił problem podczas zapisywania profilu. Spróbuj ponownie.',
+        title: 'Error',
+        description: 'There was a problem saving your profile. Please try again.',
         variant: 'destructive',
       });
     },
@@ -367,26 +367,26 @@ export default function OnboardingQuiz() {
                     {step === 8 && <Star className="w-10 h-10 text-white" />}
                   </motion.div>
                   <h2 className="text-2xl font-bold mb-2">
-                    {step === 0 ? 'Jaki jest Twój główny cel?' :
-                     step === 1 ? 'Wybierz swoją płeć' :
-                     step === 2 ? 'Ile masz lat?' :
-                     step === 3 ? 'Jaki jest Twój wzrost?' :
-                     step === 4 ? 'Ile ważysz?' :
-                     step === 5 ? 'Jaka jest Twoja waga docelowa?' :
-                     step === 6 ? 'Jaki jest Twój poziom aktywności?' :
-                     step === 7 ? 'Dodaj zdjęcie profilowe' :
-                     step === 8 ? 'Twoja tablica wizji' : 'Gratulacje!'}
+                    {step === 0 ? 'What is your main goal?' :
+                     step === 1 ? 'Choose your gender' :
+                     step === 2 ? 'How old are you?' :
+                     step === 3 ? 'What is your height?' :
+                     step === 4 ? 'How much do you weigh?' :
+                     step === 5 ? 'What is your goal weight?' :
+                     step === 6 ? 'What is your activity level?' :
+                     step === 7 ? 'Add profile picture' :
+                     step === 8 ? 'Your vision board' : 'Congratulations!'}
                   </h2>
                   <p className="text-white/90 text-sm">
-                    {step === 0 ? 'Wybierz to, co jest dla Ciebie najważniejsze' :
-                     step === 1 ? 'Pomaga nam lepiej dostosować plan' :
-                     step === 2 ? 'Potrzebujemy tego do obliczenia kalorii' :
-                     step === 3 ? 'Podaj wzrost w centymetrach' :
-                     step === 4 ? 'Aktualna waga w kilogramach' :
-                     step === 5 ? 'Do jakiej wagi dążysz?' :
-                     step === 6 ? 'Jak często ćwiczysz?' :
-                     step === 7 ? 'Dodaj swoje zdjęcie (opcjonalne)' :
-                     step === 8 ? 'Spersonalizowany plan dla Ciebie' : 'Twój profil jest gotowy!'}
+                    {step === 0 ? 'Choose what matters most to you' :
+                     step === 1 ? 'Helps us better tailor your plan' :
+                     step === 2 ? 'We need this to calculate calories' :
+                     step === 3 ? 'Enter height in centimeters' :
+                     step === 4 ? 'Current weight in kilograms' :
+                     step === 5 ? 'What weight are you aiming for?' :
+                     step === 6 ? 'How often do you exercise?' :
+                     step === 7 ? 'Add your photo (optional)' :
+                     step === 8 ? 'Your personalized plan' : 'Your profile is ready!'}
                   </p>
                 </div>
               </div>
@@ -398,9 +398,9 @@ export default function OnboardingQuiz() {
                   <div className="space-y-4">
                     <div className="space-y-3">
                       {[
-                        { value: 'weight_loss', label: 'Utrata wagi', icon: '', desc: 'Zdrowo' },
-                        { value: 'muscle_gain', label: 'Budowa mięśni', icon: '', desc: 'Masa' },
-                        { value: 'health_improve', label: 'Poprawa zdrowia', icon: '', desc: 'Zdrowie' }
+                        { value: 'weight_loss', label: 'Weight Loss', icon: '', desc: 'Healthy' },
+                        { value: 'muscle_gain', label: 'Build Muscle', icon: '', desc: 'Mass' },
+                        { value: 'health_improve', label: 'Improve Health', icon: '', desc: 'Health' }
                       ].map((goal) => (
                         <motion.div
                           key={goal.value}
@@ -440,11 +440,11 @@ export default function OnboardingQuiz() {
                       {/* Custom goal input */}
                       <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          na przykład chcę
+                          for example I want to
                         </label>
                         <input
                           type="text"
-                          placeholder="wpisz tutaj swój cel..."
+                          placeholder="enter your goal here..."
                           value={formData.customGoal || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
                           className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
@@ -462,8 +462,8 @@ export default function OnboardingQuiz() {
                       onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value as any }))}
                     >
                       {[
-                        { value: 'male', label: 'Mężczyzna', icon: '' },
-                        { value: 'female', label: 'Kobieta', icon: '' }
+                        { value: 'male', label: 'Male', icon: '' },
+                        { value: 'female', label: 'Female', icon: '' }
                       ].map((gender) => (
                         <motion.div
                           key={gender.value}
@@ -499,12 +499,12 @@ export default function OnboardingQuiz() {
                           const age = value ? parseInt(value, 10) : 0;
                           setFormData(prev => ({ ...prev, age: isNaN(age) ? 0 : age }));
                         }}
-                        placeholder="Wiek"
+                        placeholder="Age"
                         className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl focus:border-purple-400 focus:ring-purple-200 transition-all duration-300"
                         min="10"
                         max="100"
                       />
-                      <p className="text-sm text-gray-500 mt-2">lat</p>
+                      <p className="text-sm text-gray-500 mt-2">years old</p>
                     </div>
                   </div>
                 )}
@@ -521,7 +521,7 @@ export default function OnboardingQuiz() {
                           const height = value ? parseInt(value, 10) : 0;
                           setFormData(prev => ({ ...prev, height: isNaN(height) ? 0 : height }));
                         }}
-                        placeholder="Wzrost"
+                        placeholder="Height"
                         className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl focus:border-green-400 focus:ring-green-200 transition-all duration-300"
                         min="100"
                         max="250"
@@ -543,7 +543,7 @@ export default function OnboardingQuiz() {
                           const weight = value ? parseInt(value, 10) : 0;
                           setFormData(prev => ({ ...prev, weight: isNaN(weight) ? 0 : weight }));
                         }}
-                        placeholder="Aktualna waga"
+                        placeholder="Current weight"
                         className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl focus:border-blue-400 focus:ring-blue-200 transition-all duration-300"
                         min="30"
                         max="300"
@@ -565,7 +565,7 @@ export default function OnboardingQuiz() {
                           const goalWeight = value ? parseInt(value, 10) : 0;
                           setFormData(prev => ({ ...prev, goalWeight: isNaN(goalWeight) ? 0 : goalWeight }));
                         }}
-                        placeholder="Waga docelowa"
+                        placeholder="Goal weight"
                         className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl focus:border-amber-400 focus:ring-amber-200 transition-all duration-300"
                         min="30"
                         max="300"
@@ -581,10 +581,10 @@ export default function OnboardingQuiz() {
                     {/* Activity Level Buttons */}
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { value: 'sedentary', label: 'Mało aktywny' },
-                        { value: 'light', label: 'Lekko aktywny' },
-                        { value: 'moderate', label: 'Umiarkowany' },
-                        { value: 'active', label: 'Bardzo aktywny' }
+                        { value: 'sedentary', label: 'Sedentary' },
+                        { value: 'light', label: 'Lightly Active' },
+                        { value: 'moderate', label: 'Moderate' },
+                        { value: 'active', label: 'Very Active' }
                       ].map((activity) => (
                         <motion.button
                           key={activity.value}
@@ -636,9 +636,9 @@ export default function OnboardingQuiz() {
                         className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 cursor-pointer transition-colors"
                       >
                         <Camera className="w-4 h-4 mr-2" />
-                        Wybierz zdjęcie
+                        Choose Photo
                       </Label>
-                      <p className="text-sm text-gray-500 mt-2">Opcjonalne - możesz pominąć ten krok</p>
+                      <p className="text-sm text-gray-500 mt-2">Optional - you can skip this step</p>
                     </div>
                   </div>
                 )}
@@ -667,11 +667,11 @@ export default function OnboardingQuiz() {
                         className="text-center space-y-6"
                       >
                         <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                          Twoja wizja
+                          Your Vision
                         </h2>
                         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
                           <p className="text-xl text-gray-800 leading-relaxed font-medium">
-                            {typeof visionBoardData.motivation === 'string' ? visionBoardData.motivation : visionBoardData.motivation?.inspiration || 'Twoja podróż do zdrowszego życia się rozpoczyna!'}
+                            {typeof visionBoardData.motivation === 'string' ? visionBoardData.motivation : visionBoardData.motivation?.inspiration || 'Your journey to a healthier life begins!'}
                           </p>
                         </div>
                         <div className="flex justify-center items-center">
@@ -691,33 +691,33 @@ export default function OnboardingQuiz() {
                         className="text-center space-y-4"
                       >
                         <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                          Twój plan żywieniowy
+                          Your Nutrition Plan
                         </h2>
                         <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 border border-green-200">
                           <div className="text-center mb-4">
                             <div className="text-2xl font-bold text-green-600 mb-1">
                               {calculateCalories(formData)} kcal
                             </div>
-                            <p className="text-sm text-gray-700">dziennie</p>
+                            <p className="text-sm text-gray-700">daily</p>
                           </div>
                           <div className="grid grid-cols-3 gap-3">
                             <div className="text-center">
                               <div className="text-lg font-bold text-blue-600">
                                 {Math.round(calculateCalories(formData) * 0.3 / 4)}g
                               </div>
-                              <div className="text-xs text-gray-600">Białko</div>
+                              <div className="text-xs text-gray-600">Protein</div>
                             </div>
                             <div className="text-center">
                               <div className="text-lg font-bold text-orange-600">
                                 {Math.round(calculateCalories(formData) * 0.45 / 4)}g
                               </div>
-                              <div className="text-xs text-gray-600">Węglowodany</div>
+                              <div className="text-xs text-gray-600">Carbs</div>
                             </div>
                             <div className="text-center">
                               <div className="text-lg font-bold text-purple-600">
                                 {Math.round(calculateCalories(formData) * 0.25 / 9)}g
                               </div>
-                              <div className="text-xs text-gray-600">Tłuszcze</div>
+                              <div className="text-xs text-gray-600">Fats</div>
                             </div>
                           </div>
                         </div>
@@ -738,7 +738,7 @@ export default function OnboardingQuiz() {
                         className="text-center space-y-4"
                       >
                         <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                          Twoja podróż
+                          Your Journey
                         </h2>
                         
                         {(() => {
@@ -753,27 +753,27 @@ export default function OnboardingQuiz() {
                                       <div className="text-xl font-bold text-orange-600">
                                         {timeline.weeks}
                                       </div>
-                                      <div className="text-xs text-gray-600">tygodni</div>
+                                      <div className="text-xs text-gray-600">weeks</div>
                                     </div>
                                     <div>
                                       <div className="text-xl font-bold text-red-600">
                                         {timeline.months}
                                       </div>
-                                      <div className="text-xs text-gray-600">miesięcy</div>
+                                      <div className="text-xs text-gray-600">months</div>
                                     </div>
                                   </div>
                                   <div className="mt-3 pt-3 border-t border-orange-200">
                                     <p className="text-xs text-gray-700">
-                                      {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/tydzień
+                                      {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/week
                                     </p>
                                   </div>
                                 </div>
                               )}
                               
                               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200">
-                                <h3 className="text-lg font-bold text-purple-800 mb-2">Rozpocznij teraz!</h3>
+                                <h3 className="text-lg font-bold text-purple-800 mb-2">Start Now!</h3>
                                 <p className="text-sm text-gray-700 mb-3">
-                                  Twój plan jest gotowy
+                                  Your plan is ready
                                 </p>
                                 <div className="flex justify-center">
                                   <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
@@ -793,7 +793,7 @@ export default function OnboardingQuiz() {
                         <div className="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center">
                           <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-800">Tworzenie Twojej tablicy wizji...</h2>
+                        <h2 className="text-2xl font-bold text-gray-800">Creating your vision board...</h2>
                         <div className="flex justify-center">
                           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
                         </div>
@@ -813,7 +813,7 @@ export default function OnboardingQuiz() {
                     className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-gray-50 px-6 py-3 rounded-2xl transition-all duration-300"
                   >
                     <span className="mr-2 text-lg">←</span>
-                    Wstecz
+                    Back
                   </Button>
 
                   <Button
@@ -824,14 +824,14 @@ export default function OnboardingQuiz() {
                     {mutation.isPending ? (
                       <div className="flex items-center">
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Zapisywanie...
+                        Saving...
                       </div>
                     ) : (
                       step === 8 && visionBoardPage === 3 ? 'Start!' :
-                      step === 8 && visionBoardPage > 0 ? 'Dalej' :
-                      step === 8 && visionBoardPage === 0 ? 'Dalej' :
-                      step === 7 ? 'Dalej' :
-                      'Dalej'
+                      step === 8 && visionBoardPage > 0 ? 'Next' :
+                      step === 8 && visionBoardPage === 0 ? 'Next' :
+                      step === 7 ? 'Next' :
+                      'Next'
                     )}
                   </Button>
                 </div>
