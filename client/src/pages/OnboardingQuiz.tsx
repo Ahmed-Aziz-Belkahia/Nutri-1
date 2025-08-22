@@ -398,10 +398,10 @@ export default function OnboardingQuiz() {
                   <div className="space-y-4">
                     <div className="space-y-3">
                       {[
-                        { value: 'weight_loss', label: 'Weight Loss', icon: '🎯', desc: 'Reach your ideal weight' },
-                        { value: 'muscle_gain', label: 'Build Muscle', icon: '💪', desc: 'Gain strength and mass' },
-                        { value: 'health_improve', label: 'Improve Health', icon: '❤️', desc: 'Feel better overall' },
-                        { value: 'other', label: 'Other', icon: '✨', desc: 'Custom goal' }
+                        { value: 'weight_loss', label: 'Weight Loss', icon: '', desc: 'Reach your ideal weight' },
+                        { value: 'muscle_gain', label: 'Build Muscle', icon: '', desc: 'Gain strength and mass' },
+                        { value: 'health_improve', label: 'Improve Health', icon: '', desc: 'Feel better overall' },
+                        { value: 'other', label: 'Other', icon: '', desc: 'Custom goal' }
                       ].map((goal) => (
                         <motion.div
                           key={goal.value}
