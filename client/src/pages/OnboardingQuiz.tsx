@@ -407,26 +407,26 @@ export default function OnboardingQuiz() {
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
-                            formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
+                            formData.perfectGoal.includes(goal.value as any)
                               ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
                               : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
                           }`}
                           onClick={() => {
-                            // Set only this goal, clearing others
-                            setFormData(prev => ({ 
-                              ...prev, 
-                              perfectGoal: [goal.value as any],
-                              customGoal: '' // Clear custom goal when selecting a preset
-                            }));
+                            const currentGoals = formData.perfectGoal;
+                            const goalValue = goal.value as any;
+                            const newGoals = currentGoals.includes(goalValue)
+                              ? currentGoals.filter(g => g !== goalValue)
+                              : [...currentGoals, goalValue];
+                            setFormData(prev => ({ ...prev, perfectGoal: newGoals }));
                           }}
                         >
-                          <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                            formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
+                          <div className={`w-5 h-5 border-2 rounded-md flex items-center justify-center ${
+                            formData.perfectGoal.includes(goal.value as any)
                               ? 'bg-purple-600 border-purple-600' 
                               : 'border-gray-300'
                           }`}>
-                            {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value && (
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            {formData.perfectGoal.includes(goal.value as any) && (
+                              <div className="w-2 h-2 bg-white rounded-sm"></div>
                             )}
                           </div>
                           <div className="text-2xl">{goal.icon}</div>
@@ -446,10 +446,6 @@ export default function OnboardingQuiz() {
                           type="text"
                           placeholder="enter your goal here..."
                           value={formData.customGoal || ''}
-                          onFocus={() => {
-                            // Clear perfect goal selections when focusing on custom input
-                            setFormData(prev => ({ ...prev, perfectGoal: [] }));
-                          }}
                           onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
                           className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
                         />
