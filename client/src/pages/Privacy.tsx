@@ -25,7 +25,7 @@ export default function Privacy() {
         </div>
       </header>
       
-      <div className="container mx-auto py-8 px-4">
+      <div className="w-full py-8 px-6 lg:px-12">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white/70 backdrop-blur-md p-6 rounded-2xl border border-white/30 shadow-sm">
             <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">Privacy Policy</h2>

@@ -107,8 +107,8 @@ export default function EmotionalLandingPage() {
 
       {/* Header/Navbar with glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/90 border-b border-gray-200">
-        <div className="container mx-auto">
-          <nav className="flex justify-between items-center py-4 px-4 md:px-0">
+        <div className="w-full">
+          <nav className="flex justify-between items-center py-4 px-6 lg:px-12">
             <div className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-[#00BCD6]" />
               <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF]">
@@ -145,7 +145,7 @@ export default function EmotionalLandingPage() {
       {/* Main content overlaid on video */}
       <div className="relative z-10 pt-20 h-screen flex flex-col">
         {/* Hero Section */}
-        <section className="flex-1 container mx-auto px-4 flex flex-col justify-center">
+        <section className="flex-1 w-full px-6 lg:px-12 flex flex-col justify-center">
           <div className="max-w-3xl mx-auto text-center">
             <motion.div 
               initial="hidden"
@@ -258,7 +258,7 @@ export default function EmotionalLandingPage() {
       {/* Journey highlights as visual steps */}
       <section className="relative bg-gradient-to-b from-white to-gray-50 py-24" id="transformation">
         <div className="absolute inset-0 bg-[#00BCD6]/5 mix-blend-multiply"></div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="w-full px-6 lg:px-12 relative z-10">
           <div className="max-w-3xl mx-auto text-center mb-20">
             <motion.h2 
               initial={{ opacity: 0 }}
@@ -327,7 +327,7 @@ export default function EmotionalLandingPage() {
       
       {/* Body Wisdom Section */}
       <section className="relative py-24 bg-gradient-to-b from-gray-50 to-white" id="body-wisdom">
-        <div className="container mx-auto px-4">
+        <div className="w-full px-6 lg:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -498,7 +498,7 @@ export default function EmotionalLandingPage() {
           </svg>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="w-full px-6 lg:px-12 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <motion.h2
               initial={{ opacity: 0, y: 30 }}

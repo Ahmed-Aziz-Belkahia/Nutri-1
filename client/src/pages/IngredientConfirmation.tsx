@@ -281,7 +281,7 @@ export default function IngredientConfirmation() {
         animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/50"
       >
-        <div className="container mx-auto px-6 py-4">
+        <div className="w-full px-6 lg:px-12 py-4">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -307,7 +307,7 @@ export default function IngredientConfirmation() {
       </motion.div>
 
       {/* Main content with recipes page styling */}
-      <div className="container mx-auto px-6 py-8">
+      <div className="w-full px-6 lg:px-12 py-8">
         {/* Confidence indicator */}
         {analysisData?.confidence && (
           <motion.div 
@@ -573,7 +573,7 @@ export default function IngredientConfirmation() {
         transition={{ delay: 0.4 }}
         className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200/50 p-4 safe-area-pb"
       >
-        <div className="container mx-auto px-2">
+        <div className="w-full px-6 lg:px-12">
           <Button
             onClick={generateRecipes}
             disabled={isGenerating || ingredients.length === 0}

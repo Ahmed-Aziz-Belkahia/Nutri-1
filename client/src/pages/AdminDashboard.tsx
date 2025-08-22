@@ -233,7 +233,7 @@ export default function AdminDashboard() {
 
   if (usersError) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-6 lg:px-12 py-8">
         <h1 className="text-3xl font-bold mb-8 flex items-center">
           <Shield className="mr-2" /> Admin Dashboard
         </h1>
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
 
   if (isLoadingUsers) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-6 lg:px-12 py-8">
         <h1 className="text-3xl font-bold mb-8 flex items-center">
           <Shield className="mr-2" /> Admin Dashboard
         </h1>
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
 
     if (!selectedUser) {
       return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full px-6 lg:px-12 py-8">
           <h1 className="text-3xl font-bold mb-8 flex items-center">
             <Shield className="mr-2" /> Admin Dashboard
           </h1>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
     }
 
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="w-full px-6 lg:px-12 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold flex items-center">
             <Shield className="mr-2" /> Admin Dashboard
@@ -565,7 +565,7 @@ export default function AdminDashboard() {
 
   // Main admin dashboard
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full px-6 lg:px-12 py-8">
       <h1 className="text-3xl font-bold mb-8 flex items-center">
         <Shield className="mr-2" /> Admin Dashboard
       </h1>

@@ -118,7 +118,7 @@ export default function RecipeDetail() {
         animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/50"
       >
-        <div className="container mx-auto px-6 py-4">
+        <div className="w-full px-6 lg:px-12 py-4">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -133,7 +133,7 @@ export default function RecipeDetail() {
       </motion.div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 pt-4 pb-8 max-w-4xl">
+      <div className="w-full px-6 lg:px-12 pt-4 pb-8 max-w-4xl mx-auto">
         {/* Recipe Header Card - matching EnhancedRecipeCard style */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

@@ -887,7 +887,7 @@ export default function MealDetail() {
             </Button>
           </div>
 
-          <div className="container mx-auto px-4 py-6 space-y-6">
+          <div className="w-full px-6 lg:px-12 py-6 space-y-6">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
