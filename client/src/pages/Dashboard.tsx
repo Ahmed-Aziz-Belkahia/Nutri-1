@@ -25,6 +25,7 @@ import toast from 'react-hot-toast';
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useTranslation } from "react-i18next";
 import { usePersistentGuide } from "@/hooks/use-persistent-guide";
+import { TutorialOverlay } from "@/components/TutorialOverlay";
 
 
 
@@ -851,6 +852,7 @@ export default function Dashboard() {
 
 
       </div>
+      <TutorialOverlay />
     </div>
   );
 }

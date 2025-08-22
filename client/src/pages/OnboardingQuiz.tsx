@@ -242,6 +242,9 @@ export default function OnboardingQuiz() {
       // Invalidate user query to refresh auth state with updated onboarding status
       queryClient.invalidateQueries({ queryKey: ["user"] });
       
+      // Set flag to show tutorial overlay on dashboard
+      localStorage.setItem('justCompletedOnboarding', 'true');
+      
       // Use setTimeout to ensure the toast is shown before navigation
       setTimeout(() => {
         navigate('/dashboard');
