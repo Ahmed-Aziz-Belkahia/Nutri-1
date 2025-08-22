@@ -53,14 +53,14 @@ export default function LandingPage() {
       </div>
 
       {/* Main content - centered vertically */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 py-16">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-8 py-8">
         
         {/* App Icon */}
         <motion.div 
           variants={scaleIn}
           initial="hidden"
           animate="visible"
-          className="mb-12"
+          className="mb-8"
         >
           <div className="relative">
             <div className="w-24 h-24 bg-gradient-to-br from-[#0CC5BA] to-[#00BCD6] rounded-[28px] flex items-center justify-center shadow-2xl shadow-teal-500/20">
@@ -87,7 +87,7 @@ export default function LandingPage() {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.1 }}
-          className="text-xl text-gray-500 mb-16 font-light text-center max-w-xs"
+          className="text-xl text-gray-500 mb-12 font-light text-center max-w-xs"
         >
           Your personal AI nutrition coach in your pocket
         </motion.p>
@@ -124,7 +124,7 @@ export default function LandingPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 1 }}
-        className="relative z-10 pb-12 text-center"
+        className="relative z-10 pb-6 text-center"
       >
         <div className="flex items-center justify-center space-x-2 text-xs text-gray-400">
           <div className="w-1 h-1 bg-gray-300 rounded-full" />
@@ -138,7 +138,7 @@ export default function LandingPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8, duration: 1 }}
-        className="absolute bottom-20 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <div className="flex space-x-1.5">
           {[...Array(3)].map((_, i) => (
