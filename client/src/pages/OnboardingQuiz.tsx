@@ -261,9 +261,9 @@ export default function OnboardingQuiz() {
     if (step === 7 && !isGeneratingVisionBoard) {
       generateVisionBoard();
       setStep(8);
-    } else if (step === 8 && visionBoardPage < 3) {
+    } else if (step === 8 && visionBoardPage < 2) {
       setVisionBoardPage(prev => prev + 1);
-    } else if (step === 8 && visionBoardPage === 3) {
+    } else if (step === 8 && visionBoardPage === 2) {
       mutation.mutate(formData);
     } else {
       setStep(prev => prev + 1);
@@ -636,12 +636,12 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 8: Vision Board - 3 substeps */}
+                {/* Step 8: Vision Board - 2 substeps */}
                 {step === 8 && (
                   <div className="space-y-6">
                     {/* Vision Board Page Indicators */}
                     <div className="flex justify-center space-x-2 mb-6">
-                      {[1, 2, 3].map((page) => (
+                      {[1, 2].map((page) => (
                         <div
                           key={page}
                           className={`w-3 h-3 rounded-full transition-colors ${
@@ -651,32 +651,8 @@ export default function OnboardingQuiz() {
                       ))}
                     </div>
 
-                    {/* Page 1: AI-Generated Motivational Content */}
-                    {visionBoardPage === 1 && visionBoardData && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center space-y-6"
-                      >
-                        <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                          Your Vision
-                        </h2>
-                        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-6 border border-purple-200">
-                          <p className="text-xl text-gray-800 leading-relaxed font-medium">
-                            {typeof visionBoardData.motivation === 'string' ? visionBoardData.motivation : visionBoardData.motivation?.inspiration || 'Your journey to a healthier life begins!'}
-                          </p>
-                        </div>
-                        <div className="flex justify-center items-center">
-                          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                            <Star className="w-10 h-10 text-white fill-current" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Page 2: Macro Confirmation */}
-                    {visionBoardPage === 2 && (
+                    {/* Page 1: Macro Confirmation */}
+                    {visionBoardPage === 1 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -722,8 +698,8 @@ export default function OnboardingQuiz() {
                       </motion.div>
                     )}
 
-                    {/* Page 3: Timeline with CTA */}
-                    {visionBoardPage === 3 && (
+                    {/* Page 2: Timeline with CTA */}
+                    {visionBoardPage === 2 && (
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -822,7 +798,7 @@ export default function OnboardingQuiz() {
                         Saving...
                       </div>
                     ) : (
-                      step === 8 && visionBoardPage === 3 ? 'Start!' :
+                      step === 8 && visionBoardPage === 2 ? 'Start!' :
                       step === 8 && visionBoardPage > 0 ? 'Next' :
                       step === 8 && visionBoardPage === 0 ? 'Next' :
                       step === 7 ? 'Next' :
