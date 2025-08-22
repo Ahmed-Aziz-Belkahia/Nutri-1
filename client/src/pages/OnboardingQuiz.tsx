@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Camera, Upload, User, Target, Heart, Zap, Clock, Star } from 'lucide-react';
 
 type OnboardingData = {
-  perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change')[];
+  perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change' | 'other')[];
   customGoal?: string;
   gender: 'male' | 'female' | '';
   age: number;
@@ -295,19 +295,19 @@ export default function OnboardingQuiz() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 relative overflow-hidden">
-      {/* Enhanced Background decorations */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-400/10 to-indigo-400/10 filter blur-3xl -translate-y-1/2 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-blue-400/8 to-cyan-400/8 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
-      <div className="absolute top-1/2 left-1/4 w-[350px] h-[350px] rounded-full bg-gradient-to-br from-emerald-400/8 to-teal-400/8 filter blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-gradient-to-tl from-pink-400/8 to-rose-400/8 filter blur-3xl" />
+    <div className="h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 relative overflow-hidden">
+      {/* Modern Glassmorphic Background */}
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-300/20 to-blue-300/20 filter blur-3xl -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-blue-300/15 to-purple-300/15 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
+      <div className="absolute top-1/2 left-1/4 w-[350px] h-[350px] rounded-full bg-gradient-to-br from-purple-200/10 to-pink-200/10 filter blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] rounded-full bg-gradient-to-tl from-blue-200/10 to-purple-200/10 filter blur-3xl" />
       
       {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className={`absolute w-2 h-2 rounded-full bg-purple-300/20`}
+            className={`absolute w-1.5 h-1.5 rounded-full bg-purple-400/10`}
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -337,7 +337,7 @@ export default function OnboardingQuiz() {
             transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
             className="w-full"
           >
-            <Card className="bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-white/30 mb-8 w-full">
+            <Card className="bg-white/70 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl border border-white/50 mb-8 w-full">
               {/* Question header */}
               <div className="p-8 relative overflow-hidden rounded-t-3xl"
                 style={{
@@ -393,25 +393,24 @@ export default function OnboardingQuiz() {
 
               {/* Content area */}
               <div className="p-6">
-                {/* Step 0: Perfect Goal */}
+                {/* Step 0: Perfect Goal - Modern Glassmorphic Design */}
                 {step === 0 && (
-                  <div className="space-y-4">
-                    <div className="space-y-3">
+                  <div className="py-8 px-2">
+                    <div className="space-y-6">
                       {[
-                        { value: 'weight_loss', label: 'Weight Loss', icon: '', desc: 'Reach your ideal weight' },
-                        { value: 'muscle_gain', label: 'Build Muscle', icon: '', desc: 'Gain strength and mass' },
-                        { value: 'health_improve', label: 'Improve Health', icon: '', desc: 'Feel better overall' },
-                        { value: 'other', label: 'Other', icon: '', desc: 'Custom goal' }
+                        { value: 'weight_loss', label: 'Weight Loss', desc: 'Reach your ideal weight' },
+                        { value: 'muscle_gain', label: 'Build Muscle', desc: 'Gain strength and mass' },
+                        { value: 'health_improve', label: 'Improve Health', desc: 'Feel better overall' },
+                        { value: 'other', label: 'Other', desc: 'Custom goal' }
                       ].map((goal) => (
                         <motion.div
                           key={goal.value}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
-                            (formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value) ||
-                            (goal.value === 'other' && formData.perfectGoal.length === 1 && formData.perfectGoal[0] === 'other')
-                              ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
-                              : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
+                          whileHover={{ scale: 1.01, y: -2 }}
+                          whileTap={{ scale: 0.99 }}
+                          className={`relative backdrop-blur-xl rounded-2xl p-6 cursor-pointer transition-all duration-300 ${
+                            formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
+                              ? 'bg-white/90 shadow-2xl ring-2 ring-purple-400 ring-offset-2' 
+                              : 'bg-white/60 hover:bg-white/80 shadow-lg hover:shadow-xl'
                           }`}
                           onClick={() => {
                             setFormData(prev => ({ 
@@ -421,43 +420,55 @@ export default function OnboardingQuiz() {
                             }));
                           }}
                         >
-                          <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
-                            formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
-                              ? 'bg-purple-600 border-purple-600' 
-                              : 'border-gray-300'
-                          }`}>
-                            {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value && (
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            )}
+                          <div className="flex items-center space-x-4">
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                              formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
+                                ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-transparent' 
+                                : 'border-gray-300 bg-white/50'
+                            }`}>
+                              {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value && (
+                                <motion.div 
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="w-2.5 h-2.5 bg-white rounded-full"
+                                />
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-gray-900 mb-1">{goal.label}</h3>
+                              <p className="text-sm text-gray-600">{goal.desc}</p>
+                            </div>
                           </div>
-                          <div className="text-2xl">{goal.icon}</div>
-                          <div className="flex-1">
-                            <div className="font-semibold text-lg text-gray-800">{goal.label}</div>
-                            <div className="text-sm text-gray-600">{goal.desc}</div>
-                          </div>
+                          
+                          {/* Gradient overlay for selected state */}
+                          {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value && (
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-2xl pointer-events-none" />
+                          )}
                         </motion.div>
                       ))}
                       
-                      {/* Custom goal input - only show when "Other" is selected */}
+                      {/* Custom goal input - Modern glassmorphic style */}
                       {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === 'other' && (
                         <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 0 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          className="mt-8"
                         >
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Please specify your goal
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="Enter your custom goal..."
-                            value={formData.customGoal || ''}
-                            onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
-                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
-                            autoFocus
-                          />
+                          <div className="backdrop-blur-xl bg-white/80 rounded-2xl p-6 shadow-xl">
+                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                              Please specify your goal
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter your custom goal..."
+                              value={formData.customGoal || ''}
+                              onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
+                              className="w-full p-4 bg-white/60 backdrop-blur-sm border border-gray-200 rounded-xl focus:border-purple-400 focus:ring-2 focus:ring-purple-100 focus:outline-none transition-all duration-300 placeholder:text-gray-400"
+                              autoFocus
+                            />
+                          </div>
                         </motion.div>
                       )}
                     </div>
