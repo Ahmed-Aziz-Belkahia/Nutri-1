@@ -798,16 +798,18 @@ export default function OnboardingQuiz() {
 
               {/* Navigation buttons */}
               <div className="mt-12">
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="ghost"
-                    onClick={handleBack}
-                    disabled={step === 0 || (step === 8 && visionBoardPage === 0)}
-                    className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-300"
-                  >
-                    <span className="mr-2 text-lg">←</span>
-                    Back
-                  </Button>
+                <div className={`flex ${step === 0 ? 'justify-center' : 'justify-between'} items-center`}>
+                  {step !== 0 && (
+                    <Button
+                      variant="ghost"
+                      onClick={handleBack}
+                      disabled={step === 8 && visionBoardPage === 0}
+                      className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-300"
+                    >
+                      <span className="mr-2 text-lg">←</span>
+                      Back
+                    </Button>
+                  )}
 
                   <Button
                     onClick={handleNext}
