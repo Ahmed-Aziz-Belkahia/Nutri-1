@@ -398,35 +398,36 @@ export default function OnboardingQuiz() {
                   <div className="space-y-4">
                     <div className="space-y-3">
                       {[
-                        { value: 'weight_loss', label: 'Weight Loss', icon: '', desc: 'Healthy' },
-                        { value: 'muscle_gain', label: 'Build Muscle', icon: '', desc: 'Mass' },
-                        { value: 'health_improve', label: 'Improve Health', icon: '', desc: 'Health' }
+                        { value: 'weight_loss', label: 'Weight Loss', icon: '🎯', desc: 'Reach your ideal weight' },
+                        { value: 'muscle_gain', label: 'Build Muscle', icon: '💪', desc: 'Gain strength and mass' },
+                        { value: 'health_improve', label: 'Improve Health', icon: '❤️', desc: 'Feel better overall' },
+                        { value: 'other', label: 'Other', icon: '✨', desc: 'Custom goal' }
                       ].map((goal) => (
                         <motion.div
                           key={goal.value}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
-                            formData.perfectGoal.includes(goal.value as any)
+                            (formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value) ||
+                            (goal.value === 'other' && formData.perfectGoal.length === 1 && formData.perfectGoal[0] === 'other')
                               ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
                               : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
                           }`}
                           onClick={() => {
-                            const currentGoals = formData.perfectGoal;
-                            const goalValue = goal.value as any;
-                            const newGoals = currentGoals.includes(goalValue)
-                              ? currentGoals.filter(g => g !== goalValue)
-                              : [...currentGoals, goalValue];
-                            setFormData(prev => ({ ...prev, perfectGoal: newGoals }));
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              perfectGoal: [goal.value as any],
+                              customGoal: goal.value === 'other' ? prev.customGoal : ''
+                            }));
                           }}
                         >
-                          <div className={`w-5 h-5 border-2 rounded-md flex items-center justify-center ${
-                            formData.perfectGoal.includes(goal.value as any)
+                          <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
+                            formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
                               ? 'bg-purple-600 border-purple-600' 
                               : 'border-gray-300'
                           }`}>
-                            {formData.perfectGoal.includes(goal.value as any) && (
-                              <div className="w-2 h-2 bg-white rounded-sm"></div>
+                            {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value && (
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
                             )}
                           </div>
                           <div className="text-2xl">{goal.icon}</div>
@@ -437,19 +438,28 @@ export default function OnboardingQuiz() {
                         </motion.div>
                       ))}
                       
-                      {/* Custom goal input */}
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          for example I want to
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="enter your goal here..."
-                          value={formData.customGoal || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
-                          className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
-                        />
-                      </div>
+                      {/* Custom goal input - only show when "Other" is selected */}
+                      {formData.perfectGoal.length === 1 && formData.perfectGoal[0] === 'other' && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-4"
+                        >
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Please specify your goal
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Enter your custom goal..."
+                            value={formData.customGoal || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
+                            className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none transition-colors"
+                            autoFocus
+                          />
+                        </motion.div>
+                      )}
                     </div>
                   </div>
                 )}
