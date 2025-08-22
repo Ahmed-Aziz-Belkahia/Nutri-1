@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { 
   Loader2, 
   ArrowLeft, 
@@ -170,44 +170,37 @@ export default function AuthPage() {
                 )}
               </div>
 
-              <AnimatePresence>
-                {!isLogin && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <label htmlFor="confirmPassword" className="text-xs font-medium text-gray-500 mb-1 ml-1 block">
-                      Potwierdź hasło
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="h-12 rounded-lg w-full bg-gray-50 border border-gray-200 pl-10 pr-10"
-                        placeholder="••••••••"
-                        required
-                      />
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Lock className="w-5 h-5" />
-                      </div>
-                      <button 
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-                      >
-                        {showConfirmPassword ? 
-                          <EyeOff className="h-5 w-5" /> : 
-                          <Eye className="h-5 w-5" />
-                        }
-                      </button>
+              {!isLogin && (
+                <div>
+                  <label htmlFor="confirmPassword" className="text-xs font-medium text-gray-500 mb-1 ml-1 block">
+                    Potwierdź hasło
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      className="h-12 rounded-lg w-full bg-gray-50 border border-gray-200 pl-10 pr-10"
+                      placeholder="••••••••"
+                      required
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Lock className="w-5 h-5" />
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <button 
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                    >
+                      {showConfirmPassword ? 
+                        <EyeOff className="h-5 w-5" /> : 
+                        <Eye className="h-5 w-5" />
+                      }
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <Button 
                 type="submit"
