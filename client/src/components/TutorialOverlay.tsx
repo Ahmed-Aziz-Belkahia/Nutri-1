@@ -11,19 +11,12 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
   const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
-    // Check if user just completed onboarding
-    const hasSeenTutorial = localStorage.getItem('hasSeenDashboardTutorial');
-    const justCompletedOnboarding = localStorage.getItem('justCompletedOnboarding');
-    
-    if (justCompletedOnboarding === 'true' && !hasSeenTutorial) {
-      setShowTutorial(true);
-      localStorage.removeItem('justCompletedOnboarding');
-    }
+    // For development: Always show tutorial when entering dashboard
+    setShowTutorial(true);
   }, []);
 
   const handleClose = () => {
     setShowTutorial(false);
-    localStorage.setItem('hasSeenDashboardTutorial', 'true');
     onComplete?.();
   };
 
