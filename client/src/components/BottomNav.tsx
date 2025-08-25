@@ -115,48 +115,24 @@ export default function BottomNav() {
                 );
               })}
 
-              {/* Camera Button */}
+              {/* Add Button */}
               <Link href="/add-food">
                 <motion.div
                   className={`
-                    relative flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl overflow-hidden
+                    relative flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl
                     transition-all duration-300
                     ${location === "/add-food"
                       ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg' 
-                      : 'bg-black'
+                      : 'bg-gradient-to-r from-cyan-500 to-cyan-600'
                     }
                   `}
                   whileTap={{ scale: 0.9 }}
                   data-testid="add-food-button"
                   data-tutorial="add-food-button"
                 >
-                  {location === "/add-food" ? (
-                    <span className="text-white text-2xl font-light">×</span>
-                  ) : (
-                    <div className="relative w-full h-full flex items-center justify-center">
-                      {/* Camera viewfinder background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black"></div>
-                      
-                      {/* Square viewfinder frame with corners */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {/* Main square frame */}
-                        <div className="w-7 h-7 border border-white/40 rounded-[2px]"></div>
-                        
-                        {/* Corner brackets for focus */}
-                        <div className="absolute w-9 h-9">
-                          <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-white rounded-tl-sm"></div>
-                          <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-white rounded-tr-sm"></div>
-                          <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-white rounded-bl-sm"></div>
-                          <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-white rounded-br-sm"></div>
-                        </div>
-                      </div>
-                      
-                      {/* Camera capture circle button */}
-                      <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2">
-                        <div className="w-2.5 h-2.5 rounded-full bg-white/20 border border-white"></div>
-                      </div>
-                    </div>
-                  )}
+                  <span className="text-white text-2xl font-light">
+                    {location === "/add-food" ? '×' : '+'}
+                  </span>
                 </motion.div>
               </Link>
             </div>
