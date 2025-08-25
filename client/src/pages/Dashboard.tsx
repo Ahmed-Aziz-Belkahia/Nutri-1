@@ -844,7 +844,8 @@ export default function Dashboard() {
 
 
       </div>
-      <TutorialOverlay />
+      {/* Tutorial overlay disabled */}
+      {/* <TutorialOverlay /> */}
     </div>
   );
 }
