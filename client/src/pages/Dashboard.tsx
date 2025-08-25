@@ -509,100 +509,230 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
+          {/* Revamped Calories Section */}
           <motion.div variants={itemVariants}>
-            <Card
-              className={`mt-4 overflow-hidden border-none shadow-md rounded-3xl transition-colors duration-500 ${
-                todayTotals.calories >= calorieGoal
-                  ? 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2]'
-                  : 'bg-white'
-              }`}
-            >
-              <div className="flex flex-col p-5">
-                {/* Top row with calorie info and percentage */}
-                <div className="flex justify-between items-center mb-6">
-                  <div className="flex items-baseline">
-                    <div>
-                      <div className="flex items-baseline">
-                        {todayTotals.calories >= calorieGoal ? (
-                          <span className="text-3xl font-extrabold text-white">{formatNumber(todayTotals.calories)}</span>
-                        ) : (
-                          <span className="text-3xl font-extrabold bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent">
-                            {formatNumber(todayTotals.calories)}
-                          </span>
-                        )}
-                        <span className={`ml-1 text-sm font-medium ${
-                          todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                        }`}>kcal</span>
-                      </div>
-                      <div className={`text-xs ${
-                        todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                      }`}>of {formatNumber(calorieGoal)} kcal goal</div>
+            <Card className="mt-4 overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-br from-[#09b7b3] to-[#0295c2] rounded-xl">
+                      <Flame className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800">{t('nutrition.calories')}</h2>
+                  </div>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      todayTotals.calories >= calorieGoal
+                        ? 'bg-green-100 text-green-700'
+                        : todayTotals.calories >= calorieGoal * 0.8
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {todayTotals.calories >= calorieGoal ? '🎯 Goal Reached!' : 
+                     todayTotals.calories >= calorieGoal * 0.8 ? '🔥 Almost There!' : 
+                     '💪 Keep Going!'}
+                  </motion.div>
+                </div>
+
+                {/* Main Calorie Display with Circular Progress */}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex-1">
+                    <div className="flex items-baseline gap-2 mb-2">
+                      <motion.span
+                        key={todayTotals.calories}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-4xl font-bold bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent"
+                      >
+                        {formatNumber(todayTotals.calories)}
+                      </motion.span>
+                      <span className="text-gray-500 font-medium">kcal</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      of <span className="font-semibold">{formatNumber(calorieGoal)}</span> daily goal
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {calorieGoal - todayTotals.calories > 0 ? (
+                        <span className="text-[#09b7b3] font-semibold">
+                          {formatNumber(calorieGoal - todayTotals.calories)} kcal remaining
+                        </span>
+                      ) : (
+                        <span className="text-orange-500 font-semibold">
+                          {formatNumber(todayTotals.calories - calorieGoal)} kcal over goal
+                        </span>
+                      )}
                     </div>
                   </div>
-                  
+
+                  {/* Circular Progress Indicator */}
                   <div className="relative">
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'border-[3px] border-white'
-                        : 'border-[3px] border-[#09b7b3]'
-                    }`}>
-                      <span className={`text-xl font-bold ${
-                        todayTotals.calories >= calorieGoal
-                          ? 'text-white'
-                          : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent'
-                      }`}>{caloriePercentage}%</span>
+                    <svg className="w-32 h-32 transform -rotate-90">
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        stroke="#e5e7eb"
+                        strokeWidth="12"
+                        fill="none"
+                      />
+                      <motion.circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        stroke="url(#calorieGradient)"
+                        strokeWidth="12"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 56}`}
+                        initial={{ strokeDashoffset: 2 * Math.PI * 56 }}
+                        animate={{ 
+                          strokeDashoffset: 2 * Math.PI * 56 * (1 - Math.min(caloriePercentage / 100, 1))
+                        }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                      />
+                      <defs>
+                        <linearGradient id="calorieGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#09b7b3" />
+                          <stop offset="100%" stopColor="#0295c2" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <motion.span
+                        key={actualCaloriePercentage}
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                        className="text-2xl font-bold text-gray-800"
+                      >
+                        {actualCaloriePercentage}%
+                      </motion.span>
+                      <span className="text-xs text-gray-500">consumed</span>
                     </div>
                   </div>
                 </div>
-                
-                {/* Bottom row with macros */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-full h-2 rounded-full mb-2.5 ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'bg-white'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2]'
-                    }`}></div>
-                    <span className={`text-lg font-bold ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'text-white'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent'
-                    }`}>{formatNumber(todayTotals.carbs)}g</span>
-                    <span className={`text-xs font-medium ${
-                      todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>{t('nutrition.carbs').toUpperCase()}</span>
+
+                {/* Macronutrients Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-semibold text-gray-700">Macronutrients</h3>
+                    <Link href="/nutrition">
+                      <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
+                        View Details
+                        <ChevronRight className="h-3 w-3" />
+                      </button>
+                    </Link>
                   </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className={`w-full h-2 rounded-full mb-2.5 ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'bg-white/50'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2] opacity-50'
-                    }`}></div>
-                    <span className={`text-lg font-bold ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'text-white'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent'
-                    }`}>{formatNumber(todayTotals.protein)}g</span>
-                    <span className={`text-xs font-medium ${
-                      todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>{t('nutrition.protein').toUpperCase()}</span>
+
+                  {/* Carbs */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <span className="text-sm font-medium text-gray-700">{t('nutrition.carbs')}</span>
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-semibold text-gray-800">
+                          {formatNumber(todayTotals.carbs)}g
+                        </span>
+                        <span className="text-xs text-gray-500">/ {profile?.carbsGoal || 250}g</span>
+                      </div>
+                    </div>
+                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ 
+                          width: `${Math.min((todayTotals.carbs / (profile?.carbsGoal || 250)) * 100, 100)}%` 
+                        }}
+                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
+                      />
+                    </div>
                   </div>
-                  
-                  <div className="flex flex-col items-center">
-                    <div className={`w-full h-2 rounded-full mb-2.5 ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'bg-white'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2]'
-                    }`}></div>
-                    <span className={`text-lg font-bold ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'text-white'
-                        : 'bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent'
-                    }`}>{formatNumber(todayTotals.fat)}g</span>
-                    <span className={`text-xs font-medium ${
-                      todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>{t('nutrition.fat').toUpperCase()}</span>
+
+                  {/* Protein */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <span className="text-sm font-medium text-gray-700">{t('nutrition.protein')}</span>
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-semibold text-gray-800">
+                          {formatNumber(todayTotals.protein)}g
+                        </span>
+                        <span className="text-xs text-gray-500">/ {profile?.proteinGoal || 150}g</span>
+                      </div>
+                    </div>
+                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ 
+                          width: `${Math.min((todayTotals.protein / (profile?.proteinGoal || 150)) * 100, 100)}%` 
+                        }}
+                        transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Fat */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                        <span className="text-sm font-medium text-gray-700">{t('nutrition.fat')}</span>
+                      </div>
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-sm font-semibold text-gray-800">
+                          {formatNumber(todayTotals.fat)}g
+                        </span>
+                        <span className="text-xs text-gray-500">/ {profile?.fatGoal || 65}g</span>
+                      </div>
+                    </div>
+                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ 
+                          width: `${Math.min((todayTotals.fat / (profile?.fatGoal || 65)) * 100, 100)}%` 
+                        }}
+                        transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-1">Meals Logged</div>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {foodLogs?.length || 0}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-1">Avg per Meal</div>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {foodLogs?.length > 0 
+                          ? formatNumber(todayTotals.calories / foodLogs.length)
+                          : '0'
+                        }
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-1">Status</div>
+                      <div className="text-lg">
+                        {todayTotals.calories >= calorieGoal ? '✅' : 
+                         todayTotals.calories >= calorieGoal * 0.5 ? '⏳' : '🚀'}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
