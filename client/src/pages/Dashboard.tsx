@@ -813,7 +813,7 @@ export default function Dashboard() {
                   {/* Camera preview interface */}
                   <div 
                     onClick={() => setLocation('/add-food')}
-                    className="relative w-48 h-48 bg-black rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all"
+                    className="relative w-64 h-40 bg-black rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all"
                   >
                     {/* Camera preview background */}
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-90" />
@@ -827,27 +827,13 @@ export default function Dashboard() {
                     
                     {/* Center focus square */}
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-16 h-16 border-2 border-white/50 rounded-lg animate-pulse" />
+                      <div className="w-16 h-12 border-2 border-white/50 rounded animate-pulse" />
                       <div className="absolute inset-2 border border-white/30 rounded" />
-                    </div>
-                    
-                    {/* Camera capture circle button */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                      <div className="w-12 h-12 rounded-full border-4 border-white bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-white" />
-                      </div>
                     </div>
                     
                     {/* Camera icon overlay */}
                     <div className="absolute top-4 right-4">
                       <Camera className="h-5 w-5 text-white/70" />
-                    </div>
-                    
-                    {/* Tap to capture text */}
-                    <div className="absolute top-4 left-4 right-4">
-                      <p className="text-white/70 text-xs text-center font-medium">
-                        {t('dashboard.tapToCapture', 'Tap to capture')}
-                      </p>
                     </div>
                   </div>
                 </motion.div>
