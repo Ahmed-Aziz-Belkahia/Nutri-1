@@ -810,14 +810,46 @@ export default function Dashboard() {
                   transition={{ delay: 0.2 }}
                   className="flex justify-center"
                 >
-                  <Button
+                  {/* Camera preview interface */}
+                  <div 
                     onClick={() => setLocation('/add-food')}
-                    className="bg-[#0CC5BA] hover:bg-[#0CC5BA]/90 text-white px-6 py-2.5 rounded-full shadow-md font-medium"
-                    data-tutorial="log-food-button"
+                    className="relative w-48 h-48 bg-black rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('dashboard.logFood', 'Log Food')}
-                  </Button>
+                    {/* Camera preview background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-90" />
+                    
+                    {/* Grid lines for camera viewfinder */}
+                    <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
+                      {[...Array(9)].map((_, i) => (
+                        <div key={i} className="border border-white/10" />
+                      ))}
+                    </div>
+                    
+                    {/* Center focus square */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="w-16 h-16 border-2 border-white/50 rounded-lg animate-pulse" />
+                      <div className="absolute inset-2 border border-white/30 rounded" />
+                    </div>
+                    
+                    {/* Camera capture circle button */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                      <div className="w-12 h-12 rounded-full border-4 border-white bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-white" />
+                      </div>
+                    </div>
+                    
+                    {/* Camera icon overlay */}
+                    <div className="absolute top-4 right-4">
+                      <Camera className="h-5 w-5 text-white/70" />
+                    </div>
+                    
+                    {/* Tap to capture text */}
+                    <div className="absolute top-4 left-4 right-4">
+                      <p className="text-white/70 text-xs text-center font-medium">
+                        {t('dashboard.tapToCapture', 'Tap to capture')}
+                      </p>
+                    </div>
+                  </div>
                 </motion.div>
               </motion.div>
             )}
