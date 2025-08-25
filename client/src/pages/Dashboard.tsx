@@ -368,25 +368,14 @@ export default function Dashboard() {
   };
 
 
-  if (isLoadingLogs) {
-    return (
-      <motion.div
-        className="min-h-screen flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <Loader2 className="h-8 w-8 animate-spin text-[#0CC5BA]" />
-      </motion.div>
-    );
-  }
+  // Don't show full-screen loading - keep UI visible while fetching data
 
   const username = user?.email ? getUsername(user.email) : 'there';
   const todayTotals = {
-    calories: foodLogs.reduce((sum, log) => sum + calculateTotal(log.name, log.calories), 0),
-    protein: foodLogs.reduce((sum, log) => sum + calculateTotal(log.name, log.protein), 0),
-    carbs: foodLogs.reduce((sum, log) => sum + calculateTotal(log.name, log.carbs), 0),
-    fat: foodLogs.reduce((sum, log) => sum + calculateTotal(log.name, log.fat), 0)
+    calories: foodLogs?.reduce((sum, log) => sum + calculateTotal(log.name, log.calories), 0) || 0,
+    protein: foodLogs?.reduce((sum, log) => sum + calculateTotal(log.name, log.protein), 0) || 0,
+    carbs: foodLogs?.reduce((sum, log) => sum + calculateTotal(log.name, log.carbs), 0) || 0,
+    fat: foodLogs?.reduce((sum, log) => sum + calculateTotal(log.name, log.fat), 0) || 0
   };
   // Calculate the actual percentage (can exceed 100%)
   const actualCaloriePercentage = Math.round((Number(todayTotals.calories || 0) / calorieGoal) * 100);
@@ -492,8 +481,13 @@ export default function Dashboard() {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="mt-4 bg-white rounded-2xl shadow-md overflow-hidden"
+            className="mt-4 bg-white rounded-2xl shadow-md overflow-hidden relative"
           >
+            {isLoadingLogs && (
+              <div className="absolute top-2 right-2 z-10">
+                <Loader2 className="h-4 w-4 animate-spin text-[#0CC5BA]" />
+              </div>
+            )}
             <div className="grid grid-cols-7 gap-0 p-0.5">
               {days.map((day, index) => (
                 <motion.div
