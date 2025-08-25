@@ -55,19 +55,16 @@ export default function BottomNav() {
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-t border-white/20 shadow-xl"
       style={{ 
-        position: 'fixed',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
-      <div className="relative mx-3 mb-0">
-        {/* Main navbar container with glassmorphism */}
-        <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
-          
-          <div className="relative px-2 py-2">
-            <div className="flex justify-around items-center">
+      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
+      
+      <div className="relative">
+        <div className="px-4 py-3">
+          <div className="flex justify-around items-center">
               {/* Navigation Items */}
               {navItems.map((item) => {
                 const isItemActive = isActive(item.path);
@@ -115,54 +112,42 @@ export default function BottomNav() {
               })}
 
               {/* Add Button */}
-              <div className="relative">
-                <Link href="/add-food">
+              <Link href="/add-food">
+                <motion.div
+                  className={`
+                    relative flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl
+                    transition-all duration-300
+                    ${location === "/add-food"
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg' 
+                      : 'bg-gray-100 dark:bg-gray-800'
+                    }
+                  `}
+                  whileTap={{ scale: 0.9 }}
+                  data-testid="add-food-button"
+                  data-tutorial="add-food-button"
+                >
+                  {/* Add icon */}
                   <motion.div
-                    className={`
-                      absolute flex items-center justify-center cursor-pointer w-16 h-16 rounded-xl
-                      transition-all duration-300
-                      ${location === "/add-food"
-                        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-lg' 
-                        : ''
-                      }
-                    `}
-                    style={{
-                      bottom: '-18px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
+                    className="relative flex items-center justify-center"
+                    animate={{
+                      rotate: location === "/add-food" ? 45 : 0,
                     }}
-                    whileTap={{ scale: 0.9 }}
-                    data-testid="add-food-button"
-                    data-tutorial="add-food-button"
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 25
+                    }}
                   >
-                    {/* Add icon */}
-                    <motion.div
-                      className="relative flex items-center justify-center"
-                      animate={{
-                        scale: location === "/add-food" ? 1.15 : 1,
-                        rotate: location === "/add-food" ? 45 : 0,
-                      }}
-                      transition={{ 
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 25
-                      }}
-                    >
-                      <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 bg-white/90 dark:bg-white/90 backdrop-blur-lg border border-white/30 relative">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
-                        {location === "/add-food" ? (
-                          <span className="text-gray-700 text-3xl font-light relative z-10">×</span>
-                        ) : (
-                          <IoAddCircleOutline className="w-8 h-8 text-gray-700 relative z-10" />
-                        )}
-                      </div>
-                    </motion.div>
+                    {location === "/add-food" ? (
+                      <span className="text-white text-2xl font-light">×</span>
+                    ) : (
+                      <IoAddCircleOutline className={`w-6 h-6 ${location === "/add-food" ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                    )}
                   </motion.div>
-                </Link>
-              </div>
+                </motion.div>
+              </Link>
             </div>
           </div>
-        </div>
       </div>
     </nav>
   );

@@ -846,6 +846,8 @@ export default function Dashboard() {
       </div>
       {/* Tutorial overlay disabled */}
       {/* <TutorialOverlay /> */}
+      {/* Bottom padding for fixed navigation */}
+      <div className="h-20"></div>
     </div>
   );
 }
