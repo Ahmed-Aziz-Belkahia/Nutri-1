@@ -61,6 +61,10 @@ export default function BottomNav() {
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
+      {/* Background that extends to bottom of screen */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-white" style={{ 
+        bottom: 'calc(-1 * env(safe-area-inset-bottom) - 50px)'
+      }} />
       <div className="relative mx-3 mb-2">
         {/* Main navbar container with glassmorphism */}
         <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
