@@ -1205,31 +1205,195 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 6: Activity Level */}
+                {/* Step 6: Activity Level - Interactive Slider */}
                 {step === 6 && (
-                  <div className="space-y-6">
-                    {/* Activity Level Buttons */}
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { value: 'sedentary', label: 'Sedentary' },
-                        { value: 'light', label: 'Lightly Active' },
-                        { value: 'moderate', label: 'Moderate' },
-                        { value: 'active', label: 'Very Active' }
-                      ].map((activity) => (
-                        <motion.button
-                          key={activity.value}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
-                          className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-                            formData.activityLevel === activity.value
-                              ? 'bg-purple-600 text-white border-purple-600 shadow-lg'
-                              : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'
-                          }`}
-                        >
-                          <div className="font-medium">{activity.label}</div>
-                        </motion.button>
-                      ))}
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-pink-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Activity Level Display */}
+                        <div className="flex flex-col items-center mb-8">
+                          <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
+                            <div className="text-4xl mb-2">
+                              {(() => {
+                                const icons = {
+                                  sedentary: '🪑',
+                                  light: '🚶',
+                                  moderate: '🏃',
+                                  active: '💪',
+                                  very_active: '🔥'
+                                };
+                                return icons[formData.activityLevel as keyof typeof icons] || '🚶';
+                              })()}
+                            </div>
+                            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                              {(() => {
+                                const labels = {
+                                  sedentary: 'Sedentary',
+                                  light: 'Lightly Active',
+                                  moderate: 'Moderate',
+                                  active: 'Active',
+                                  very_active: 'Very Active'
+                                };
+                                return labels[formData.activityLevel as keyof typeof labels] || 'Select Activity';
+                              })()}
+                            </div>
+                          </div>
+                          <p className="text-gray-600 text-center text-sm max-w-xs">
+                            {(() => {
+                              const descriptions = {
+                                sedentary: 'Little to no exercise, desk job',
+                                light: 'Light exercise 1-3 days/week',
+                                moderate: 'Moderate exercise 3-5 days/week',
+                                active: 'Heavy exercise 6-7 days/week',
+                                very_active: 'Very heavy physical job or training'
+                              };
+                              return descriptions[formData.activityLevel as keyof typeof descriptions] || 'Move the slider to select your activity level';
+                            })()}
+                          </p>
+                        </div>
+                        
+                        {/* Interactive Activity Slider */}
+                        <div className="relative mb-8">
+                          {/* Gradient background track */}
+                          <div className="absolute inset-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-200/30 via-purple-200/30 to-pink-200/30 rounded-full"></div>
+                          
+                          {/* Main slider */}
+                          <input
+                            type="range"
+                            min="0"
+                            max="4"
+                            step="1"
+                            value={(() => {
+                              const levelMap: Record<string, number> = {
+                                sedentary: 0,
+                                light: 1,
+                                moderate: 2,
+                                active: 3,
+                                very_active: 4
+                              };
+                              return levelMap[formData.activityLevel] ?? 1;
+                            })()}
+                            onChange={(e) => {
+                              const levels = ['sedentary', 'light', 'moderate', 'active', 'very_active'];
+                              setFormData(prev => ({ 
+                                ...prev, 
+                                activityLevel: levels[parseInt(e.target.value)] 
+                              }));
+                            }}
+                            className="relative w-full h-4 bg-transparent rounded-full outline-none appearance-none cursor-pointer z-10"
+                            style={{
+                              background: 'transparent'
+                            }}
+                          />
+                          
+                          {/* Slider markers */}
+                          <div className="absolute inset-0 flex justify-between items-center pointer-events-none">
+                            {['🪑', '🚶', '🏃', '💪', '🔥'].map((icon, index) => (
+                              <div
+                                key={index}
+                                className={`flex flex-col items-center transition-all duration-300 ${
+                                  (() => {
+                                    const levelMap: Record<string, number> = {
+                                      sedentary: 0,
+                                      light: 1,
+                                      moderate: 2,
+                                      active: 3,
+                                      very_active: 4
+                                    };
+                                    return levelMap[formData.activityLevel] === index;
+                                  })() ? 'scale-125' : 'scale-100 opacity-60'
+                                }`}
+                              >
+                                <div className="w-3 h-3 bg-white/80 rounded-full shadow-sm mb-2"></div>
+                                <div className="text-xl">{icon}</div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <style>{`
+                            input[type="range"]::-webkit-slider-thumb {
+                              appearance: none;
+                              width: 32px;
+                              height: 32px;
+                              background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                              border: 4px solid rgba(255, 255, 255, 0.9);
+                              border-radius: 50%;
+                              cursor: pointer;
+                              box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                              transition: all 0.3s ease;
+                            }
+                            input[type="range"]::-webkit-slider-thumb:hover {
+                              transform: scale(1.2);
+                              box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+                            }
+                            input[type="range"]::-moz-range-thumb {
+                              width: 32px;
+                              height: 32px;
+                              background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                              border: 4px solid rgba(255, 255, 255, 0.9);
+                              border-radius: 50%;
+                              cursor: pointer;
+                              box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                              transition: all 0.3s ease;
+                            }
+                            input[type="range"]::-moz-range-thumb:hover {
+                              transform: scale(1.2);
+                              box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+                            }
+                          `}</style>
+                        </div>
+                        
+                        {/* Activity Level Cards */}
+                        <div className="grid grid-cols-5 gap-2 mt-8">
+                          {[
+                            { value: 'sedentary', label: 'Sedentary', days: '0 days' },
+                            { value: 'light', label: 'Light', days: '1-3 days' },
+                            { value: 'moderate', label: 'Moderate', days: '3-5 days' },
+                            { value: 'active', label: 'Active', days: '6-7 days' },
+                            { value: 'very_active', label: 'Very Active', days: 'Daily+' }
+                          ].map((activity) => (
+                            <motion.button
+                              key={activity.value}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
+                              className={`backdrop-blur-sm p-3 rounded-xl border transition-all duration-300 ${
+                                formData.activityLevel === activity.value
+                                  ? 'bg-gradient-to-b from-purple-500/80 to-pink-500/80 text-white border-white/40 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                              }`}
+                            >
+                              <div className="text-xs font-semibold">{activity.label}</div>
+                              <div className="text-xs opacity-80 mt-1">{activity.days}</div>
+                            </motion.button>
+                          ))}
+                        </div>
+                        
+                        {/* Calorie Multiplier Display */}
+                        <div className="mt-6 text-center">
+                          <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3 inline-block">
+                            <span className="text-sm text-gray-600">Calorie Multiplier: </span>
+                            <span className="font-bold text-purple-600">
+                              ×{(() => {
+                                const multipliers = {
+                                  sedentary: '1.2',
+                                  light: '1.375',
+                                  moderate: '1.55',
+                                  active: '1.725',
+                                  very_active: '1.9'
+                                };
+                                return multipliers[formData.activityLevel as keyof typeof multipliers] || '1.2';
+                              })()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
