@@ -61,7 +61,7 @@ export default function BottomNav() {
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
-      <div className="relative mx-3 mb-2">
+      <div className="relative mx-3 mb-0">
         {/* Main navbar container with glassmorphism */}
         <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
           <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
