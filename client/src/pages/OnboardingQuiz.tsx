@@ -1216,46 +1216,11 @@ export default function OnboardingQuiz() {
                       
                       {/* Main glassmorphic card */}
                       <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
-                        {/* Activity Level Display */}
-                        <div className="flex flex-col items-center mb-8">
-                          <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
-                            <div className="text-4xl mb-2 flex items-center justify-center">
-                              {(() => {
-                                const icons = {
-                                  sedentary: '🪑',
-                                  moderate: '🏃',
-                                  active: '💪'
-                                };
-                                return icons[formData.activityLevel as keyof typeof icons] || '🏃';
-                              })()}
-                            </div>
-                            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                              {(() => {
-                                const labels = {
-                                  sedentary: 'Low Activity',
-                                  moderate: 'Moderate Activity',
-                                  active: 'High Activity'
-                                };
-                                return labels[formData.activityLevel as keyof typeof labels] || 'Select Activity';
-                              })()}
-                            </div>
-                          </div>
-                          <p className="text-gray-600 text-center text-sm max-w-xs">
-                            {(() => {
-                              const descriptions = {
-                                sedentary: 'Little to no exercise, mostly sedentary',
-                                moderate: 'Regular exercise 3-5 days per week',
-                                active: 'Daily intense exercise or physical job'
-                              };
-                              return descriptions[formData.activityLevel as keyof typeof descriptions] || 'Move the slider to select your activity level';
-                            })()}
-                          </p>
-                        </div>
                         
                         {/* Interactive Activity Slider */}
-                        <div className="relative mb-8 px-8">
+                        <div className="relative mb-8 px-8 py-8">
                           {/* Gradient background track */}
-                          <div className="absolute inset-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-200/30 via-purple-200/30 to-pink-200/30 rounded-full"></div>
+                          <div className="absolute inset-x-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-200/30 via-purple-200/30 to-pink-200/30 rounded-full"></div>
                           
                           {/* Main slider */}
                           <input
@@ -1283,28 +1248,6 @@ export default function OnboardingQuiz() {
                               background: 'transparent'
                             }}
                           />
-                          
-                          {/* Slider markers with centered emojis */}
-                          <div className="absolute inset-0 flex justify-between items-center pointer-events-none">
-                            {['🪑', '🏃', '💪'].map((icon, index) => (
-                              <div
-                                key={index}
-                                className={`flex flex-col items-center justify-center transition-all duration-300 ${
-                                  (() => {
-                                    const levelMap: Record<string, number> = {
-                                      sedentary: 0,
-                                      moderate: 1,
-                                      active: 2
-                                    };
-                                    return levelMap[formData.activityLevel] === index;
-                                  })() ? 'scale-125' : 'scale-100 opacity-60'
-                                }`}
-                              >
-                                <div className="w-3 h-3 bg-white/80 rounded-full shadow-sm mb-2"></div>
-                                <div className="text-2xl flex items-center justify-center">{icon}</div>
-                              </div>
-                            ))}
-                          </div>
                           
                           <style>{`
                             input[type="range"]::-webkit-slider-thumb {
