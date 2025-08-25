@@ -810,32 +810,14 @@ export default function Dashboard() {
                   transition={{ delay: 0.2 }}
                   className="flex justify-center"
                 >
-                  {/* Camera preview interface */}
-                  <div 
+                  <Button
                     onClick={() => setLocation('/add-food')}
-                    className="relative w-64 h-40 bg-black rounded-xl overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all"
+                    className="bg-[#0CC5BA] hover:bg-[#0CC5BA]/90 text-white px-6 py-2.5 rounded-full shadow-md font-medium"
+                    data-tutorial="log-food-button"
                   >
-                    {/* Camera preview background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 to-black opacity-90" />
-                    
-                    {/* Grid lines for camera viewfinder */}
-                    <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
-                      {[...Array(9)].map((_, i) => (
-                        <div key={i} className="border border-white/10" />
-                      ))}
-                    </div>
-                    
-                    {/* Center focus square */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-16 h-12 border-2 border-white/50 rounded animate-pulse" />
-                      <div className="absolute inset-2 border border-white/30 rounded" />
-                    </div>
-                    
-                    {/* Camera icon overlay */}
-                    <div className="absolute top-4 right-4">
-                      <Camera className="h-5 w-5 text-white/70" />
-                    </div>
-                  </div>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t('dashboard.logFood', 'Log Food')}
+                  </Button>
                 </motion.div>
               </motion.div>
             )}
