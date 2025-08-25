@@ -1515,7 +1515,7 @@ export default function OnboardingQuiz() {
                               <div className="flex items-center justify-between">
                                 <div>
                                   <div className="text-sm text-gray-600">Current</div>
-                                  <div className="text-xl font-bold text-gray-800">{formData.currentWeight} kg</div>
+                                  <div className="text-xl font-bold text-gray-800">{formData.weight} kg</div>
                                 </div>
                                 <div className="flex-1 mx-6">
                                   <div className="relative h-2 bg-gray-200/50 rounded-full overflow-hidden">
