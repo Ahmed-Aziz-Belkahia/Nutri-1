@@ -1285,9 +1285,9 @@ export default function OnboardingQuiz() {
                         {/* Activity Level Cards - 3 options */}
                         <div className="grid grid-cols-3 gap-4 mt-8">
                           {[
-                            { value: 'sedentary', label: 'Low', days: '0-2 days/week', icon: '🪑' },
-                            { value: 'moderate', label: 'Moderate', days: '3-5 days/week', icon: '🏃' },
-                            { value: 'active', label: 'High', days: '6-7 days/week', icon: '💪' }
+                            { value: 'sedentary', label: 'Low', days: '0-2 days/week' },
+                            { value: 'moderate', label: 'Moderate', days: '3-5 days/week' },
+                            { value: 'active', label: 'High', days: '6-7 days/week' }
                           ].map((activity) => (
                             <motion.button
                               key={activity.value}
@@ -1300,9 +1300,8 @@ export default function OnboardingQuiz() {
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
                               }`}
                             >
-                              <div className="text-2xl mb-2 flex items-center justify-center">{activity.icon}</div>
-                              <div className="text-sm font-semibold">{activity.label}</div>
-                              <div className="text-xs opacity-80 mt-1">{activity.days}</div>
+                              <div className="text-lg font-semibold">{activity.label}</div>
+                              <div className="text-xs opacity-80 mt-2">{activity.days}</div>
                             </motion.button>
                           ))}
                         </div>
@@ -1311,10 +1310,7 @@ export default function OnboardingQuiz() {
                         <div className="mt-8">
                           <div className="backdrop-blur-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/30 shadow-xl">
                             <div className="flex items-center justify-between mb-4">
-                              <div className="flex items-center space-x-2">
-                                <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                                  <span className="text-white text-sm">🔥</span>
-                                </div>
+                              <div className="flex items-center">
                                 <h3 className="text-sm font-semibold text-gray-700">Daily Calorie Boost</h3>
                               </div>
                               <div className="backdrop-blur-md bg-white/60 rounded-full px-3 py-1">
@@ -1442,7 +1438,7 @@ export default function OnboardingQuiz() {
                             <div className="backdrop-blur-md bg-white/50 rounded-xl px-4 py-2 inline-block border border-white/30">
                               <p className="text-sm text-gray-600">
                                 {formData.profileImage ? (
-                                  <span className="text-green-600 font-medium">✓ Photo selected</span>
+                                  <span className="text-green-600 font-medium">Photo selected</span>
                                 ) : (
                                   'Optional - you can skip this step'
                                 )}
@@ -1453,18 +1449,17 @@ export default function OnboardingQuiz() {
                           {/* Benefits of adding photo */}
                           <div className="mt-8 grid grid-cols-3 gap-3">
                             {[
-                              { icon: '👤', text: 'Personalized', desc: 'Experience' },
-                              { icon: '🎯', text: 'Stay', desc: 'Motivated' },
-                              { icon: '📈', text: 'Track', desc: 'Progress' }
+                              { text: 'Personalized', desc: 'Experience' },
+                              { text: 'Stay', desc: 'Motivated' },
+                              { text: 'Track', desc: 'Progress' }
                             ].map((benefit, index) => (
                               <motion.div 
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: index * 0.1 }}
-                                className="backdrop-blur-sm bg-white/30 rounded-xl p-3 border border-white/20"
+                                className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/20"
                               >
-                                <div className="text-2xl mb-1">{benefit.icon}</div>
                                 <div className="text-xs font-semibold text-gray-700">{benefit.text}</div>
                                 <div className="text-xs text-gray-600">{benefit.desc}</div>
                               </motion.div>
