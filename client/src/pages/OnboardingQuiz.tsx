@@ -1226,73 +1226,8 @@ export default function OnboardingQuiz() {
                       {/* Main glassmorphic card */}
                       <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
                         
-                        {/* Interactive Activity Slider */}
-                        <div className="relative mb-8 px-8 py-8">
-                          {/* Gradient background track - Green theme */}
-                          <div className="absolute inset-x-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-green-200/30 via-emerald-200/30 to-teal-200/30 rounded-full"></div>
-                          
-                          {/* Main slider */}
-                          <input
-                            type="range"
-                            min="0"
-                            max="2"
-                            step="1"
-                            value={(() => {
-                              const levelMap: Record<string, number> = {
-                                sedentary: 0,
-                                moderate: 1,
-                                active: 2
-                              };
-                              return levelMap[formData.activityLevel] ?? 1;
-                            })()}
-                            onChange={(e) => {
-                              const levels = ['sedentary', 'moderate', 'active'];
-                              setFormData(prev => ({ 
-                                ...prev, 
-                                activityLevel: levels[parseInt(e.target.value)] 
-                              }));
-                            }}
-                            className="relative w-full h-4 bg-transparent rounded-full outline-none appearance-none cursor-pointer z-10"
-                            style={{
-                              background: 'transparent'
-                            }}
-                          />
-                          
-                          <style>{`
-                            input[type="range"]::-webkit-slider-thumb {
-                              appearance: none;
-                              width: 32px;
-                              height: 32px;
-                              background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-                              border: 4px solid rgba(255, 255, 255, 0.9);
-                              border-radius: 50%;
-                              cursor: pointer;
-                              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-                              transition: all 0.3s ease;
-                            }
-                            input[type="range"]::-webkit-slider-thumb:hover {
-                              transform: scale(1.2);
-                              box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-                            }
-                            input[type="range"]::-moz-range-thumb {
-                              width: 32px;
-                              height: 32px;
-                              background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-                              border: 4px solid rgba(255, 255, 255, 0.9);
-                              border-radius: 50%;
-                              cursor: pointer;
-                              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-                              transition: all 0.3s ease;
-                            }
-                            input[type="range"]::-moz-range-thumb:hover {
-                              transform: scale(1.2);
-                              box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-                            }
-                          `}</style>
-                        </div>
-                        
                         {/* Activity Level Cards - 3 options */}
-                        <div className="grid grid-cols-3 gap-4 mt-8">
+                        <div className="grid grid-cols-3 gap-4">
                           {[
                             { value: 'sedentary', label: 'Low', days: '0-2 days/week' },
                             { value: 'moderate', label: 'Moderate', days: '3-5 days/week' },
