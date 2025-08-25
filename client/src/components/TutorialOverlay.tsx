@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 
 interface TutorialOverlayProps {
   onComplete?: () => void;
@@ -68,18 +66,6 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
               }}
             />
           </motion.div>
-          
-          {/* Skip button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ delay: 0.5 }}
-            onClick={handleClose}
-            className="fixed top-4 right-4 z-[102] p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
-          >
-            <X className="w-6 h-6 text-white" />
-          </motion.button>
         </>
       )}
     </AnimatePresence>
