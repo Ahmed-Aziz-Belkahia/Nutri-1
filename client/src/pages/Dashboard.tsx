@@ -579,7 +579,7 @@ export default function Dashboard() {
                     }`}>{formatNumber(todayTotals.carbs)}g</span>
                     <span className={`text-xs font-medium ${
                       todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>WĘGLOWODANY</span>
+                    }`}>{t('nutrition.carbs').toUpperCase()}</span>
                   </div>
                   
                   <div className="flex flex-col items-center">
@@ -595,7 +595,7 @@ export default function Dashboard() {
                     }`}>{formatNumber(todayTotals.protein)}g</span>
                     <span className={`text-xs font-medium ${
                       todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>BIAŁKO</span>
+                    }`}>{t('nutrition.protein').toUpperCase()}</span>
                   </div>
                   
                   <div className="flex flex-col items-center">
@@ -611,7 +611,7 @@ export default function Dashboard() {
                     }`}>{formatNumber(todayTotals.fat)}g</span>
                     <span className={`text-xs font-medium ${
                       todayTotals.calories >= calorieGoal ? 'text-white/80' : 'text-gray-500'
-                    }`}>TŁUSZCZE</span>
+                    }`}>{t('nutrition.fat').toUpperCase()}</span>
                   </div>
                 </div>
               </div>
@@ -682,7 +682,7 @@ export default function Dashboard() {
                               
                               <div className="text-center text-white z-10">
                                 <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                <div className="text-sm font-medium">Analizowanie...</div>
+                                <div className="text-sm font-medium">{t('common.analyzing') || 'Analyzing...'}</div>
                               </div>
                             </div>
                           </div>
@@ -706,7 +706,7 @@ export default function Dashboard() {
                             {/* Animated progress bars for macros */}
                             <div className="space-y-2 text-xs text-gray-600">
                               <div className="flex justify-between items-center">
-                                <span>Kalorie:</span>
+                                <span>{t('nutrition.calories')}:</span>
                                 <div className="flex items-center">
                                   <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
                                     <div className="h-full bg-gradient-to-r from-orange-400 to-red-400 animate-pulse" style={{width: '60%'}} />
@@ -715,7 +715,7 @@ export default function Dashboard() {
                                 </div>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span>Białko:</span>
+                                <span>{t('nutrition.protein')}:</span>
                                 <div className="flex items-center">
                                   <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
                                     <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" style={{width: '40%', animationDelay: '0.2s'}} />

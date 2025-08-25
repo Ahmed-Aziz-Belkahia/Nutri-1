@@ -10,17 +10,17 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ onLanguageSelected, showTitle = true }: LanguageSelectorProps) {
   const { i18n } = useTranslation();
-  const [selectedLanguage, setSelectedLanguage] = useState('pl');
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
 
   useEffect(() => {
-    // Always set to Polish since it's the only option
-    setSelectedLanguage('pl');
-    i18n.changeLanguage('pl');
+    // Always set to English
+    setSelectedLanguage('en');
+    i18n.changeLanguage('en');
   }, [i18n]);
 
   useEffect(() => {
     if (onLanguageSelected) {
-      onLanguageSelected('pl');
+      onLanguageSelected('en');
     }
   }, [onLanguageSelected]);
 

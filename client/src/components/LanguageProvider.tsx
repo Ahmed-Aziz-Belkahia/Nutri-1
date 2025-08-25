@@ -11,12 +11,12 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
   const { i18n } = useTranslation();
 
   useEffect(() => {
-    // Always force Polish language
-    i18n.changeLanguage('pl').then(() => {
-      console.log('Language set to Polish');
-      document.documentElement.lang = 'pl';
+    // Always force English language
+    i18n.changeLanguage('en').then(() => {
+      console.log('Language set to English');
+      document.documentElement.lang = 'en';
     }).catch(err => {
-      console.error('Error setting Polish language:', err);
+      console.error('Error setting English language:', err);
     });
   }, [i18n]);
 

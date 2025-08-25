@@ -1,0 +1,10 @@
+{
+  "title": "Let's personalize your meal plans",
+  "subtitle": "Answer a few questions to get meal recommendations tailored just for you",
+  "steps": {
+    "diet": "Diet",
+    "budget": "Budget",
+    "skill": "Skill",
+    "preferences": "Preferences"
+  }
+}
