@@ -533,9 +533,9 @@ export default function Dashboard() {
                         : 'bg-gray-100 text-gray-600'
                     }`}
                   >
-                    {todayTotals.calories >= calorieGoal ? '🎯 Goal Reached!' : 
-                     todayTotals.calories >= calorieGoal * 0.8 ? '🔥 Almost There!' : 
-                     '💪 Keep Going!'}
+                    {todayTotals.calories >= calorieGoal ? 'Goal Reached' : 
+                     todayTotals.calories >= calorieGoal * 0.8 ? 'Almost There' : 
+                     'Keep Going'}
                   </motion.div>
                 </div>
 
@@ -728,9 +728,9 @@ export default function Dashboard() {
                     </div>
                     <div className="text-center">
                       <div className="text-xs text-gray-500 mb-1">Status</div>
-                      <div className="text-lg">
-                        {todayTotals.calories >= calorieGoal ? '✅' : 
-                         todayTotals.calories >= calorieGoal * 0.5 ? '⏳' : '🚀'}
+                      <div className="text-sm font-semibold text-gray-800">
+                        {todayTotals.calories >= calorieGoal ? 'Complete' : 
+                         todayTotals.calories >= calorieGoal * 0.5 ? 'In Progress' : 'Started'}
                       </div>
                     </div>
                   </div>
