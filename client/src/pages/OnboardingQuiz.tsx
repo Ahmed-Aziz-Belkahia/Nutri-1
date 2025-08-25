@@ -1552,54 +1552,7 @@ export default function OnboardingQuiz() {
                                   {/* Timeline Visualization - Revamped */}
                                   {formData.weightGoal !== 'maintain' && (
                                     <div className="backdrop-blur-md bg-gradient-to-br from-white/40 to-white/20 rounded-2xl p-6 border border-white/40 shadow-xl">
-                                      <h3 className="text-center text-lg font-semibold text-gray-700 mb-8">Your Success Journey</h3>
-                                      
-                                      {/* Visual Timeline Path */}
-                                      <div className="relative mb-8">
-                                        {/* Timeline Background Bar */}
-                                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-green-200 via-emerald-200 to-teal-200 rounded-full" />
-                                        
-                                        {/* Start Point */}
-                                        <motion.div 
-                                          initial={{ scale: 0 }}
-                                          animate={{ scale: 1 }}
-                                          transition={{ delay: 0.2, type: "spring" }}
-                                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
-                                        >
-                                          <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full shadow-lg ring-4 ring-white/50" />
-                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-gray-600 font-medium whitespace-nowrap">Today</div>
-                                        </motion.div>
-                                        
-                                        {/* End Point */}
-                                        <motion.div 
-                                          initial={{ scale: 0 }}
-                                          animate={{ scale: 1 }}
-                                          transition={{ delay: 0.6, type: "spring" }}
-                                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2"
-                                        >
-                                          <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full shadow-lg ring-4 ring-white/50 flex items-center justify-center">
-                                            <Star className="w-3 h-3 text-white" />
-                                          </div>
-                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-gray-600 font-medium whitespace-nowrap">Goal</div>
-                                        </motion.div>
-                                        
-                                        {/* Animated Progress Indicator */}
-                                        <motion.div 
-                                          initial={{ left: "0%" }}
-                                          animate={{ left: "70%" }}
-                                          transition={{ delay: 0.4, duration: 1.5, ease: "easeOut" }}
-                                          className="absolute top-1/2 -translate-y-1/2"
-                                        >
-                                          <motion.div
-                                            animate={{ scale: [1, 1.2, 1] }}
-                                            transition={{ duration: 2, repeat: Infinity }}
-                                            className="w-3 h-3 bg-white rounded-full shadow-md"
-                                          />
-                                        </motion.div>
-                                        
-                                        {/* Invisible height spacer */}
-                                        <div className="h-12" />
-                                      </div>
+                                      <h3 className="text-center text-lg font-semibold text-gray-700 mb-6">Your Success Journey</h3>
                                       
                                       {/* Time Display Cards - Redesigned */}
                                       <div className="grid grid-cols-3 gap-3 mb-6">
