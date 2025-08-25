@@ -1371,41 +1371,107 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 7: Profile Picture */}
+                {/* Step 7: Profile Picture - Green Glassmorphism */}
                 {step === 7 && (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <div className="mx-auto w-32 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-full flex items-center justify-center border-4 border-dashed border-purple-300 mb-4">
-                        {formData.profileImage ? (
-                          <img 
-                            src={URL.createObjectURL(formData.profileImage)} 
-                            alt="Profile" 
-                            className="w-full h-full rounded-full object-cover"
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements - Green theme */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        <div className="text-center">
+                          {/* Profile Picture Container */}
+                          <div className="mx-auto h-40 w-40 relative mb-6">
+                            {/* Gradient border effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full p-1">
+                              <div className="h-full w-full bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center overflow-hidden">
+                                {formData.profileImage ? (
+                                  <img 
+                                    src={URL.createObjectURL(formData.profileImage)} 
+                                    alt="Profile" 
+                                    className="w-full h-full rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center">
+                                    <User className="w-16 h-16 text-green-500 mb-2" />
+                                    <span className="text-xs text-gray-600">No photo yet</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Decorative dots */}
+                            <div className="absolute -top-2 -right-2 w-4 h-4 bg-gradient-to-br from-green-400 to-emerald-400 rounded-full animate-pulse"></div>
+                            <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-gradient-to-br from-emerald-400 to-green-400 rounded-full animate-pulse delay-75"></div>
+                          </div>
+                          
+                          {/* File input */}
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setFormData(prev => ({ ...prev, profileImage: file }));
+                              }
+                            }}
+                            className="hidden"
+                            id="profile-image"
                           />
-                        ) : (
-                          <User className="w-12 h-12 text-purple-400" />
-                        )}
+                          
+                          {/* Upload button with glassmorphism */}
+                          <Label
+                            htmlFor="profile-image"
+                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white rounded-xl hover:from-green-600/80 hover:to-emerald-600/80 cursor-pointer transition-all duration-300 backdrop-blur-md border border-white/30 shadow-lg"
+                          >
+                            <Camera className="w-5 h-5 mr-2" />
+                            <span className="font-semibold">
+                              {formData.profileImage ? 'Change Photo' : 'Choose Photo'}
+                            </span>
+                          </Label>
+                          
+                          {/* Status indicator */}
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="mt-4"
+                          >
+                            <div className="backdrop-blur-md bg-white/50 rounded-xl px-4 py-2 inline-block border border-white/30">
+                              <p className="text-sm text-gray-600">
+                                {formData.profileImage ? (
+                                  <span className="text-green-600 font-medium">✓ Photo selected</span>
+                                ) : (
+                                  'Optional - you can skip this step'
+                                )}
+                              </p>
+                            </div>
+                          </motion.div>
+                          
+                          {/* Benefits of adding photo */}
+                          <div className="mt-8 grid grid-cols-3 gap-3">
+                            {[
+                              { icon: '👤', text: 'Personalized', desc: 'Experience' },
+                              { icon: '🎯', text: 'Stay', desc: 'Motivated' },
+                              { icon: '📈', text: 'Track', desc: 'Progress' }
+                            ].map((benefit, index) => (
+                              <motion.div 
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className="backdrop-blur-sm bg-white/30 rounded-xl p-3 border border-white/20"
+                              >
+                                <div className="text-2xl mb-1">{benefit.icon}</div>
+                                <div className="text-xs font-semibold text-gray-700">{benefit.text}</div>
+                                <div className="text-xs text-gray-600">{benefit.desc}</div>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setFormData(prev => ({ ...prev, profileImage: file }));
-                          }
-                        }}
-                        className="hidden"
-                        id="profile-image"
-                      />
-                      <Label
-                        htmlFor="profile-image"
-                        className="inline-flex items-center px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 cursor-pointer transition-colors"
-                      >
-                        <Camera className="w-4 h-4 mr-2" />
-                        Choose Photo
-                      </Label>
-                      <p className="text-sm text-gray-500 mt-2">Optional - you can skip this step</p>
                     </div>
                   </div>
                 )}
