@@ -53,18 +53,17 @@ export default function BottomNav() {
     return location === path;
   };
 
-  // Calculate position for the bump - adjusted for 4 items with equal spacing
+  // Calculate position for the bump
   const getBumpPosition = () => {
     const homeActive = isActive("/dashboard");
     const recipesActive = isActive("/recipes");
     const progressActive = isActive("/progress");
     const addActive = location === "/add-food";
     
-    // Positions for 4 items with justify-around
-    if (homeActive) return "12.5%";     // First item
-    if (recipesActive) return "37.5%";   // Second item
-    if (progressActive) return "62.5%";  // Third item
-    if (addActive) return "87.5%";       // Fourth item
+    if (homeActive) return "25%";
+    if (recipesActive) return "41.66%";
+    if (progressActive) return "58.33%";
+    if (addActive) return "75%";
     return null;
   };
 
@@ -79,83 +78,35 @@ export default function BottomNav() {
       }}
     >
       <div className="relative mx-3 mb-2">
-        {/* Circular bump that integrates with navbar */}
+        {/* Circular bump that goes behind - positioned absolutely */}
         {bumpPosition && (
-          <>
-            {/* Connection piece to blend circle with navbar */}
-            <motion.div
-              className="absolute h-8 w-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl"
-              style={{ 
-                left: bumpPosition,
-                transform: 'translateX(-50%)',
-                bottom: '20px',
-                zIndex: 5,
-                maskImage: 'linear-gradient(to top, white, transparent)'
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ 
-                opacity: 1,
-                left: bumpPosition 
-              }}
-              transition={{ 
-                type: "spring",
-                stiffness: 500,
-                damping: 30
-              }}
-            />
-            
-            {/* Main circle bump with enhanced glass effect */}
-            <motion.div
-              className="absolute w-16 h-16 rounded-full shadow-2xl overflow-hidden"
-              style={{ 
-                left: bumpPosition,
-                transform: 'translateX(-50%)',
-                bottom: '8px',
-                zIndex: 0,
-                background: 'rgba(255, 255, 255, 0.6)',
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                border: '1px solid rgba(255, 255, 255, 0.3)'
-              }}
-              initial={{ scale: 0 }}
-              animate={{ 
-                scale: 1,
-                left: bumpPosition 
-              }}
-              transition={{ 
-                type: "spring",
-                stiffness: 500,
-                damping: 30
-              }}
-            >
-              {/* Gradient overlay for depth */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10" />
-              
-              {/* Inner shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20" />
-              
-              {/* Colored accent based on active item */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-blue-400/10" />
-            </motion.div>
-          </>
+          <motion.div
+            className="absolute w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
+            style={{ 
+              left: bumpPosition,
+              transform: 'translateX(-50%)',
+              bottom: '12px',
+              zIndex: 0
+            }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 500,
+              damping: 25
+            }}
+            layoutId="navbar-bump"
+          >
+            {/* Inner gradient */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
+          </motion.div>
         )}
         
-        {/* Main navbar container with enhanced glassmorphism */}
+        {/* Main navbar container with glassmorphism - on top */}
         <div className="relative" style={{ zIndex: 10 }}>
-          {/* Background bar with stronger glass effect */}
-          <div 
-            className="relative rounded-2xl shadow-2xl overflow-hidden"
-            style={{
-              background: 'rgba(255, 255, 255, 0.6)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              border: '1px solid rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            {/* Multiple gradient layers for depth */}
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
-            <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent pointer-events-none" />
+          {/* Background bar */}
+          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
             
             <div className="relative px-2 py-2">
               <div className="flex justify-around items-center">
@@ -175,7 +126,7 @@ export default function BottomNav() {
                         <motion.div
                           className="relative flex items-center justify-center"
                           animate={{
-                            y: isItemActive ? -8 : 0,
+                            y: isItemActive ? -6 : 0,
                             scale: isItemActive ? 1.15 : 1,
                           }}
                           transition={{ 
@@ -188,8 +139,8 @@ export default function BottomNav() {
                             className={`
                               w-6 h-6 transition-all duration-300
                               ${isItemActive 
-                                ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg filter drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]' 
-                                : 'text-gray-600 dark:text-gray-400'
+                                ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg' 
+                                : 'text-gray-500 dark:text-gray-400'
                               }
                             `}
                           />
@@ -211,7 +162,7 @@ export default function BottomNav() {
                     <motion.div
                       className="relative flex items-center justify-center"
                       animate={{
-                        y: location === "/add-food" ? -8 : 0,
+                        y: location === "/add-food" ? -6 : 0,
                         scale: location === "/add-food" ? 1.15 : 1,
                         rotate: location === "/add-food" ? 45 : 0,
                       }}
@@ -222,27 +173,16 @@ export default function BottomNav() {
                       }}
                     >
                       <div className={`
-                        w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden
+                        w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-300
                         ${location === "/add-food" 
-                          ? 'shadow-lg shadow-purple-500/30' 
-                          : 'shadow-md shadow-cyan-500/20'
+                          ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
+                          : 'bg-gradient-to-br from-cyan-500 to-blue-500'
                         }
-                      `}
-                      style={{
-                        background: location === "/add-food" 
-                          ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(236, 72, 153, 0.8))'
-                          : 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(59, 130, 246, 0.8))',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.3)'
-                      }}>
-                        {/* Glass shine effect */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
-                        
+                      `}>
                         {location === "/add-food" ? (
-                          <span className="text-white text-2xl font-light relative z-10">×</span>
+                          <span className="text-white text-2xl font-light">×</span>
                         ) : (
-                          <IoAddCircleOutline className="w-6 h-6 text-white relative z-10" />
+                          <IoAddCircleOutline className="w-6 h-6 text-white" />
                         )}
                       </div>
                     </motion.div>
