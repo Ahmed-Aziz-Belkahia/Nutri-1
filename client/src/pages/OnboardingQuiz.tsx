@@ -1210,17 +1210,17 @@ export default function OnboardingQuiz() {
                   <div className="space-y-8">
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
-                      {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-pink-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      {/* Background decorative elements - Green theme */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
                       
                       {/* Main glassmorphic card */}
                       <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
                         
                         {/* Interactive Activity Slider */}
                         <div className="relative mb-8 px-8 py-8">
-                          {/* Gradient background track */}
-                          <div className="absolute inset-x-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-200/30 via-purple-200/30 to-pink-200/30 rounded-full"></div>
+                          {/* Gradient background track - Green theme */}
+                          <div className="absolute inset-x-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-green-200/30 via-emerald-200/30 to-teal-200/30 rounded-full"></div>
                           
                           {/* Main slider */}
                           <input
@@ -1254,30 +1254,30 @@ export default function OnboardingQuiz() {
                               appearance: none;
                               width: 32px;
                               height: 32px;
-                              background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                              background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
                               border: 4px solid rgba(255, 255, 255, 0.9);
                               border-radius: 50%;
                               cursor: pointer;
-                              box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
                               transition: all 0.3s ease;
                             }
                             input[type="range"]::-webkit-slider-thumb:hover {
                               transform: scale(1.2);
-                              box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+                              box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
                             }
                             input[type="range"]::-moz-range-thumb {
                               width: 32px;
                               height: 32px;
-                              background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+                              background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
                               border: 4px solid rgba(255, 255, 255, 0.9);
                               border-radius: 50%;
                               cursor: pointer;
-                              box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+                              box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
                               transition: all 0.3s ease;
                             }
                             input[type="range"]::-moz-range-thumb:hover {
                               transform: scale(1.2);
-                              box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+                              box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
                             }
                           `}</style>
                         </div>
@@ -1296,7 +1296,7 @@ export default function OnboardingQuiz() {
                               onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
                               className={`backdrop-blur-sm p-4 rounded-xl border transition-all duration-300 ${
                                 formData.activityLevel === activity.value
-                                  ? 'bg-gradient-to-b from-purple-500/80 to-pink-500/80 text-white border-white/40 shadow-lg'
+                                  ? 'bg-gradient-to-b from-green-500/80 to-emerald-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
                               }`}
                             >
@@ -1307,20 +1307,63 @@ export default function OnboardingQuiz() {
                           ))}
                         </div>
                         
-                        {/* Calorie Multiplier Display */}
-                        <div className="mt-6 text-center">
-                          <div className="backdrop-blur-sm bg-white/30 rounded-xl p-3 inline-block">
-                            <span className="text-sm text-gray-600">Calorie Multiplier: </span>
-                            <span className="font-bold text-purple-600">
-                              ×{(() => {
-                                const multipliers = {
-                                  sedentary: '1.2',
-                                  moderate: '1.55',
-                                  active: '1.725'
-                                };
-                                return multipliers[formData.activityLevel as keyof typeof multipliers] || '1.55';
-                              })()}
-                            </span>
+                        {/* Enhanced Calorie Multiplier Display */}
+                        <div className="mt-8">
+                          <div className="backdrop-blur-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/30 shadow-xl">
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center space-x-2">
+                                <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-sm">🔥</span>
+                                </div>
+                                <h3 className="text-sm font-semibold text-gray-700">Daily Calorie Boost</h3>
+                              </div>
+                              <div className="backdrop-blur-md bg-white/60 rounded-full px-3 py-1">
+                                <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                                  {(() => {
+                                    const multipliers = {
+                                      sedentary: '+20%',
+                                      moderate: '+55%',
+                                      active: '+72%'
+                                    };
+                                    return multipliers[formData.activityLevel as keyof typeof multipliers] || '+55%';
+                                  })()}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Visual Progress Bar */}
+                            <div className="relative h-4 bg-white/30 rounded-full overflow-hidden mb-3">
+                              <div 
+                                className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-500 ease-out"
+                                style={{
+                                  width: (() => {
+                                    const widths = {
+                                      sedentary: '33%',
+                                      moderate: '66%',
+                                      active: '100%'
+                                    };
+                                    return widths[formData.activityLevel as keyof typeof widths] || '66%';
+                                  })()
+                                }}
+                              >
+                                <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                              </div>
+                            </div>
+                            
+                            {/* Example Calorie Calculation */}
+                            <div className="flex justify-between items-center text-xs">
+                              <span className="text-gray-600">Base: ~2000 kcal</span>
+                              <span className="font-semibold text-green-700">
+                                Total: ~{(() => {
+                                  const totals = {
+                                    sedentary: '2400',
+                                    moderate: '3100',
+                                    active: '3450'
+                                  };
+                                  return totals[formData.activityLevel as keyof typeof totals] || '3100';
+                                })()} kcal/day
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
