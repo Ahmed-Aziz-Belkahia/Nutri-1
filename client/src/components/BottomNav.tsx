@@ -1,5 +1,5 @@
 import { useLocation, Link } from "wouter";
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   IoHomeOutline, 
   IoHome, 
@@ -7,9 +7,7 @@ import {
   IoReader, 
   IoStatsChartOutline, 
   IoStatsChart,
-  IoAddCircle,
-  IoSparkles,
-  IoNutrition
+  IoAddCircleOutline
 } from "react-icons/io5";
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -47,7 +45,6 @@ const navItems: NavItem[] = [
 
 export default function BottomNav() {
   const [location] = useLocation();
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const isActive = (path: string) => {
     if (path === "/progress") {
@@ -64,17 +61,14 @@ export default function BottomNav() {
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}
     >
-      {/* Glassmorphism container */}
-      <div className="relative">
-        {/* Gradient border effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl" />
-        
+      {/* Glassmorphism container - shorter height */}
+      <div className="relative mx-3 mb-2">
         {/* Main glass container */}
-        <div className="relative mx-2 mb-2 rounded-3xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 shadow-2xl shadow-black/10">
-          {/* Inner glow effect */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+        <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
           
-          <div className="relative px-4 py-3">
+          <div className="relative px-2 py-2">
             <div className="flex justify-around items-center">
               {/* Navigation Items */}
               {navItems.map((item) => {
@@ -84,179 +78,156 @@ export default function BottomNav() {
                 return (
                   <Link key={item.path} href={item.path}>
                     <motion.div
-                      className="relative flex flex-col items-center cursor-pointer group"
+                      className="relative flex items-center justify-center cursor-pointer"
                       data-tutorial={item.testId}
-                      onHoverStart={() => setHoveredItem(item.path)}
-                      onHoverEnd={() => setHoveredItem(null)}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.9 }}
                     >
-                      {/* Active indicator backdrop */}
+                      {/* Floating circle for active item - extends above navbar */}
                       <AnimatePresence>
                         {isItemActive && (
-                          <motion.div
-                            initial={{ scale: 0, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, type: "spring" }}
-                            className="absolute inset-0 -m-2 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 blur-md"
-                          />
+                          <>
+                            {/* Background circle that extends beyond navbar */}
+                            <motion.div
+                              initial={{ scale: 0, y: 0 }}
+                              animate={{ scale: 1, y: -8 }}
+                              exit={{ scale: 0, y: 0 }}
+                              transition={{ 
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 25
+                              }}
+                              className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/30"
+                              style={{ 
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                zIndex: -1
+                              }}
+                            />
+                            {/* Inner white circle */}
+                            <motion.div
+                              initial={{ scale: 0, y: 0 }}
+                              animate={{ scale: 1, y: -8 }}
+                              exit={{ scale: 0, y: 0 }}
+                              transition={{ 
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 25,
+                                delay: 0.05
+                              }}
+                              className="absolute w-12 h-12 rounded-full bg-white dark:bg-gray-900"
+                              style={{ 
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                zIndex: -1
+                              }}
+                            />
+                          </>
                         )}
                       </AnimatePresence>
 
                       {/* Icon container */}
                       <motion.div
-                        className="relative p-2 rounded-xl transition-all duration-300"
+                        className="relative p-3 z-10"
                         animate={{
-                          y: isItemActive ? -2 : 0,
+                          y: isItemActive ? -8 : 0,
+                        }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 25
                         }}
                       >
-                        {/* Hover glow effect */}
-                        <AnimatePresence>
-                          {hoveredItem === item.path && !isItemActive && (
-                            <motion.div
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 0.3 }}
-                              exit={{ scale: 0, opacity: 0 }}
-                              className="absolute inset-0 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-400 blur-md"
-                            />
-                          )}
-                        </AnimatePresence>
-
                         <Icon 
                           className={`
-                            w-6 h-6 relative z-10 transition-all duration-300
+                            w-6 h-6 transition-colors duration-200
                             ${isItemActive 
-                              ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg' 
-                              : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
+                              ? 'text-cyan-600 dark:text-cyan-400' 
+                              : 'text-gray-500 dark:text-gray-400'
                             }
                           `}
                         />
-                        
-                        {/* Sparkle effect for active items */}
-                        {isItemActive && (
-                          <motion.div
-                            initial={{ scale: 0, rotate: 0 }}
-                            animate={{ 
-                              scale: [0, 1, 0],
-                              rotate: [0, 180, 360],
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatDelay: 3
-                            }}
-                            className="absolute top-0 right-0"
-                          >
-                            <IoSparkles className="w-3 h-3 text-yellow-400" />
-                          </motion.div>
-                        )}
                       </motion.div>
-
-                      {/* Label */}
-                      <AnimatePresence>
-                        {(isItemActive || hoveredItem === item.path) && (
-                          <motion.span
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            transition={{ duration: 0.2 }}
-                            className={`
-                              text-xs mt-1 font-medium
-                              ${isItemActive 
-                                ? 'text-cyan-600 dark:text-cyan-400' 
-                                : 'text-gray-600 dark:text-gray-400'
-                              }
-                            `}
-                          >
-                            {item.label}
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
                     </motion.div>
                   </Link>
                 );
               })}
 
-              {/* Floating Add Button */}
+              {/* Add Button - Compact design */}
               <Link href="/add-food">
                 <motion.div
-                  className="relative -mt-4"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="relative flex items-center justify-center cursor-pointer"
+                  whileTap={{ scale: 0.9 }}
                   data-testid="add-food-button"
                   data-tutorial="add-food-button"
                 >
-                  {/* Pulsing ring animation */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500"
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 0, 0.5],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
-                  
-                  {/* Main button with gradient */}
-                  <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-500 shadow-xl shadow-cyan-500/30 flex items-center justify-center group overflow-hidden">
-                    {/* Inner shine effect */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/20 to-white/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Rotating gradient background */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 via-transparent to-purple-400"
-                      animate={{
-                        rotate: 360,
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "linear"
-                      }}
-                      style={{ opacity: 0.3 }}
-                    />
-                    
-                    {/* Icon */}
-                    <motion.div
-                      animate={{
-                        rotate: location === "/add-food" ? 45 : 0,
-                      }}
-                      transition={{ duration: 0.3, type: "spring" }}
-                      className="relative z-10"
-                    >
-                      <IoAddCircle className="w-8 h-8 text-white drop-shadow-lg" />
-                    </motion.div>
-
-                    {/* Food icon overlay */}
-                    <motion.div
-                      className="absolute"
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{
-                        scale: location === "/add-food" ? 1 : 0,
-                        opacity: location === "/add-food" ? 1 : 0,
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <IoNutrition className="w-5 h-5 text-white/90" />
-                    </motion.div>
-                  </div>
-
-                  {/* Label for add button */}
+                  {/* Active state for add button */}
                   <AnimatePresence>
                     {location === "/add-food" && (
-                      <motion.span
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -5 }}
-                        className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 text-xs font-medium text-cyan-600 dark:text-cyan-400 whitespace-nowrap"
-                      >
-                        Add Food
-                      </motion.span>
+                      <>
+                        <motion.div
+                          initial={{ scale: 0, y: 0 }}
+                          animate={{ scale: 1, y: -8 }}
+                          exit={{ scale: 0, y: 0 }}
+                          transition={{ 
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 25
+                          }}
+                          className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30"
+                          style={{ 
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: -1
+                          }}
+                        />
+                        <motion.div
+                          initial={{ scale: 0, y: 0 }}
+                          animate={{ scale: 1, y: -8 }}
+                          exit={{ scale: 0, y: 0 }}
+                          transition={{ 
+                            type: "spring",
+                            stiffness: 500,
+                            damping: 25,
+                            delay: 0.05
+                          }}
+                          className="absolute w-12 h-12 rounded-full bg-white dark:bg-gray-900"
+                          style={{ 
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: -1
+                          }}
+                        />
+                      </>
                     )}
                   </AnimatePresence>
+
+                  {/* Add icon */}
+                  <motion.div
+                    className="relative p-3 z-10"
+                    animate={{
+                      y: location === "/add-food" ? -8 : 0,
+                      rotate: location === "/add-food" ? 45 : 0,
+                    }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 25
+                    }}
+                  >
+                    {location === "/add-food" ? (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span className="text-white text-2xl font-light">×</span>
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shadow-md">
+                        <IoAddCircleOutline className="w-6 h-6 text-white" />
+                      </div>
+                    )}
+                  </motion.div>
                 </motion.div>
               </Link>
             </div>
