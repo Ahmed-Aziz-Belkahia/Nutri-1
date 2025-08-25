@@ -287,7 +287,9 @@ export default function Dashboard() {
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
     const formattedDate = format(date, 'yyyy-MM-dd');
-    setLocation(`/dashboard?date=${formattedDate}`, { replace: true });
+    // Update URL without causing navigation
+    const newUrl = `${window.location.pathname}?date=${formattedDate}`;
+    window.history.replaceState({}, '', newUrl);
   };
 
   const handleFoodLog = async (data: any) => {
