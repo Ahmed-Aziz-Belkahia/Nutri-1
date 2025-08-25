@@ -739,218 +739,193 @@ export default function Dashboard() {
             </Card>
           </motion.div>
           
+          {/* Revamped Today's Meals Section */}
           <motion.div variants={itemVariants} className="mt-6">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">
-                  {t('dashboard.todaysMeals')}
-                </h2>
-              </div>
+            <Card className="overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl">
+                      <Utensils className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800">{t('dashboard.todaysMeals')}</h2>
+                  </div>
+                  {foodLogs && foodLogs.length > 0 && (
+                    <Link href="/food-logs">
+                      <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
+                        View All
+                        <ChevronRight className="h-3 w-3" />
+                      </button>
+                    </Link>
+                  )}
+                </div>
 
-            </div>
-
-            {(foodLogs && foodLogs.length > 0) || analyzingMeal ? (
-              <div className="overflow-hidden" ref={emblaRef}>
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="show"
-                  className="flex"
-                >
-                  {/* Show analyzing meal card first if it exists */}
-                  {analyzingMeal && (
-                    <motion.div
-                      key={analyzingMeal.id}
-                      variants={itemVariants}
-                      initial="hidden"
-                      animate="show"
-                      className="flex-[0_0_220px] min-w-0 mr-3"
-                    >
-                      <Card className="overflow-hidden rounded-2xl border-none shadow-md transition-all duration-300 h-full flex flex-col bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200">
-                        <div className="relative">
-                          <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-cyan-100 relative overflow-hidden">
+                {(foodLogs && foodLogs.length > 0) || analyzingMeal ? (
+                  <div className="space-y-3">
+                    {/* Show analyzing meal card first if it exists */}
+                    {analyzingMeal && (
+                      <motion.div
+                        key={analyzingMeal.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-100"
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Image */}
+                          <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
                             {analyzingMeal.image && (
                               <img
                                 src={analyzingMeal.image}
                                 alt="Analyzing food"
-                                className="w-full h-full object-cover opacity-80"
+                                className="w-full h-full object-cover"
                               />
                             )}
-                            {/* Analyzing overlay with enhanced animations */}
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center overflow-hidden">
-                              {/* Floating particles */}
-                              <div className="absolute inset-0">
-                                {[...Array(8)].map((_, i) => (
-                                  <div
-                                    key={i}
-                                    className="absolute w-2 h-2 bg-white/30 rounded-full animate-bounce"
-                                    style={{
-                                      left: `${Math.random() * 100}%`,
-                                      top: `${Math.random() * 100}%`,
-                                      animationDelay: `${i * 0.2}s`,
-                                      animationDuration: `${2 + Math.random()}s`
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                              
-                              {/* Scanning line animation */}
-                              <div className="absolute inset-0">
-                                <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-white to-transparent animate-pulse">
-                                  <div className="w-full h-full bg-white/50 animate-ping" />
-                                </div>
-                              </div>
-                              
-                              <div className="text-center text-white z-10">
-                                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
-                                <div className="text-sm font-medium">{t('common.analyzing') || 'Analyzing...'}</div>
-                              </div>
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                              <Loader2 className="w-6 h-6 animate-spin text-white" />
                             </div>
                           </div>
-                        </div>
-                        <div className="p-3 flex-1 flex flex-col relative overflow-hidden">
-                          {/* Background animation */}
-                          <div className="absolute inset-0 opacity-5">
-                            <div className="w-full h-full bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 animate-pulse" />
-                          </div>
                           
-                          <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-semibold text-gray-700 text-sm truncate flex-1">
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-semibold text-gray-800 text-sm truncate">
                                 {analyzingMeal.name}
                               </h3>
+                              <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                                {format(analyzingMeal.timestamp, 'HH:mm')}
+                              </span>
                             </div>
-                            <div className="text-xs text-gray-500 mb-2">
-                              {format(analyzingMeal.timestamp, 'HH:mm')}
-                            </div>
-                            
-                            {/* Animated progress bars for macros */}
-                            <div className="space-y-2 text-xs text-gray-600">
-                              <div className="flex justify-between items-center">
-                                <span>{t('nutrition.calories')}:</span>
-                                <div className="flex items-center">
-                                  <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-orange-400 to-red-400 animate-pulse" style={{width: '60%'}} />
-                                  </div>
-                                  <span className="text-gray-400">...</span>
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span>{t('nutrition.protein')}:</span>
-                                <div className="flex items-center">
-                                  <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 animate-pulse" style={{width: '40%', animationDelay: '0.2s'}} />
-                                  </div>
-                                  <span className="text-gray-400">...</span>
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span>Węglowodany:</span>
-                                <div className="flex items-center">
-                                  <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-green-400 to-emerald-400 animate-pulse" style={{width: '70%', animationDelay: '0.4s'}} />
-                                  </div>
-                                  <span className="text-gray-400">...</span>
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <span>Tłuszcze:</span>
-                                <div className="flex items-center">
-                                  <div className="w-12 h-1 bg-gray-200 rounded-full mr-2 overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-purple-400 to-pink-400 animate-pulse" style={{width: '50%', animationDelay: '0.6s'}} />
-                                  </div>
-                                  <span className="text-gray-400">...</span>
-                                </div>
-                              </div>
+                            <div className="text-xs text-blue-600 font-medium mb-2">
+                              Analyzing nutritional content...
                             </div>
                             
-                            {/* Shimmer effect at bottom */}
-                            <div className="mt-3 h-2 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse rounded" />
+                            {/* Animated loading bars */}
+                            <div className="space-y-1">
+                              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse" 
+                                     style={{width: '60%'}} />
+                              </div>
+                            </div>
                           </div>
                         </div>
-                      </Card>
-                    </motion.div>
-                  )}
-                  {/* Show existing food logs */}
-                  {foodLogs?.map((log) => (
-                    <motion.div
-                      key={log.id}
-                      variants={itemVariants}
-                      whileHover={{ y: -5 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                      className="flex-[0_0_220px] min-w-0 mr-3 last:mr-0"
+                      </motion.div>
+                    )}
+
+                    {/* Regular meal cards */}
+                    {foodLogs?.map((log, index) => {
+                      const mealType = getMealTime(new Date(log.createdAt), t);
+                      const totalCalories = calculateTotal(log.name, log.calories);
+                      const totalProtein = calculateTotal(log.name, log.protein);
+                      const totalCarbs = calculateTotal(log.name, log.carbs);
+                      const totalFat = calculateTotal(log.name, log.fat);
+                      
+                      return (
+                        <motion.div
+                          key={log.id}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          whileHover={{ scale: 1.01 }}
+                          className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer"
+                          onClick={() => setLocation(`/meal/${log.id}`)}
+                        >
+                          <div className="flex items-center gap-4">
+                            {/* Image or Meal Type Icon */}
+                            <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+                              {log.image ? (
+                                <img
+                                  src={log.image}
+                                  alt={log.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
+                                  <Utensils className="h-8 w-8 text-gray-400" />
+                                </div>
+                              )}
+                              {/* Meal type badge */}
+                              <div className="absolute top-1 left-1 px-2 py-0.5 bg-white/90 backdrop-blur rounded-full">
+                                <span className="text-[10px] font-semibold text-gray-700">
+                                  {mealType}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold text-gray-800 text-sm truncate">
+                                    {formatFoodName(log)}
+                                  </h3>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-xs text-gray-500">
+                                      {format(new Date(log.createdAt), 'HH:mm')}
+                                    </span>
+                                    {log.components && log.components.length > 0 && (
+                                      <>
+                                        <span className="text-gray-300">•</span>
+                                        <span className="text-xs text-gray-500">
+                                          {log.components.length} items
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className="text-right ml-3">
+                                  <div className="text-lg font-bold bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent">
+                                    {formatNumber(totalCalories)}
+                                  </div>
+                                  <div className="text-[10px] text-gray-500 font-medium">KCAL</div>
+                                </div>
+                              </div>
+                              
+                              {/* Macro nutrients */}
+                              <div className="flex items-center gap-3 text-xs">
+                                <div className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                  <span className="text-gray-600">P: {formatNumber(totalProtein)}g</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                                  <span className="text-gray-600">C: {formatNumber(totalCarbs)}g</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                                  <span className="text-gray-600">F: {formatNumber(totalFat)}g</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Action icon */}
+                            <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center">
+                      <Utensils className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <h3 className="text-gray-700 font-semibold mb-2">No meals logged yet</h3>
+                    <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+                      Start tracking your nutrition by logging your first meal of the day
+                    </p>
+                    <Button
+                      onClick={() => setLocation('/add-food')}
+                      className="bg-gradient-to-r from-[#09b7b3] to-[#0295c2] hover:from-[#09b7b3]/90 hover:to-[#0295c2]/90 text-white px-6 py-2.5 rounded-xl shadow-md font-medium"
+                      data-tutorial="log-food-button"
                     >
-                      <Card
-                        className="overflow-hidden rounded-2xl border-none shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group h-full flex flex-col"
-                        onClick={() => setLocation(`/meal/${log.id}`)}
-                      >
-                        <div className="relative">
-                          {log.image ? (
-                            <div className="w-full h-full relative">
-                              <img
-                                src={log.image}
-                                alt={log.name}
-                                className="w-full h-full object-cover aspect-square rounded-t-xl" 
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-full aspect-square flex items-center justify-center bg-gray-100 relative rounded-t-xl">
-                              <Camera className="h-10 w-10 text-gray-300" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="px-3 py-1.5 pb-2">
-                          <h3 className="font-semibold text-gray-800 leading-tight mb-0.5">
-                            {formatFoodName(log)}
-                          </h3>
-                          
-                          <div className="flex justify-between items-center">
-                            <div className="text-gray-500 text-xs">
-                              {t('nutrition.calories', 'Calories')}
-                            </div>
-                            <div className="flex items-center">
-                              <div className="text-orange-500 text-xl font-bold">
-                                {parseFloat(log.calories)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </motion.div>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Log Your First Meal
+                    </Button>
+                  </div>
+                )}
               </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-center py-8 px-4"
-              >
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-base text-gray-500 mb-6"
-                >
-                  {t('dashboard.noMeals')}
-                </motion.p>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="flex justify-center"
-                >
-                  <Button
-                    onClick={() => setLocation('/add-food')}
-                    className="bg-[#0CC5BA] hover:bg-[#0CC5BA]/90 text-white px-6 py-2.5 rounded-full shadow-md font-medium"
-                    data-tutorial="log-food-button"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t('dashboard.logFood', 'Log Food')}
-                  </Button>
-                </motion.div>
-              </motion.div>
-            )}
+            </Card>
           </motion.div>
 
 
