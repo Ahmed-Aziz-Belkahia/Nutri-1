@@ -483,24 +483,123 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 2: Age */}
+                {/* Step 2: Age - Modern Glassmorphism Style */}
                 {step === 2 && (
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <Input
-                        type="number"
-                        value={formData.age || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const age = value ? parseInt(value, 10) : 0;
-                          setFormData(prev => ({ ...prev, age: isNaN(age) ? 0 : age }));
-                        }}
-                        placeholder="Age"
-                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl focus:border-purple-400 focus:ring-purple-200 transition-all duration-300"
-                        min="10"
-                        max="100"
-                      />
-                      <p className="text-sm text-gray-500 mt-2">years old</p>
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Age display with glassmorphic effect */}
+                        <div className="flex flex-col items-center mb-8">
+                          <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
+                            <div className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                              {formData.age || 25}
+                            </div>
+                          </div>
+                          <p className="text-gray-600 font-medium">years old</p>
+                        </div>
+                        
+                        {/* Modern slider with glassmorphism */}
+                        <div className="space-y-4">
+                          <div className="relative">
+                            <input
+                              type="range"
+                              min="13"
+                              max="80"
+                              value={formData.age || 25}
+                              onChange={(e) => setFormData(prev => ({ ...prev, age: parseInt(e.target.value) }))}
+                              className="w-full h-3 bg-gradient-to-r from-purple-200/50 to-blue-200/50 rounded-full outline-none opacity-80 transition-opacity hover:opacity-100 appearance-none cursor-pointer backdrop-blur-sm"
+                              style={{
+                                background: `linear-gradient(to right, rgba(147, 51, 234, 0.3) 0%, rgba(147, 51, 234, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(219, 234, 254, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(219, 234, 254, 0.3) 100%)`
+                              }}
+                            />
+                            {/* Custom slider thumb styling via CSS */}
+                            <style jsx>{`
+                              input[type="range"]::-webkit-slider-thumb {
+                                appearance: none;
+                                width: 24px;
+                                height: 24px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                border: 3px solid rgba(255, 255, 255, 0.8);
+                                border-radius: 50%;
+                                cursor: pointer;
+                                box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+                                transition: all 0.3s ease;
+                              }
+                              input[type="range"]::-webkit-slider-thumb:hover {
+                                transform: scale(1.2);
+                                box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+                              }
+                              input[type="range"]::-moz-range-thumb {
+                                width: 24px;
+                                height: 24px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                border: 3px solid rgba(255, 255, 255, 0.8);
+                                border-radius: 50%;
+                                cursor: pointer;
+                                box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+                                transition: all 0.3s ease;
+                              }
+                              input[type="range"]::-moz-range-thumb:hover {
+                                transform: scale(1.2);
+                                box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+                              }
+                            `}</style>
+                          </div>
+                          
+                          {/* Age range labels */}
+                          <div className="flex justify-between text-sm text-gray-500 px-1">
+                            <span>13</span>
+                            <span>80</span>
+                          </div>
+                        </div>
+                        
+                        {/* Quick select buttons with glassmorphism */}
+                        <div className="mt-8 grid grid-cols-4 gap-3">
+                          {[18, 25, 35, 45].map((age) => (
+                            <motion.button
+                              key={age}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setFormData(prev => ({ ...prev, age }))}
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                                formData.age === age
+                                  ? 'bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white border-white/40 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                              }`}
+                            >
+                              <span className="font-semibold">{age}</span>
+                            </motion.button>
+                          ))}
+                        </div>
+                        
+                        {/* Manual input option */}
+                        <div className="mt-6 flex justify-center">
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={formData.age || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const age = value ? parseInt(value, 10) : 0;
+                                if (age >= 13 && age <= 80) {
+                                  setFormData(prev => ({ ...prev, age }));
+                                }
+                              }}
+                              className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-transparent transition-all duration-300"
+                              min="13"
+                              max="80"
+                              placeholder="Age"
+                            />
+                            <div className="absolute -top-2 -right-2 w-2 h-2 bg-purple-500 rounded-full animate-ping"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
