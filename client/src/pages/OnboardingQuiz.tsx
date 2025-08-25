@@ -601,24 +601,153 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 3: Height */}
+                {/* Step 3: Height - Ruler Scroller Style */}
                 {step === 3 && (
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <Input
-                        type="number"
-                        value={formData.height || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const height = value ? parseInt(value, 10) : 0;
-                          setFormData(prev => ({ ...prev, height: isNaN(height) ? 0 : height }));
-                        }}
-                        placeholder="Height"
-                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl focus:border-green-400 focus:ring-green-200 transition-all duration-300"
-                        min="100"
-                        max="250"
-                      />
-                      <p className="text-sm text-gray-500 mt-2">cm</p>
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-teal-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-cyan-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Height display with glassmorphic effect */}
+                        <div className="flex flex-col items-center mb-8">
+                          <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
+                            <div className="text-6xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                              {formData.height || 170}
+                            </div>
+                          </div>
+                          <p className="text-gray-600 font-medium">cm</p>
+                        </div>
+                        
+                        {/* Ruler Scroller Container */}
+                        <div className="relative">
+                          {/* Selection indicator */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                            <div className="w-1 h-20 bg-gradient-to-b from-teal-500 to-cyan-500 shadow-lg"></div>
+                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-teal-500"></div>
+                          </div>
+                          
+                          {/* Ruler container with horizontal scroll */}
+                          <div className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-white/20 border border-white/30 p-4">
+                            <div 
+                              className="flex items-end h-16 select-none cursor-grab active:cursor-grabbing"
+                              style={{ width: '3000px', paddingLeft: '50%', paddingRight: '50%' }}
+                              onScroll={(e) => {
+                                const scrollLeft = e.currentTarget.scrollLeft;
+                                const pixelsPerCm = 10;
+                                const centerOffset = e.currentTarget.clientWidth / 2;
+                                const height = Math.round(100 + (scrollLeft + centerOffset - e.currentTarget.clientWidth / 2) / pixelsPerCm);
+                                const clampedHeight = Math.max(100, Math.min(250, height));
+                                setFormData(prev => ({ ...prev, height: clampedHeight }));
+                              }}
+                              ref={(el) => {
+                                if (el && !el.dataset.initialized) {
+                                  el.dataset.initialized = 'true';
+                                  const targetHeight = formData.height || 170;
+                                  const scrollPosition = (targetHeight - 100) * 10 - el.clientWidth / 2;
+                                  el.scrollLeft = scrollPosition;
+                                  
+                                  // Add scroll event listener
+                                  el.addEventListener('scroll', () => {
+                                    const scrollLeft = el.scrollLeft;
+                                    const pixelsPerCm = 10;
+                                    const height = Math.round(100 + scrollLeft / pixelsPerCm);
+                                    const clampedHeight = Math.max(100, Math.min(250, height));
+                                    setFormData(prev => ({ ...prev, height: clampedHeight }));
+                                  });
+                                }
+                              }}
+                            >
+                              {/* Generate ruler marks */}
+                              {Array.from({ length: 151 }, (_, i) => i + 100).map((cm) => (
+                                <div key={cm} className="flex flex-col items-center" style={{ minWidth: '10px' }}>
+                                  {cm % 10 === 0 ? (
+                                    <>
+                                      <div className="w-0.5 h-12 bg-gray-700/60"></div>
+                                      <span className="text-xs text-gray-700 mt-1 font-semibold">{cm}</span>
+                                    </>
+                                  ) : cm % 5 === 0 ? (
+                                    <>
+                                      <div className="w-0.5 h-8 bg-gray-600/40"></div>
+                                      <span className="text-xs text-gray-600 mt-1">{cm}</span>
+                                    </>
+                                  ) : (
+                                    <div className="w-0.5 h-4 bg-gray-500/30"></div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <style jsx>{`
+                              .no-scrollbar::-webkit-scrollbar {
+                                display: none;
+                              }
+                              .no-scrollbar {
+                                -ms-overflow-style: none;
+                                scrollbar-width: none;
+                              }
+                            `}</style>
+                          </div>
+                        </div>
+                        
+                        {/* Quick select buttons */}
+                        <div className="mt-8 grid grid-cols-4 gap-3">
+                          {[150, 165, 175, 185].map((height) => (
+                            <motion.button
+                              key={height}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, height }));
+                                // Scroll to selected height
+                                const ruler = document.querySelector('[style*="width: 3000px"]') as HTMLElement;
+                                if (ruler && ruler.parentElement) {
+                                  const pixelsPerCm = 10;
+                                  const scrollPosition = (height - 100) * pixelsPerCm - ruler.parentElement.clientWidth / 2;
+                                  ruler.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }}
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                                formData.height === height
+                                  ? 'bg-gradient-to-r from-teal-500/80 to-cyan-500/80 text-white border-white/40 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                              }`}
+                            >
+                              <span className="font-semibold">{height}</span>
+                              <span className="text-xs ml-1">cm</span>
+                            </motion.button>
+                          ))}
+                        </div>
+                        
+                        {/* Manual input option */}
+                        <div className="mt-6 flex justify-center">
+                          <input
+                            type="number"
+                            value={formData.height || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const height = value ? parseInt(value, 10) : 0;
+                              if (height >= 100 && height <= 250) {
+                                setFormData(prev => ({ ...prev, height }));
+                                // Scroll to entered height
+                                const ruler = document.querySelector('[style*="width: 3000px"]') as HTMLElement;
+                                if (ruler && ruler.parentElement) {
+                                  const pixelsPerCm = 10;
+                                  const scrollPosition = (height - 100) * pixelsPerCm - ruler.parentElement.clientWidth / 2;
+                                  ruler.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }
+                            }}
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-transparent transition-all duration-300"
+                            min="100"
+                            max="250"
+                            placeholder="Height"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
