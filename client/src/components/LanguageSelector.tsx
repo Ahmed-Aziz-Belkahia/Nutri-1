@@ -27,7 +27,7 @@ export function LanguageSelector({ onLanguageSelected, showTitle = true }: Langu
   return (
     <div className="w-full flex flex-col items-center">
       {showTitle && (
-        <h3 className="text-xl font-semibold mb-4 text-gray-700">Język aplikacji</h3>
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">App Language</h3>
       )}
       
       <div className="flex justify-center w-full max-w-xs">
@@ -37,29 +37,29 @@ export function LanguageSelector({ onLanguageSelected, showTitle = true }: Langu
           className="relative"
         >
           <div
-            className="w-32 h-32 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 overflow-hidden bg-red-50 border-2 border-red-500 shadow-xl shadow-red-500/20"
+            className="w-32 h-32 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 overflow-hidden bg-blue-50 border-2 border-blue-500 shadow-xl shadow-blue-500/20"
           >
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-red-500 flex items-center justify-center shadow-md"
+              className="absolute top-3 right-3 w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center shadow-md"
             >
               <Check className="w-4 h-4 text-white" />
             </motion.div>
             
             <div className="flex flex-col items-center justify-center h-full">
               <img 
-                src="/poland-flag.svg" 
-                alt="Poland Flag" 
+                src="/us-flag.svg" 
+                alt="US Flag" 
                 className="w-12 h-12 mb-2 object-cover rounded"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNDAwIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDY0MHY0MDBIMHoiLz48cGF0aCBmaWxsPSIjZGMxNDNjIiBkPSJNMCAyMDBoNjQwdjIwMEgweiIvPjwvc3ZnPg==";
+                  target.src = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOSAxMCI+PHBhdGggZmlsbD0iI2IyMjIzNCIgZD0iTTAgMGgxOXYxMEgweiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0wIDFoMTl2MUgwem0wIDJoMTl2MUgwem0wIDJoMTl2MUgwem0wIDJoMTl2MUgweiIvPjxwYXRoIGZpbGw9IiMzYzNiNmUiIGQ9Ik0wIDBoOXY3SDB6Ii8+PC9zdmc+";
                 }}
               />
-              <div className="font-medium text-lg text-red-600">
-                Polski
+              <div className="font-medium text-lg text-blue-600">
+                English
               </div>
             </div>
           </div>

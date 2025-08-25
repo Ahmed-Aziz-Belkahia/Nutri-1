@@ -186,6 +186,25 @@
     "dataDeleted": "Data deleted successfully",
     "errorSaving": "Error saving data"
   },
+  "mealPlan": {
+    "title": "Today's Meal Plan",
+    "generatePlan": "Generate Meal Plan",
+    "regenerate": "Regenerate Plan",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "noMealPlan": "No meal plan for today",
+    "noMealPlanYet": "No meal plan yet",
+    "createMealPlanDescription": "Create your first meal plan to receive personalized meal suggestions tailored to your nutritional goals.",
+    "generateDescription": "Generate a personalized meal plan",
+    "viewDetails": "View Details",
+    "markComplete": "Mark as Complete",
+    "completed": "Completed",
+    "notStarted": "Not Started",
+    "planMeals": "Plan Meals",
+    "createMealPlan": "Create Meal Plan"
+  },
   "onboarding": {
     "title": "Welcome to NutriAI",
     "subtitle": "Let's personalize your experience",
