@@ -115,49 +115,56 @@ export default function BottomNav() {
               })}
 
               {/* Add Button */}
-              <Link href="/add-food">
-                <motion.div
-                  className={`
-                    relative flex items-center justify-center cursor-pointer w-16 h-16 rounded-xl
-                    transition-all duration-300
-                    ${location === "/add-food"
-                      ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-lg' 
-                      : ''
-                    }
-                  `}
-                  whileTap={{ scale: 0.9 }}
-                  data-testid="add-food-button"
-                  data-tutorial="add-food-button"
-                >
-                  {/* Add icon */}
+              <div className="relative">
+                <Link href="/add-food">
                   <motion.div
-                    className="relative flex items-center justify-center"
-                    animate={{
-                      scale: location === "/add-food" ? 1.15 : 1,
-                      rotate: location === "/add-food" ? 45 : 0,
-                    }}
-                    transition={{ 
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 25
-                    }}
-                  >
-                    <div className={`
-                      w-14 h-14 rounded-full flex items-center justify-center shadow-md transition-all duration-300
-                      ${location === "/add-food" 
-                        ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
-                        : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                    className={`
+                      absolute flex items-center justify-center cursor-pointer w-16 h-16 rounded-xl
+                      transition-all duration-300
+                      ${location === "/add-food"
+                        ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-lg' 
+                        : ''
                       }
-                    `}>
-                      {location === "/add-food" ? (
-                        <span className="text-white text-3xl font-light">×</span>
-                      ) : (
-                        <IoAddCircleOutline className="w-8 h-8 text-white" />
-                      )}
-                    </div>
+                    `}
+                    style={{
+                      bottom: '-4px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                    }}
+                    whileTap={{ scale: 0.9 }}
+                    data-testid="add-food-button"
+                    data-tutorial="add-food-button"
+                  >
+                    {/* Add icon */}
+                    <motion.div
+                      className="relative flex items-center justify-center"
+                      animate={{
+                        scale: location === "/add-food" ? 1.15 : 1,
+                        rotate: location === "/add-food" ? 45 : 0,
+                      }}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 25
+                      }}
+                    >
+                      <div className={`
+                        w-14 h-14 rounded-full flex items-center justify-center shadow-md transition-all duration-300
+                        ${location === "/add-food" 
+                          ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
+                          : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                        }
+                      `}>
+                        {location === "/add-food" ? (
+                          <span className="text-white text-3xl font-light">×</span>
+                        ) : (
+                          <IoAddCircleOutline className="w-8 h-8 text-white" />
+                        )}
+                      </div>
+                    </motion.div>
                   </motion.div>
-                </motion.div>
-              </Link>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
