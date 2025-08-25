@@ -79,37 +79,83 @@ export default function BottomNav() {
       }}
     >
       <div className="relative mx-3 mb-2">
-        {/* Circular bump that goes behind - positioned absolutely */}
+        {/* Circular bump that integrates with navbar */}
         {bumpPosition && (
-          <motion.div
-            className="absolute w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
-            style={{ 
-              left: bumpPosition,
-              transform: 'translateX(-50%)',
-              bottom: '8px',
-              zIndex: 0
-            }}
-            initial={{ scale: 0 }}
-            animate={{ 
-              scale: 1,
-              left: bumpPosition 
-            }}
-            transition={{ 
-              type: "spring",
-              stiffness: 500,
-              damping: 30
-            }}
-          >
-            {/* Inner gradient */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
-          </motion.div>
+          <>
+            {/* Connection piece to blend circle with navbar */}
+            <motion.div
+              className="absolute h-8 w-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl"
+              style={{ 
+                left: bumpPosition,
+                transform: 'translateX(-50%)',
+                bottom: '20px',
+                zIndex: 5,
+                maskImage: 'linear-gradient(to top, white, transparent)'
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: 1,
+                left: bumpPosition 
+              }}
+              transition={{ 
+                type: "spring",
+                stiffness: 500,
+                damping: 30
+              }}
+            />
+            
+            {/* Main circle bump with enhanced glass effect */}
+            <motion.div
+              className="absolute w-16 h-16 rounded-full shadow-2xl overflow-hidden"
+              style={{ 
+                left: bumpPosition,
+                transform: 'translateX(-50%)',
+                bottom: '8px',
+                zIndex: 0,
+                background: 'rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.3)'
+              }}
+              initial={{ scale: 0 }}
+              animate={{ 
+                scale: 1,
+                left: bumpPosition 
+              }}
+              transition={{ 
+                type: "spring",
+                stiffness: 500,
+                damping: 30
+              }}
+            >
+              {/* Gradient overlay for depth */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/10" />
+              
+              {/* Inner shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20" />
+              
+              {/* Colored accent based on active item */}
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-blue-400/10" />
+            </motion.div>
+          </>
         )}
         
-        {/* Main navbar container with glassmorphism - on top */}
+        {/* Main navbar container with enhanced glassmorphism */}
         <div className="relative" style={{ zIndex: 10 }}>
-          {/* Background bar */}
-          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
+          {/* Background bar with stronger glass effect */}
+          <div 
+            className="relative rounded-2xl shadow-2xl overflow-hidden"
+            style={{
+              background: 'rgba(255, 255, 255, 0.6)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
+            {/* Multiple gradient layers for depth */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent pointer-events-none" />
             
             <div className="relative px-2 py-2">
               <div className="flex justify-around items-center">
@@ -142,8 +188,8 @@ export default function BottomNav() {
                             className={`
                               w-6 h-6 transition-all duration-300
                               ${isItemActive 
-                                ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg' 
-                                : 'text-gray-500 dark:text-gray-400'
+                                ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg filter drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]' 
+                                : 'text-gray-600 dark:text-gray-400'
                               }
                             `}
                           />
@@ -176,16 +222,27 @@ export default function BottomNav() {
                       }}
                     >
                       <div className={`
-                        w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-300
+                        w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 overflow-hidden
                         ${location === "/add-food" 
-                          ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
-                          : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                          ? 'shadow-lg shadow-purple-500/30' 
+                          : 'shadow-md shadow-cyan-500/20'
                         }
-                      `}>
+                      `}
+                      style={{
+                        background: location === "/add-food" 
+                          ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.8), rgba(236, 72, 153, 0.8))'
+                          : 'linear-gradient(135deg, rgba(6, 182, 212, 0.8), rgba(59, 130, 246, 0.8))',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(255, 255, 255, 0.3)'
+                      }}>
+                        {/* Glass shine effect */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent" />
+                        
                         {location === "/add-food" ? (
-                          <span className="text-white text-2xl font-light">×</span>
+                          <span className="text-white text-2xl font-light relative z-10">×</span>
                         ) : (
-                          <IoAddCircleOutline className="w-6 h-6 text-white" />
+                          <IoAddCircleOutline className="w-6 h-6 text-white relative z-10" />
                         )}
                       </div>
                     </motion.div>
