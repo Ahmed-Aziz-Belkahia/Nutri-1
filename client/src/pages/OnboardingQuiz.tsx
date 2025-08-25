@@ -1219,26 +1219,22 @@ export default function OnboardingQuiz() {
                         {/* Activity Level Display */}
                         <div className="flex flex-col items-center mb-8">
                           <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
-                            <div className="text-4xl mb-2">
+                            <div className="text-4xl mb-2 flex items-center justify-center">
                               {(() => {
                                 const icons = {
                                   sedentary: '🪑',
-                                  light: '🚶',
                                   moderate: '🏃',
-                                  active: '💪',
-                                  very_active: '🔥'
+                                  active: '💪'
                                 };
-                                return icons[formData.activityLevel as keyof typeof icons] || '🚶';
+                                return icons[formData.activityLevel as keyof typeof icons] || '🏃';
                               })()}
                             </div>
                             <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                               {(() => {
                                 const labels = {
-                                  sedentary: 'Sedentary',
-                                  light: 'Lightly Active',
-                                  moderate: 'Moderate',
-                                  active: 'Active',
-                                  very_active: 'Very Active'
+                                  sedentary: 'Low Activity',
+                                  moderate: 'Moderate Activity',
+                                  active: 'High Activity'
                                 };
                                 return labels[formData.activityLevel as keyof typeof labels] || 'Select Activity';
                               })()}
@@ -1247,11 +1243,9 @@ export default function OnboardingQuiz() {
                           <p className="text-gray-600 text-center text-sm max-w-xs">
                             {(() => {
                               const descriptions = {
-                                sedentary: 'Little to no exercise, desk job',
-                                light: 'Light exercise 1-3 days/week',
-                                moderate: 'Moderate exercise 3-5 days/week',
-                                active: 'Heavy exercise 6-7 days/week',
-                                very_active: 'Very heavy physical job or training'
+                                sedentary: 'Little to no exercise, mostly sedentary',
+                                moderate: 'Regular exercise 3-5 days per week',
+                                active: 'Daily intense exercise or physical job'
                               };
                               return descriptions[formData.activityLevel as keyof typeof descriptions] || 'Move the slider to select your activity level';
                             })()}
@@ -1259,7 +1253,7 @@ export default function OnboardingQuiz() {
                         </div>
                         
                         {/* Interactive Activity Slider */}
-                        <div className="relative mb-8">
+                        <div className="relative mb-8 px-8">
                           {/* Gradient background track */}
                           <div className="absolute inset-0 h-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-200/30 via-purple-200/30 to-pink-200/30 rounded-full"></div>
                           
@@ -1267,20 +1261,18 @@ export default function OnboardingQuiz() {
                           <input
                             type="range"
                             min="0"
-                            max="4"
+                            max="2"
                             step="1"
                             value={(() => {
                               const levelMap: Record<string, number> = {
                                 sedentary: 0,
-                                light: 1,
-                                moderate: 2,
-                                active: 3,
-                                very_active: 4
+                                moderate: 1,
+                                active: 2
                               };
                               return levelMap[formData.activityLevel] ?? 1;
                             })()}
                             onChange={(e) => {
-                              const levels = ['sedentary', 'light', 'moderate', 'active', 'very_active'];
+                              const levels = ['sedentary', 'moderate', 'active'];
                               setFormData(prev => ({ 
                                 ...prev, 
                                 activityLevel: levels[parseInt(e.target.value)] 
@@ -1292,26 +1284,24 @@ export default function OnboardingQuiz() {
                             }}
                           />
                           
-                          {/* Slider markers */}
+                          {/* Slider markers with centered emojis */}
                           <div className="absolute inset-0 flex justify-between items-center pointer-events-none">
-                            {['🪑', '🚶', '🏃', '💪', '🔥'].map((icon, index) => (
+                            {['🪑', '🏃', '💪'].map((icon, index) => (
                               <div
                                 key={index}
-                                className={`flex flex-col items-center transition-all duration-300 ${
+                                className={`flex flex-col items-center justify-center transition-all duration-300 ${
                                   (() => {
                                     const levelMap: Record<string, number> = {
                                       sedentary: 0,
-                                      light: 1,
-                                      moderate: 2,
-                                      active: 3,
-                                      very_active: 4
+                                      moderate: 1,
+                                      active: 2
                                     };
                                     return levelMap[formData.activityLevel] === index;
                                   })() ? 'scale-125' : 'scale-100 opacity-60'
                                 }`}
                               >
                                 <div className="w-3 h-3 bg-white/80 rounded-full shadow-sm mb-2"></div>
-                                <div className="text-xl">{icon}</div>
+                                <div className="text-2xl flex items-center justify-center">{icon}</div>
                               </div>
                             ))}
                           </div>
@@ -1349,27 +1339,26 @@ export default function OnboardingQuiz() {
                           `}</style>
                         </div>
                         
-                        {/* Activity Level Cards */}
-                        <div className="grid grid-cols-5 gap-2 mt-8">
+                        {/* Activity Level Cards - 3 options */}
+                        <div className="grid grid-cols-3 gap-4 mt-8">
                           {[
-                            { value: 'sedentary', label: 'Sedentary', days: '0 days' },
-                            { value: 'light', label: 'Light', days: '1-3 days' },
-                            { value: 'moderate', label: 'Moderate', days: '3-5 days' },
-                            { value: 'active', label: 'Active', days: '6-7 days' },
-                            { value: 'very_active', label: 'Very Active', days: 'Daily+' }
+                            { value: 'sedentary', label: 'Low', days: '0-2 days/week', icon: '🪑' },
+                            { value: 'moderate', label: 'Moderate', days: '3-5 days/week', icon: '🏃' },
+                            { value: 'active', label: 'High', days: '6-7 days/week', icon: '💪' }
                           ].map((activity) => (
                             <motion.button
                               key={activity.value}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
-                              className={`backdrop-blur-sm p-3 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm p-4 rounded-xl border transition-all duration-300 ${
                                 formData.activityLevel === activity.value
                                   ? 'bg-gradient-to-b from-purple-500/80 to-pink-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
                               }`}
                             >
-                              <div className="text-xs font-semibold">{activity.label}</div>
+                              <div className="text-2xl mb-2 flex items-center justify-center">{activity.icon}</div>
+                              <div className="text-sm font-semibold">{activity.label}</div>
                               <div className="text-xs opacity-80 mt-1">{activity.days}</div>
                             </motion.button>
                           ))}
@@ -1383,12 +1372,10 @@ export default function OnboardingQuiz() {
                               ×{(() => {
                                 const multipliers = {
                                   sedentary: '1.2',
-                                  light: '1.375',
                                   moderate: '1.55',
-                                  active: '1.725',
-                                  very_active: '1.9'
+                                  active: '1.725'
                                 };
-                                return multipliers[formData.activityLevel as keyof typeof multipliers] || '1.2';
+                                return multipliers[formData.activityLevel as keyof typeof multipliers] || '1.55';
                               })()}
                             </span>
                           </div>
