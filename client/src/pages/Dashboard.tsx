@@ -746,7 +746,7 @@ export default function Dashboard() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl">
+                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl">
                       <Utensils className="h-5 w-5 text-white" />
                     </div>
                     <h2 className="text-lg font-semibold text-gray-800">{t('dashboard.todaysMeals')}</h2>
