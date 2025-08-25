@@ -33,14 +33,16 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             onClick={handleClose}
           />
           
-          {/* Spotlight for + button in center of bottom nav */}
+          {/* Spotlight for + button */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="fixed bottom-[10px] left-1/2 transform -translate-x-1/2 z-[101]"
+            className="fixed z-[101]"
             style={{
+              bottom: '36px',
+              right: '66px',
               pointerEvents: 'none'
             }}
           >
@@ -65,39 +67,6 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
                 ease: "easeInOut"
               }}
             />
-          </motion.div>
-          
-          {/* Tutorial message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ delay: 0.3 }}
-            className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 z-[102] max-w-[280px] text-center"
-          >
-            <div className="bg-white rounded-2xl p-4 shadow-2xl">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Start Tracking Your Meals
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Tap the + button to log your first meal and begin your journey to better nutrition!
-              </p>
-              <Button
-                onClick={handleClose}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl"
-              >
-                Got it!
-              </Button>
-            </div>
-            
-            {/* Arrow pointing to + button */}
-            <svg
-              className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-8 h-8 text-white"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M12 2 L6 8 L10 8 L10 16 L14 16 L14 8 L18 8 Z" transform="rotate(180 12 12)" />
-            </svg>
           </motion.div>
           
           {/* Skip button */}
