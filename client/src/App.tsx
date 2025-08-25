@@ -210,16 +210,17 @@ function App() {
   const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food';
   const appBackgroundClass = isFullScreenCameraPage 
     ? "app-container min-h-screen relative bg-black" 
-    : "app-container min-h-screen relative bg-white fixed inset-0";
+    : "app-container min-h-screen relative bg-white";
   
   const contentPaddingClass = isFullScreenCameraPage 
     ? "main-content" 
     : "main-content pb-4 pt-safe-or-6";
 
   return (
-    <div className={appBackgroundClass}>
-      <div className={contentPaddingClass}>
-        <Switch>
+    <>
+      <div className={appBackgroundClass}>
+        <div className={contentPaddingClass}>
+          <Switch>
           {/* Common routes accessible to all users */}
           <Route path="/privacy" component={Privacy} />
 
@@ -469,10 +470,11 @@ function App() {
         )}
         </Switch>
       </div>
-
-      {/* Show bottom navigation for authenticated users on main pages */}
-      {showBottomNav && <BottomNav />}
     </div>
+    
+    {/* Show bottom navigation for authenticated users on main pages - Outside main container */}
+    {showBottomNav && <BottomNav />}
+    </>
   );
 }
 

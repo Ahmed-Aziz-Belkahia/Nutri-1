@@ -407,7 +407,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden pb-20">
       
       {/* Colorful abstract shapes */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-purple-600/5 filter blur-3xl -translate-y-1/3 translate-x-1/3" />
@@ -846,8 +846,6 @@ export default function Dashboard() {
       </div>
       {/* Tutorial overlay - shows every time */}
       <TutorialOverlay />
-      {/* Bottom padding for fixed navigation */}
-      <div className="h-20"></div>
     </div>
   );
 }
