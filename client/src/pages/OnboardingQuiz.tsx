@@ -1415,138 +1415,260 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 8: Vision Board - 2 substeps */}
+                {/* Step 8: Vision Board - Completely Revamped */}
                 {step === 8 && (
-                  <div className="space-y-6">
-                    {/* Vision Board Page Indicators */}
-                    <div className="flex justify-center space-x-2 mb-6">
-                      {[1, 2].map((page) => (
-                        <div
-                          key={page}
-                          className={`w-3 h-3 rounded-full transition-colors ${
-                            visionBoardPage >= page ? 'bg-purple-600' : 'bg-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Page 1: Macro Confirmation */}
-                    {visionBoardPage === 1 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center space-y-4"
-                      >
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                          Your Nutrition Plan
-                        </h2>
-                        <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-4 border border-green-200">
-                          <div className="text-center mb-4">
-                            <div className="text-2xl font-bold text-green-600 mb-1">
-                              {calculateCalories(formData)} kcal
-                            </div>
-                            <p className="text-sm text-gray-700">daily</p>
-                          </div>
-                          <div className="grid grid-cols-3 gap-3">
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-blue-600">
-                                {Math.round(calculateCalories(formData) * 0.3 / 4)}g
-                              </div>
-                              <div className="text-xs text-gray-600">Protein</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-orange-600">
-                                {Math.round(calculateCalories(formData) * 0.45 / 4)}g
-                              </div>
-                              <div className="text-xs text-gray-600">Carbs</div>
-                            </div>
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-purple-600">
-                                {Math.round(calculateCalories(formData) * 0.25 / 9)}g
-                              </div>
-                              <div className="text-xs text-gray-600">Fats</div>
-                            </div>
-                          </div>
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements - Green theme */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Page Indicators - Green theme */}
+                        <div className="flex justify-center space-x-3 mb-8">
+                          {[1, 2].map((page) => (
+                            <motion.div
+                              key={page}
+                              initial={{ scale: 0.8 }}
+                              animate={{ scale: visionBoardPage >= page ? 1 : 0.8 }}
+                              className={`w-10 h-2 rounded-full transition-all duration-300 ${
+                                visionBoardPage >= page 
+                                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg' 
+                                  : 'bg-gray-300/50'
+                              }`}
+                            />
+                          ))}
                         </div>
-                        <div className="flex justify-center">
-                          <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-                            <Target className="w-8 h-8 text-white" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
 
-                    {/* Page 2: Timeline with CTA */}
-                    {visionBoardPage === 2 && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-center space-y-4"
-                      >
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-                          Your Journey
-                        </h2>
-                        
-                        {(() => {
-                          const timeline = calculateTimeline();
-                          
-                          return (
-                            <div className="space-y-4">
-                              {formData.weightGoal !== 'maintain' && (
-                                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-200">
-                                  <div className="grid grid-cols-2 gap-4 text-center">
-                                    <div>
-                                      <div className="text-xl font-bold text-orange-600">
-                                        {timeline.weeks}
-                                      </div>
-                                      <div className="text-xs text-gray-600">weeks</div>
+                        {/* Page 1: Your Personalized Plan */}
+                        {visionBoardPage === 1 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, type: "spring" }}
+                            className="space-y-6"
+                          >
+                            {/* Calorie Goal Card */}
+                            <div className="backdrop-blur-md bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-white/30">
+                              <div className="text-center mb-6">
+                                <motion.div 
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ delay: 0.2, type: "spring" }}
+                                  className="text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2"
+                                >
+                                  {calculateCalories(formData)}
+                                </motion.div>
+                                <p className="text-sm text-gray-600 font-medium">Daily Calories</p>
+                              </div>
+
+                              {/* Macro Distribution */}
+                              <div className="grid grid-cols-3 gap-4">
+                                {[
+                                  { 
+                                    label: 'Protein', 
+                                    value: Math.round(calculateCalories(formData) * 0.3 / 4),
+                                    color: 'from-blue-500 to-cyan-500',
+                                    bgColor: 'bg-blue-50',
+                                    borderColor: 'border-blue-200'
+                                  },
+                                  { 
+                                    label: 'Carbs', 
+                                    value: Math.round(calculateCalories(formData) * 0.45 / 4),
+                                    color: 'from-amber-500 to-orange-500',
+                                    bgColor: 'bg-amber-50',
+                                    borderColor: 'border-amber-200'
+                                  },
+                                  { 
+                                    label: 'Fats', 
+                                    value: Math.round(calculateCalories(formData) * 0.25 / 9),
+                                    color: 'from-purple-500 to-pink-500',
+                                    bgColor: 'bg-purple-50',
+                                    borderColor: 'border-purple-200'
+                                  }
+                                ].map((macro, index) => (
+                                  <motion.div
+                                    key={macro.label}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 + index * 0.1 }}
+                                    className={`backdrop-blur-sm bg-white/50 rounded-xl p-3 border ${macro.borderColor}`}
+                                  >
+                                    <div className={`text-2xl font-bold bg-gradient-to-r ${macro.color} bg-clip-text text-transparent`}>
+                                      {macro.value}g
                                     </div>
-                                    <div>
-                                      <div className="text-xl font-bold text-red-600">
-                                        {timeline.months}
-                                      </div>
-                                      <div className="text-xs text-gray-600">months</div>
-                                    </div>
-                                  </div>
-                                  <div className="mt-3 pt-3 border-t border-orange-200">
-                                    <p className="text-xs text-gray-700">
-                                      {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/week
-                                    </p>
+                                    <div className="text-xs text-gray-600 font-medium">{macro.label}</div>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Visual Goal Progress Preview */}
+                            <motion.div 
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.5 }}
+                              className="backdrop-blur-sm bg-white/30 rounded-xl p-4 border border-white/20"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="text-sm text-gray-600">Current</div>
+                                  <div className="text-xl font-bold text-gray-800">{formData.currentWeight} kg</div>
+                                </div>
+                                <div className="flex-1 mx-6">
+                                  <div className="relative h-2 bg-gray-200/50 rounded-full overflow-hidden">
+                                    <motion.div 
+                                      initial={{ width: 0 }}
+                                      animate={{ width: "70%" }}
+                                      transition={{ delay: 0.7, duration: 1 }}
+                                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"
+                                    />
                                   </div>
                                 </div>
-                              )}
+                                <div>
+                                  <div className="text-sm text-gray-600">Goal</div>
+                                  <div className="text-xl font-bold text-green-600">{formData.goalWeight} kg</div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          </motion.div>
+                        )}
+
+                        {/* Page 2: Your Success Timeline */}
+                        {visionBoardPage === 2 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, type: "spring" }}
+                            className="space-y-6"
+                          >
+                            {(() => {
+                              const timeline = calculateTimeline();
                               
-                              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 border border-purple-200">
-                                <h3 className="text-lg font-bold text-purple-800 mb-2">Start Now!</h3>
-                                <p className="text-sm text-gray-700 mb-3">
-                                  Your plan is ready
-                                </p>
-                                <div className="flex justify-center">
-                                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                                    <Star className="w-8 h-8 text-white fill-current" />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </motion.div>
-                    )}
+                              return (
+                                <>
+                                  {/* Timeline Visualization */}
+                                  {formData.weightGoal !== 'maintain' && (
+                                    <div className="backdrop-blur-md bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl p-6 border border-white/30">
+                                      <h3 className="text-center text-lg font-semibold text-gray-700 mb-6">Your Journey Timeline</h3>
+                                      
+                                      <div className="grid grid-cols-2 gap-6">
+                                        <motion.div 
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          transition={{ delay: 0.2, type: "spring" }}
+                                          className="text-center"
+                                        >
+                                          <div className="backdrop-blur-sm bg-white/50 rounded-xl p-4 border border-white/30">
+                                            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                                              {timeline.weeks}
+                                            </div>
+                                            <div className="text-sm text-gray-600">weeks</div>
+                                          </div>
+                                        </motion.div>
+                                        
+                                        <motion.div 
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          transition={{ delay: 0.3, type: "spring" }}
+                                          className="text-center"
+                                        >
+                                          <div className="backdrop-blur-sm bg-white/50 rounded-xl p-4 border border-white/30">
+                                            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                                              {timeline.months}
+                                            </div>
+                                            <div className="text-sm text-gray-600">months</div>
+                                          </div>
+                                        </motion.div>
+                                      </div>
 
-                    {/* Loading State */}
-                    {visionBoardPage === 0 && (
-                      <div className="text-center space-y-6">
-                        <div className="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center">
-                          <div className="w-8 h-8 bg-purple-500 rounded-full"></div>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-800">Creating your vision board...</h2>
-                        <div className="flex justify-center">
-                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-                        </div>
+                                      <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                        className="mt-6 pt-4 border-t border-white/20 text-center"
+                                      >
+                                        <div className="backdrop-blur-sm bg-white/30 rounded-lg px-4 py-2 inline-flex items-center space-x-2">
+                                          <span className="text-sm text-gray-600">Progress Rate:</span>
+                                          <span className="text-sm font-bold text-green-600">
+                                            {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/week
+                                          </span>
+                                        </div>
+                                      </motion.div>
+                                    </div>
+                                  )}
+
+                                  {/* Motivational Call to Action */}
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.6 }}
+                                    className="backdrop-blur-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-white/40 text-center"
+                                  >
+                                    <motion.div
+                                      animate={{ 
+                                        rotate: [0, 5, -5, 5, 0],
+                                        scale: [1, 1.1, 1]
+                                      }}
+                                      transition={{ 
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        repeatDelay: 3
+                                      }}
+                                      className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg"
+                                    >
+                                      <Star className="w-10 h-10 text-white" />
+                                    </motion.div>
+                                    
+                                    <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
+                                      You're All Set!
+                                    </h3>
+                                    <p className="text-gray-600 text-sm">
+                                      Your personalized nutrition journey begins now
+                                    </p>
+                                  </motion.div>
+                                </>
+                              );
+                            })()}
+                          </motion.div>
+                        )}
+
+                        {/* Loading State - Green theme */}
+                        {visionBoardPage === 0 && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-center space-y-6 py-8"
+                          >
+                            <div className="relative w-24 h-24 mx-auto">
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full opacity-20"
+                              />
+                              <motion.div
+                                animate={{ rotate: -360 }}
+                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                                className="absolute inset-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full opacity-30"
+                              />
+                              <motion.div
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                                className="absolute inset-4 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center"
+                              >
+                                <Target className="w-8 h-8 text-white" />
+                              </motion.div>
+                            </div>
+                            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                              Preparing Your Vision Board
+                            </h2>
+                            <p className="text-sm text-gray-600">Calculating your personalized nutrition plan...</p>
+                          </motion.div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
