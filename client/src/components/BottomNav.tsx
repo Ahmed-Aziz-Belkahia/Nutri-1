@@ -65,7 +65,7 @@ export default function BottomNav() {
         {/* Main navbar container with glassmorphism */}
         <div className="relative overflow-visible">
           {/* Background bar */}
-          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
+          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl z-10">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
             
             <div className="relative px-2 py-2">
@@ -78,14 +78,15 @@ export default function BottomNav() {
                   return (
                     <Link key={item.path} href={item.path}>
                       <motion.div
-                        className="relative flex items-center justify-center cursor-pointer w-12 h-12"
+                        className="relative flex items-center justify-center cursor-pointer w-12 h-12 z-20"
                         data-tutorial={item.testId}
                         whileTap={{ scale: 0.9 }}
                       >
-                        {/* Circular bump that's part of the navbar */}
+                        {/* Circular bump that's behind the navbar */}
                         {isItemActive && (
                           <motion.div
                             className="absolute -top-6 w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
+                            style={{ zIndex: -1 }}
                             initial={{ scale: 0, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0, y: 20 }}
@@ -97,15 +98,12 @@ export default function BottomNav() {
                           >
                             {/* Inner gradient */}
                             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
-                            
-                            {/* Bottom connectors to make it look integrated */}
-                            <div className="absolute bottom-0 left-2 right-2 h-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg -mb-1" />
                           </motion.div>
                         )}
 
                         {/* Icon */}
                         <motion.div
-                          className="relative z-10 flex items-center justify-center"
+                          className="relative z-30 flex items-center justify-center"
                           animate={{
                             y: isItemActive ? -6 : 0,
                             scale: isItemActive ? 1.15 : 1,
@@ -134,15 +132,16 @@ export default function BottomNav() {
                 {/* Add Button */}
                 <Link href="/add-food">
                   <motion.div
-                    className="relative flex items-center justify-center cursor-pointer w-12 h-12"
+                    className="relative flex items-center justify-center cursor-pointer w-12 h-12 z-20"
                     whileTap={{ scale: 0.9 }}
                     data-testid="add-food-button"
                     data-tutorial="add-food-button"
                   >
-                    {/* Circular bump for add button when active */}
+                    {/* Circular bump for add button when active - behind navbar */}
                     {location === "/add-food" && (
                       <motion.div
                         className="absolute -top-6 w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
+                        style={{ zIndex: -1 }}
                         initial={{ scale: 0, y: 20 }}
                         animate={{ scale: 1, y: 0 }}
                         exit={{ scale: 0, y: 20 }}
@@ -154,15 +153,12 @@ export default function BottomNav() {
                       >
                         {/* Inner gradient */}
                         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
-                        
-                        {/* Bottom connectors */}
-                        <div className="absolute bottom-0 left-2 right-2 h-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg -mb-1" />
                       </motion.div>
                     )}
 
                     {/* Add icon */}
                     <motion.div
-                      className="relative z-10 flex items-center justify-center"
+                      className="relative z-30 flex items-center justify-center"
                       animate={{
                         y: location === "/add-food" ? -6 : 0,
                         scale: location === "/add-food" ? 1.15 : 1,
