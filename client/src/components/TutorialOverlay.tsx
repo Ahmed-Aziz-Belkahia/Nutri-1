@@ -8,22 +8,15 @@ interface TutorialOverlayProps {
 }
 
 export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
-  const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(true);
 
   useEffect(() => {
-    // Check if user just completed onboarding
-    const hasSeenTutorial = localStorage.getItem('hasSeenDashboardTutorial');
-    const justCompletedOnboarding = localStorage.getItem('justCompletedOnboarding');
-    
-    if (justCompletedOnboarding === 'true' && !hasSeenTutorial) {
-      setShowTutorial(true);
-      localStorage.removeItem('justCompletedOnboarding');
-    }
+    // Always show tutorial on mount
+    setShowTutorial(true);
   }, []);
 
   const handleClose = () => {
     setShowTutorial(false);
-    localStorage.setItem('hasSeenDashboardTutorial', 'true');
     onComplete?.();
   };
 
@@ -40,13 +33,13 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             onClick={handleClose}
           />
           
-          {/* Spotlight for + button */}
+          {/* Spotlight for + button in center of bottom nav */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="fixed bottom-[52px] right-[20px] z-[101]"
+            className="fixed bottom-[10px] left-1/2 transform -translate-x-1/2 z-[101]"
             style={{
               pointerEvents: 'none'
             }}
@@ -80,7 +73,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             transition={{ delay: 0.3 }}
-            className="fixed bottom-[140px] left-1/2 transform -translate-x-1/2 z-[102] max-w-[280px] text-center"
+            className="fixed bottom-[100px] left-1/2 transform -translate-x-1/2 z-[102] max-w-[280px] text-center"
           >
             <div className="bg-white rounded-2xl p-4 shadow-2xl">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">

@@ -844,8 +844,8 @@ export default function Dashboard() {
 
 
       </div>
-      {/* Tutorial overlay disabled */}
-      {/* <TutorialOverlay /> */}
+      {/* Tutorial overlay - shows every time */}
+      <TutorialOverlay />
       {/* Bottom padding for fixed navigation */}
       <div className="h-20"></div>
     </div>
