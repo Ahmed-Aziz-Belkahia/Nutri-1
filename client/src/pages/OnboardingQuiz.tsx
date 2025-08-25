@@ -489,15 +489,15 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
                       
                       {/* Main glassmorphic card */}
                       <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Age display with glassmorphic effect */}
                         <div className="flex flex-col items-center mb-8">
                           <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
-                            <div className="text-6xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                            <div className="text-6xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                               {formData.age || 25}
                             </div>
                           </div>
@@ -513,9 +513,9 @@ export default function OnboardingQuiz() {
                               max="80"
                               value={formData.age || 25}
                               onChange={(e) => setFormData(prev => ({ ...prev, age: parseInt(e.target.value) }))}
-                              className="w-full h-3 bg-gradient-to-r from-purple-200/50 to-blue-200/50 rounded-full outline-none opacity-80 transition-opacity hover:opacity-100 appearance-none cursor-pointer backdrop-blur-sm"
+                              className="w-full h-3 bg-gradient-to-r from-green-200/50 to-emerald-200/50 rounded-full outline-none opacity-80 transition-opacity hover:opacity-100 appearance-none cursor-pointer backdrop-blur-sm"
                               style={{
-                                background: `linear-gradient(to right, rgba(147, 51, 234, 0.3) 0%, rgba(147, 51, 234, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(219, 234, 254, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(219, 234, 254, 0.3) 100%)`
+                                background: `linear-gradient(to right, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(209, 250, 229, 0.3) ${((formData.age || 25) - 13) / (80 - 13) * 100}%, rgba(209, 250, 229, 0.3) 100%)`
                               }}
                             />
                             {/* Custom slider thumb styling via CSS */}
@@ -524,30 +524,30 @@ export default function OnboardingQuiz() {
                                 appearance: none;
                                 width: 24px;
                                 height: 24px;
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                                 border: 3px solid rgba(255, 255, 255, 0.8);
                                 border-radius: 50%;
                                 cursor: pointer;
-                                box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+                                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
                                 transition: all 0.3s ease;
                               }
                               input[type="range"]::-webkit-slider-thumb:hover {
                                 transform: scale(1.2);
-                                box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+                                box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
                               }
                               input[type="range"]::-moz-range-thumb {
                                 width: 24px;
                                 height: 24px;
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                                 border: 3px solid rgba(255, 255, 255, 0.8);
                                 border-radius: 50%;
                                 cursor: pointer;
-                                box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+                                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
                                 transition: all 0.3s ease;
                               }
                               input[type="range"]::-moz-range-thumb:hover {
                                 transform: scale(1.2);
-                                box-shadow: 0 6px 20px rgba(147, 51, 234, 0.6);
+                                box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
                               }
                             `}</style>
                           </div>
@@ -569,7 +569,7 @@ export default function OnboardingQuiz() {
                               onClick={() => setFormData(prev => ({ ...prev, age }))}
                               className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
                                 formData.age === age
-                                  ? 'bg-gradient-to-r from-purple-500/80 to-blue-500/80 text-white border-white/40 shadow-lg'
+                                  ? 'bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
                               }`}
                             >
@@ -580,24 +580,21 @@ export default function OnboardingQuiz() {
                         
                         {/* Manual input option */}
                         <div className="mt-6 flex justify-center">
-                          <div className="relative">
-                            <input
-                              type="number"
-                              value={formData.age || ''}
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                const age = value ? parseInt(value, 10) : 0;
-                                if (age >= 13 && age <= 80) {
-                                  setFormData(prev => ({ ...prev, age }));
-                                }
-                              }}
-                              className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-purple-400/50 focus:border-transparent transition-all duration-300"
-                              min="13"
-                              max="80"
-                              placeholder="Age"
-                            />
-                            <div className="absolute -top-2 -right-2 w-2 h-2 bg-purple-500 rounded-full animate-ping"></div>
-                          </div>
+                          <input
+                            type="number"
+                            value={formData.age || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const age = value ? parseInt(value, 10) : 0;
+                              if (age >= 13 && age <= 80) {
+                                setFormData(prev => ({ ...prev, age }));
+                              }
+                            }}
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-300"
+                            min="13"
+                            max="80"
+                            placeholder="Age"
+                          />
                         </div>
                       </div>
                     </div>
