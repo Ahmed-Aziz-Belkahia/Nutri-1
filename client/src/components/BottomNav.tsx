@@ -53,17 +53,18 @@ export default function BottomNav() {
     return location === path;
   };
 
-  // Calculate position for the bump
+  // Calculate position for the bump - adjusted for 4 items with equal spacing
   const getBumpPosition = () => {
     const homeActive = isActive("/dashboard");
     const recipesActive = isActive("/recipes");
     const progressActive = isActive("/progress");
     const addActive = location === "/add-food";
     
-    if (homeActive) return "25%";
-    if (recipesActive) return "41.66%";
-    if (progressActive) return "58.33%";
-    if (addActive) return "75%";
+    // Positions for 4 items with justify-around
+    if (homeActive) return "12.5%";     // First item
+    if (recipesActive) return "37.5%";   // Second item
+    if (progressActive) return "62.5%";  // Third item
+    if (addActive) return "87.5%";       // Fourth item
     return null;
   };
 
@@ -85,17 +86,19 @@ export default function BottomNav() {
             style={{ 
               left: bumpPosition,
               transform: 'translateX(-50%)',
-              bottom: '12px',
+              bottom: '8px',
               zIndex: 0
             }}
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            animate={{ 
+              scale: 1,
+              left: bumpPosition 
+            }}
             transition={{ 
               type: "spring",
               stiffness: 500,
-              damping: 25
+              damping: 30
             }}
-            layoutId="navbar-bump"
           >
             {/* Inner gradient */}
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
@@ -126,7 +129,7 @@ export default function BottomNav() {
                         <motion.div
                           className="relative flex items-center justify-center"
                           animate={{
-                            y: isItemActive ? -6 : 0,
+                            y: isItemActive ? -8 : 0,
                             scale: isItemActive ? 1.15 : 1,
                           }}
                           transition={{ 
@@ -162,7 +165,7 @@ export default function BottomNav() {
                     <motion.div
                       className="relative flex items-center justify-center"
                       animate={{
-                        y: location === "/add-food" ? -6 : 0,
+                        y: location === "/add-food" ? -8 : 0,
                         scale: location === "/add-food" ? 1.15 : 1,
                         rotate: location === "/add-food" ? 45 : 0,
                       }}
