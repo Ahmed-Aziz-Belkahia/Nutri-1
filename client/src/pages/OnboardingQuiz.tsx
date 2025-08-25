@@ -889,7 +889,7 @@ export default function OnboardingQuiz() {
                   <Button
                     onClick={handleNext}
                     disabled={isNextDisabled() || mutation.isPending}
-                    className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap"
+                    className="backdrop-blur-xl bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap border border-white/20 hover:from-green-600/80 hover:to-emerald-600/80"
                   >
                     {mutation.isPending ? (
                       <div className="flex items-center">
