@@ -210,7 +210,7 @@ function App() {
   const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food';
   const appBackgroundClass = isFullScreenCameraPage 
     ? "app-container min-h-screen relative bg-black" 
-    : "app-container min-h-screen relative bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff]";
+    : "app-container min-h-screen relative bg-white";
   
   const contentPaddingClass = isFullScreenCameraPage 
     ? "main-content" 
