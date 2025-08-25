@@ -78,19 +78,19 @@ export default function BottomNav() {
                 return (
                   <Link key={item.path} href={item.path}>
                     <motion.div
-                      className="relative flex items-center justify-center cursor-pointer"
+                      className="relative flex items-center justify-center cursor-pointer w-12 h-12"
                       data-tutorial={item.testId}
                       whileTap={{ scale: 0.9 }}
                     >
-                      {/* Floating circle for active item - extends above navbar */}
+                      {/* Floating circle for active item - properly centered */}
                       <AnimatePresence>
                         {isItemActive && (
                           <>
                             {/* Background circle that extends beyond navbar */}
                             <motion.div
-                              initial={{ scale: 0, y: 0 }}
-                              animate={{ scale: 1, y: -8 }}
-                              exit={{ scale: 0, y: 0 }}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              exit={{ scale: 0 }}
                               transition={{ 
                                 type: "spring",
                                 stiffness: 500,
@@ -98,17 +98,16 @@ export default function BottomNav() {
                               }}
                               className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 shadow-lg shadow-cyan-500/30"
                               style={{ 
-                                top: '50%',
+                                top: '-12px',
                                 left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                zIndex: -1
+                                transform: 'translateX(-50%)'
                               }}
                             />
                             {/* Inner white circle */}
                             <motion.div
-                              initial={{ scale: 0, y: 0 }}
-                              animate={{ scale: 1, y: -8 }}
-                              exit={{ scale: 0, y: 0 }}
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              exit={{ scale: 0 }}
                               transition={{ 
                                 type: "spring",
                                 stiffness: 500,
@@ -117,10 +116,9 @@ export default function BottomNav() {
                               }}
                               className="absolute w-12 h-12 rounded-full bg-white dark:bg-gray-900"
                               style={{ 
-                                top: '50%',
+                                top: '-8px',
                                 left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                zIndex: -1
+                                transform: 'translateX(-50%)'
                               }}
                             />
                           </>
@@ -129,7 +127,7 @@ export default function BottomNav() {
 
                       {/* Icon container */}
                       <motion.div
-                        className="relative p-3 z-10"
+                        className="relative z-10 flex items-center justify-center"
                         animate={{
                           y: isItemActive ? -8 : 0,
                         }}
@@ -157,7 +155,7 @@ export default function BottomNav() {
               {/* Add Button - Compact design */}
               <Link href="/add-food">
                 <motion.div
-                  className="relative flex items-center justify-center cursor-pointer"
+                  className="relative flex items-center justify-center cursor-pointer w-12 h-12"
                   whileTap={{ scale: 0.9 }}
                   data-testid="add-food-button"
                   data-tutorial="add-food-button"
@@ -167,9 +165,9 @@ export default function BottomNav() {
                     {location === "/add-food" && (
                       <>
                         <motion.div
-                          initial={{ scale: 0, y: 0 }}
-                          animate={{ scale: 1, y: -8 }}
-                          exit={{ scale: 0, y: 0 }}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
                           transition={{ 
                             type: "spring",
                             stiffness: 500,
@@ -177,16 +175,15 @@ export default function BottomNav() {
                           }}
                           className="absolute w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg shadow-purple-500/30"
                           style={{ 
-                            top: '50%',
+                            top: '-12px',
                             left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: -1
+                            transform: 'translateX(-50%)'
                           }}
                         />
                         <motion.div
-                          initial={{ scale: 0, y: 0 }}
-                          animate={{ scale: 1, y: -8 }}
-                          exit={{ scale: 0, y: 0 }}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          exit={{ scale: 0 }}
                           transition={{ 
                             type: "spring",
                             stiffness: 500,
@@ -195,10 +192,9 @@ export default function BottomNav() {
                           }}
                           className="absolute w-12 h-12 rounded-full bg-white dark:bg-gray-900"
                           style={{ 
-                            top: '50%',
+                            top: '-8px',
                             left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: -1
+                            transform: 'translateX(-50%)'
                           }}
                         />
                       </>
@@ -207,7 +203,7 @@ export default function BottomNav() {
 
                   {/* Add icon */}
                   <motion.div
-                    className="relative p-3 z-10"
+                    className="relative z-10 flex items-center justify-center"
                     animate={{
                       y: location === "/add-food" ? -8 : 0,
                       rotate: location === "/add-food" ? 45 : 0,
