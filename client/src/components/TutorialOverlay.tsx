@@ -31,7 +31,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             onClick={handleClose}
           />
           
-          {/* Spotlight for + button */}
+          {/* Spotlight for + button - positioned on far right of bottom nav */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -39,8 +39,9 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             transition={{ type: "spring", duration: 0.5 }}
             className="fixed z-[10001]"
             style={{
-              bottom: '36px',
-              right: '66px',
+              position: 'fixed',
+              bottom: '12px',
+              right: '15%',
               pointerEvents: 'none'
             }}
           >
