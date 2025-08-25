@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Upload, User, Target, Heart, Zap, Clock, Star } from 'lucide-react';
+import { Camera, Upload, User, Target, Heart, Zap, Clock, Star, CalendarDays, Calendar, TrendingDown } from 'lucide-react';
 
 type OnboardingData = {
   perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change' | 'other')[];
@@ -1549,52 +1549,143 @@ export default function OnboardingQuiz() {
                               
                               return (
                                 <>
-                                  {/* Timeline Visualization */}
+                                  {/* Timeline Visualization - Revamped */}
                                   {formData.weightGoal !== 'maintain' && (
-                                    <div className="backdrop-blur-md bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-2xl p-6 border border-white/30">
-                                      <h3 className="text-center text-lg font-semibold text-gray-700 mb-6">Your Journey Timeline</h3>
+                                    <div className="backdrop-blur-md bg-gradient-to-br from-white/40 to-white/20 rounded-2xl p-6 border border-white/40 shadow-xl">
+                                      <h3 className="text-center text-lg font-semibold text-gray-700 mb-8">Your Success Journey</h3>
                                       
-                                      <div className="grid grid-cols-2 gap-6">
+                                      {/* Visual Timeline Path */}
+                                      <div className="relative mb-8">
+                                        {/* Timeline Background Bar */}
+                                        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-green-200 via-emerald-200 to-teal-200 rounded-full" />
+                                        
+                                        {/* Start Point */}
                                         <motion.div 
                                           initial={{ scale: 0 }}
                                           animate={{ scale: 1 }}
                                           transition={{ delay: 0.2, type: "spring" }}
-                                          className="text-center"
+                                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
                                         >
-                                          <div className="backdrop-blur-sm bg-white/50 rounded-xl p-4 border border-white/30">
-                                            <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                                              {timeline.weeks}
-                                            </div>
-                                            <div className="text-sm text-gray-600">weeks</div>
-                                          </div>
+                                          <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full shadow-lg ring-4 ring-white/50" />
+                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-gray-600 font-medium whitespace-nowrap">Today</div>
                                         </motion.div>
                                         
+                                        {/* End Point */}
                                         <motion.div 
                                           initial={{ scale: 0 }}
                                           animate={{ scale: 1 }}
-                                          transition={{ delay: 0.3, type: "spring" }}
-                                          className="text-center"
+                                          transition={{ delay: 0.6, type: "spring" }}
+                                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2"
                                         >
-                                          <div className="backdrop-blur-sm bg-white/50 rounded-xl p-4 border border-white/30">
-                                            <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                                              {timeline.months}
+                                          <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full shadow-lg ring-4 ring-white/50 flex items-center justify-center">
+                                            <Star className="w-3 h-3 text-white" />
+                                          </div>
+                                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs text-gray-600 font-medium whitespace-nowrap">Goal</div>
+                                        </motion.div>
+                                        
+                                        {/* Animated Progress Indicator */}
+                                        <motion.div 
+                                          initial={{ left: "0%" }}
+                                          animate={{ left: "70%" }}
+                                          transition={{ delay: 0.4, duration: 1.5, ease: "easeOut" }}
+                                          className="absolute top-1/2 -translate-y-1/2"
+                                        >
+                                          <motion.div
+                                            animate={{ scale: [1, 1.2, 1] }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                            className="w-3 h-3 bg-white rounded-full shadow-md"
+                                          />
+                                        </motion.div>
+                                        
+                                        {/* Invisible height spacer */}
+                                        <div className="h-12" />
+                                      </div>
+                                      
+                                      {/* Time Display Cards - Redesigned */}
+                                      <div className="grid grid-cols-3 gap-3 mb-6">
+                                        {/* Weeks Card */}
+                                        <motion.div 
+                                          initial={{ opacity: 0, y: 20 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ delay: 0.3 }}
+                                          className="relative overflow-hidden"
+                                        >
+                                          <div className="backdrop-blur-sm bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl p-4 border border-green-200/50">
+                                            <div className="flex items-center justify-center mb-2">
+                                              <CalendarDays className="w-5 h-5 text-green-600" />
                                             </div>
-                                            <div className="text-sm text-gray-600">months</div>
+                                            <div className="text-center">
+                                              <div className="text-2xl font-bold text-gray-800">
+                                                {timeline.weeks}
+                                              </div>
+                                              <div className="text-xs text-gray-600 font-medium">weeks</div>
+                                            </div>
+                                            {/* Decorative gradient */}
+                                            <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-gradient-to-br from-green-400/20 to-transparent rounded-full blur-xl" />
+                                          </div>
+                                        </motion.div>
+                                        
+                                        {/* OR Divider */}
+                                        <motion.div 
+                                          initial={{ scale: 0 }}
+                                          animate={{ scale: 1 }}
+                                          transition={{ delay: 0.4 }}
+                                          className="flex items-center justify-center"
+                                        >
+                                          <div className="text-xs text-gray-400 font-medium px-2 py-1 bg-white/50 backdrop-blur-sm rounded-full">or</div>
+                                        </motion.div>
+                                        
+                                        {/* Months Card */}
+                                        <motion.div 
+                                          initial={{ opacity: 0, y: 20 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ delay: 0.5 }}
+                                          className="relative overflow-hidden"
+                                        >
+                                          <div className="backdrop-blur-sm bg-gradient-to-br from-teal-500/10 to-cyan-500/10 rounded-2xl p-4 border border-teal-200/50">
+                                            <div className="flex items-center justify-center mb-2">
+                                              <Calendar className="w-5 h-5 text-teal-600" />
+                                            </div>
+                                            <div className="text-center">
+                                              <div className="text-2xl font-bold text-gray-800">
+                                                {timeline.months}
+                                              </div>
+                                              <div className="text-xs text-gray-600 font-medium">months</div>
+                                            </div>
+                                            {/* Decorative gradient */}
+                                            <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-gradient-to-br from-teal-400/20 to-transparent rounded-full blur-xl" />
                                           </div>
                                         </motion.div>
                                       </div>
 
+                                      {/* Progress Rate - Enhanced */}
                                       <motion.div 
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        transition={{ delay: 0.5 }}
-                                        className="mt-6 pt-4 border-t border-white/20 text-center"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.6 }}
+                                        className="backdrop-blur-sm bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-4 border border-purple-200/50"
                                       >
-                                        <div className="backdrop-blur-sm bg-white/30 rounded-lg px-4 py-2 inline-flex items-center space-x-2">
-                                          <span className="text-sm text-gray-600">Progress Rate:</span>
-                                          <span className="text-sm font-bold text-green-600">
-                                            {Math.abs(timeline.weeklyProgress).toFixed(1)} kg/week
-                                          </span>
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <TrendingDown className="w-4 h-4 text-purple-600" />
+                                            <span className="text-sm text-gray-700 font-medium">Weekly Progress</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                                              {Math.abs(timeline.weeklyProgress).toFixed(1)}
+                                            </span>
+                                            <span className="text-sm text-gray-600">kg/week</span>
+                                          </div>
+                                        </div>
+                                        
+                                        {/* Visual Progress Bar */}
+                                        <div className="mt-3 h-2 bg-gray-200/50 rounded-full overflow-hidden">
+                                          <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${Math.min(Math.abs(timeline.weeklyProgress) * 100, 100)}%` }}
+                                            transition={{ delay: 0.8, duration: 1 }}
+                                            className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                                          />
                                         </div>
                                       </motion.div>
                                     </div>
