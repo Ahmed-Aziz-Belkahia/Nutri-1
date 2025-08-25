@@ -53,6 +53,22 @@ export default function BottomNav() {
     return location === path;
   };
 
+  // Calculate position for the bump
+  const getBumpPosition = () => {
+    const homeActive = isActive("/dashboard");
+    const recipesActive = isActive("/recipes");
+    const progressActive = isActive("/progress");
+    const addActive = location === "/add-food";
+    
+    if (homeActive) return "25%";
+    if (recipesActive) return "41.66%";
+    if (progressActive) return "58.33%";
+    if (addActive) return "75%";
+    return null;
+  };
+
+  const bumpPosition = getBumpPosition();
+
   return (
     <nav 
       className="fixed bottom-0 left-0 right-0 z-50"
@@ -62,10 +78,34 @@ export default function BottomNav() {
       }}
     >
       <div className="relative mx-3 mb-2">
-        {/* Main navbar container with glassmorphism */}
-        <div className="relative overflow-visible">
+        {/* Circular bump that goes behind - positioned absolutely */}
+        {bumpPosition && (
+          <motion.div
+            className="absolute w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
+            style={{ 
+              left: bumpPosition,
+              transform: 'translateX(-50%)',
+              bottom: '12px',
+              zIndex: 0
+            }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ 
+              type: "spring",
+              stiffness: 500,
+              damping: 25
+            }}
+            layoutId="navbar-bump"
+          >
+            {/* Inner gradient */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
+          </motion.div>
+        )}
+        
+        {/* Main navbar container with glassmorphism - on top */}
+        <div className="relative" style={{ zIndex: 10 }}>
           {/* Background bar */}
-          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl z-10">
+          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
             
             <div className="relative px-2 py-2">
@@ -78,32 +118,13 @@ export default function BottomNav() {
                   return (
                     <Link key={item.path} href={item.path}>
                       <motion.div
-                        className="relative flex items-center justify-center cursor-pointer w-12 h-12 z-20"
+                        className="relative flex items-center justify-center cursor-pointer w-12 h-12"
                         data-tutorial={item.testId}
                         whileTap={{ scale: 0.9 }}
                       >
-                        {/* Circular bump that's behind the navbar */}
-                        {isItemActive && (
-                          <motion.div
-                            className="absolute -top-6 w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
-                            style={{ zIndex: -1 }}
-                            initial={{ scale: 0, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0, y: 20 }}
-                            transition={{ 
-                              type: "spring",
-                              stiffness: 500,
-                              damping: 25
-                            }}
-                          >
-                            {/* Inner gradient */}
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
-                          </motion.div>
-                        )}
-
                         {/* Icon */}
                         <motion.div
-                          className="relative z-30 flex items-center justify-center"
+                          className="relative flex items-center justify-center"
                           animate={{
                             y: isItemActive ? -6 : 0,
                             scale: isItemActive ? 1.15 : 1,
@@ -132,33 +153,14 @@ export default function BottomNav() {
                 {/* Add Button */}
                 <Link href="/add-food">
                   <motion.div
-                    className="relative flex items-center justify-center cursor-pointer w-12 h-12 z-20"
+                    className="relative flex items-center justify-center cursor-pointer w-12 h-12"
                     whileTap={{ scale: 0.9 }}
                     data-testid="add-food-button"
                     data-tutorial="add-food-button"
                   >
-                    {/* Circular bump for add button when active - behind navbar */}
-                    {location === "/add-food" && (
-                      <motion.div
-                        className="absolute -top-6 w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
-                        style={{ zIndex: -1 }}
-                        initial={{ scale: 0, y: 20 }}
-                        animate={{ scale: 1, y: 0 }}
-                        exit={{ scale: 0, y: 20 }}
-                        transition={{ 
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 25
-                        }}
-                      >
-                        {/* Inner gradient */}
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10" />
-                      </motion.div>
-                    )}
-
                     {/* Add icon */}
                     <motion.div
-                      className="relative z-30 flex items-center justify-center"
+                      className="relative flex items-center justify-center"
                       animate={{
                         y: location === "/add-food" ? -6 : 0,
                         scale: location === "/add-food" ? 1.15 : 1,
