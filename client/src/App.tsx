@@ -214,7 +214,7 @@ function App() {
   
   const contentPaddingClass = isFullScreenCameraPage 
     ? "main-content" 
-    : "main-content pb-20 pt-safe-or-6";
+    : "main-content pb-4 pt-safe-or-6";
 
   return (
     <div className={appBackgroundClass}>
