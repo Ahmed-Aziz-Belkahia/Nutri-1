@@ -27,7 +27,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 z-[100]"
+            className="fixed inset-0 bg-black/70 z-[10000]"
             onClick={handleClose}
           />
           
@@ -37,7 +37,7 @@ export function TutorialOverlay({ onComplete }: TutorialOverlayProps) {
             animate={{ scale: 1 }}
             exit={{ scale: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="fixed z-[101]"
+            className="fixed z-[10001]"
             style={{
               bottom: '36px',
               right: '66px',
