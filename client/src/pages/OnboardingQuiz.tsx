@@ -519,7 +519,7 @@ export default function OnboardingQuiz() {
                               }}
                             />
                             {/* Custom slider thumb styling via CSS */}
-                            <style jsx>{`
+                            <style>{`
                               input[type="range"]::-webkit-slider-thumb {
                                 appearance: none;
                                 width: 24px;
@@ -727,7 +727,7 @@ export default function OnboardingQuiz() {
                               ))}
                             </div>
                             
-                            <style jsx>{`
+                            <style>{`
                               .no-scrollbar::-webkit-scrollbar {
                                 display: none;
                               }
@@ -798,46 +798,409 @@ export default function OnboardingQuiz() {
                   </div>
                 )}
 
-                {/* Step 4: Current Weight */}
+                {/* Step 4: Current Weight - Scale Style */}
                 {step === 4 && (
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <Input
-                        type="number"
-                        value={formData.weight || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const weight = value ? parseInt(value, 10) : 0;
-                          setFormData(prev => ({ ...prev, weight: isNaN(weight) ? 0 : weight }));
-                        }}
-                        placeholder="Current weight"
-                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl focus:border-blue-400 focus:ring-blue-200 transition-all duration-300"
-                        min="30"
-                        max="300"
-                      />
-                      <p className="text-sm text-gray-500 mt-2">kg</p>
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-indigo-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Weight display with scale-like design */}
+                        <div className="flex flex-col items-center mb-8">
+                          {/* Scale display */}
+                          <div className="relative">
+                            <div className="backdrop-blur-md bg-white/60 rounded-full p-8 shadow-lg border border-white/30 mb-4">
+                              <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                                {formData.weight || 70}
+                              </div>
+                              <div className="text-center text-gray-600 font-medium mt-1">kg</div>
+                            </div>
+                            {/* Scale decorative elements */}
+                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-blue-300/50 to-indigo-300/50 rounded-full"></div>
+                          </div>
+                        </div>
+                        
+                        {/* Weight Scale Scroller Container */}
+                        <div className="relative">
+                          {/* Selection indicator (scale needle) */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                            <div className="w-0.5 h-16 bg-gradient-to-b from-blue-500 to-indigo-500 shadow-lg"></div>
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-blue-500 rounded-full shadow-lg"></div>
+                          </div>
+                          
+                          {/* Scale container with horizontal scroll */}
+                          <div 
+                            className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-gradient-to-b from-white/20 to-white/10 border border-white/30 p-4"
+                            ref={(scrollContainer) => {
+                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                                scrollContainer.dataset.initialized = 'true';
+                                
+                                // Initial scroll position
+                                const targetWeight = formData.weight || 70;
+                                const scrollPosition = (targetWeight - 30) * 20; // 20px per kg
+                                setTimeout(() => {
+                                  scrollContainer.scrollLeft = scrollPosition;
+                                }, 0);
+                                
+                                // Variables for drag functionality
+                                let isDown = false;
+                                let startX = 0;
+                                let scrollLeft = 0;
+                                
+                                // Mouse events
+                                scrollContainer.addEventListener('mousedown', (e) => {
+                                  isDown = true;
+                                  scrollContainer.style.cursor = 'grabbing';
+                                  startX = e.pageX - scrollContainer.offsetLeft;
+                                  scrollLeft = scrollContainer.scrollLeft;
+                                  e.preventDefault();
+                                });
+                                
+                                scrollContainer.addEventListener('mouseleave', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mouseup', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mousemove', (e) => {
+                                  if (!isDown) return;
+                                  e.preventDefault();
+                                  const x = e.pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - startX) * 1.5;
+                                  scrollContainer.scrollLeft = scrollLeft - walk;
+                                });
+                                
+                                // Touch events for mobile
+                                let touchStartX = 0;
+                                let touchScrollLeft = 0;
+                                
+                                scrollContainer.addEventListener('touchstart', (e) => {
+                                  touchStartX = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  touchScrollLeft = scrollContainer.scrollLeft;
+                                });
+                                
+                                scrollContainer.addEventListener('touchmove', (e) => {
+                                  const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - touchStartX) * 1.5;
+                                  scrollContainer.scrollLeft = touchScrollLeft - walk;
+                                });
+                                
+                                // Scroll event listener for weight updates
+                                scrollContainer.addEventListener('scroll', () => {
+                                  const scrollLeft = scrollContainer.scrollLeft;
+                                  const pixelsPerKg = 20;
+                                  const weight = Math.round(30 + scrollLeft / pixelsPerKg);
+                                  const clampedWeight = Math.max(30, Math.min(200, weight));
+                                  setFormData(prev => ({ ...prev, weight: clampedWeight }));
+                                });
+                              }
+                            }}
+                            style={{ cursor: 'grab' }}
+                          >
+                            <div 
+                              className="flex items-end h-14 select-none"
+                              style={{ width: '3400px', paddingLeft: '50%', paddingRight: '50%' }}
+                            >
+                              {/* Generate scale marks */}
+                              {Array.from({ length: 171 }, (_, i) => i + 30).map((kg) => (
+                                <div key={kg} className="flex flex-col items-center justify-end" style={{ minWidth: '20px' }}>
+                                  {kg % 10 === 0 ? (
+                                    <>
+                                      <div className="w-1 h-10 bg-gradient-to-b from-gray-700/60 to-gray-600/40 rounded-full"></div>
+                                      <span className="text-xs text-gray-700 mt-1 font-bold">{kg}</span>
+                                    </>
+                                  ) : kg % 5 === 0 ? (
+                                    <>
+                                      <div className="w-0.5 h-7 bg-gray-600/40 rounded-full"></div>
+                                      <span className="text-xs text-gray-600 mt-1">{kg}</span>
+                                    </>
+                                  ) : (
+                                    <div className="w-0.5 h-4 bg-gray-500/30 rounded-full"></div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <style>{`
+                              .no-scrollbar::-webkit-scrollbar {
+                                display: none;
+                              }
+                              .no-scrollbar {
+                                -ms-overflow-style: none;
+                                scrollbar-width: none;
+                              }
+                            `}</style>
+                          </div>
+                        </div>
+                        
+                        {/* Quick select weight buttons */}
+                        <div className="mt-8 grid grid-cols-4 gap-3">
+                          {[50, 60, 70, 80].map((weight) => (
+                            <motion.button
+                              key={weight}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, weight }));
+                                // Scroll to selected weight
+                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
+                                if (scale && scale.parentElement) {
+                                  const pixelsPerKg = 20;
+                                  const scrollPosition = (weight - 30) * pixelsPerKg;
+                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }}
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                                formData.weight === weight
+                                  ? 'bg-gradient-to-r from-blue-500/80 to-indigo-500/80 text-white border-white/40 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                              }`}
+                            >
+                              <span className="font-semibold">{weight}</span>
+                              <span className="text-xs ml-1">kg</span>
+                            </motion.button>
+                          ))}
+                        </div>
+                        
+                        {/* Manual input option */}
+                        <div className="mt-6 flex justify-center">
+                          <input
+                            type="number"
+                            value={formData.weight || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const weight = value ? parseInt(value, 10) : 0;
+                              if (weight >= 30 && weight <= 200) {
+                                setFormData(prev => ({ ...prev, weight }));
+                                // Scroll to entered weight
+                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
+                                if (scale && scale.parentElement) {
+                                  const pixelsPerKg = 20;
+                                  const scrollPosition = (weight - 30) * pixelsPerKg;
+                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }
+                            }}
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300"
+                            min="30"
+                            max="200"
+                            placeholder="Weight"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Step 5: Goal Weight */}
+                {/* Step 5: Goal Weight - Scale Style */}
                 {step === 5 && (
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <Input
-                        type="number"
-                        value={formData.goalWeight || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          const goalWeight = value ? parseInt(value, 10) : 0;
-                          setFormData(prev => ({ ...prev, goalWeight: isNaN(goalWeight) ? 0 : goalWeight }));
-                        }}
-                        placeholder="Goal weight"
-                        className="text-center text-3xl py-8 font-bold bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl focus:border-amber-400 focus:ring-amber-200 transition-all duration-300"
-                        min="30"
-                        max="300"
-                      />
-                      <p className="text-sm text-gray-500 mt-2">kg</p>
+                  <div className="space-y-8">
+                    {/* Glassmorphic Card Container */}
+                    <div className="relative">
+                      {/* Background decorative elements */}
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-amber-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-orange-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      
+                      {/* Main glassmorphic card */}
+                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                        {/* Goal Weight display with scale-like design */}
+                        <div className="flex flex-col items-center mb-8">
+                          {/* Scale display with target icon */}
+                          <div className="relative">
+                            <div className="backdrop-blur-md bg-white/60 rounded-full p-8 shadow-lg border border-white/30 mb-4">
+                              <div className="text-5xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                                {formData.goalWeight || 65}
+                              </div>
+                              <div className="text-center text-gray-600 font-medium mt-1">kg</div>
+                            </div>
+                            {/* Target decorative elements */}
+                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-amber-300/50 to-orange-300/50 rounded-full"></div>
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center">
+                              <Target className="w-3 h-3 text-white" />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Goal Weight Scale Scroller Container */}
+                        <div className="relative">
+                          {/* Selection indicator (scale needle) */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                            <div className="w-0.5 h-16 bg-gradient-to-b from-amber-500 to-orange-500 shadow-lg"></div>
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-3 h-3 bg-amber-500 rounded-full shadow-lg"></div>
+                          </div>
+                          
+                          {/* Scale container with horizontal scroll */}
+                          <div 
+                            className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-gradient-to-b from-white/20 to-white/10 border border-white/30 p-4"
+                            ref={(scrollContainer) => {
+                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                                scrollContainer.dataset.initialized = 'true';
+                                
+                                // Initial scroll position
+                                const targetGoalWeight = formData.goalWeight || 65;
+                                const scrollPosition = (targetGoalWeight - 30) * 20; // 20px per kg
+                                setTimeout(() => {
+                                  scrollContainer.scrollLeft = scrollPosition;
+                                }, 0);
+                                
+                                // Variables for drag functionality
+                                let isDown = false;
+                                let startX = 0;
+                                let scrollLeft = 0;
+                                
+                                // Mouse events
+                                scrollContainer.addEventListener('mousedown', (e) => {
+                                  isDown = true;
+                                  scrollContainer.style.cursor = 'grabbing';
+                                  startX = e.pageX - scrollContainer.offsetLeft;
+                                  scrollLeft = scrollContainer.scrollLeft;
+                                  e.preventDefault();
+                                });
+                                
+                                scrollContainer.addEventListener('mouseleave', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mouseup', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mousemove', (e) => {
+                                  if (!isDown) return;
+                                  e.preventDefault();
+                                  const x = e.pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - startX) * 1.5;
+                                  scrollContainer.scrollLeft = scrollLeft - walk;
+                                });
+                                
+                                // Touch events for mobile
+                                let touchStartX = 0;
+                                let touchScrollLeft = 0;
+                                
+                                scrollContainer.addEventListener('touchstart', (e) => {
+                                  touchStartX = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  touchScrollLeft = scrollContainer.scrollLeft;
+                                });
+                                
+                                scrollContainer.addEventListener('touchmove', (e) => {
+                                  const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - touchStartX) * 1.5;
+                                  scrollContainer.scrollLeft = touchScrollLeft - walk;
+                                });
+                                
+                                // Scroll event listener for goal weight updates
+                                scrollContainer.addEventListener('scroll', () => {
+                                  const scrollLeft = scrollContainer.scrollLeft;
+                                  const pixelsPerKg = 20;
+                                  const goalWeight = Math.round(30 + scrollLeft / pixelsPerKg);
+                                  const clampedGoalWeight = Math.max(30, Math.min(200, goalWeight));
+                                  setFormData(prev => ({ ...prev, goalWeight: clampedGoalWeight }));
+                                });
+                              }
+                            }}
+                            style={{ cursor: 'grab' }}
+                          >
+                            <div 
+                              className="flex items-end h-14 select-none"
+                              style={{ width: '3400px', paddingLeft: '50%', paddingRight: '50%' }}
+                            >
+                              {/* Generate scale marks with goal-oriented styling */}
+                              {Array.from({ length: 171 }, (_, i) => i + 30).map((kg) => (
+                                <div key={kg} className="flex flex-col items-center justify-end" style={{ minWidth: '20px' }}>
+                                  {kg % 10 === 0 ? (
+                                    <>
+                                      <div className="w-1 h-10 bg-gradient-to-b from-gray-700/60 to-gray-600/40 rounded-full"></div>
+                                      <span className="text-xs text-gray-700 mt-1 font-bold">{kg}</span>
+                                    </>
+                                  ) : kg % 5 === 0 ? (
+                                    <>
+                                      <div className="w-0.5 h-7 bg-gray-600/40 rounded-full"></div>
+                                      <span className="text-xs text-gray-600 mt-1">{kg}</span>
+                                    </>
+                                  ) : (
+                                    <div className="w-0.5 h-4 bg-gray-500/30 rounded-full"></div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            
+                            <style>{`
+                              .no-scrollbar::-webkit-scrollbar {
+                                display: none;
+                              }
+                              .no-scrollbar {
+                                -ms-overflow-style: none;
+                                scrollbar-width: none;
+                              }
+                            `}</style>
+                          </div>
+                        </div>
+                        
+                        {/* Quick select goal weight buttons */}
+                        <div className="mt-8 grid grid-cols-4 gap-3">
+                          {[55, 65, 75, 85].map((goalWeight) => (
+                            <motion.button
+                              key={goalWeight}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                setFormData(prev => ({ ...prev, goalWeight }));
+                                // Scroll to selected goal weight
+                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
+                                if (scale && scale.parentElement) {
+                                  const pixelsPerKg = 20;
+                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg;
+                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }}
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                                formData.goalWeight === goalWeight
+                                  ? 'bg-gradient-to-r from-amber-500/80 to-orange-500/80 text-white border-white/40 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                              }`}
+                            >
+                              <span className="font-semibold">{goalWeight}</span>
+                              <span className="text-xs ml-1">kg</span>
+                            </motion.button>
+                          ))}
+                        </div>
+                        
+                        {/* Manual input option */}
+                        <div className="mt-6 flex justify-center">
+                          <input
+                            type="number"
+                            value={formData.goalWeight || ''}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const goalWeight = value ? parseInt(value, 10) : 0;
+                              if (goalWeight >= 30 && goalWeight <= 200) {
+                                setFormData(prev => ({ ...prev, goalWeight }));
+                                // Scroll to entered goal weight
+                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
+                                if (scale && scale.parentElement) {
+                                  const pixelsPerKg = 20;
+                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg;
+                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                }
+                              }
+                            }}
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-300"
+                            min="30"
+                            max="200"
+                            placeholder="Goal"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
