@@ -53,22 +53,6 @@ export default function BottomNav() {
     return location === path;
   };
 
-  // Calculate position for the bump
-  const getBumpPosition = () => {
-    const homeActive = isActive("/dashboard");
-    const recipesActive = isActive("/recipes");
-    const progressActive = isActive("/progress");
-    const addActive = location === "/add-food";
-    
-    if (homeActive) return "25%";
-    if (recipesActive) return "41.66%";
-    if (progressActive) return "58.33%";
-    if (addActive) return "75%";
-    return null;
-  };
-
-  const bumpPosition = getBumpPosition();
-
   return (
     <nav 
       className="fixed bottom-0 left-0 right-0 z-50"
@@ -78,117 +62,102 @@ export default function BottomNav() {
       }}
     >
       <div className="relative mx-3 mb-2">
-        {/* Circular bump that goes behind - positioned absolutely */}
-        {bumpPosition && (
-          <motion.div
-            className="absolute w-16 h-16 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl"
-            style={{ 
-              left: bumpPosition,
-              transform: 'translateX(-50%)',
-              bottom: '12px',
-              zIndex: 0
-            }}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ 
-              type: "spring",
-              stiffness: 500,
-              damping: 25
-            }}
-            layoutId="navbar-bump"
-          >
-            {/* Inner gradient */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-500/10 to-blue-500/10" />
-          </motion.div>
-        )}
-        
-        {/* Main navbar container with glassmorphism - on top */}
-        <div className="relative" style={{ zIndex: 10 }}>
-          {/* Background bar */}
-          <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
-            
-            <div className="relative px-2 py-2">
-              <div className="flex justify-around items-center">
-                {/* Navigation Items */}
-                {navItems.map((item) => {
-                  const isItemActive = isActive(item.path);
-                  const Icon = isItemActive ? item.activeIcon : item.icon;
-                  
-                  return (
-                    <Link key={item.path} href={item.path}>
-                      <motion.div
-                        className="relative flex items-center justify-center cursor-pointer w-12 h-12"
-                        data-tutorial={item.testId}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        {/* Icon */}
-                        <motion.div
-                          className="relative flex items-center justify-center"
-                          animate={{
-                            y: isItemActive ? -6 : 0,
-                            scale: isItemActive ? 1.15 : 1,
-                          }}
-                          transition={{ 
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 25
-                          }}
-                        >
-                          <Icon 
-                            className={`
-                              w-6 h-6 transition-all duration-300
-                              ${isItemActive 
-                                ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg' 
-                                : 'text-gray-500 dark:text-gray-400'
-                              }
-                            `}
-                          />
-                        </motion.div>
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-
-                {/* Add Button */}
-                <Link href="/add-food">
-                  <motion.div
-                    className="relative flex items-center justify-center cursor-pointer w-12 h-12"
-                    whileTap={{ scale: 0.9 }}
-                    data-testid="add-food-button"
-                    data-tutorial="add-food-button"
-                  >
-                    {/* Add icon */}
+        {/* Main navbar container with glassmorphism */}
+        <div className="relative rounded-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-xl">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 pointer-events-none" />
+          
+          <div className="relative px-2 py-2">
+            <div className="flex justify-around items-center">
+              {/* Navigation Items */}
+              {navItems.map((item) => {
+                const isItemActive = isActive(item.path);
+                const Icon = isItemActive ? item.activeIcon : item.icon;
+                
+                return (
+                  <Link key={item.path} href={item.path}>
                     <motion.div
-                      className="relative flex items-center justify-center"
-                      animate={{
-                        y: location === "/add-food" ? -6 : 0,
-                        scale: location === "/add-food" ? 1.15 : 1,
-                        rotate: location === "/add-food" ? 45 : 0,
-                      }}
-                      transition={{ 
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 25
-                      }}
-                    >
-                      <div className={`
-                        w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-300
-                        ${location === "/add-food" 
-                          ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
-                          : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                      className={`
+                        relative flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl
+                        transition-all duration-300
+                        ${isItemActive 
+                          ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-lg' 
+                          : ''
                         }
-                      `}>
-                        {location === "/add-food" ? (
-                          <span className="text-white text-2xl font-light">×</span>
-                        ) : (
-                          <IoAddCircleOutline className="w-6 h-6 text-white" />
-                        )}
-                      </div>
+                      `}
+                      data-tutorial={item.testId}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {/* Icon */}
+                      <motion.div
+                        className="relative flex items-center justify-center"
+                        animate={{
+                          scale: isItemActive ? 1.15 : 1,
+                        }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 25
+                        }}
+                      >
+                        <Icon 
+                          className={`
+                            w-6 h-6 transition-all duration-300
+                            ${isItemActive 
+                              ? 'text-cyan-600 dark:text-cyan-400 drop-shadow-lg' 
+                              : 'text-gray-500 dark:text-gray-400'
+                            }
+                          `}
+                        />
+                      </motion.div>
                     </motion.div>
+                  </Link>
+                );
+              })}
+
+              {/* Add Button */}
+              <Link href="/add-food">
+                <motion.div
+                  className={`
+                    relative flex items-center justify-center cursor-pointer w-12 h-12 rounded-xl
+                    transition-all duration-300
+                    ${location === "/add-food"
+                      ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-white/20 shadow-lg' 
+                      : ''
+                    }
+                  `}
+                  whileTap={{ scale: 0.9 }}
+                  data-testid="add-food-button"
+                  data-tutorial="add-food-button"
+                >
+                  {/* Add icon */}
+                  <motion.div
+                    className="relative flex items-center justify-center"
+                    animate={{
+                      scale: location === "/add-food" ? 1.15 : 1,
+                      rotate: location === "/add-food" ? 45 : 0,
+                    }}
+                    transition={{ 
+                      type: "spring",
+                      stiffness: 500,
+                      damping: 25
+                    }}
+                  >
+                    <div className={`
+                      w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all duration-300
+                      ${location === "/add-food" 
+                        ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
+                        : 'bg-gradient-to-br from-cyan-500 to-blue-500'
+                      }
+                    `}>
+                      {location === "/add-food" ? (
+                        <span className="text-white text-2xl font-light">×</span>
+                      ) : (
+                        <IoAddCircleOutline className="w-6 h-6 text-white" />
+                      )}
+                    </div>
                   </motion.div>
-                </Link>
-              </div>
+                </motion.div>
+              </Link>
             </div>
           </div>
         </div>
