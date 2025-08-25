@@ -127,7 +127,7 @@ export default function BottomNav() {
                       }
                     `}
                     style={{
-                      bottom: '-4px',
+                      bottom: '-18px',
                       left: '50%',
                       transform: 'translateX(-50%)',
                     }}
