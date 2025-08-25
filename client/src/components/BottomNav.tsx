@@ -148,17 +148,12 @@ export default function BottomNav() {
                         damping: 25
                       }}
                     >
-                      <div className={`
-                        w-14 h-14 rounded-full flex items-center justify-center shadow-md transition-all duration-300
-                        ${location === "/add-food" 
-                          ? 'bg-gradient-to-br from-purple-500 to-pink-500' 
-                          : 'bg-gradient-to-br from-cyan-500 to-blue-500'
-                        }
-                      `}>
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 bg-white/90 dark:bg-white/90 backdrop-blur-lg border border-white/30 relative">
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-500/10 to-emerald-500/10" />
                         {location === "/add-food" ? (
-                          <span className="text-white text-3xl font-light">×</span>
+                          <span className="text-gray-700 text-3xl font-light relative z-10">×</span>
                         ) : (
-                          <IoAddCircleOutline className="w-8 h-8 text-white" />
+                          <IoAddCircleOutline className="w-8 h-8 text-gray-700 relative z-10" />
                         )}
                       </div>
                     </motion.div>
