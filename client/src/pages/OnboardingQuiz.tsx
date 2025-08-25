@@ -631,35 +631,81 @@ export default function OnboardingQuiz() {
                           </div>
                           
                           {/* Ruler container with horizontal scroll */}
-                          <div className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-white/20 border border-white/30 p-4">
+                          <div 
+                            className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-white/20 border border-white/30 p-4"
+                            ref={(scrollContainer) => {
+                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                                scrollContainer.dataset.initialized = 'true';
+                                
+                                // Initial scroll position
+                                const targetHeight = formData.height || 170;
+                                const scrollPosition = (targetHeight - 100) * 10;
+                                setTimeout(() => {
+                                  scrollContainer.scrollLeft = scrollPosition;
+                                }, 0);
+                                
+                                // Variables for drag functionality
+                                let isDown = false;
+                                let startX = 0;
+                                let scrollLeft = 0;
+                                
+                                // Mouse events
+                                scrollContainer.addEventListener('mousedown', (e) => {
+                                  isDown = true;
+                                  scrollContainer.style.cursor = 'grabbing';
+                                  startX = e.pageX - scrollContainer.offsetLeft;
+                                  scrollLeft = scrollContainer.scrollLeft;
+                                  e.preventDefault();
+                                });
+                                
+                                scrollContainer.addEventListener('mouseleave', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mouseup', () => {
+                                  isDown = false;
+                                  scrollContainer.style.cursor = 'grab';
+                                });
+                                
+                                scrollContainer.addEventListener('mousemove', (e) => {
+                                  if (!isDown) return;
+                                  e.preventDefault();
+                                  const x = e.pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - startX) * 1.5; // Scroll speed multiplier
+                                  scrollContainer.scrollLeft = scrollLeft - walk;
+                                });
+                                
+                                // Touch events for mobile
+                                let touchStartX = 0;
+                                let touchScrollLeft = 0;
+                                
+                                scrollContainer.addEventListener('touchstart', (e) => {
+                                  touchStartX = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  touchScrollLeft = scrollContainer.scrollLeft;
+                                });
+                                
+                                scrollContainer.addEventListener('touchmove', (e) => {
+                                  const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+                                  const walk = (x - touchStartX) * 1.5;
+                                  scrollContainer.scrollLeft = touchScrollLeft - walk;
+                                });
+                                
+                                // Scroll event listener for height updates
+                                scrollContainer.addEventListener('scroll', () => {
+                                  const scrollLeft = scrollContainer.scrollLeft;
+                                  const pixelsPerCm = 10;
+                                  const height = Math.round(100 + scrollLeft / pixelsPerCm);
+                                  const clampedHeight = Math.max(100, Math.min(250, height));
+                                  setFormData(prev => ({ ...prev, height: clampedHeight }));
+                                });
+                              }
+                            }}
+                            style={{ cursor: 'grab' }}
+                          >
                             <div 
-                              className="flex items-end h-16 select-none cursor-grab active:cursor-grabbing"
+                              className="flex items-end h-16 select-none"
                               style={{ width: '3000px', paddingLeft: '50%', paddingRight: '50%' }}
-                              onScroll={(e) => {
-                                const scrollLeft = e.currentTarget.scrollLeft;
-                                const pixelsPerCm = 10;
-                                const centerOffset = e.currentTarget.clientWidth / 2;
-                                const height = Math.round(100 + (scrollLeft + centerOffset - e.currentTarget.clientWidth / 2) / pixelsPerCm);
-                                const clampedHeight = Math.max(100, Math.min(250, height));
-                                setFormData(prev => ({ ...prev, height: clampedHeight }));
-                              }}
-                              ref={(el) => {
-                                if (el && !el.dataset.initialized) {
-                                  el.dataset.initialized = 'true';
-                                  const targetHeight = formData.height || 170;
-                                  const scrollPosition = (targetHeight - 100) * 10 - el.clientWidth / 2;
-                                  el.scrollLeft = scrollPosition;
-                                  
-                                  // Add scroll event listener
-                                  el.addEventListener('scroll', () => {
-                                    const scrollLeft = el.scrollLeft;
-                                    const pixelsPerCm = 10;
-                                    const height = Math.round(100 + scrollLeft / pixelsPerCm);
-                                    const clampedHeight = Math.max(100, Math.min(250, height));
-                                    setFormData(prev => ({ ...prev, height: clampedHeight }));
-                                  });
-                                }
-                              }}
                             >
                               {/* Generate ruler marks */}
                               {Array.from({ length: 151 }, (_, i) => i + 100).map((cm) => (
