@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { Clock, Check, ChevronRight, Utensils, Coffee, Pizza } from "lucide-react";
+import { Clock, Check, ChevronRight, Utensils, Coffee, Pizza, CalendarDays, Plus, Sun, Moon, Cloud } from "lucide-react";
 import useEmblaCarousel from 'embla-carousel-react';
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { useTranslation } from 'react-i18next';
@@ -260,24 +260,21 @@ export function TodaysMealPlans({ className, selectedDate }: TodaysMealPlansProp
   if (!mealPlanData?.hasPlan) {
     return (
       <div className={className}>
-        <div className="text-center py-8 space-y-6">
-          <div className="w-20 h-20 bg-[#0CC5BA]/10 rounded-full flex items-center justify-center mx-auto">
-            <Utensils className="w-10 h-10 text-[#0CC5BA]" />
+        <div className="text-center py-12">
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-indigo-50 rounded-full flex items-center justify-center">
+            <CalendarDays className="h-10 w-10 text-purple-500" />
           </div>
-          <div>
-            <h3 className="text-xl font-semibold text-[#0CC5BA] mb-2">
-              {t('mealPlan.noMealPlanYet', 'Brak planu posiłków')}
-            </h3>
-            <p className="text-gray-600 max-w-xs mx-auto mb-6">
-              {t('mealPlan.createMealPlanDescription', 'Utwórz swój pierwszy plan posiłków, aby otrzymać spersonalizowane sugestie posiłków dostosowane do Twoich celów żywieniowych.')}
-            </p>
-            <Button 
-              onClick={() => setLocation('/meal-planning-quiz')}
-              className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white font-medium hover:from-blue-500 hover:to-[#0CC5BA] shadow-md px-6 py-2 rounded-lg"
-            >
-              {t('mealPlan.createMealPlan', 'Utwórz plan posiłków')}
-            </Button>
-          </div>
+          <h3 className="text-gray-700 font-semibold mb-2">No meal plan created</h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+            Create a personalized meal plan tailored to your nutritional goals and preferences
+          </p>
+          <Button 
+            onClick={() => setLocation('/meal-planning-quiz')}
+            className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-2.5 rounded-xl shadow-md font-medium"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Meal Plan
+          </Button>
         </div>
       </div>
     );
@@ -439,34 +436,58 @@ export function TodaysMealPlans({ className, selectedDate }: TodaysMealPlansProp
   
   return (
     <div className={className}>
-      <Tabs defaultValue="morning" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-4 bg-gray-100 rounded-xl p-1">
-          <TabsTrigger value="morning" className="text-sm py-2 px-3 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Coffee className="h-4 w-4 mr-2" />
-            {t('mealPlan.morning', 'Morning')}
-          </TabsTrigger>
-          <TabsTrigger value="afternoon" className="text-sm py-2 px-3 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Utensils className="h-4 w-4 mr-2" />
-            {t('mealPlan.afternoon', 'Afternoon')}
-          </TabsTrigger>
-          <TabsTrigger value="evening" className="text-sm py-2 px-3 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <Pizza className="h-4 w-4 mr-2" />
-            {t('mealPlan.evening', 'Evening')}
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-4">
+        {/* Morning meals */}
+        {groupedMeals['morning'] && groupedMeals['morning'].length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Sun className="h-4 w-4 text-amber-500" />
+              <h3 className="text-sm font-semibold text-gray-700">Morning</h3>
+              <span className="text-xs text-gray-500">({groupedMeals['morning'].length} meals)</span>
+            </div>
+            <div className="space-y-2">
+              {groupedMeals['morning'].map(meal => renderMealCard(meal))}
+            </div>
+          </div>
+        )}
         
-        <TabsContent value="morning" className="space-y-2">
-          {groupedMeals['morning']?.map(meal => renderMealCard(meal))}
-        </TabsContent>
+        {/* Afternoon meals */}
+        {groupedMeals['afternoon'] && groupedMeals['afternoon'].length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Cloud className="h-4 w-4 text-blue-500" />
+              <h3 className="text-sm font-semibold text-gray-700">Afternoon</h3>
+              <span className="text-xs text-gray-500">({groupedMeals['afternoon'].length} meals)</span>
+            </div>
+            <div className="space-y-2">
+              {groupedMeals['afternoon'].map(meal => renderMealCard(meal))}
+            </div>
+          </div>
+        )}
         
-        <TabsContent value="afternoon" className="space-y-2">
-          {groupedMeals['afternoon']?.map(meal => renderMealCard(meal))}
-        </TabsContent>
+        {/* Evening meals */}
+        {groupedMeals['evening'] && groupedMeals['evening'].length > 0 && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Moon className="h-4 w-4 text-indigo-500" />
+              <h3 className="text-sm font-semibold text-gray-700">Evening</h3>
+              <span className="text-xs text-gray-500">({groupedMeals['evening'].length} meals)</span>
+            </div>
+            <div className="space-y-2">
+              {groupedMeals['evening'].map(meal => renderMealCard(meal))}
+            </div>
+          </div>
+        )}
         
-        <TabsContent value="evening" className="space-y-2">
-          {groupedMeals['evening']?.map(meal => renderMealCard(meal))}
-        </TabsContent>
-      </Tabs>
+        {/* If no meals in any category */}
+        {(!groupedMeals['morning'] || groupedMeals['morning'].length === 0) && 
+         (!groupedMeals['afternoon'] || groupedMeals['afternoon'].length === 0) && 
+         (!groupedMeals['evening'] || groupedMeals['evening'].length === 0) && (
+          <div className="text-center py-8">
+            <p className="text-sm text-gray-500">No meals scheduled for today</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -932,16 +932,32 @@ export default function Dashboard() {
 
 
 
-          <motion.div variants={itemVariants} className="mt-8" data-tutorial="meal-plans-section">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <h2 className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">
-                  {t('mealPlan.title')}
-                </h2>
+          {/* Revamped Today's Meal Plan Section */}
+          <motion.div variants={itemVariants} className="mt-6" data-tutorial="meal-plans-section">
+            <Card className="overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
+              <div className="p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl">
+                      <CalendarDays className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-lg font-semibold text-gray-800">{t('mealPlan.title')}</h2>
+                  </div>
+                  <Link href="/meal-planning">
+                    <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
+                      Manage Plan
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  </Link>
+                </div>
+                
+                {/* Meal Plans Content */}
+                <div className="relative">
+                  <TodaysMealPlans selectedDate={selectedDate} />
+                </div>
               </div>
-
-            </div>
-            <TodaysMealPlans selectedDate={selectedDate} />
+            </Card>
           </motion.div>
         </motion.main>
 
