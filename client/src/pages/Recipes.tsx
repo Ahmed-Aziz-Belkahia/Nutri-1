@@ -370,6 +370,8 @@ export default function Recipes() {
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [newIngredient, setNewIngredient] = useState("");
+  const [recipeImage, setRecipeImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<CreateRecipeForm>({
     resolver: zodResolver(createRecipeSchema),
     defaultValues: {
@@ -410,6 +412,8 @@ export default function Recipes() {
       reset();
       setIngredients([]); // Clear ingredients array
       setNewIngredient("");
+      setRecipeImage(null);
+      setImagePreview("");
     },
     onError: (error) => {
       toast({
@@ -461,23 +465,52 @@ export default function Recipes() {
   const handleRemoveIngredient = (index: number) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setRecipeImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  const onSubmit = (data: CreateRecipeForm) => {
-    // Ensure ingredients are included
+  const onSubmit = async (data: CreateRecipeForm) => {
+    // Prepare form data for multipart upload if image is present
+    const formData = new FormData();
+    
+    // Add recipe data
     const recipeData = {
       ...data,
       ingredients: ingredients,
-      // Parse prep time to number (in minutes)
       prepTime: parseInt(data.prepTime) || 0,
       cookTime: parseInt(data.cookTime || "0") || 0,
       totalTime: (parseInt(data.prepTime) || 0) + (parseInt(data.cookTime || "0") || 0),
-      // Ensure nutrition values are numbers
       calories: data.calories || 0,
       protein: data.protein || 0,
       carbs: data.carbs || 0,
       fat: data.fat || 0
     };
-    createRecipeMutation.mutate(recipeData);
+    
+    // If there's an image, use FormData, otherwise send JSON
+    if (recipeImage) {
+      formData.append('image', recipeImage);
+      Object.keys(recipeData).forEach(key => {
+        const value = recipeData[key as keyof typeof recipeData];
+        if (Array.isArray(value)) {
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      // TODO: Update mutation to handle FormData
+      createRecipeMutation.mutate(recipeData);
+    } else {
+      createRecipeMutation.mutate(recipeData);
+    }
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
@@ -1069,9 +1102,11 @@ export default function Recipes() {
           reset();
           setIngredients([]);
           setNewIngredient("");
+          setRecipeImage(null);
+          setImagePreview("");
         }
       }}>
-        <DialogContent className="max-w-[480px] max-h-[85vh] overflow-hidden p-0 border-0 bg-transparent fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogContent className="max-w-[480px] max-h-[85vh] overflow-hidden p-0 border-0 bg-transparent">
           {/* Glassmorphism container */}
           <div className="relative bg-white/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden">
             {/* Decorative gradient orbs */}
@@ -1086,6 +1121,48 @@ export default function Recipes() {
               </DialogHeader>
               
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-6 max-h-[calc(90vh-120px)] overflow-y-auto pr-2">
+                {/* Image Upload Section */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Camera className="inline w-4 h-4 mr-1" />
+                    Recipe Image
+                  </label>
+                  <div className="relative">
+                    {imagePreview ? (
+                      <div className="relative group">
+                        <img 
+                          src={imagePreview} 
+                          alt="Recipe preview" 
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRecipeImage(null);
+                            setImagePreview("");
+                          }}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white/30 hover:bg-white/40 transition-all">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Camera className="w-8 h-8 mb-2 text-gray-400" />
+                          <p className="text-xs text-gray-500">Click to upload image</p>
+                        </div>
+                        <input 
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+                
                 {/* Recipe name with glassmorphism input */}
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
