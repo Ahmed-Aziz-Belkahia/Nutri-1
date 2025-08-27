@@ -67,15 +67,10 @@ const createRecipeSchema = z.object({
   name: z.string().min(1, "Recipe name is required"),
   description: z.string().optional(),
   prepTime: z.string().min(1, "Preparation time is required"),
-  cookTime: z.string().optional(),
   servings: z.number().min(1, "Number of servings is required"),
   difficulty: z.enum(["Easy", "Medium", "Hard"]),
   ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
   instructions: z.string().min(1, "Instructions are required"),
-  calories: z.number().optional(),
-  protein: z.number().optional(),
-  carbs: z.number().optional(),
-  fat: z.number().optional(),
   imageUrl: z.string().optional(),
   isPublic: z.boolean().default(true),
 });
@@ -370,24 +365,17 @@ export default function Recipes() {
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [newIngredient, setNewIngredient] = useState("");
-  const [recipeImage, setRecipeImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
-  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<CreateRecipeForm>({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateRecipeForm>({
     resolver: zodResolver(createRecipeSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      prepTime: "",
-      cookTime: "",
-      servings: 4,
-      difficulty: "Medium",
+      name: "High-Protein Breakfast Bowl",
+      description: "A nutritious breakfast bowl perfect for muscle recovery and sustained energy throughout the morning.",
+      prepTime: "20 mins",
+      servings: 1,
+      difficulty: "Easy",
       ingredients: [],
-      instructions: "",
-      calories: 0,
-      protein: 0,
-      carbs: 0,
-      fat: 0,
-      isPublic: false
+      instructions: "1. Cook quinoa according to package instructions and let it cool\n2. Cook turkey bacon until crispy\n3. Scramble the eggs\n4. Dice avocado and tomatoes\n5. In a bowl, arrange quinoa as the base\n6. Top with scrambled eggs, spinach, avocado, tomatoes, and crumbled bacon\n7. Season with salt and pepper\n8. Drizzle with olive oil\n9. Serve immediately while warm",
+      isPublic: true
     }
   });
 
@@ -410,10 +398,6 @@ export default function Recipes() {
       });
       setShowCreateModal(false);
       reset();
-      setIngredients([]); // Clear ingredients array
-      setNewIngredient("");
-      setRecipeImage(null);
-      setImagePreview("");
     },
     onError: (error) => {
       toast({
@@ -465,52 +449,10 @@ export default function Recipes() {
   const handleRemoveIngredient = (index: number) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
-  
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setRecipeImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const onSubmit = async (data: CreateRecipeForm) => {
-    // Prepare form data for multipart upload if image is present
-    const formData = new FormData();
-    
-    // Add recipe data
-    const recipeData = {
-      ...data,
-      ingredients: ingredients,
-      prepTime: parseInt(data.prepTime) || 0,
-      cookTime: parseInt(data.cookTime || "0") || 0,
-      totalTime: (parseInt(data.prepTime) || 0) + (parseInt(data.cookTime || "0") || 0),
-      calories: data.calories || 0,
-      protein: data.protein || 0,
-      carbs: data.carbs || 0,
-      fat: data.fat || 0
-    };
-    
-    // If there's an image, use FormData, otherwise send JSON
-    if (recipeImage) {
-      formData.append('image', recipeImage);
-      Object.keys(recipeData).forEach(key => {
-        const value = recipeData[key as keyof typeof recipeData];
-        if (Array.isArray(value)) {
-          formData.append(key, JSON.stringify(value));
-        } else {
-          formData.append(key, String(value));
-        }
-      });
-      // TODO: Update mutation to handle FormData
-      createRecipeMutation.mutate(recipeData);
-    } else {
-      createRecipeMutation.mutate(recipeData);
-    }
+  const onSubmit = (data: CreateRecipeForm) => {
+    data.ingredients = ingredients;
+    createRecipeMutation.mutate(data);
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
@@ -739,11 +681,10 @@ export default function Recipes() {
                   </div>
                   <Button
                     onClick={() => setShowCreateModal(true)}
-                    size="sm"
-                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white hover:shadow-md transition-all"
+                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Recipe
+                    <Plus className="h-4 w-4" />
+                    {t('recipes.createRecipe', 'Create Recipe')}
                   </Button>
                 </div>
 
@@ -794,7 +735,13 @@ export default function Recipes() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">{t('recipes.noRecipesYet')}</h3>
                     <p className="text-gray-500 mb-6">{t('recipes.startCulinaryJourney')}</p>
-                    {/* Buttons removed as requested */}
+                    <Button
+                      onClick={() => setShowCreateModal(true)}
+                      className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-lg px-6 py-3 flex items-center gap-2 hover:shadow-lg transition-all mx-auto"
+                    >
+                      <Plus className="h-5 w-5" />
+                      {t('recipes.createRecipe', 'Create Recipe')}
+                    </Button>
                   </div>
                 )}
               </motion.section>
@@ -1095,310 +1042,113 @@ export default function Recipes() {
         </motion.main>
       </div>
       
-      <Dialog open={showCreateModal} onOpenChange={(open) => {
-        setShowCreateModal(open);
-        if (!open) {
-          // Reset form when dialog closes
-          reset();
-          setIngredients([]);
-          setNewIngredient("");
-          setRecipeImage(null);
-          setImagePreview("");
-        }
-      }}>
-        <DialogContent className="max-w-[480px] max-h-[85vh] overflow-hidden p-0 border-0 bg-transparent">
-          {/* Glassmorphism container */}
-          <div className="relative bg-white/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden">
-            {/* Decorative gradient orbs */}
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-br from-[#0CC5BA] to-[#0091ff] rounded-full blur-3xl opacity-20" />
-            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20" />
-            
-            <div className="relative z-10 p-6">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] bg-clip-text text-transparent">
-                  {t('recipes.createNewRecipe')}
-                </DialogTitle>
-              </DialogHeader>
-              
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-6 max-h-[calc(90vh-120px)] overflow-y-auto pr-2">
-                {/* Image Upload Section */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <Camera className="inline w-4 h-4 mr-1" />
-                    Recipe Image
-                  </label>
-                  <div className="relative">
-                    {imagePreview ? (
-                      <div className="relative group">
-                        <img 
-                          src={imagePreview} 
-                          alt="Recipe preview" 
-                          className="w-full h-48 object-cover rounded-lg"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRecipeImage(null);
-                            setImagePreview("");
-                          }}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white/30 hover:bg-white/40 transition-all">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <Camera className="w-8 h-8 mb-2 text-gray-400" />
-                          <p className="text-xs text-gray-500">Click to upload image</p>
-                        </div>
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={handleImageChange}
-                        />
-                      </label>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Recipe name with glassmorphism input */}
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('recipes.name')}
-                  </label>
-                  <Input
-                    id="name"
-                    {...register("name")}
-                    placeholder="e.g., Grandma's Secret Pasta"
-                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all placeholder:text-gray-400"
-                  />
-                  {errors.name && <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.name.message}</p>}
-                </div>
-                
-                {/* Description */}
-                <div>
-                  <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('recipes.description')}
-                  </label>
-                  <Textarea
-                    id="description"
-                    {...register("description")}
-                    placeholder="What makes this recipe special?"
-                    rows={2}
-                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all resize-none placeholder:text-gray-400"
-                  />
-                </div>
-                
-                {/* Time and Servings Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                    <label htmlFor="prepTime" className="block text-xs font-semibold text-gray-600 mb-1">
-                      <Clock className="inline w-3 h-3 mr-1" />
-                      {t('recipes.prepTime')}
-                    </label>
-                    <Input
-                      id="prepTime"
-                      {...register("prepTime")}
-                      placeholder="15 mins"
-                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
-                    />
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                    <label htmlFor="cookTime" className="block text-xs font-semibold text-gray-600 mb-1">
-                      <Flame className="inline w-3 h-3 mr-1" />
-                      Cook Time
-                    </label>
-                    <Input
-                      id="cookTime"
-                      {...register("cookTime")}
-                      placeholder="30 mins"
-                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
-                    />
-                  </div>
-                </div>
-                
-                {/* Servings and Difficulty */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                    <label htmlFor="servings" className="block text-xs font-semibold text-gray-600 mb-1">
-                      <User className="inline w-3 h-3 mr-1" />
-                      Servings
-                    </label>
-                    <Input
-                      id="servings"
-                      type="number"
-                      {...register("servings", { valueAsNumber: true })}
-                      placeholder="4"
-                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
-                    />
-                  </div>
-                  
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                    <label htmlFor="difficulty" className="block text-xs font-semibold text-gray-600 mb-1">
-                      <Settings className="inline w-3 h-3 mr-1" />
-                      Difficulty
-                    </label>
-                    <select 
-                      id="difficulty"
-                      {...register("difficulty")}
-                      className="w-full h-8 px-2 rounded-md bg-white/60 border-0 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/50"
-                    >
-                      <option value="Easy">Easy</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Hard">Hard</option>
-                    </select>
-                  </div>
-                </div>
-                
-                {/* Nutrition Info with gradient background */}
-                <div className="bg-gradient-to-r from-[#0CC5BA]/10 to-[#0091ff]/10 rounded-lg p-4 border border-white/20">
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    <Heart className="inline w-4 h-4 mr-1" />
-                    Nutrition Info (Optional)
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        {...register("calories", { valueAsNumber: true })}
-                        placeholder="Calories"
-                        className="bg-white/70 border-white/50 h-9 text-sm pl-8"
-                      />
-                      <Flame className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
-                    </div>
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        {...register("protein", { valueAsNumber: true })}
-                        placeholder="Protein (g)"
-                        className="bg-white/70 border-white/50 h-9 text-sm"
-                      />
-                    </div>
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        {...register("carbs", { valueAsNumber: true })}
-                        placeholder="Carbs (g)"
-                        className="bg-white/70 border-white/50 h-9 text-sm"
-                      />
-                    </div>
-                    <div className="relative">
-                      <Input
-                        type="number"
-                        {...register("fat", { valueAsNumber: true })}
-                        placeholder="Fat (g)"
-                        className="bg-white/70 border-white/50 h-9 text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Ingredients Section with glassmorphism */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <ShoppingBag className="inline w-4 h-4 mr-1" />
-                    {t('recipes.ingredients')}
-                  </label>
-                  <div className="space-y-2 bg-white/30 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                    {ingredients.map((ingredient, index) => (
-                      <motion.div 
-                        key={index} 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center gap-2"
-                      >
-                        <div className="flex-1 bg-white/70 backdrop-blur-sm rounded-md px-3 py-2 text-sm">
-                          {ingredient}
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRemoveIngredient(index)}
-                          className="hover:bg-red-100/50 transition-colors"
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </motion.div>
-                    ))}
-                    <div className="flex gap-2 pt-2">
-                      <Input
-                        value={newIngredient}
-                        onChange={(e) => setNewIngredient(e.target.value)}
-                        placeholder={t('recipes.ingredientPlaceholder') || "e.g., 2 cups flour"}
-                        className="bg-white/70 border-white/50 text-sm"
-                        onKeyPress={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddIngredient();
-                          }
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        onClick={handleAddIngredient}
-                        className="bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] text-white hover:shadow-md"
-                        size="sm"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  {ingredients.length === 0 && errors.ingredients && (
-                    <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.ingredients.message}</p>
-                  )}
-                </div>
-                
-                {/* Instructions with glassmorphism */}
-                <div>
-                  <label htmlFor="instructions" className="block text-sm font-semibold text-gray-700 mb-2">
-                    <Sparkles className="inline w-4 h-4 mr-1" />
-                    {t('recipes.instructions')}
-                  </label>
-                  <Textarea
-                    id="instructions"
-                    {...register("instructions")}
-                    placeholder={t('recipes.instructionsPlaceholder') || "1. First step..."}
-                    rows={4}
-                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all resize-none placeholder:text-gray-400"
-                  />
-                  {errors.instructions && <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.instructions.message}</p>}
-                </div>
-                
-                {/* Buttons with gradient styling */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-white/20">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setShowCreateModal(false)}
-                    className="hover:bg-white/30"
-                  >
-                    {t('common.cancel')}
-                  </Button>
-                  <Button 
-                    type="submit"
-                    disabled={createRecipeMutation.isPending}
-                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] text-white hover:shadow-lg transition-all min-w-[120px]"
-                  >
-                    {createRecipeMutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {t('recipes.creating')}
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="h-4 w-4 mr-2" />
-                        {t('recipes.createRecipe')}
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
+      <Dialog open={showCreateModal} onOpenChange={(open) => setShowCreateModal(open)}>
+        <DialogContent className="max-w-[420px] rounded-xl">
+          <DialogHeader>
+            <DialogTitle>{t('recipes.createNewRecipe')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium">{t('recipes.name')}</label>
+              <Input
+                id="name"
+                {...register("name")}
+                className="mt-1"
+                placeholder={t('recipes.name')}
+              />
+              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
-          </div>
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium">{t('recipes.description')}</label>
+              <Textarea
+                id="description"
+                {...register("description")}
+                className="mt-1"
+                placeholder={t('recipes.description')}
+              />
+            </div>
+            <div>
+              <label htmlFor="prepTime" className="block text-sm font-medium">{t('recipes.prepTime')}</label>
+              <Input
+                id="prepTime"
+                {...register("prepTime")}
+                className="mt-1"
+                placeholder={t('recipes.prepTimePlaceholder')}
+              />
+              {errors.prepTime && <p className="text-red-500 text-xs mt-1">{errors.prepTime.message}</p>}
+            </div>
+            <div>
+              <label htmlFor="ingredients" className="block text-sm font-medium">{t('recipes.ingredients')}</label>
+              <div className="flex items-center mt-1">
+                <Input
+                  value={newIngredient}
+                  onChange={(e) => setNewIngredient(e.target.value)}
+                  className="flex-1"
+                  placeholder={t('recipes.ingredientPlaceholder')}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddIngredient())}
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddIngredient}
+                  variant="outline"
+                  className="ml-2"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {ingredients.length === 0 && errors.ingredients && (
+                <p className="text-red-500 text-xs mt-1">{errors.ingredients.message}</p>
+              )}
+              <div className="mt-2 space-y-1">
+                {ingredients.map((ingredient, index) => (
+                  <div key={index} className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
+                    <span className="text-sm">{ingredient}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleRemoveIngredient(index)}
+                    >
+                      <Trash2 className="h-4 w-4 text-gray-400" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="instructions" className="block text-sm font-medium">{t('recipes.instructions')}</label>
+              <Textarea
+                id="instructions"
+                {...register("instructions")}
+                className="mt-1"
+                placeholder={t('recipes.instructionsPlaceholder')}
+                rows={4}
+              />
+              {errors.instructions && <p className="text-red-500 text-xs mt-1">{errors.instructions.message}</p>}
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCreateModal(false)}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={createRecipeMutation.isPending}
+              >
+                {createRecipeMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('recipes.creating')}
+                  </>
+                ) : (
+                  t('recipes.createRecipe')
+                )}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 
