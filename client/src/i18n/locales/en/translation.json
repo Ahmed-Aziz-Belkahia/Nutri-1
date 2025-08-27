@@ -219,5 +219,32 @@
     "profile_completed": "Profile completed!",
     "preferences_saved": "Your dietary preferences have been saved.",
     "save_error": "Failed to save preferences"
+  },
+  "recipes": {
+    "welcomeBack": "Welcome back,",
+    "discover": "Discover",
+    "aIPoweredCreator": "AI-Powered Recipe Creator",
+    "takePhoto": "Take a photo of your ingredients and let AI create a personalized recipe tailored to your nutritional goals",
+    "scanIngredients": "Scan Ingredients",
+    "yourRecipes": "Your Recipes",
+    "noRecipesYet": "No recipes yet",
+    "startCulinaryJourney": "Start your culinary journey by creating your first recipe",
+    "savedFavorites": "Saved Favorites",
+    "createNewRecipe": "Create New Recipe",
+    "name": "Name",
+    "description": "Description",
+    "prepTime": "Prep Time",
+    "prepTimePlaceholder": "e.g., 30 mins",
+    "ingredients": "Ingredients",
+    "ingredientPlaceholder": "Add ingredient",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Step by step instructions",
+    "creating": "Creating...",
+    "createRecipe": "Create Recipe",
+    "deleteRecipe": "Delete Recipe",
+    "deleteConfirmation": "Are you sure you want to delete recipe",
+    "cannotBeUndone": "This action cannot be undone.",
+    "deleteSuccess": "Recipe deleted successfully!",
+    "deleteError": "Failed to delete recipe. Please try again."
   }
 }

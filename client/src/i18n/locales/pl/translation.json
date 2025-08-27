@@ -1024,5 +1024,32 @@
       "permissionDenied": "Odmówiono dostępu do kamery",
       "connectionError": "Błąd połączenia, sprawdź swoje połączenie internetowe"
     }
+  },
+  "recipes": {
+    "welcomeBack": "Witaj ponownie,",
+    "discover": "Odkryj",
+    "aIPoweredCreator": "Kreator przepisów z AI",
+    "takePhoto": "Zrób zdjęcie składników, a AI stworzy spersonalizowany przepis dopasowany do Twoich celów żywieniowych",
+    "scanIngredients": "Skanuj składniki",
+    "yourRecipes": "Twoje przepisy",
+    "noRecipesYet": "Nie masz jeszcze przepisów",
+    "startCulinaryJourney": "Rozpocznij swoją kulinarną podróż, tworząc swój pierwszy przepis",
+    "savedFavorites": "Zapisane ulubione",
+    "createNewRecipe": "Utwórz nowy przepis",
+    "name": "Nazwa",
+    "description": "Opis",
+    "prepTime": "Czas przygotowania",
+    "prepTimePlaceholder": "np. 30 min",
+    "ingredients": "Składniki",
+    "ingredientPlaceholder": "Dodaj składnik",
+    "instructions": "Instrukcje",
+    "instructionsPlaceholder": "Instrukcje krok po kroku",
+    "creating": "Tworzenie...",
+    "createRecipe": "Utwórz przepis",
+    "deleteRecipe": "Usuń przepis",
+    "deleteConfirmation": "Czy na pewno chcesz usunąć przepis",
+    "cannotBeUndone": "Tej akcji nie można cofnąć.",
+    "deleteSuccess": "Przepis został pomyślnie usunięty!",
+    "deleteError": "Nie udało się usunąć przepisu. Spróbuj ponownie."
   }
 }
