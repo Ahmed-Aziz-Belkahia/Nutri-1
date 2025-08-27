@@ -1071,175 +1071,257 @@ export default function Recipes() {
           setNewIngredient("");
         }
       }}>
-        <DialogContent className="max-w-[420px] rounded-xl">
-          <DialogHeader>
-            <DialogTitle>{t('recipes.createNewRecipe')}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto px-1">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">{t('recipes.name')}</label>
-              <Input
-                id="name"
-                {...register("name")}
-                placeholder={t('recipes.name')}
-              />
-              {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
-            </div>
+        <DialogContent className="max-w-[480px] max-h-[90vh] overflow-hidden p-0 border-0 bg-transparent">
+          {/* Glassmorphism container */}
+          <div className="relative bg-white/90 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Decorative gradient orbs */}
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-br from-[#0CC5BA] to-[#0091ff] rounded-full blur-3xl opacity-20" />
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20" />
             
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium mb-1">{t('recipes.description')}</label>
-              <Textarea
-                id="description"
-                {...register("description")}
-                placeholder={t('recipes.description')}
-                rows={2}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="prepTime" className="block text-sm font-medium mb-1">{t('recipes.prepTime')}</label>
-                <Input
-                  id="prepTime"
-                  {...register("prepTime")}
-                  placeholder="e.g., 15 mins"
-                />
-                {errors.prepTime && <p className="text-red-500 text-xs mt-1">{errors.prepTime.message}</p>}
-              </div>
+            <div className="relative z-10 p-6">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] bg-clip-text text-transparent">
+                  {t('recipes.createNewRecipe')}
+                </DialogTitle>
+              </DialogHeader>
               
-              <div>
-                <label htmlFor="cookTime" className="block text-sm font-medium mb-1">Cook Time</label>
-                <Input
-                  id="cookTime"
-                  {...register("cookTime")}
-                  placeholder="e.g., 30 mins"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="servings" className="block text-sm font-medium mb-1">Servings</label>
-                <Input
-                  id="servings"
-                  type="number"
-                  {...register("servings", { valueAsNumber: true })}
-                  placeholder="4"
-                />
-                {errors.servings && <p className="text-red-500 text-xs mt-1">{errors.servings.message}</p>}
-              </div>
-              
-              <div>
-                <label htmlFor="difficulty" className="block text-sm font-medium mb-1">Difficulty</label>
-                <select 
-                  id="difficulty"
-                  {...register("difficulty")}
-                  className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm"
-                >
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Nutrition Info (Optional)</label>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  type="number"
-                  {...register("calories", { valueAsNumber: true })}
-                  placeholder="Calories"
-                />
-                <Input
-                  type="number"
-                  {...register("protein", { valueAsNumber: true })}
-                  placeholder="Protein (g)"
-                />
-                <Input
-                  type="number"
-                  {...register("carbs", { valueAsNumber: true })}
-                  placeholder="Carbs (g)"
-                />
-                <Input
-                  type="number"
-                  {...register("fat", { valueAsNumber: true })}
-                  placeholder="Fat (g)"
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="ingredients" className="block text-sm font-medium">{t('recipes.ingredients')}</label>
-              <div className="flex items-center mt-1">
-                <Input
-                  value={newIngredient}
-                  onChange={(e) => setNewIngredient(e.target.value)}
-                  className="flex-1"
-                  placeholder={t('recipes.ingredientPlaceholder')}
-                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddIngredient())}
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddIngredient}
-                  variant="outline"
-                  className="ml-2"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              {ingredients.length === 0 && errors.ingredients && (
-                <p className="text-red-500 text-xs mt-1">{errors.ingredients.message}</p>
-              )}
-              <div className="mt-2 space-y-1">
-                {ingredients.map((ingredient, index) => (
-                  <div key={index} className="flex items-center justify-between bg-slate-50 p-2 rounded-md">
-                    <span className="text-sm">{ingredient}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="h-8 w-8 p-0"
-                      onClick={() => handleRemoveIngredient(index)}
-                    >
-                      <Trash2 className="h-4 w-4 text-gray-400" />
-                    </Button>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-6 max-h-[calc(90vh-120px)] overflow-y-auto pr-2">
+                {/* Recipe name with glassmorphism input */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('recipes.name')}
+                  </label>
+                  <Input
+                    id="name"
+                    {...register("name")}
+                    placeholder="e.g., Grandma's Secret Pasta"
+                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all placeholder:text-gray-400"
+                  />
+                  {errors.name && <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.name.message}</p>}
+                </div>
+                
+                {/* Description */}
+                <div>
+                  <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('recipes.description')}
+                  </label>
+                  <Textarea
+                    id="description"
+                    {...register("description")}
+                    placeholder="What makes this recipe special?"
+                    rows={2}
+                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all resize-none placeholder:text-gray-400"
+                  />
+                </div>
+                
+                {/* Time and Servings Grid */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                    <label htmlFor="prepTime" className="block text-xs font-semibold text-gray-600 mb-1">
+                      <Clock className="inline w-3 h-3 mr-1" />
+                      {t('recipes.prepTime')}
+                    </label>
+                    <Input
+                      id="prepTime"
+                      {...register("prepTime")}
+                      placeholder="15 mins"
+                      className="bg-white/60 border-0 h-8 text-sm"
+                    />
                   </div>
-                ))}
-              </div>
+                  
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                    <label htmlFor="cookTime" className="block text-xs font-semibold text-gray-600 mb-1">
+                      <Flame className="inline w-3 h-3 mr-1" />
+                      Cook Time
+                    </label>
+                    <Input
+                      id="cookTime"
+                      {...register("cookTime")}
+                      placeholder="30 mins"
+                      className="bg-white/60 border-0 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+                
+                {/* Servings and Difficulty */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                    <label htmlFor="servings" className="block text-xs font-semibold text-gray-600 mb-1">
+                      <User className="inline w-3 h-3 mr-1" />
+                      Servings
+                    </label>
+                    <Input
+                      id="servings"
+                      type="number"
+                      {...register("servings", { valueAsNumber: true })}
+                      placeholder="4"
+                      className="bg-white/60 border-0 h-8 text-sm"
+                    />
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                    <label htmlFor="difficulty" className="block text-xs font-semibold text-gray-600 mb-1">
+                      <Settings className="inline w-3 h-3 mr-1" />
+                      Difficulty
+                    </label>
+                    <select 
+                      id="difficulty"
+                      {...register("difficulty")}
+                      className="w-full h-8 px-2 rounded-lg bg-white/60 border-0 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/50"
+                    >
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+                
+                {/* Nutrition Info with gradient background */}
+                <div className="bg-gradient-to-r from-[#0CC5BA]/10 to-[#0091ff]/10 rounded-xl p-4 border border-white/30">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <Heart className="inline w-4 h-4 mr-1" />
+                    Nutrition Info (Optional)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        {...register("calories", { valueAsNumber: true })}
+                        placeholder="Calories"
+                        className="bg-white/70 border-white/50 h-9 text-sm pl-8"
+                      />
+                      <Flame className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-orange-400" />
+                    </div>
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        {...register("protein", { valueAsNumber: true })}
+                        placeholder="Protein (g)"
+                        className="bg-white/70 border-white/50 h-9 text-sm"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        {...register("carbs", { valueAsNumber: true })}
+                        placeholder="Carbs (g)"
+                        className="bg-white/70 border-white/50 h-9 text-sm"
+                      />
+                    </div>
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        {...register("fat", { valueAsNumber: true })}
+                        placeholder="Fat (g)"
+                        className="bg-white/70 border-white/50 h-9 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Ingredients Section with glassmorphism */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <ShoppingBag className="inline w-4 h-4 mr-1" />
+                    {t('recipes.ingredients')}
+                  </label>
+                  <div className="space-y-2 bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                    {ingredients.map((ingredient, index) => (
+                      <motion.div 
+                        key={index} 
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-2"
+                      >
+                        <div className="flex-1 bg-white/70 backdrop-blur-sm rounded-lg px-3 py-2 text-sm">
+                          {ingredient}
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveIngredient(index)}
+                          className="hover:bg-red-100/50 transition-colors"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </motion.div>
+                    ))}
+                    <div className="flex gap-2 pt-2">
+                      <Input
+                        value={newIngredient}
+                        onChange={(e) => setNewIngredient(e.target.value)}
+                        placeholder={t('recipes.ingredientPlaceholder') || "e.g., 2 cups flour"}
+                        className="bg-white/70 border-white/50 text-sm"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddIngredient();
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleAddIngredient}
+                        className="bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] text-white hover:shadow-md"
+                        size="sm"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {ingredients.length === 0 && errors.ingredients && (
+                    <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.ingredients.message}</p>
+                  )}
+                </div>
+                
+                {/* Instructions with glassmorphism */}
+                <div>
+                  <label htmlFor="instructions" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Sparkles className="inline w-4 h-4 mr-1" />
+                    {t('recipes.instructions')}
+                  </label>
+                  <Textarea
+                    id="instructions"
+                    {...register("instructions")}
+                    placeholder={t('recipes.instructionsPlaceholder') || "1. First step..."}
+                    rows={4}
+                    className="bg-white/50 backdrop-blur-sm border-white/30 focus:bg-white/70 transition-all resize-none placeholder:text-gray-400"
+                  />
+                  {errors.instructions && <p className="text-red-500 text-xs mt-1 flex items-center"><span className="mr-1">⚠️</span>{errors.instructions.message}</p>}
+                </div>
+                
+                {/* Buttons with gradient styling */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-white/20">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => setShowCreateModal(false)}
+                    className="hover:bg-white/30"
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                  <Button 
+                    type="submit"
+                    disabled={createRecipeMutation.isPending}
+                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] text-white hover:shadow-lg transition-all min-w-[120px]"
+                  >
+                    {createRecipeMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('recipes.creating')}
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t('recipes.createRecipe')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
             </div>
-            <div>
-              <label htmlFor="instructions" className="block text-sm font-medium">{t('recipes.instructions')}</label>
-              <Textarea
-                id="instructions"
-                {...register("instructions")}
-                className="mt-1"
-                placeholder={t('recipes.instructionsPlaceholder')}
-                rows={4}
-              />
-              {errors.instructions && <p className="text-red-500 text-xs mt-1">{errors.instructions.message}</p>}
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCreateModal(false)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                type="submit"
-                disabled={createRecipeMutation.isPending}
-              >
-                {createRecipeMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('recipes.creating')}
-                  </>
-                ) : (
-                  t('recipes.createRecipe')
-                )}
-              </Button>
-            </div>
-          </form>
+          </div>
         </DialogContent>
       </Dialog>
 
