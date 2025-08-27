@@ -67,10 +67,15 @@ const createRecipeSchema = z.object({
   name: z.string().min(1, "Recipe name is required"),
   description: z.string().optional(),
   prepTime: z.string().min(1, "Preparation time is required"),
+  cookTime: z.string().optional(),
   servings: z.number().min(1, "Number of servings is required"),
   difficulty: z.enum(["Easy", "Medium", "Hard"]),
   ingredients: z.array(z.string()).min(1, "At least one ingredient is required"),
   instructions: z.string().min(1, "Instructions are required"),
+  calories: z.number().optional(),
+  protein: z.number().optional(),
+  carbs: z.number().optional(),
+  fat: z.number().optional(),
   imageUrl: z.string().optional(),
   isPublic: z.boolean().default(true),
 });
@@ -365,17 +370,22 @@ export default function Recipes() {
 
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [newIngredient, setNewIngredient] = useState("");
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateRecipeForm>({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<CreateRecipeForm>({
     resolver: zodResolver(createRecipeSchema),
     defaultValues: {
-      name: "High-Protein Breakfast Bowl",
-      description: "A nutritious breakfast bowl perfect for muscle recovery and sustained energy throughout the morning.",
-      prepTime: "20 mins",
-      servings: 1,
-      difficulty: "Easy",
+      name: "",
+      description: "",
+      prepTime: "",
+      cookTime: "",
+      servings: 4,
+      difficulty: "Medium",
       ingredients: [],
-      instructions: "1. Cook quinoa according to package instructions and let it cool\n2. Cook turkey bacon until crispy\n3. Scramble the eggs\n4. Dice avocado and tomatoes\n5. In a bowl, arrange quinoa as the base\n6. Top with scrambled eggs, spinach, avocado, tomatoes, and crumbled bacon\n7. Season with salt and pepper\n8. Drizzle with olive oil\n9. Serve immediately while warm",
-      isPublic: true
+      instructions: "",
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      isPublic: false
     }
   });
 
@@ -398,6 +408,8 @@ export default function Recipes() {
       });
       setShowCreateModal(false);
       reset();
+      setIngredients([]); // Clear ingredients array
+      setNewIngredient("");
     },
     onError: (error) => {
       toast({
@@ -451,8 +463,21 @@ export default function Recipes() {
   };
 
   const onSubmit = (data: CreateRecipeForm) => {
-    data.ingredients = ingredients;
-    createRecipeMutation.mutate(data);
+    // Ensure ingredients are included
+    const recipeData = {
+      ...data,
+      ingredients: ingredients,
+      // Parse prep time to number (in minutes)
+      prepTime: parseInt(data.prepTime) || 0,
+      cookTime: parseInt(data.cookTime || "0") || 0,
+      totalTime: (parseInt(data.prepTime) || 0) + (parseInt(data.cookTime || "0") || 0),
+      // Ensure nutrition values are numbers
+      calories: data.calories || 0,
+      protein: data.protein || 0,
+      carbs: data.carbs || 0,
+      fat: data.fat || 0
+    };
+    createRecipeMutation.mutate(recipeData);
   };
 
   const handleRecipeClick = (recipe: Recipe) => {
@@ -670,13 +695,23 @@ export default function Recipes() {
                 transition={{ delay: 0.4 }}
                 className="mb-10"
               >
-                <div className="flex items-center mb-4">
-                  <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
-                    <Utensils className="h-5 w-5 text-[#0CC5BA]" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
+                      <Utensils className="h-5 w-5 text-[#0CC5BA]" />
+                    </div>
+                    <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
+                      {t('recipes.yourRecipes')}
+                    </h2>
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
-                    {t('recipes.yourRecipes')}
-                  </h2>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    size="sm"
+                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white hover:shadow-md transition-all"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Recipe
+                  </Button>
                 </div>
 
                 {/* Display recipes with new styling or skeletons while loading */}
@@ -1027,40 +1062,111 @@ export default function Recipes() {
         </motion.main>
       </div>
       
-      <Dialog open={showCreateModal} onOpenChange={(open) => setShowCreateModal(open)}>
+      <Dialog open={showCreateModal} onOpenChange={(open) => {
+        setShowCreateModal(open);
+        if (!open) {
+          // Reset form when dialog closes
+          reset();
+          setIngredients([]);
+          setNewIngredient("");
+        }
+      }}>
         <DialogContent className="max-w-[420px] rounded-xl">
           <DialogHeader>
             <DialogTitle>{t('recipes.createNewRecipe')}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4 max-h-[60vh] overflow-y-auto px-1">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium">{t('recipes.name')}</label>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">{t('recipes.name')}</label>
               <Input
                 id="name"
                 {...register("name")}
-                className="mt-1"
                 placeholder={t('recipes.name')}
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
             </div>
+            
             <div>
-              <label htmlFor="description" className="block text-sm font-medium">{t('recipes.description')}</label>
+              <label htmlFor="description" className="block text-sm font-medium mb-1">{t('recipes.description')}</label>
               <Textarea
                 id="description"
                 {...register("description")}
-                className="mt-1"
                 placeholder={t('recipes.description')}
+                rows={2}
               />
             </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="prepTime" className="block text-sm font-medium mb-1">{t('recipes.prepTime')}</label>
+                <Input
+                  id="prepTime"
+                  {...register("prepTime")}
+                  placeholder="e.g., 15 mins"
+                />
+                {errors.prepTime && <p className="text-red-500 text-xs mt-1">{errors.prepTime.message}</p>}
+              </div>
+              
+              <div>
+                <label htmlFor="cookTime" className="block text-sm font-medium mb-1">Cook Time</label>
+                <Input
+                  id="cookTime"
+                  {...register("cookTime")}
+                  placeholder="e.g., 30 mins"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="servings" className="block text-sm font-medium mb-1">Servings</label>
+                <Input
+                  id="servings"
+                  type="number"
+                  {...register("servings", { valueAsNumber: true })}
+                  placeholder="4"
+                />
+                {errors.servings && <p className="text-red-500 text-xs mt-1">{errors.servings.message}</p>}
+              </div>
+              
+              <div>
+                <label htmlFor="difficulty" className="block text-sm font-medium mb-1">Difficulty</label>
+                <select 
+                  id="difficulty"
+                  {...register("difficulty")}
+                  className="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm"
+                >
+                  <option value="Easy">Easy</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Hard">Hard</option>
+                </select>
+              </div>
+            </div>
+            
             <div>
-              <label htmlFor="prepTime" className="block text-sm font-medium">{t('recipes.prepTime')}</label>
-              <Input
-                id="prepTime"
-                {...register("prepTime")}
-                className="mt-1"
-                placeholder={t('recipes.prepTimePlaceholder')}
-              />
-              {errors.prepTime && <p className="text-red-500 text-xs mt-1">{errors.prepTime.message}</p>}
+              <label className="block text-sm font-medium mb-1">Nutrition Info (Optional)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  type="number"
+                  {...register("calories", { valueAsNumber: true })}
+                  placeholder="Calories"
+                />
+                <Input
+                  type="number"
+                  {...register("protein", { valueAsNumber: true })}
+                  placeholder="Protein (g)"
+                />
+                <Input
+                  type="number"
+                  {...register("carbs", { valueAsNumber: true })}
+                  placeholder="Carbs (g)"
+                />
+                <Input
+                  type="number"
+                  {...register("fat", { valueAsNumber: true })}
+                  placeholder="Fat (g)"
+                />
+              </div>
             </div>
             <div>
               <label htmlFor="ingredients" className="block text-sm font-medium">{t('recipes.ingredients')}</label>
