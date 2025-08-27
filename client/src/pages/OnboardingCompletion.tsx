@@ -151,8 +151,8 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
       console.error('Completion error:', error);
       toast({
         variant: "destructive",
-        title: "Błąd konfiguracji",
-        description: "Spróbuj ponownie.",
+        title: "Configuration Error",
+        description: "Please try again.",
       });
     } finally {
       setIsCompleting(false);

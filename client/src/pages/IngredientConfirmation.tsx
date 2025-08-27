@@ -145,7 +145,7 @@ export default function IngredientConfirmation() {
     const data = searchParams.get('data');
     
     if (!data) {
-      setError('Nie znaleziono danych składników');
+      setError('No ingredient data found');
       setIsLoading(false);
       return;
     }
@@ -155,7 +155,7 @@ export default function IngredientConfirmation() {
       const parsedData = JSON.parse(decodedData);
 
       if (!parsedData || !parsedData.ingredients) {
-        throw new Error('Nieprawidłowy format danych');
+        throw new Error('Invalid data format');
       }
 
       setAnalysisData(parsedData);
@@ -163,7 +163,7 @@ export default function IngredientConfirmation() {
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to parse ingredient data:', error);
-      setError('Nie udało się załadować danych składników');
+      setError('Failed to load ingredient data');
       setIsLoading(false);
     }
   }, []);

@@ -59,15 +59,15 @@ export default function UnifiedProgress() {
     try {
       await uploadPhoto(imageData, 'latest');
       toast({
-        title: "Sukces!",
-        description: "Zdjęcie postępu zostało przesłane",
+        title: "Success!",
+        description: "Progress photo uploaded",
       });
       setIsCameraOpen(false);
     } catch (error) {
       console.error('Failed to upload photo:', error);
       toast({
-        title: "Błąd",
-        description: "Nie udało się przesłać zdjęcia",
+        title: "Error",
+        description: "Failed to upload photo",
         variant: "destructive",
       });
     } finally {
@@ -84,8 +84,8 @@ export default function UnifiedProgress() {
     // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "Plik za duży",
-        description: "Wybierz zdjęcie mniejsze niż 10MB",
+        title: "File too large",
+        description: "Choose a photo smaller than 10MB",
         variant: "destructive",
       });
       return;
@@ -94,8 +94,8 @@ export default function UnifiedProgress() {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Nieprawidłowy typ pliku",
-        description: "Wybierz plik graficzny",
+        title: "Invalid file type",
+        description: "Choose an image file",
         variant: "destructive",
       });
       return;
@@ -122,22 +122,22 @@ export default function UnifiedProgress() {
     
     // Show immediate feedback
     toast({
-      title: "Przesyłanie...",
-      description: "Przetwarzanie zdjęcia postępu",
+      title: "Uploading...",
+      description: "Processing progress photo",
     });
 
     try {
       await uploadPhoto(base64String, 'latest');
       
       toast({
-        title: "Sukces!",
-        description: "Zdjęcie postępu zostało przesłane",
+        title: "Success!",
+        description: "Progress photo uploaded",
       });
     } catch (error) {
       console.error('Failed to upload photo:', error);
       toast({
-        title: "Błąd",
-        description: "Nie udało się przesłać zdjęcia",
+        title: "Error",
+        description: "Failed to upload photo",
         variant: "destructive",
       });
     } finally {

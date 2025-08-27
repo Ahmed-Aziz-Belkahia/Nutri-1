@@ -18,26 +18,26 @@ import { analyzeFoodText } from '@/lib/vision';
 import CameraUI from '@/components/CameraUI';
 import CaptureButton from '@/components/CaptureButton';
 
-// Form schema for manual food entry with Polish messages
+// Form schema for manual food entry
 const formSchema = z.object({
-  name: z.string().min(1, "Nazwa jest wymagana"),
+  name: z.string().min(1, "Name is required"),
   calories: z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, {
-    message: "Kalorie muszą być liczbą dodatnią",
+    message: "Calories must be a positive number",
   }),
   protein: z.string().refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "Białko musi być liczbą",
+    message: "Protein must be a number",
   }),
   carbs: z.string().refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "Węglowodany muszą być liczbą",
+    message: "Carbs must be a number",
   }),
   fat: z.string().refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
-    message: "Tłuszcz musi być liczbą",
+    message: "Fat must be a number",
   }),
 });
 
 // Form schema for the text-based food analysis
 const textAnalysisSchema = z.object({
-  text: z.string().min(1, "Opis jedzenia jest wymagany"),
+  text: z.string().min(1, "Food description is required"),
 });
 
 // Interface for food analysis result
@@ -113,8 +113,8 @@ export default function AddFood() {
       });
 
       toast({
-        title: "Sukces",
-        description: `Dodano ${values.name} do dziennika`,
+        title: "Success",
+        description: `Added ${values.name} to log`,
       });
 
       setLocation("/dashboard");
@@ -123,8 +123,8 @@ export default function AddFood() {
       
       toast({
         variant: "destructive",
-        title: "Błąd",
-        description: "Nie udało się dodać jedzenia do dziennika",
+        title: "Error",
+        description: "Failed to add food to log",
       });
     }
   };
@@ -529,9 +529,9 @@ export default function AddFood() {
       <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-4">
         <AlertTriangle className="h-10 w-10 text-red-500" />
       </div>
-      <h2 className="text-xl font-semibold text-gray-800 text-center mb-2">Błąd Dostępu do Kamery</h2>
+      <h2 className="text-xl font-semibold text-gray-800 text-center mb-2">Camera Access Error</h2>
       <p className="text-gray-600 text-center max-w-md mb-6">
-        {cameraError || "Nie mogliśmy uzyskać dostępu do Twojej kamery. Sprawdź uprawnienia kamery lub przełącz się na ręczne dodawanie."}
+        {cameraError || "We couldn't access your camera. Check camera permissions or switch to manual entry."}
       </p>
       <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
         <Button
@@ -573,7 +573,7 @@ export default function AddFood() {
             </motion.button>
             
             <div className="text-xl font-bold bg-gradient-to-r from-[#0E95A7] via-[#0CBACC] to-[#0E95A7] bg-clip-text text-transparent">
-              Dodaj Jedzenie
+              Add Food
             </div>
             
             <div className="w-11 h-11"></div> {/* Empty space for alignment */}

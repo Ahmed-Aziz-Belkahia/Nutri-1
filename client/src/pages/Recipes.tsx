@@ -422,8 +422,8 @@ export default function Recipes() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/recipes", "created"] });
       toast({
-        title: t('common.success', 'Sukces'),
-        description: t('recipes.deleteSuccess', 'Przepis został pomyślnie usunięty!'),
+        title: t('common.success', 'Success'),
+        description: t('recipes.deleteSuccess', 'Recipe deleted successfully!'),
         duration: 3000,
       });
       setShowDeleteModal(false);
@@ -431,8 +431,8 @@ export default function Recipes() {
     },
     onError: (error) => {
       toast({
-        title: t('common.error', 'Błąd'),
-        description: t('recipes.deleteError', 'Nie udało się usunąć przepisu. Spróbuj ponownie.'),
+        title: t('common.error', 'Error'),
+        description: t('recipes.deleteError', 'Failed to delete recipe. Please try again.'),
         variant: "destructive",
         duration: 3000,
       });
@@ -1141,13 +1141,13 @@ export default function Recipes() {
       <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('recipes.deleteRecipe', 'Usuń przepis')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('recipes.deleteRecipe', 'Delete Recipe')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('recipes.deleteConfirmation', 'Czy na pewno chcesz usunąć przepis')}: "{recipeToDelete?.name}"? {t('recipes.cannotBeUndone', 'Tej akcji nie można cofnąć.')}
+              {t('recipes.deleteConfirmation', 'Are you sure you want to delete recipe')}: "{recipeToDelete?.name}"? {t('recipes.cannotBeUndone', 'This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel', 'Anuluj')}</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-red-500 hover:bg-red-600"
               onClick={() => {
@@ -1156,7 +1156,7 @@ export default function Recipes() {
                 }
               }}
             >
-              {t('common.delete', 'Usuń')}
+              {t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

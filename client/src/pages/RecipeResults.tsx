@@ -71,10 +71,10 @@ export default function RecipeResults() {
         body: JSON.stringify({
           ingredients: ingredientsData.ingredients,
           preferences: ingredientsData.preferences || {
-            difficulty: 'Średni',
+            difficulty: 'Medium',
             timeNeeded: 30,
-            flavor: 'Zrównoważony',
-            language: 'pl'
+            flavor: 'Balanced',
+            language: 'en'
           },
           prompt: `Generate 3 creative recipe suggestions using these ingredients: ${ingredients}. Include detailed instructions, nutritional information, prep time, cooking time, difficulty level, and cuisine type.`
         })
@@ -324,7 +324,7 @@ export default function RecipeResults() {
       <div className="min-h-screen bg-gradient-to-br from-[#f0f9ff] via-white to-[#ecfeff] flex flex-col items-center justify-center gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#0CC5BA]"></div>
         <p className="text-base font-medium text-gray-600">
-          Przetwarzanie składników...
+          Processing ingredients...
         </p>
       </div>
     );
@@ -338,17 +338,17 @@ export default function RecipeResults() {
             <X className="w-6 h-6 text-red-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900">
-            {error || "Nie znaleziono przepisów"}
+            {error || "No recipes found"}
           </h2>
           <p className="text-gray-600 text-sm">
             {error
-              ? "Wystąpił błąd podczas przetwarzania składników. Spróbuj ponownie."
-              : "Nie mogliśmy znaleźć przepisów pasujących do Twoich składników. Spróbuj zeskanować inne składniki."}
+              ? "An error occurred while processing ingredients. Please try again."
+              : "We couldn't find recipes matching your ingredients. Try scanning different ingredients."}
           </p>
         </div>
         <Link href="/recipes">
           <Button className="bg-[#0CC5BA] hover:bg-[#0BB5AA] text-white px-6 py-2 rounded-xl font-medium">
-            Spróbuj ponownie
+            Try Again
           </Button>
         </Link>
       </div>

@@ -220,7 +220,7 @@ export default function SimpleCookingMode() {
               onClick={() => navigate('/add-food')}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Dodaj do dziennika jedzenia
+              Add to Food Diary
             </Button>
             
             <Button 
@@ -228,7 +228,7 @@ export default function SimpleCookingMode() {
               className="w-full py-4 rounded-xl font-medium"
               onClick={() => navigate('/dashboard')}
             >
-              Wróć do przepisu
+              Back to Recipe
             </Button>
           </div>
         </div>
@@ -372,7 +372,7 @@ export default function SimpleCookingMode() {
             {/* Instruction */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border mb-6">
               <p className="text-lg text-gray-800 leading-relaxed">
-                {instructionSteps[currentStep] || 'Ładowanie instrukcji...'}
+                {instructionSteps[currentStep] || 'Loading instructions...'}
               </p>
             </div>
             

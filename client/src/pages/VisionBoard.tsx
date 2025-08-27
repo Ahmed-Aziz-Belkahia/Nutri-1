@@ -77,8 +77,8 @@ export default function VisionBoard() {
       console.error('Error fetching vision board:', error);
       toast({
         variant: "destructive",
-        title: "Błąd",
-        description: "Nie udało się wczytać tablicy wizji.",
+        title: "Error",
+        description: "Failed to load vision board.",
       });
     } finally {
       setIsLoading(false);
@@ -108,9 +108,9 @@ export default function VisionBoard() {
     return (
       <div className="h-screen bg-gradient-to-br from-[#0CC5BA]/20 via-purple-500/10 to-blue-500/20 flex items-center justify-center overflow-hidden">
         <Card className="p-6 text-center">
-          <p className="text-gray-600 mb-4">Nie udało się wczytać tablicy wizji.</p>
+          <p className="text-gray-600 mb-4">Failed to load vision board.</p>
           <Button onClick={() => setLocation("/dashboard")}>
-            Przejdź do pulpitu
+            Go to Dashboard
           </Button>
         </Card>
       </div>

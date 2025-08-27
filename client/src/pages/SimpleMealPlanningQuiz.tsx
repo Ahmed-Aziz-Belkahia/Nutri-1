@@ -215,8 +215,8 @@ export default function SimpleMealPlanningQuiz() {
       setIsGeneratingMealPlan(false);
       console.error("Meal plan creation error:", error);
       toast({
-        title: "Błąd tworzenia planu",
-        description: error instanceof Error ? error.message : "Nie udało się utworzyć planu posiłków.",
+        title: "Plan Creation Error",
+        description: error instanceof Error ? error.message : "Failed to create meal plan.",
         variant: "destructive",
       });
     }
