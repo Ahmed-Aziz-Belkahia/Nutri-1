@@ -1071,9 +1071,9 @@ export default function Recipes() {
           setNewIngredient("");
         }
       }}>
-        <DialogContent className="max-w-[480px] max-h-[90vh] overflow-hidden p-0 border-0 bg-transparent">
+        <DialogContent className="max-w-[480px] max-h-[85vh] overflow-hidden p-0 border-0 bg-transparent fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%]">
           {/* Glassmorphism container */}
-          <div className="relative bg-white/90 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="relative bg-white/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden">
             {/* Decorative gradient orbs */}
             <div className="absolute -top-20 -left-20 w-40 h-40 bg-gradient-to-br from-[#0CC5BA] to-[#0091ff] rounded-full blur-3xl opacity-20" />
             <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20" />
@@ -1116,7 +1116,7 @@ export default function Recipes() {
                 
                 {/* Time and Servings Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                     <label htmlFor="prepTime" className="block text-xs font-semibold text-gray-600 mb-1">
                       <Clock className="inline w-3 h-3 mr-1" />
                       {t('recipes.prepTime')}
@@ -1125,11 +1125,11 @@ export default function Recipes() {
                       id="prepTime"
                       {...register("prepTime")}
                       placeholder="15 mins"
-                      className="bg-white/60 border-0 h-8 text-sm"
+                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
                     />
                   </div>
                   
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                     <label htmlFor="cookTime" className="block text-xs font-semibold text-gray-600 mb-1">
                       <Flame className="inline w-3 h-3 mr-1" />
                       Cook Time
@@ -1138,14 +1138,14 @@ export default function Recipes() {
                       id="cookTime"
                       {...register("cookTime")}
                       placeholder="30 mins"
-                      className="bg-white/60 border-0 h-8 text-sm"
+                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
                     />
                   </div>
                 </div>
                 
                 {/* Servings and Difficulty */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                     <label htmlFor="servings" className="block text-xs font-semibold text-gray-600 mb-1">
                       <User className="inline w-3 h-3 mr-1" />
                       Servings
@@ -1155,11 +1155,11 @@ export default function Recipes() {
                       type="number"
                       {...register("servings", { valueAsNumber: true })}
                       placeholder="4"
-                      className="bg-white/60 border-0 h-8 text-sm"
+                      className="bg-white/60 border-0 h-8 text-sm rounded-md"
                     />
                   </div>
                   
-                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                  <div className="bg-gradient-to-br from-white/40 to-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                     <label htmlFor="difficulty" className="block text-xs font-semibold text-gray-600 mb-1">
                       <Settings className="inline w-3 h-3 mr-1" />
                       Difficulty
@@ -1167,7 +1167,7 @@ export default function Recipes() {
                     <select 
                       id="difficulty"
                       {...register("difficulty")}
-                      className="w-full h-8 px-2 rounded-lg bg-white/60 border-0 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/50"
+                      className="w-full h-8 px-2 rounded-md bg-white/60 border-0 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/50"
                     >
                       <option value="Easy">Easy</option>
                       <option value="Medium">Medium</option>
@@ -1177,7 +1177,7 @@ export default function Recipes() {
                 </div>
                 
                 {/* Nutrition Info with gradient background */}
-                <div className="bg-gradient-to-r from-[#0CC5BA]/10 to-[#0091ff]/10 rounded-xl p-4 border border-white/30">
+                <div className="bg-gradient-to-r from-[#0CC5BA]/10 to-[#0091ff]/10 rounded-lg p-4 border border-white/20">
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     <Heart className="inline w-4 h-4 mr-1" />
                     Nutrition Info (Optional)
@@ -1225,7 +1225,7 @@ export default function Recipes() {
                     <ShoppingBag className="inline w-4 h-4 mr-1" />
                     {t('recipes.ingredients')}
                   </label>
-                  <div className="space-y-2 bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/30">
+                  <div className="space-y-2 bg-white/30 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                     {ingredients.map((ingredient, index) => (
                       <motion.div 
                         key={index} 
@@ -1233,7 +1233,7 @@ export default function Recipes() {
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center gap-2"
                       >
-                        <div className="flex-1 bg-white/70 backdrop-blur-sm rounded-lg px-3 py-2 text-sm">
+                        <div className="flex-1 bg-white/70 backdrop-blur-sm rounded-md px-3 py-2 text-sm">
                           {ingredient}
                         </div>
                         <Button
