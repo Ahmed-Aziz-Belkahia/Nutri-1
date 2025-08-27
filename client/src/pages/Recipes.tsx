@@ -670,13 +670,22 @@ export default function Recipes() {
                 transition={{ delay: 0.4 }}
                 className="mb-10"
               >
-                <div className="flex items-center mb-4">
-                  <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
-                    <Utensils className="h-5 w-5 text-[#0CC5BA]" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center">
+                    <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
+                      <Utensils className="h-5 w-5 text-[#0CC5BA]" />
+                    </div>
+                    <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
+                      {t('recipes.yourRecipes')}
+                    </h2>
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
-                    {t('recipes.yourRecipes')}
-                  </h2>
+                  <Button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {t('recipes.createRecipe', 'Create Recipe')}
+                  </Button>
                 </div>
 
                 {/* Display recipes with new styling or skeletons while loading */}
@@ -726,7 +735,13 @@ export default function Recipes() {
                     </div>
                     <h3 className="text-xl font-bold text-gray-800 mb-2">{t('recipes.noRecipesYet')}</h3>
                     <p className="text-gray-500 mb-6">{t('recipes.startCulinaryJourney')}</p>
-                    {/* Buttons removed as requested */}
+                    <Button
+                      onClick={() => setShowCreateModal(true)}
+                      className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-lg px-6 py-3 flex items-center gap-2 hover:shadow-lg transition-all mx-auto"
+                    >
+                      <Plus className="h-5 w-5" />
+                      {t('recipes.createRecipe', 'Create Recipe')}
+                    </Button>
                   </div>
                 )}
               </motion.section>
