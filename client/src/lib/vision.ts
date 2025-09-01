@@ -53,7 +53,7 @@ export async function analyzeFoodText(text: string): Promise<{
     let betterName = result.name;
     if (betterName === "Overall food description" || betterName === "Food description" || betterName === "Meal") {
       if (Array.isArray(result.components) && result.components.length > 0) {
-        const componentNames = result.components.map(c => c.name).filter(Boolean);
+  const componentNames = result.components.map((c: { name: string }) => c.name).filter(Boolean);
         if (componentNames.length > 0) {
           betterName = componentNames.slice(0, 3).join(' with ');
           console.log('Generated better name from components:', betterName);

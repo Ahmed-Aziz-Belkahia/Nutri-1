@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryFunctionContext } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,13 +11,11 @@ export const queryClient = new QueryClient({
       retry: 1, // Minimize retries
       retryDelay: 300, // Even faster retry (300ms instead of 500ms)
       networkMode: 'always',
-      cacheTime: 1800000, // 30 minutes - explicit cache time setting
-      suspense: false, // Don't use React Suspense
-      useErrorBoundary: false, // Don't use React Error Boundary
-      queryFn: async ({ queryKey }) => {
+    queryFn: async (ctx: QueryFunctionContext) => {
         try {
-          // Add cache-control headers to help with caching
-          const res = await fetch(queryKey[0] as string, {
+      // Add cache-control headers to help with caching
+      const endpoint = String((ctx.queryKey as readonly unknown[])[0] ?? '');
+      const res = await fetch(endpoint, {
             credentials: "include",
             headers: {
               "Cache-Control": "max-age=600", // 10 minutes browser cache

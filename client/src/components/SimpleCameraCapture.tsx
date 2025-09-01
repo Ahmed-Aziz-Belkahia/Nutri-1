@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Camera, Loader2 } from "lucide-react";
+import { getCameraPermissionStatus, requestCameraPermission, type CameraPermissionState } from "@/lib/cameraPermissions";
 
 interface SimpleCameraCaptureProps {
   onCapture: (photoUrl: string) => void;
@@ -14,12 +15,15 @@ export default function SimpleCameraCapture({ onClose, onCapture }: SimpleCamera
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [permission, setPermission] = useState<CameraPermissionState>('prompt');
+  const [hasPermission, setHasPermission] = useState(false);
+  const [checkingPermission, setCheckingPermission] = useState(true);
 
   console.log("SimpleCameraCapture rendered with state:", { isReady, error, isCapturing });
 
   useEffect(() => {
     let mounted = true;
-    
+
     // Prevent body scroll when camera page is active
     document.body.style.overflow = 'hidden';
     document.body.classList.add('camera-active');
@@ -82,8 +86,22 @@ export default function SimpleCameraCapture({ onClose, onCapture }: SimpleCamera
         }
       }
     };
-
-    initCamera();
+    
+    // First check permission; only init camera if already granted
+    (async () => {
+      try {
+        setCheckingPermission(true);
+        const status = await getCameraPermissionStatus();
+        if (!mounted) return;
+        setPermission(status);
+        setHasPermission(status === 'granted');
+        if (status === 'granted') {
+          await initCamera();
+        }
+      } finally {
+        if (mounted) setCheckingPermission(false);
+      }
+    })();
 
     return () => {
       mounted = false;
@@ -95,6 +113,38 @@ export default function SimpleCameraCapture({ onClose, onCapture }: SimpleCamera
       }
     };
   }, []);
+
+  const handleEnableCamera = async () => {
+    const res = await requestCameraPermission({ facingMode: 'user' });
+    if (res.granted) {
+      setHasPermission(true);
+      setPermission('granted');
+      setError(null);
+      // After explicit permission, initialize camera
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          },
+          audio: false,
+        });
+        setStream(mediaStream);
+        if (videoRef.current) {
+          const video = videoRef.current;
+          video.srcObject = mediaStream;
+          await video.play().catch(() => {});
+          setIsReady(true);
+        }
+      } catch (e: any) {
+        setError(e?.message || 'Failed to start camera');
+      }
+    } else {
+      setPermission('denied');
+      setError(res.error ?? 'Camera permission denied');
+    }
+  };
 
   const capturePhoto = async () => {
     if (!videoRef.current || !canvasRef.current || !isReady) return;
@@ -145,19 +195,46 @@ export default function SimpleCameraCapture({ onClose, onCapture }: SimpleCamera
 
       {/* Camera View */}
       <div className="w-full h-full relative">
-        {error ? (
+        {/* Permission gate */}
+        {!hasPermission && !checkingPermission ? (
+          <div className="flex flex-col items-center justify-center h-full text-white p-8">
+            <Camera className="w-16 h-16 mb-4 text-gray-400" />
+            <h2 className="text-xl font-bold mb-2">Enable Camera</h2>
+            <p className="text-center mb-6 max-w-sm text-white/80">
+              We need access to your camera to take a progress photo. You'll see your device's permission prompt.
+            </p>
+            <div className="flex gap-3">
+              <Button onClick={handleEnableCamera} className="bg-white text-black">
+                Enable Camera
+              </Button>
+              <Button onClick={onClose} variant="ghost" className="text-white">
+                Cancel
+              </Button>
+            </div>
+            {permission === 'denied' && (
+              <p className="text-center mt-4 text-sm text-red-300">
+                Permission denied. Please enable camera access in your browser or device settings.
+              </p>
+            )}
+          </div>
+        ) : error ? (
           <div className="flex flex-col items-center justify-center h-full text-white p-8">
             <Camera className="w-16 h-16 mb-4 text-gray-400" />
             <h2 className="text-xl font-bold mb-2">Camera Error</h2>
             <p className="text-center mb-6">{error}</p>
-            <Button onClick={onClose} className="bg-white text-black">
-              Close
-            </Button>
+            <div className="flex gap-3">
+              <Button onClick={handleEnableCamera} className="bg-white text-black">
+                Try Again
+              </Button>
+              <Button onClick={onClose} variant="ghost" className="text-white">
+                Close
+              </Button>
+            </div>
           </div>
         ) : (
           // Always show camera interface if no error
           <>
-            {!isReady && (
+            {(!isReady || checkingPermission) && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-10 text-white">
                 <Loader2 className="w-12 h-12 mb-4 animate-spin text-[#0CC5BA]" />
                 <p>Loading camera...</p>

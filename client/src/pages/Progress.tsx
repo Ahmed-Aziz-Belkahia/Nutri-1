@@ -227,36 +227,31 @@ export default function ProgressPage() {
   
   // More robust parsing with fallbacks and debug info
   let currentWeight = 0;
-  if (userProfile?.currentWeight) {
+  if (userProfile?.currentWeight != null) {
     console.log('Using weight from userProfile:', userProfile.currentWeight);
-    currentWeight = typeof userProfile.currentWeight === 'number' 
-      ? userProfile.currentWeight 
-      : parseFloat(userProfile.currentWeight.toString());
-  } else if (user?.profile?.weight) {
-    console.log('Using weight from user.profile:', user.profile.weight);
-    currentWeight = typeof user.profile.weight === 'number' 
-      ? user.profile.weight 
-      : parseFloat(user.profile.weight.toString());
-  } else if (user?.profile?.currentWeight) {
-    console.log('Using currentWeight from user.profile:', user.profile.currentWeight);
-    currentWeight = typeof user.profile.currentWeight === 'number' 
-      ? user.profile.currentWeight 
-      : parseFloat(user.profile.currentWeight.toString());
+    currentWeight = typeof userProfile.currentWeight === 'number'
+      ? userProfile.currentWeight
+      : parseFloat(String(userProfile.currentWeight));
+  } else if (user?.profile?.weight != null) {
+    console.log('Using weight from user.profile:', user?.profile?.weight);
+    currentWeight = typeof user?.profile?.weight === 'number'
+      ? (user?.profile?.weight as number)
+      : parseFloat(String(user?.profile?.weight));
   }
   console.log('Final current weight:', currentWeight);
     
   // More robust height parsing
   let height = 0;
-  if (userProfile?.height) {
+  if (userProfile?.height != null) {
     console.log('Using height from userProfile:', userProfile.height);
-    height = typeof userProfile.height === 'number' 
-      ? userProfile.height 
-      : parseFloat(userProfile.height.toString());
-  } else if (user?.profile?.height) {
-    console.log('Using height from user.profile:', user.profile.height);
-    height = typeof user.profile.height === 'number' 
-      ? user.profile.height 
-      : parseFloat(user.profile.height.toString());
+    height = typeof userProfile.height === 'number'
+      ? userProfile.height
+      : parseFloat(String(userProfile.height));
+  } else if (user?.profile?.height != null) {
+    console.log('Using height from user.profile:', user?.profile?.height);
+    height = typeof user?.profile?.height === 'number'
+      ? (user?.profile?.height as number)
+      : parseFloat(String(user?.profile?.height));
   }
   console.log('Final height:', height);
 
@@ -477,11 +472,16 @@ export default function ProgressPage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Subtle emerald blobs background */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-600/20 blur-3xl" />
+      </div>
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 w-full bg-white/80 backdrop-blur-md z-10 border-b border-white/20 shadow-sm"
+        className="sticky top-0 w-full bg-white/20 backdrop-blur-xl z-10 border-b border-white/30 shadow-sm"
       >
         <div className="w-full max-w-[500px] mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-start sm:items-center justify-between gap-4">
@@ -489,7 +489,7 @@ export default function ProgressPage() {
               <motion.h1
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent truncate"
+                className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent truncate"
               >
                 NutriAI
               </motion.h1>
@@ -511,9 +511,9 @@ export default function ProgressPage() {
               className="relative"
               ref={dropdownRef}
             >
-              <div className="relative">
+        <div className="relative">
                 <button
-                  className="w-12 h-12 rounded-full bg-[#0CC5BA] flex items-center justify-center text-white text-xl font-semibold hover:bg-[#0CC5BA]/90 transition-colors overflow-hidden"
+          className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-xl font-semibold hover:from-emerald-500/90 hover:to-emerald-600/90 transition-colors overflow-hidden border border-white/20"
                   onClick={() => setLocation('/profile')}
                 >
                   {user?.profileImage ? (
@@ -533,25 +533,22 @@ export default function ProgressPage() {
       </motion.header>
 
       {/* Main Content - Carousel */}
-      <div className="max-w-[500px] mx-auto px-4 py-6">
+  <div className="max-w-[500px] mx-auto px-4 py-6">
         {/* Carousel navigation */}
         <div className="flex justify-between items-center mb-6 px-2">
           {progressSections.map((section, index) => (
-            <div 
+              <div 
               key={section.id}
               className="flex flex-col items-center gap-2 cursor-pointer"
               onClick={() => setCurrentSection(index)}
             >
               <div 
                 className={`w-12 h-12 flex items-center justify-center rounded-full 
-                  shadow-md border border-white/50
-                  ${index === currentSection 
-                    ? 'bg-gradient-to-br from-[#0CC5BA] to-blue-500 text-white' 
-                    : 'bg-gray-100 text-gray-500'}`}
+                  shadow-md border ${index === currentSection ? 'border-white/30 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white' : 'border-white/20 bg-white/20 text-gray-700 backdrop-blur-xl'}`}
               >
                 <span className="text-lg font-medium">{index + 1}</span>
               </div>
-              <div className={`text-xs text-center ${index === currentSection ? 'font-medium text-[#0CC5BA]' : 'text-gray-500'}`}>
+              <div className={`text-xs text-center ${index === currentSection ? 'font-medium text-emerald-600' : 'text-gray-600'}`}>
                 {section.title.split(' ')[0]}
               </div>
             </div>
@@ -559,9 +556,9 @@ export default function ProgressPage() {
         </div>
         
         {/* Progress indicator */}
-        <div className="relative h-1 bg-gray-200 rounded-full mb-6">
+        <div className="relative h-1 bg-white/30 backdrop-blur rounded-full mb-6 border border-white/20">
           <div 
-            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-[#0CC5BA] to-blue-500 rounded-full transition-all duration-300"
+            className="absolute top-0 left-0 h-1 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-300"
             style={{ width: `${((currentSection + 1) / progressSections.length) * 100}%` }}
           ></div>
         </div>
@@ -588,23 +585,23 @@ export default function ProgressPage() {
           {/* Section 1: Weight & Metrics */}
           {currentSection === 0 && (
             <div className="space-y-4">
-              <Card className="p-6 rounded-[28px] border-[#0CC5BA]/10 bg-white">
+              <Card className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-[#0CC5BA]/10 flex items-center justify-center">
-                    <Scale className="w-5 h-5 text-[#0CC5BA]" />
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-white/20">
+                    <Scale className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">Weight Metrics</h3>
+                    <h3 className="text-lg font-bold bg-gradient-to-br from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Weight Metrics</h3>
                     <p className="text-sm text-gray-500">Current and target weight</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="p-4 bg-white/30 backdrop-blur rounded-xl border border-white/30">
                     <div className="text-sm text-gray-500">Current</div>
                     <div className="text-2xl font-bold">{currentWeight} kg</div>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="p-4 bg-white/30 backdrop-blur rounded-xl border border-white/30">
                     <div className="text-sm text-gray-500">Goal</div>
                     <div className="text-2xl font-bold">{userProfile?.goalWeight ? parseFloat(userProfile.goalWeight.toString()) : "--"} kg</div>
                   </div>
@@ -625,23 +622,23 @@ export default function ProgressPage() {
                 />
               </Card>
               
-              <Card className="p-6 rounded-[28px] border-[#0CC5BA]/10 bg-white">
+              <Card className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-blue-500" />
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-white/20">
+                    <Activity className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-500 bg-clip-text text-transparent">Body Metrics</h3>
+                    <h3 className="text-lg font-bold bg-gradient-to-br from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Body Metrics</h3>
                     <p className="text-sm text-gray-500">BMI and calculations</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="p-4 bg-white/30 backdrop-blur rounded-xl border border-white/30">
                     <div className="text-sm text-gray-500">BMI</div>
                     <div className="text-2xl font-bold">{bmi}</div>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="p-4 bg-white/30 backdrop-blur rounded-xl border border-white/30">
                     <div className="text-sm text-gray-500">Height</div>
                     <div className="text-2xl font-bold">{height} cm</div>
                   </div>
@@ -668,13 +665,13 @@ export default function ProgressPage() {
           {/* Section 2: Body Composition */}
           {currentSection === 1 && (
             <div className="space-y-4">
-              <Card className="p-6 rounded-[28px] border-[#0CC5BA]/10 bg-white">
+              <Card className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                    <Activity className="w-5 h-5 text-indigo-500" />
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-white/20">
+                    <Activity className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-br from-indigo-500 to-purple-500 bg-clip-text text-transparent">Body Composition</h3>
+                    <h3 className="text-lg font-bold bg-gradient-to-br from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Body Composition</h3>
                     <p className="text-sm text-gray-500">Your detailed body analysis</p>
                   </div>
                 </div>
@@ -685,20 +682,20 @@ export default function ProgressPage() {
                       <span className="text-sm text-gray-500">BMI</span>
                       <span className="text-sm font-medium">{bmi}</span>
                     </div>
-                    <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-white/30 border border-white/20 backdrop-blur rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"
                         style={{ width: `${Math.min(parseFloat(bmi) * 4, 100)}%` }}
                       />
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="bg-gray-50 p-4 rounded-xl">
+                    <div className="bg-white/30 backdrop-blur p-4 rounded-xl border border-white/30">
                       <div className="text-gray-500 text-sm">Weight</div>
                       <div className="font-bold text-xl">{currentWeight} kg</div>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-xl">
+                    <div className="bg-white/30 backdrop-blur p-4 rounded-xl border border-white/30">
                       <div className="text-gray-500 text-sm">Height</div>
                       <div className="font-bold text-xl">{height} cm</div>
                     </div>
@@ -715,13 +712,13 @@ export default function ProgressPage() {
           {/* Section 3: Progress Photos */}
           {currentSection === 2 && (
             <div className="space-y-4">
-              <Card className="p-6 rounded-[28px] border-[#0CC5BA]/10 bg-white">
+              <Card className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-pink-500" />
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-white/20">
+                    <Camera className="w-5 h-5 text-emerald-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold bg-gradient-to-br from-purple-500 to-pink-500 bg-clip-text text-transparent">Progress Photos</h3>
+                    <h3 className="text-lg font-bold bg-gradient-to-br from-emerald-500 to-emerald-700 bg-clip-text text-transparent">Progress Photos</h3>
                     <p className="text-sm text-gray-500">Visual tracking of your journey</p>
                   </div>
                 </div>
@@ -729,14 +726,15 @@ export default function ProgressPage() {
                 <div className="space-y-4">
                   <div className="flex gap-2">
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90"
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90"
                       onClick={handleCameraOpen}
                     >
                       <Camera className="w-4 h-4 mr-2" />
                       Take Photo
                     </Button>
                     <Button 
-                      className="flex-1 bg-white border border-purple-500 text-purple-500 hover:bg-purple-50"
+                      variant="outline"
+                      className="flex-1 border-emerald-500 text-emerald-600 hover:bg-emerald-50"
                       onClick={() => document.getElementById('photo-upload')?.click()}
                     >
                       <Upload className="w-4 h-4 mr-2" />
@@ -853,7 +851,8 @@ export default function ProgressPage() {
                   </div>
                   
                   <Button
-                    className="w-full mt-4 bg-white border border-pink-500 text-pink-500 hover:bg-pink-50"
+                    variant="outline"
+                    className="w-full mt-4 border-emerald-500 text-emerald-600 hover:bg-emerald-50"
                     onClick={() => setIsGalleryOpen(true)}
                   >
                     View All Photos
@@ -870,7 +869,7 @@ export default function ProgressPage() {
         <div className="flex justify-between">
           <Button
             variant="outline"
-            className="w-12 h-12 rounded-full flex items-center justify-center"
+            className="w-12 h-12 rounded-full flex items-center justify-center border-emerald-500 text-emerald-700 hover:bg-emerald-50"
             onClick={() => setCurrentSection(prev => Math.max(0, prev - 1))}
             disabled={currentSection === 0}
           >
@@ -878,7 +877,7 @@ export default function ProgressPage() {
           </Button>
           <Button
             variant="outline"
-            className="w-12 h-12 rounded-full flex items-center justify-center"
+            className="w-12 h-12 rounded-full flex items-center justify-center border-emerald-500 text-emerald-700 hover:bg-emerald-50"
             onClick={() => setCurrentSection(prev => Math.min(progressSections.length - 1, prev + 1))}
             disabled={currentSection === progressSections.length - 1}
           >

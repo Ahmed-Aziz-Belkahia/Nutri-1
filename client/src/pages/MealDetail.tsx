@@ -760,10 +760,10 @@ export default function MealDetail() {
   const totalMacros = calculateTotalMacros();
   
   // Get profile macro goals or default values
-  const calorieGoal = user?.profile?.calorieGoal || 2000;
-  const proteinGoal = user?.profile?.proteinGoal || 150;
-  const carbsGoal = user?.profile?.carbsGoal || 200;
-  const fatGoal = user?.profile?.fatGoal || 67;
+  const calorieGoal = user?.profile?.goals?.calories || 2000;
+  const proteinGoal = user?.profile?.goals?.protein || 150;
+  const carbsGoal = user?.profile?.goals?.carbs || 200;
+  const fatGoal = user?.profile?.goals?.fat || 67;
 
   // Calculate percentage of daily goals
   const caloriePercentage = Math.round((totalMacros.calories / calorieGoal) * 100);

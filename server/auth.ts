@@ -167,7 +167,7 @@ export function setupAuth(app: Express) {
         email,
         password: await crypto.hash(password),
         hasCompletedOnboarding: Boolean(profile),
-        lastActivityDate: new Date(),
+        lastActivityDate: new Date().toISOString().split('T')[0] as any,
         profileImage: null,
         preferred_language: 'en', // this one actually uses snake_case in the schema
         // Initialize new user stats
@@ -195,7 +195,7 @@ export function setupAuth(app: Express) {
             height: Number(profile.height || 170), // Default to 170cm if not provided
             weightGoal: profile.weightGoal,
             activityLevel: profile.activityLevel,
-            calorieGoal: Number(profile.calorieGoal),
+            caloriesGoal: Number(profile.calorieGoal),
             proteinGoal: Number(profile.proteinGoal),
             carbsGoal: Number(profile.carbsGoal),
             fatGoal: Number(profile.fatGoal),

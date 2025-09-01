@@ -47,10 +47,10 @@ export default function SimpleCookingMode() {
   });
 
   // Parse instructions
-  const instructionSteps = React.useMemo(() => {
+  const instructionSteps = React.useMemo<string[]>(() => {
     if (!recipe) return [];
     
-    let steps = [];
+  let steps: string[] = [];
     
     if (Array.isArray(recipe.instructions)) {
       steps = recipe.instructions;
@@ -59,13 +59,13 @@ export default function SimpleCookingMode() {
         if (recipe.instructions.startsWith('[') && recipe.instructions.endsWith(']')) {
           steps = JSON.parse(recipe.instructions);
         } else {
-          steps = recipe.instructions
+          steps = (recipe.instructions as string)
             .split(/\r?\n/)
             .filter((step: string) => step.trim() !== '')
             .map((step: string) => step.replace(/^\d+[\.\)\-]\s*/, '').trim());
         }
       } catch (e) {
-        steps = recipe.instructions
+        steps = (recipe.instructions as string)
           .split(/\r?\n/)
           .filter((step: string) => step.trim() !== '')
           .map((step: string) => step.replace(/^\d+[\.\)\-]\s*/, '').trim());
@@ -83,19 +83,21 @@ export default function SimpleCookingMode() {
   }, [recipe]);
 
   // Adjust ingredients based on serving size
-  const adjustedIngredients = React.useMemo(() => {
+  const adjustedIngredients = React.useMemo<string[]>(() => {
     if (!recipe?.ingredients || !Array.isArray(recipe.ingredients)) return [];
     
     const baseServingSize = 2;
     const ratio = servingSize / baseServingSize;
     
-    return recipe.ingredients.map((ingredient: string) => {
-      return ingredient.replace(/^([\d\/\.]+)(\s+)/, (match, quantity, space) => {
+    return (recipe.ingredients as string[]).map((ingredient: string) => {
+      return ingredient.replace(/^([\d\/\.]+)(\s+)/, (_match: string, quantity: string, space: string) => {
         let numericValue: number;
         
         if (quantity.includes('/')) {
           const parts = quantity.split('/');
-          numericValue = parseInt(parts[0]) / parseInt(parts[1]);
+          const numerator = parseFloat(parts[0]);
+          const denominator = parseFloat(parts[1]);
+          numericValue = denominator ? numerator / denominator : numerator;
         } else {
           numericValue = parseFloat(quantity);
         }

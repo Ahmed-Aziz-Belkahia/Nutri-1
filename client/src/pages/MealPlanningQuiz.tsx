@@ -39,35 +39,36 @@ import MealPlanGenerationProgress from "@/components/MealPlanGenerationProgress"
 // Form types
 interface MealPlanPreferencesForm {
   dietaryType: string;
-  healthGoals: string[];
+  // Allow both string and array for flexibility with UI components using text input or multi-select
+  healthGoals: string | string[];
   activityLevel: string;
   calorieTarget: number;
   mealsPerDay: number;
   allergies: string[];
   maxCookingTime: number;
   budgetPreference: string;
-  cuisinePreferences: string[];
+  cuisinePreferences: string | string[];
   preferredIngredients: string[];
   excludedIngredients: string[];
   cookingSkillLevel: string;
   mealPlanDuration: string;
   weekdayVsWeekend: string;
   cookingEquipment: string[];
-  specialRequirements: string;
+  specialRequirements?: string;
 }
 
 const getQuestions = (t: Function) => [
   {
     id: "dietaryType",
-    title: "Jaki jest Twój styl odżywiania?",
-    description: "Wybierz preferowany typ diety",
+    title: "What is your eating style?",
+    description: "Choose your preferred diet type",
     type: "select",
     icon: <Utensils className="w-6 h-6" />,
     color: "from-green-400 to-emerald-600"
   },
   {
     id: "healthGoals",
-    title: "Jakie są Twoje cele zdrowotne?",
+    title: "What are your health goals?",
     description: "Lub dodaj własne, aby było bardziej spersonalizowane",
     type: "select_with_input",
     icon: <Target className="w-6 h-6" />,
@@ -133,14 +134,14 @@ export default function MealPlanningQuiz() {
   const { control, register, handleSubmit, setValue, watch, formState: { errors } } = useForm<MealPlanPreferencesForm>({
     defaultValues: {
       dietaryType: "omnivore",
-      healthGoals: "schudnąć",
+  healthGoals: "schudnąć",
       activityLevel: "moderate",
       calorieTarget: 2000,
       mealsPerDay: 3,
       allergies: [],
       maxCookingTime: 60,
       budgetPreference: "medium",
-      cuisinePreferences: "polskie",
+  cuisinePreferences: "polskie",
       preferredIngredients: [],
       excludedIngredients: [],
       cookingSkillLevel: "intermediate",
@@ -277,11 +278,11 @@ export default function MealPlanningQuiz() {
         if (questionId === "dietaryType") {
           const popularOptions = [
             { value: "omnivore", label: "Omniwor", description: "Jem wszystko" },
-            { value: "vegetarian", label: "Wegetariańska", description: "Bez mięsa" },
-            { value: "vegan", label: "Wegańska", description: "Tylko roślinne" },
-            { value: "keto", label: "Ketogeniczna", description: "Niskie węglowodany" },
-            { value: "paleo", label: "Paleo", description: "Naturalne produkty" },
-            { value: "mediterranean", label: "Śródziemnomorska", description: "Zdrowe tłuszcze" },
+            { value: "vegetarian", label: "Vegetarian", description: "No meat" },
+            { value: "vegan", label: "Vegan", description: "Plant-based only" },
+            { value: "keto", label: "Ketogenic", description: "Low carb" },
+            { value: "paleo", label: "Paleo", description: "Natural products" },
+            { value: "mediterranean", label: "Mediterranean", description: "Healthy fats" },
           ];
 
           return (
@@ -342,7 +343,7 @@ export default function MealPlanningQuiz() {
           );
         }
 
-        if (questionId === "activityLevel") {
+  if (questionId === "activityLevel") {
           const options = [
             { value: "sedentary", label: "Sedentary", description: "Little to no exercise" },
             { value: "moderate", label: "Moderate", description: "Regular exercise" },
@@ -368,7 +369,6 @@ export default function MealPlanningQuiz() {
                       }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="text-2xl">{option.icon}</div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
                           <p className="text-sm text-gray-500">{option.description}</p>
@@ -391,7 +391,7 @@ export default function MealPlanningQuiz() {
           );
         }
 
-        if (questionId === "cookingSkillLevel") {
+    if (questionId === "cookingSkillLevel") {
           const options = [
             { value: "beginner", label: "Beginner", description: "Simple recipes" },
             { value: "intermediate", label: "Intermediate", description: "Most cooking methods" },
@@ -416,7 +416,6 @@ export default function MealPlanningQuiz() {
                       }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="text-2xl">{option.icon}</div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
                           <p className="text-sm text-gray-500">{option.description}</p>
@@ -455,7 +454,8 @@ export default function MealPlanningQuiz() {
               render={({ field }) => (
                 <div className="grid grid-cols-1 gap-3">
                   {options.map((option) => {
-                    const isSelected = field.value?.includes(option.value);
+        const values = Array.isArray(field.value) ? field.value : [];
+        const isSelected = values.includes(option.value);
                     
                     return (
                       <motion.div
@@ -463,7 +463,7 @@ export default function MealPlanningQuiz() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                          const currentValues = field.value || [];
+          const currentValues = Array.isArray(field.value) ? field.value : [];
                           if (isSelected) {
                             field.onChange(currentValues.filter(v => v !== option.value));
                           } else {
@@ -477,7 +477,6 @@ export default function MealPlanningQuiz() {
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="text-2xl">{option.icon}</div>
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
                             <p className="text-sm text-gray-500">{option.description}</p>
@@ -509,14 +508,15 @@ export default function MealPlanningQuiz() {
             { value: "mediterranean", label: "Mediterranean", description: "Healthy, fresh, olive oil" },
           ];
 
-          return (
+      return (
             <Controller
               control={control}
               name="cuisinePreferences"
               render={({ field }) => (
                 <div className="grid grid-cols-1 gap-3">
                   {options.map((option) => {
-                    const isSelected = field.value?.includes(option.value);
+        const values = Array.isArray(field.value) ? field.value : [];
+        const isSelected = values.includes(option.value);
                     
                     return (
                       <motion.div
@@ -524,7 +524,7 @@ export default function MealPlanningQuiz() {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                          const currentValues = field.value || [];
+          const currentValues = Array.isArray(field.value) ? field.value : [];
                           if (isSelected) {
                             field.onChange(currentValues.filter(v => v !== option.value));
                           } else {
@@ -538,7 +538,6 @@ export default function MealPlanningQuiz() {
                         }`}
                       >
                         <div className="flex items-center gap-4">
-                          <div className="text-2xl">{option.icon}</div>
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
                             <p className="text-sm text-gray-500">{option.description}</p>
@@ -637,7 +636,7 @@ export default function MealPlanningQuiz() {
         break;
 
       case "select_with_input":
-        if (questionId === "healthGoals") {
+    if (questionId === "healthGoals") {
           // Get current weight goal from user preferences
           const getCurrentWeightGoal = () => {
             if (!userPreferences) return null;
@@ -660,7 +659,8 @@ export default function MealPlanningQuiz() {
           return (
             <Controller
               control={control}
-              name={questionId}
+      // Cast dynamic name to satisfy RHF generic constraints
+      name={questionId as keyof MealPlanPreferencesForm as any}
               render={({ field }) => {
                 const [agreed, setAgreed] = useState(false);
                 const [customGoal, setCustomGoal] = useState("");
@@ -672,7 +672,7 @@ export default function MealPlanningQuiz() {
                       <div className="bg-white rounded-3xl p-6 border-2 border-gray-100 shadow-lg">
                         <div className="text-center mb-5">
                           <h4 className="text-sm font-medium text-gray-500 mb-3">
-                            Twój obecny cel zdrowotny:
+                            Your current health goal:
                           </h4>
                           <div className="inline-flex items-center px-6 py-4 bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CBACC]/10 rounded-2xl border-2 border-[#0CC5BA]/20">
                             <span className="text-xl font-semibold text-[#0CC5BA]">{currentGoal}</span>
@@ -762,11 +762,12 @@ export default function MealPlanningQuiz() {
         }
 
         // Original logic for other select_with_input questions
-        const popularOptions = currentQuestion.popularOptions || [];
+    const popularOptions = currentQuestion.popularOptions || [] as Array<{ value: string; label: string }>;
         return (
           <Controller
             control={control}
-            name={questionId}
+      // Cast dynamic name
+      name={questionId as keyof MealPlanPreferencesForm as any}
             render={({ field }) => {
               const [customValue, setCustomValue] = useState("");
               const [selectedType, setSelectedType] = useState("popular"); // "popular" or "custom"
@@ -865,7 +866,7 @@ export default function MealPlanningQuiz() {
         return (
           <Controller
             control={control}
-            name={questionId}
+            name={questionId as keyof MealPlanPreferencesForm as any}
             render={({ field }) => (
               <Input
                 {...field}
@@ -881,35 +882,35 @@ export default function MealPlanningQuiz() {
           return (
             <Controller
               control={control}
-              name={questionId}
+              name={questionId as keyof MealPlanPreferencesForm as any}
               render={({ field }) => (
                 <div className="space-y-4">
                   {/* Current Macro Goals */}
                   {userPreferences && (
                     <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl p-5 border border-gray-200/50 shadow-lg shadow-gray-100/30">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Twoje obecne cele makro:</h4>
+                      <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Your current macro goals:</h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-2xl p-3 text-center border border-purple-500/20">
                           <div className="text-xl font-bold text-purple-600 mb-1">{userPreferences.caloriesGoal || 2000}</div>
-                          <div className="text-xs font-medium text-gray-600">Kalorie</div>
+                          <div className="text-xs font-medium text-gray-600">Calories</div>
                         </div>
                         <div className="bg-gradient-to-br from-pink-500/10 to-pink-500/5 rounded-2xl p-3 text-center border border-pink-500/20">
                           <div className="text-xl font-bold text-pink-600 mb-1">
                             {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.proteinGoal || 30) / 100) / 4)}g
                           </div>
-                          <div className="text-xs font-medium text-gray-600">Białko</div>
+                          <div className="text-xs font-medium text-gray-600">Protein</div>
                         </div>
                         <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 rounded-2xl p-3 text-center border border-emerald-500/20">
                           <div className="text-xl font-bold text-emerald-600 mb-1">
                             {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.carbsGoal || 40) / 100) / 4)}g
                           </div>
-                          <div className="text-xs font-medium text-gray-600">Węglowodany</div>
+                          <div className="text-xs font-medium text-gray-600">Carbs</div>
                         </div>
                         <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-2xl p-3 text-center border border-amber-500/20">
                           <div className="text-xl font-bold text-amber-600 mb-1">
                             {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.fatGoal || 30) / 100) / 9)}g
                           </div>
-                          <div className="text-xs font-medium text-gray-600">Tłuszcze</div>
+                          <div className="text-xs font-medium text-gray-600">Fat</div>
                         </div>
                       </div>
                       
@@ -917,11 +918,11 @@ export default function MealPlanningQuiz() {
                       <div className="mt-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
                         <div className="text-xs font-medium text-blue-800 text-center">
                           {userPreferences.weightGoal === 'gain' || userPreferences.goalWeight > userPreferences.currentWeight ? (
-                            <span>Aby przybrać na wadze, jedz więcej białka (buduje mięśnie) i zwiększ kalorie!</span>
+                            <span>To gain weight, eat more protein (builds muscle) and increase calories!</span>
                           ) : userPreferences.weightGoal === 'loss' || userPreferences.goalWeight < userPreferences.currentWeight ? (
-                            <span>Aby schudnąć, utrzymaj wysokie spożycie białka (chroni mięśnie) i zmniejsz kalorie!</span>
+                            <span>To lose weight, maintain high protein intake (protects muscle) and reduce calories!</span>
                           ) : (
-                            <span>Aby utrzymać wagę, zachowaj zbilansowane makro i stabilne kalorie!</span>
+                            <span>To maintain weight, keep balanced macros and stable calories!</span>
                           )}
                         </div>
                       </div>
@@ -952,7 +953,7 @@ export default function MealPlanningQuiz() {
         return (
           <Controller
             control={control}
-            name={questionId}
+            name={questionId as keyof MealPlanPreferencesForm as any}
             render={({ field }) => (
               <Input
                 {...field}

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -363,6 +363,22 @@ export default function Recipes() {
     }
   }, [allMealPlansData, selectedDate]);
 
+  // Normalize meals for display (distribute generic "snack" types)
+  const normalizedMeals = useMemo(() => {
+    if (!selectedPlan?.meals) return [] as Meal[];
+    // Clone to avoid mutating original state
+    const meals = selectedPlan.meals.map(m => ({ ...m }));
+    const snackMeals = meals.filter(m => m.mealType?.toLowerCase() === 'snack');
+
+    if (snackMeals.length >= 1) snackMeals[0].mealType = 'morning snack';
+    if (snackMeals.length >= 2) snackMeals[1].mealType = 'evening snack';
+    for (let i = 2; i < snackMeals.length; i++) {
+      snackMeals[i].mealType = 'afternoon snack';
+    }
+
+    return meals;
+  }, [selectedPlan]);
+
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [newIngredient, setNewIngredient] = useState("");
   const { register, handleSubmit, formState: { errors }, reset } = useForm<CreateRecipeForm>({
@@ -538,31 +554,24 @@ export default function Recipes() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden">
-      {/* Abstract background pattern */}
-      <div className="absolute inset-0 opacity-5" style={{ 
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-      }}></div>
-      
-      {/* Colorful abstract shapes */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-purple-600/5 filter blur-3xl -translate-y-1/3 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-500/5 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
-      <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full bg-emerald-500/5 filter blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] rounded-full bg-pink-500/5 filter blur-3xl" />
-    
-      <div className="max-w-[600px] mx-auto relative z-10 pt-4 px-4">
-        {/* Keep the header part from original design */}
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden">
+      {/* Minimal, soft background accents */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
+
+      <div className="max-w-md mx-auto relative z-10 pt-6 px-4">
+        {/* Minimal header to match Dashboard */}
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="w-full bg-white/60 backdrop-blur-md border-b border-white/10 p-4 rounded-xl mb-6"
+          className="mb-6"
         >
           <div className="flex items-start sm:items-center justify-between gap-4">
-            <div className="flex-1 min-w-0 space-y-2">
+            <div className="flex-1 min-w-0 space-y-1">
               <motion.h1
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="text-2xl sm:text-3xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent truncate"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 truncate"
               >
                 {t('recipes.welcomeBack')} {username}!
               </motion.h1>
@@ -572,8 +581,7 @@ export default function Recipes() {
                 transition={{ delay: 0.1 }}
                 className="flex flex-wrap items-center gap-2"
               >
-
-                <span className="text-sm sm:text-base text-gray-500 truncate">
+                <span className="text-sm sm:text-base text-gray-600 truncate">
                   {t('recipes.discover')}
                 </span>
               </motion.div>
@@ -587,7 +595,7 @@ export default function Recipes() {
             >
               <div className="relative">
                 <button
-                  className="w-12 h-12 rounded-full bg-[#0CC5BA] flex items-center justify-center text-white text-xl font-semibold hover:bg-[#0CC5BA]/90 transition-colors overflow-hidden"
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center text-white text-xl font-semibold hover:from-emerald-500 hover:to-green-600 transition-colors overflow-hidden"
                   onClick={() => setLocation('/profile')}
                 >
                   {user?.profileImage ? (
@@ -624,11 +632,11 @@ export default function Recipes() {
             }}
             className="w-full mb-8"
           >
-            <TabsList className="grid w-full grid-cols-2 mb-2 bg-gray-100 rounded-xl p-1">
-              <TabsTrigger value="recipes" className="text-base font-medium py-2 px-4 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsList className="grid w-full grid-cols-2 mb-2 bg-white/20 backdrop-blur-lg border border-white/30 rounded-xl p-1">
+              <TabsTrigger value="recipes" className="text-base font-medium py-2 px-4 rounded-lg text-gray-700 data-[state=active]:bg-white/50 data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm">
                 {t('navigation.recipes', 'Recipes')}
               </TabsTrigger>
-              <TabsTrigger value="meal-plan" className="text-base font-medium py-2 px-4 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+              <TabsTrigger value="meal-plan" className="text-base font-medium py-2 px-4 rounded-lg text-gray-700 data-[state=active]:bg-white/50 data-[state=active]:text-emerald-700 data-[state=active]:shadow-sm">
                 {t('navigation.mealPlan', 'Meal Plan')}
               </TabsTrigger>
             </TabsList>
@@ -640,11 +648,11 @@ export default function Recipes() {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-xl p-6 mb-8 relative overflow-hidden"
+                className="bg-white/25 backdrop-blur-lg rounded-2xl border border-white/40 p-6 mb-8 relative overflow-hidden"
               >
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-[#0CC5BA]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Camera className="w-8 h-8 text-[#0CC5BA]" />
+                  <div className="w-16 h-16 bg-emerald-100/60 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera className="w-8 h-8 text-emerald-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-800 mb-2">{t('recipes.aIPoweredCreator')}</h2>
                   <p className="text-sm text-gray-600 mb-6">
@@ -654,7 +662,7 @@ export default function Recipes() {
                   <div className="flex justify-center">
                     <Button
                       onClick={() => setLocation('/scan-recipe')}
-                      className="py-8 px-12 bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-2xl font-semibold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center"
+                      className="py-8 px-12 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-2xl font-semibold text-lg hover:shadow-lg transition-all duration-300 flex items-center justify-center"
                     >
                       <Camera className="w-6 h-6 mr-3" />
                       {t('recipes.scanIngredients')}
@@ -672,16 +680,16 @@ export default function Recipes() {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
-                      <Utensils className="h-5 w-5 text-[#0CC5BA]" />
+                    <div className="bg-emerald-100/60 p-2 rounded-full">
+                      <Utensils className="h-5 w-5 text-emerald-600" />
                     </div>
-                    <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
+                    <h2 className="text-xl font-bold text-gray-900 ml-2">
                       {t('recipes.yourRecipes')}
                     </h2>
                   </div>
                   <Button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-gradient-to-r from-[#0CC5BA] to-[#0C9CCC] text-white rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all"
+                    className="bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all"
                   >
                     <Plus className="h-4 w-4" />
                     {t('recipes.createRecipe', 'Create Recipe')}
@@ -755,10 +763,10 @@ export default function Recipes() {
                   className="mb-8"
                 >
                   <div className="flex items-center space-x-2 mb-4">
-                    <div className="bg-blue-500/10 p-2 rounded-full">
-                      <Heart className="h-5 w-5 text-blue-500" />
+                    <div className="bg-emerald-100/60 p-2 rounded-full">
+                      <Heart className="h-5 w-5 text-emerald-600" />
                     </div>
-                    <h2 className="text-xl font-bold bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-500 bg-clip-text text-transparent">
+                    <h2 className="text-xl font-bold text-gray-900">
                       {t('recipes.savedFavorites')}
                     </h2>
                   </div>
@@ -787,7 +795,7 @@ export default function Recipes() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-xl shadow-xl p-6 mb-8"
+                className="bg-white/25 backdrop-blur-lg rounded-2xl border border-white/40 p-6 mb-8"
               >
                 {/* Calendar Date Selector */}
                 <div className="mb-6">
@@ -811,16 +819,16 @@ export default function Recipes() {
                           onClick={() => handleDateSelect(date)}
                           className={`flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl transition-all ${
                             isSelected
-                              ? 'bg-[#0CC5BA] text-white'
+                              ? 'bg-emerald-500 text-white'
                               : hasPlan
-                              ? 'bg-[#0CC5BA]/10 text-[#0CC5BA]'
-                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : 'bg-white/40 text-gray-700 border border-white/30 hover:bg-white/60'
                           }`}
                         >
                           <span className="text-xs font-medium">
                             {format(date, 'EEE')}
                           </span>
-                          <span className={`text-lg font-bold ${isSelected ? 'text-white' : ''}`}>
+                          <span className={`text-lg font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
                             {format(date, 'd')}
                           </span>
                         </button>
@@ -846,44 +854,6 @@ export default function Recipes() {
                       </div>
                     </div>
                     
-                    {/* Add debug logging for the meals */}
-                    {console.log("Recipe.tsx - Meals:", selectedPlan.meals.map(m => ({
-                      id: m.id, 
-                      name: m.name,
-                      mealType: m.mealType
-                    })))}
-                    
-                    {/* Handle distribution of "snack" types for proper display */}
-                    {(() => {
-                      // Find any meals with generic "snack" type
-                      const snackMeals = selectedPlan.meals.filter(m => 
-                        m.mealType.toLowerCase() === "snack"
-                      );
-                      
-                      if (snackMeals.length > 0) {
-                        console.log(`Found ${snackMeals.length} generic snack meals to distribute in Recipes.tsx`);
-                        
-                        // Distribute the first snack to morning, and the second to evening
-                        if (snackMeals.length >= 1) {
-                          snackMeals[0].mealType = "morning snack";
-                          console.log(`Assigned first snack to morning: ${snackMeals[0].name}`);
-                        }
-                        
-                        if (snackMeals.length >= 2) {
-                          snackMeals[1].mealType = "evening snack";
-                          console.log(`Assigned second snack to evening: ${snackMeals[1].name}`);
-                        }
-                        
-                        // If there are more snacks (unlikely), assign them to afternoon
-                        for (let i = 2; i < snackMeals.length; i++) {
-                          snackMeals[i].mealType = "afternoon snack";
-                          console.log(`Assigned extra snack ${i+1} to afternoon: ${snackMeals[i].name}`);
-                        }
-                      }
-                      
-                      return null;
-                    })()}
-                    
                     {/* Meal tabs: Morning, Afternoon, Evening */}
                     <Tabs defaultValue="morning" className="w-full">
                       <TabsList className="grid w-full grid-cols-3 bg-gray-100 rounded-xl p-1">
@@ -903,7 +873,7 @@ export default function Recipes() {
                       
                       <TabsContent value="morning">
                         {/* Morning meals (breakfast + morning snack) */}
-                        {selectedPlan.meals
+                        {normalizedMeals
                           .filter(meal => 
                             meal.mealType.toLowerCase() === 'breakfast' || 
                             meal.mealType.toLowerCase() === 'morning_snack' ||
@@ -929,7 +899,7 @@ export default function Recipes() {
                       
                       <TabsContent value="afternoon">
                         {/* Afternoon meals (lunch + afternoon snack) */}
-                        {selectedPlan.meals
+                        {normalizedMeals
                           .filter(meal => 
                             meal.mealType.toLowerCase() === 'lunch' || 
                             meal.mealType.toLowerCase() === 'afternoon_snack' ||
@@ -955,7 +925,7 @@ export default function Recipes() {
                       
                       <TabsContent value="evening">
                         {/* Evening meals (dinner + evening snack if any) */}
-                        {selectedPlan.meals
+                        {normalizedMeals
                           .filter(meal => 
                             meal.mealType.toLowerCase() === 'dinner' || 
                             meal.mealType.toLowerCase() === 'evening_snack' ||
@@ -995,41 +965,41 @@ export default function Recipes() {
                 className="mb-8"
               >
                 <div className="flex items-center mb-4">
-                  <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
-                    <ShoppingBag className="h-5 w-5 text-[#0CC5BA]" />
+                  <div className="bg-emerald-100/60 p-2 rounded-full">
+                    <ShoppingBag className="h-5 w-5 text-emerald-600" />
                   </div>
-                  <h2 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent ml-2">
+                  <h2 className="text-xl font-bold text-gray-900 ml-2">
                     {t('navigation.shoppingList', 'Shopping List')}
                   </h2>
                 </div>
                 
-                <Card className="overflow-hidden rounded-3xl border-0 shadow-lg transition-all duration-300 group bg-white">
-                  <div className="relative p-5 bg-white border-b border-gray-100">
+                <Card className="overflow-hidden rounded-3xl border border-white/40 shadow-lg transition-all duration-300 group bg-white/25 backdrop-blur-lg">
+                  <div className="relative p-5 bg-transparent border-b border-white/40">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-xl font-bold leading-tight text-gray-900 group-hover:text-[#0CC5BA] transition-colors">
+                        <h3 className="text-xl font-bold leading-tight text-gray-900 group-hover:text-emerald-600 transition-colors">
                           {t('shoppingList.weeklyTitle', 'Weekly Shopping List')}
                         </h3>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-600 mt-1">
                           {t('shoppingList.description', 'Your meal plan shopping items')}
                         </p>
                       </div>
-                      <div className="h-12 w-12 flex items-center justify-center bg-gradient-to-br from-[#0CC5BA] to-[#0091ff] rounded-full shadow-lg">
+                      <div className="h-12 w-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-green-600 rounded-full shadow-lg">
                         <ShoppingBag className="h-6 w-6 text-white" />
                       </div>
                     </div>
                   </div>
-                  <div className="p-4 bg-white">
+                  <div className="p-4 bg-transparent">
                     <EmbeddedShoppingList />
                   </div>
                 </Card>
               </motion.section>
 
               {/* Generate New Meal Plan button at the bottom */}
-              <div className="flex flex-col gap-4 justify-center mb-6">
+        <div className="flex flex-col gap-4 justify-center mb-6">
                 <Button
                   onClick={() => setLocation('/meal-planning-quiz')}
-                  className="w-full max-w-md py-5 bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all"
+          className="w-full max-w-md py-5 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all"
                 >
                   <CalendarDays className="mr-2 h-5 w-5" />
                   {t('mealPlan.generateNew', 'Generate New Meal Plan')}

@@ -142,8 +142,8 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
       }
 
       toast({
-        title: "Profil ukończony!",
-        description: "Twój spersonalizowany plan żywieniowy jest gotowy.",
+        title: "Profile completed!",
+        description: "Your personalized nutrition plan is ready.",
       });
 
       setLocation("/vision-board");
@@ -235,7 +235,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 className="hidden"
               />
               <p className="text-center text-xs text-gray-500">
-                Twoje zdjęcie profilowe będzie wyświetlane w Twoim profilu i w aplikacji. Możesz je zmienić później.
+                Your profile picture will be displayed in your profile and in the app. You can change it later.
               </p>
             </motion.div>
 
@@ -251,10 +251,10 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                   <Flame className="w-6 h-6 text-orange-500" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Twoje dzienne zapotrzebowanie kaloryczne
+                  Your daily calorie requirement
                 </h3>
                 <p className="text-sm text-gray-600">
-                  Możesz dostosować wartość według swoich potrzeb
+                  You can adjust the value according to your needs
                 </p>
               </div>
 
@@ -264,7 +264,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                     <Flame className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">
-                    Twoje dzienne zapotrzebowanie
+                    Your daily requirement
                   </span>
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-1">
@@ -331,15 +331,15 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
               <div className="grid grid-cols-3 gap-3">
                 <Card className="p-4 text-center bg-green-50 border-green-200">
                   <div className="text-lg font-bold text-green-700">{macros.protein}g</div>
-                  <div className="text-xs text-gray-600">Białko</div>
+                  <div className="text-xs text-gray-600">Protein</div>
                 </Card>
                 <Card className="p-4 text-center bg-yellow-50 border-yellow-200">
                   <div className="text-lg font-bold text-yellow-700">{macros.carbs}g</div>
-                  <div className="text-xs text-gray-600">Węglowodany</div>
+                  <div className="text-xs text-gray-600">Carbs</div>
                 </Card>
                 <Card className="p-4 text-center bg-purple-50 border-purple-200">
                   <div className="text-lg font-bold text-purple-700">{macros.fat}g</div>
-                  <div className="text-xs text-gray-600">Tłuszcze</div>
+                  <div className="text-xs text-gray-600">Fat</div>
                 </Card>
               </div>
             </motion.div>

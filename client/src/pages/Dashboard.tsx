@@ -162,6 +162,24 @@ const calculateTotal = (name: string, value: string | number) => {
   return baseValue;
 };
 
+// Safely get a display time for a food log even if createdAt is missing
+function getLogTime(log: any): string {
+  try {
+    // Prefer explicit createdAt
+    if (log?.createdAt) {
+      return format(new Date(log.createdAt), 'HH:mm');
+    }
+    // Try date field variants
+    const candidate = log?.timestamp || log?.date || log?.created_at;
+    if (candidate) {
+      return format(new Date(candidate), 'HH:mm');
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
 export default function Dashboard() {
   const [location, setLocation] = useLocation();
   const { t } = useTranslation(); // Add translation hook
@@ -406,64 +424,54 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden pb-20">
       
-      {/* Colorful abstract shapes */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-purple-600/5 filter blur-3xl -translate-y-1/3 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-500/5 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
-      <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full bg-emerald-500/5 filter blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] rounded-full bg-pink-500/5 filter blur-3xl" />
+      {/* Minimalist background elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
+      <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
     
-      <div className="max-w-[600px] mx-auto relative z-10 pt-4 px-4">
-        {/* Header with newer design matching recipes page */}
+      <div className="max-w-md mx-auto relative z-10 pt-6 px-4">
+        {/* Minimalist Header */}
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="sticky top-0 w-full bg-white/60 backdrop-blur-md z-10 border-b border-white/10 py-3 px-4 rounded-2xl mb-4"
+          className="mb-8"
         >
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between">
+            <div>
               <motion.h1
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent truncate"
+                className="text-2xl font-bold text-gray-900 mb-1"
               >
                 {isToday(selectedDate) ? (
-                  <>NutriAI</>
+                  <>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}</>
                 ) : (
-                  <>{format(selectedDate, 'MMMM d, yyyy')}</>
+                  <>{format(selectedDate, 'MMM d, yyyy')}</>
                 )}
               </motion.h1>
+              <p className="text-sm text-gray-600">Track your nutrition journey</p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative cursor-pointer"
-                onClick={() => setLocation('/profile')}
-                data-tutorial="profile-button"
-              >
-                <div className="relative">
-                  <button
-                    className="w-12 h-12 rounded-full bg-[#0CC5BA] flex items-center justify-center text-white text-xl font-semibold hover:bg-[#0CC5BA]/90 transition-colors overflow-hidden"
-                  >
-                    {user?.profileImage ? (
-                      <img 
-                        src={user.profileImage} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span>{username[0].toUpperCase()}</span>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="cursor-pointer"
+              onClick={() => setLocation('/profile')}
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center text-white font-semibold shadow-sm">
+                {user?.profileImage ? (
+                  <img 
+                    src={user.profileImage} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <span className="text-sm">{username[0].toUpperCase()}</span>
+                )}
+              </div>
+            </motion.div>
           </div>
         </motion.header>
 
@@ -471,498 +479,257 @@ export default function Dashboard() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="pb-24 mx-auto"
+          className="space-y-6"
         >
+          {/* Week Navigation - Glassmorphism Style */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="mt-4 bg-white rounded-2xl shadow-md overflow-hidden relative"
+            className="bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/30 shadow-sm"
           >
-            {isLoadingLogs && (
-              <div className="absolute top-2 right-2 z-10">
-                <Loader2 className="h-4 w-4 animate-spin text-[#0CC5BA]" />
-              </div>
-            )}
-            <div className="grid grid-cols-7 gap-0 p-0.5">
+            <div className="grid grid-cols-7 gap-1">
               {days.map((day, index) => (
                 <motion.div
                   key={index}
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * 0.03 }}
                   onClick={() => handleDateChange(day.date)}
                   className={`
-                    relative flex flex-col items-center justify-center py-1.5 px-1 cursor-pointer
-                    transition-all duration-200 group min-h-[48px] mx-0.5
-                    ${isSelectedDate(day.date) ? 'bg-[#09b7b3] rounded-xl shadow-sm' : 'hover:bg-gray-100 rounded-xl'}
+                    flex flex-col items-center justify-center py-3 px-1 cursor-pointer
+                    transition-all duration-200 rounded-xl
+                    ${isSelectedDate(day.date) 
+                      ? 'bg-emerald-500 text-white shadow-md' 
+                      : 'hover:bg-white/40 text-gray-700'
+                    }
                   `}
                 >
-                  <span className={`text-xs font-medium transition-colors ${isSelectedDate(day.date) ? 'text-white' : 'text-[#09b7b3] group-hover:text-[#09b7b3]'}`}>
+                  <span className={`text-xs font-medium mb-1 ${isSelectedDate(day.date) ? 'text-white' : 'text-gray-500'}`}>
                     {day.dayName}
                   </span>
-                  <span className={`text-lg font-bold transition-colors ${isSelectedDate(day.date) ? 'text-white' : 'text-gray-700 group-hover:text-gray-900'}`}>
+                  <span className={`text-lg font-bold ${isSelectedDate(day.date) ? 'text-white' : 'text-gray-800'}`}>
                     {day.day}
                   </span>
-
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* Revamped Calories Section */}
+          {/* Calories Card - Compact Glassmorphism */}
           <motion.div variants={itemVariants}>
-            <Card className="mt-4 overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gradient-to-br from-[#09b7b3] to-[#0295c2] rounded-xl">
-                      <Flame className="h-5 w-5 text-white" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-800">{t('nutrition.calories')}</h2>
-                  </div>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      todayTotals.calories >= calorieGoal
-                        ? 'bg-green-100 text-green-700'
-                        : todayTotals.calories >= calorieGoal * 0.8
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {todayTotals.calories >= calorieGoal ? 'Goal Reached' : 
-                     todayTotals.calories >= calorieGoal * 0.8 ? 'Almost There' : 
-                     'Keep Going'}
-                  </motion.div>
+            <div className="bg-white/25 backdrop-blur-lg rounded-2xl p-4 border border-white/40 shadow-lg">
+              {/* Compact header */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-semibold text-gray-800">Today's Progress</h2>
+                <div className="p-1.5 bg-emerald-100/60 rounded-lg">
+                  <Flame className="h-3.5 w-3.5 text-emerald-600" />
                 </div>
+              </div>
 
-                {/* Main Calorie Display with Circular Progress */}
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2 mb-2">
-                      <motion.span
-                        key={todayTotals.calories}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-4xl font-bold bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent"
-                      >
-                        {formatNumber(todayTotals.calories)}
-                      </motion.span>
-                      <span className="text-gray-500 font-medium">kcal</span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      of <span className="font-semibold">{formatNumber(calorieGoal)}</span> daily goal
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      {calorieGoal - todayTotals.calories > 0 ? (
-                        <span className="text-[#09b7b3] font-semibold">
-                          {formatNumber(calorieGoal - todayTotals.calories)} kcal remaining
-                        </span>
-                      ) : (
-                        <span className="text-orange-500 font-semibold">
-                          {formatNumber(todayTotals.calories - calorieGoal)} kcal over goal
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Circular Progress Indicator */}
-                  <div className="relative">
-                    <svg className="w-32 h-32 transform -rotate-90">
-                      <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="#e5e7eb"
-                        strokeWidth="12"
-                        fill="none"
-                      />
-                      <motion.circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="url(#calorieGradient)"
-                        strokeWidth="12"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 56}`}
-                        initial={{ strokeDashoffset: 2 * Math.PI * 56 }}
-                        animate={{ 
-                          strokeDashoffset: 2 * Math.PI * 56 * (1 - Math.min(caloriePercentage / 100, 1))
-                        }}
-                        transition={{ duration: 1.5, ease: "easeOut" }}
-                      />
-                      <defs>
-                        <linearGradient id="calorieGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#09b7b3" />
-                          <stop offset="100%" stopColor="#0295c2" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <motion.span
-                        key={actualCaloriePercentage}
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                        className="text-2xl font-bold text-gray-800"
-                      >
-                        {actualCaloriePercentage}%
-                      </motion.span>
-                      <span className="text-xs text-gray-500">consumed</span>
-                    </div>
+              {/* Main content in horizontal layout */}
+              <div className="flex items-center gap-4">
+                {/* Compact Circular Progress */}
+                <div className="relative flex-shrink-0">
+                  <svg className="w-20 h-20 transform -rotate-90">
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="32"
+                      stroke="#e5e7eb"
+                      strokeWidth="6"
+                      fill="none"
+                      className="opacity-30"
+                    />
+                    <motion.circle
+                      cx="40"
+                      cy="40"
+                      r="32"
+                      stroke="url(#calorieGradient)"
+                      strokeWidth="6"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 32}`}
+                      initial={{ strokeDashoffset: 2 * Math.PI * 32 }}
+                      animate={{ 
+                        strokeDashoffset: 2 * Math.PI * 32 * (1 - Math.min(caloriePercentage / 100, 1))
+                      }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                    />
+                    <defs>
+                      <linearGradient id="calorieGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#059669" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <motion.span
+                      key={todayTotals.calories}
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-sm font-bold text-gray-800"
+                    >
+                      {Math.round(todayTotals.calories)}
+                    </motion.span>
+                    <span className="text-xs text-gray-600">kcal</span>
                   </div>
                 </div>
 
-                {/* Macronutrients Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-semibold text-gray-700">Macronutrients</h3>
-                    <Link href="/nutrition">
-                      <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
-                        View Details
-                        <ChevronRight className="h-3 w-3" />
-                      </button>
-                    </Link>
+                {/* Macros - Compact Grid */}
+                <div className="flex-1 grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mx-auto mb-1"></div>
+                    <div className="text-sm font-bold text-gray-800">{Math.round(todayTotals.protein)}g</div>
+                    <div className="text-xs text-gray-600">Protein</div>
                   </div>
-
-                  {/* Carbs */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                        <span className="text-sm font-medium text-gray-700">{t('nutrition.carbs')}</span>
-                      </div>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-sm font-semibold text-gray-800">
-                          {formatNumber(todayTotals.carbs)}g
-                        </span>
-                        <span className="text-xs text-gray-500">/ {profile?.carbsGoal || 250}g</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ 
-                          width: `${Math.min((todayTotals.carbs / (profile?.carbsGoal || 250)) * 100, 100)}%` 
-                        }}
-                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-400 to-amber-500 rounded-full"
-                      />
-                    </div>
+                  <div className="text-center">
+                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full mx-auto mb-1"></div>
+                    <div className="text-sm font-bold text-gray-800">{Math.round(todayTotals.carbs)}g</div>
+                    <div className="text-xs text-gray-600">Carbs</div>
                   </div>
-
-                  {/* Protein */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <span className="text-sm font-medium text-gray-700">{t('nutrition.protein')}</span>
-                      </div>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-sm font-semibold text-gray-800">
-                          {formatNumber(todayTotals.protein)}g
-                        </span>
-                        <span className="text-xs text-gray-500">/ {profile?.proteinGoal || 150}g</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ 
-                          width: `${Math.min((todayTotals.protein / (profile?.proteinGoal || 150)) * 100, 100)}%` 
-                        }}
-                        transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
-                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Fat */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        <span className="text-sm font-medium text-gray-700">{t('nutrition.fat')}</span>
-                      </div>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-sm font-semibold text-gray-800">
-                          {formatNumber(todayTotals.fat)}g
-                        </span>
-                        <span className="text-xs text-gray-500">/ {profile?.fatGoal || 65}g</span>
-                      </div>
-                    </div>
-                    <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ 
-                          width: `${Math.min((todayTotals.fat / (profile?.fatGoal || 65)) * 100, 100)}%` 
-                        }}
-                        transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
-                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-1">Meals Logged</div>
-                      <div className="text-lg font-semibold text-gray-800">
-                        {foodLogs?.length || 0}
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-1">Avg per Meal</div>
-                      <div className="text-lg font-semibold text-gray-800">
-                        {foodLogs?.length > 0 
-                          ? formatNumber(todayTotals.calories / foodLogs.length)
-                          : '0'
-                        }
-                      </div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-1">Status</div>
-                      <div className="text-sm font-semibold text-gray-800">
-                        {todayTotals.calories >= calorieGoal ? 'Complete' : 
-                         todayTotals.calories >= calorieGoal * 0.5 ? 'In Progress' : 'Started'}
-                      </div>
-                    </div>
+                  <div className="text-center">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mx-auto mb-1"></div>
+                    <div className="text-sm font-bold text-gray-800">{Math.round(todayTotals.fat)}g</div>
+                    <div className="text-xs text-gray-600">Fat</div>
                   </div>
                 </div>
               </div>
-            </Card>
+
+              {/* Goal status indicator */}
+              <div className="mt-3 text-center">
+                <span className="text-xs text-gray-600">
+                  {calorieGoal - todayTotals.calories > 0 ? (
+                    <>{Math.round(calorieGoal - todayTotals.calories)} kcal remaining</>
+                  ) : (
+                    <>{Math.round(todayTotals.calories - calorieGoal)} kcal over goal</>
+                  )}
+                </span>
+              </div>
+            </div>
           </motion.div>
           
-          {/* Revamped Today's Meals Section */}
-          <motion.div variants={itemVariants} className="mt-6">
-            <Card className="overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl">
-                      <Utensils className="h-5 w-5 text-white" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-800">{t('dashboard.todaysMeals')}</h2>
-                  </div>
-                  {foodLogs && foodLogs.length > 0 && (
-                    <Link href="/food-logs">
-                      <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
-                        View All
-                        <ChevronRight className="h-3 w-3" />
-                      </button>
-                    </Link>
-                  )}
+          {/* Today's Meals - Simplified */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white/25 backdrop-blur-lg rounded-3xl p-6 border border-white/40 shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-800">Today's Meals</h2>
+                <div className="p-2 bg-green-100/60 rounded-xl">
+                  <Utensils className="h-4 w-4 text-green-600" />
                 </div>
+              </div>
 
-                {(foodLogs && foodLogs.length > 0) || analyzingMeal ? (
-                  <div className="space-y-3">
-                    {/* Show analyzing meal card first if it exists */}
-                    {analyzingMeal && (
+              {(foodLogs && foodLogs.length > 0) || analyzingMeal ? (
+                <div className="space-y-3">
+                  {/* Analyzing meal */}
+                  {analyzingMeal && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/30"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-800 text-sm">{analyzingMeal.name}</h3>
+                          <p className="text-xs text-blue-600">Analyzing...</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Regular meals */}
+                  {foodLogs?.slice(0, 3).map((log: any, index: number) => {
+                    const totalCalories = calculateTotal(log.name, log.calories);
+                    
+                    return (
                       <motion.div
-                        key={analyzingMeal.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-100"
+                        key={log.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        onClick={() => setLocation(`/meal/${log.id}`)}
+                        className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/30 cursor-pointer hover:bg-white/50 transition-all duration-200"
                       >
-                        <div className="flex items-center gap-4">
-                          {/* Image */}
-                          <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                            {analyzingMeal.image && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                            {log.image ? (
                               <img
-                                src={analyzingMeal.image}
-                                alt="Analyzing food"
+                                src={log.image}
+                                alt={log.name}
                                 className="w-full h-full object-cover"
                               />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Utensils className="h-5 w-5 text-gray-400" />
+                              </div>
                             )}
-                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                              <Loader2 className="w-6 h-6 animate-spin text-white" />
-                            </div>
                           </div>
                           
-                          {/* Content */}
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between mb-1">
-                              <h3 className="font-semibold text-gray-800 text-sm truncate">
-                                {analyzingMeal.name}
-                              </h3>
-                              <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                                {format(analyzingMeal.timestamp, 'HH:mm')}
-                              </span>
-                            </div>
-                            <div className="text-xs text-blue-600 font-medium mb-2">
-                              Analyzing nutritional content...
-                            </div>
-                            
-                            {/* Animated loading bars */}
-                            <div className="space-y-1">
-                              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse" 
-                                     style={{width: '60%'}} />
-                              </div>
-                            </div>
+                            <h3 className="font-medium text-gray-800 text-sm truncate">
+                              {formatFoodName(log)}
+                            </h3>
+                            <p className="text-xs text-gray-600">{getLogTime(log)}</p>
+                          </div>
+                          
+                          <div className="text-right">
+                            <div className="font-bold text-gray-800">{Math.round(totalCalories)}</div>
+                            <div className="text-xs text-gray-600">kcal</div>
                           </div>
                         </div>
                       </motion.div>
-                    )}
+                    );
+                  })}
 
-                    {/* Regular meal cards */}
-                    {foodLogs?.map((log, index) => {
-                      const mealType = getMealTime(new Date(log.createdAt), t);
-                      const totalCalories = calculateTotal(log.name, log.calories);
-                      const totalProtein = calculateTotal(log.name, log.protein);
-                      const totalCarbs = calculateTotal(log.name, log.carbs);
-                      const totalFat = calculateTotal(log.name, log.fat);
-                      
-                      return (
-                        <motion.div
-                          key={log.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          whileHover={{ scale: 1.01 }}
-                          className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer"
-                          onClick={() => setLocation(`/meal/${log.id}`)}
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* Image or Meal Type Icon */}
-                            <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
-                              {log.image ? (
-                                <img
-                                  src={log.image}
-                                  alt={log.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                                  <Utensils className="h-8 w-8 text-gray-400" />
-                                </div>
-                              )}
-                              {/* Meal type badge */}
-                              <div className="absolute top-1 left-1 px-2 py-0.5 bg-white/90 backdrop-blur rounded-full">
-                                <span className="text-[10px] font-semibold text-gray-700">
-                                  {mealType}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-gray-800 text-sm truncate">
-                                    {formatFoodName(log)}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mt-0.5">
-                                    <span className="text-xs text-gray-500">
-                                      {format(new Date(log.createdAt), 'HH:mm')}
-                                    </span>
-                                    {log.components && log.components.length > 0 && (
-                                      <>
-                                        <span className="text-gray-300">•</span>
-                                        <span className="text-xs text-gray-500">
-                                          {log.components.length} items
-                                        </span>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="text-right ml-3">
-                                  <div className="text-lg font-bold bg-gradient-to-r from-[#09b7b3] to-[#0295c2] bg-clip-text text-transparent">
-                                    {formatNumber(totalCalories)}
-                                  </div>
-                                  <div className="text-[10px] text-gray-500 font-medium">KCAL</div>
-                                </div>
-                              </div>
-                              
-                              {/* Macro nutrients */}
-                              <div className="flex items-center gap-3 text-xs">
-                                <div className="flex items-center gap-1">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                  <span className="text-gray-600">P: {formatNumber(totalProtein)}g</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
-                                  <span className="text-gray-600">C: {formatNumber(totalCarbs)}g</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                  <span className="text-gray-600">F: {formatNumber(totalFat)}g</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Action icon */}
-                            <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center">
-                      <Utensils className="h-10 w-10 text-gray-400" />
+                  {foodLogs && foodLogs.length > 3 && (
+                    <div className="text-center pt-2">
+                      <Link href="/food-logs">
+                        <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                          View all {foodLogs.length} meals
+                        </button>
+                      </Link>
                     </div>
-                    <h3 className="text-gray-700 font-semibold mb-2">No meals logged yet</h3>
-                    <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-                      Start tracking your nutrition by logging your first meal of the day
-                    </p>
-                    <Button
-                      onClick={() => setLocation('/add-food')}
-                      className="bg-gradient-to-r from-[#09b7b3] to-[#0295c2] hover:from-[#09b7b3]/90 hover:to-[#0295c2]/90 text-white px-6 py-2.5 rounded-xl shadow-md font-medium"
-                      data-tutorial="log-food-button"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Log Your First Meal
-                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100/60 to-gray-200/60 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                    <Utensils className="h-8 w-8 text-gray-400" />
                   </div>
-                )}
-              </div>
-            </Card>
+                  <h3 className="text-gray-700 font-medium mb-2">No meals yet</h3>
+                  <p className="text-sm text-gray-600 mb-4">Start your nutrition journey</p>
+                  <Button
+                    onClick={() => setLocation('/add-food')}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-xl font-medium shadow-sm transition-colors"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Meal
+                  </Button>
+                </div>
+              )}
+            </div>
           </motion.div>
 
-
-
-
-
-          {/* Revamped Today's Meal Plan Section */}
-          <motion.div variants={itemVariants} className="mt-6" data-tutorial="meal-plans-section">
-            <Card className="overflow-hidden border-none shadow-lg rounded-3xl bg-gradient-to-br from-white to-gray-50">
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl">
-                      <CalendarDays className="h-5 w-5 text-white" />
-                    </div>
-                    <h2 className="text-lg font-semibold text-gray-800">{t('mealPlan.title')}</h2>
-                  </div>
-                  <Link href="/meal-planning">
-                    <button className="text-xs text-[#09b7b3] hover:text-[#0295c2] font-medium flex items-center gap-1">
-                      Manage Plan
-                      <ChevronRight className="h-3 w-3" />
-                    </button>
-                  </Link>
-                </div>
-                
-                {/* Meal Plans Content */}
-                <div className="relative">
-                  <TodaysMealPlans selectedDate={selectedDate} />
-                </div>
+          {/* Meal Plan - Minimalist */}
+          <motion.div variants={itemVariants}>
+            <div className="bg-white/25 backdrop-blur-lg rounded-3xl p-6 border border-white/40 shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-semibold text-gray-800">Meal Plan</h2>
+                <Link href="/meal-planning">
+                  <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+                    View Plan
+                  </button>
+                </Link>
               </div>
-            </Card>
+              
+              <div className="relative">
+                <TodaysMealPlans selectedDate={selectedDate} />
+              </div>
+            </div>
           </motion.div>
         </motion.main>
-
-
-
       </div>
     </div>
   );

@@ -247,7 +247,7 @@ export function registerRoutes(app: Express): Server {
     const userId = req.params.userId;
     
     // Check if user data exists
-    if (!exampleUserData[userId]) {
+    if (!exampleUserData[userId as unknown as keyof typeof exampleUserData]) {
       return res.status(404).json({
         error: 'User not found',
         message: 'No nutrition data found for the specified user ID'
@@ -255,7 +255,7 @@ export function registerRoutes(app: Express): Server {
     }
     
     // Return the user's nutrition data
-    res.json(exampleUserData[userId]);
+    res.json(exampleUserData[userId as unknown as keyof typeof exampleUserData]);
   });
 
   // Add logout endpoint
@@ -504,52 +504,25 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      const {
-        name,
-        description,
-        servings,
-        prepTime,
-        cookTime,
-        totalTime,
-        difficulty,
-        cuisine,
-        calories,
-        protein,
-        carbs,
-        fat,
-        ingredients,
-        instructions,
-        notes,
-        tags,
-        isPublic,
-        imageUrl
-      } = req.body;
+      const { name, description, calories, protein, carbs, fat, ingredients, instructions, isPublic, imageUrl } = req.body;
 
-      // Create the recipe in the database
+      // Create the recipe in the database (only columns that exist in schema)
       const [newRecipe] = await db
         .insert(recipes)
         .values({
           userId: req.user.id,
           name,
           description,
-          ingredients: ingredients || [],
-          instructions: instructions || [],
+          ingredients: Array.isArray(ingredients) ? ingredients : [],
+          instructions: Array.isArray(instructions) ? instructions : [],
           nutritionInfo: {
-            calories: calories || 0,
-            protein: protein || 0,
-            carbs: carbs || 0,
-            fat: fat || 0
+            calories: Number(calories) || 0,
+            protein: Number(protein) || 0,
+            carbs: Number(carbs) || 0,
+            fat: Number(fat) || 0
           },
-          prepTime: prepTime || 0,
-          cookTime: cookTime || 0,
-          totalTime: totalTime || 0,
-          difficulty: difficulty || 'Medium',
-          cuisine: cuisine || 'International',
-          servings: servings || 4,
-          notes: notes || '',
-          tags: tags || [],
           imageUrl: imageUrl || '',
-          isPublic: isPublic || false,
+          isPublic: Boolean(isPublic),
           source: 'created',
           likesCount: 0,
           commentsCount: 0,
@@ -611,10 +584,9 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Get recent food logs
-      const recentLogs = await db.select({
+  const recentLogs = await db.select({
         id: foodLogs.id,
         name: foodLogs.name,
-        description: foodLogs.description,
         imageUrl: foodLogs.image,
         date: foodLogs.date,
       })
@@ -652,7 +624,23 @@ export function registerRoutes(app: Express): Server {
       // Get public recipes sorted by likes with like status
       const topRecipes = await db
         .select({
-          ...recipes,
+          id: recipes.id,
+          userId: recipes.userId,
+          name: recipes.name,
+          description: recipes.description,
+          ingredients: recipes.ingredients,
+          instructions: recipes.instructions,
+          nutritionInfo: recipes.nutritionInfo,
+          createdAt: recipes.createdAt,
+          updatedAt: recipes.updatedAt,
+          imageUrl: recipes.imageUrl,
+          rating: recipes.rating,
+          likesCount: recipes.likesCount,
+          commentsCount: recipes.commentsCount,
+          isPublic: recipes.isPublic,
+          isSaved: recipes.isSaved,
+          source: recipes.source,
+          originalRecipeId: recipes.originalRecipeId,
           isLiked: sql`EXISTS(
             SELECT 1 FROM ${recipeLikes} 
             WHERE ${recipeLikes.recipeId} = ${recipes.id} 
@@ -691,12 +679,7 @@ export function registerRoutes(app: Express): Server {
           likesCount: recipes.likesCount,
         })
         .from(recipes)
-        .where(
-          and(
-            eq(recipes.isLiked, true),
-            eq(recipes.userId, req.user.id)
-          )
-        )
+        .innerJoin(recipeLikes, and(eq(recipeLikes.recipeId, recipes.id), eq(recipeLikes.userId, req.user.id)))
         .orderBy(desc(recipes.likesCount))
         .limit(10);
 
@@ -728,7 +711,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Call the OpenAI recipe generation service
-      const generatedRecipe = await generateRecipe(ingredients);
+  const generatedRecipe = await generateRecipe(ingredients, { difficulty: 'Medium', timeNeeded: 30, flavor: 'Mixed' });
 
       // Return the generated recipe without saving
       res.json({
@@ -1443,8 +1426,8 @@ export function registerRoutes(app: Express): Server {
         }
       }
       
-      // Convert instructions if needed
-      let instructions = recipeData.instructions;
+  // Convert instructions if needed
+  let instructions: string | string[] | undefined = recipeData.instructions as any;
       
       // Debug log to help diagnose issues
       console.log(`Processing instructions for recipe ${recipeData.name} (ID: ${recipeData.id}):`, {
@@ -1453,24 +1436,24 @@ export function registerRoutes(app: Express): Server {
         instructionsJSON: typeof instructions === 'string' ? instructions.slice(0, 100) + '...' : null
       });
       
-      // Make sure instructions are always returned as an array
-      let instructionsArray = [];
+  // Make sure instructions are always returned as an array
+  let instructionsArray: string[] = [];
       
       if (Array.isArray(instructions)) {
         instructionsArray = instructions;
-      } else if (typeof instructions === 'string') {
+  } else if (typeof instructions === 'string') {
         // Try to parse JSON string if it looks like an array
-        if (instructions.startsWith('[') && instructions.endsWith(']')) {
+        if ((instructions as string).startsWith('[') && (instructions as string).endsWith(']')) {
           try {
-            instructionsArray = JSON.parse(instructions);
+            instructionsArray = JSON.parse(instructions as string);
           } catch (e) {
             console.warn('Failed to parse instructions JSON:', e);
             // Split by newlines as fallback if JSON parsing fails
-            instructionsArray = instructions.split('\n').filter(line => line.trim() !== '');
+            instructionsArray = (instructions as string).split('\n').filter((line: string) => line.trim() !== '');
           }
-        } else if (instructions !== '{}' && instructions.trim() !== '') {
+        } else if (instructions !== '{}' && (instructions as string).trim() !== '') {
           // If it's not empty and not a JSON object, split by newlines
-          instructionsArray = instructions.split('\n').filter(line => line.trim() !== '');
+          instructionsArray = (instructions as string).split('\n').filter((line: string) => line.trim() !== '');
         }
       }
       
@@ -1738,18 +1721,16 @@ export function registerRoutes(app: Express): Server {
               mealData.map(async (mealInfo, index) => {
                 // Store both ingredients and instructions as arrays
                 const recipeData = {
-                  name: mealInfo.name,
                   userId: req.user.id,
-                  ingredients: mealInfo.recipe.ingredients,
-                  instructions: mealInfo.recipe.instructions, // Store as array to keep the structure
-                  prepTime: mealInfo.recipe.prepTime?.toString() || "15",
-                  cookingTime: mealInfo.recipe.prepTime?.toString() || "15",
-                  calories: mealInfo.recipe.nutritionInfo.calories.toString(),
-                  protein: mealInfo.recipe.nutritionInfo.protein.toString(),
-                  carbs: mealInfo.recipe.nutritionInfo.carbs.toString(),
-                  fat: mealInfo.recipe.nutritionInfo.fat.toString(),
-                  servings: "1",
-                  difficulty: "Medium",
+                  name: mealInfo.name,
+                  ingredients: Array.isArray(mealInfo.recipe?.ingredients) ? mealInfo.recipe.ingredients : [],
+                  instructions: Array.isArray(mealInfo.recipe?.instructions) ? mealInfo.recipe.instructions : [],
+                  nutritionInfo: mealInfo.recipe?.nutritionInfo ? {
+                    calories: Number(mealInfo.recipe.nutritionInfo.calories) || 0,
+                    protein: Number(mealInfo.recipe.nutritionInfo.protein) || 0,
+                    carbs: Number(mealInfo.recipe.nutritionInfo.carbs) || 0,
+                    fat: Number(mealInfo.recipe.nutritionInfo.fat) || 0,
+                  } : undefined,
                   isPublic: false,
                   createdAt: new Date(),
                   updatedAt: new Date(),
@@ -1847,12 +1828,8 @@ export function registerRoutes(app: Express): Server {
       console.log("User profile structure for monthly meal plan:", JSON.stringify(userProfile[0], null, 2));
       
       // Handle both possible data structures
-      let language = 'pl'; // Default to Polish
-      if (userProfile[0]?.users?.preferred_language) {
-        // Joined query structure
-        language = userProfile[0].users.preferred_language;
-        console.log("Using language from joined query structure (users.preferred_language):", language);
-      } else if (userProfile[0]?.preferred_language) {
+  let language = 'pl'; // Default to Polish
+  if (userProfile[0]?.preferred_language) {
         // Direct query structure 
         language = userProfile[0].preferred_language;
         console.log("Using language from direct query structure (preferred_language):", language);
@@ -1996,7 +1973,7 @@ export function registerRoutes(app: Express): Server {
         
         // Generate unique meals for each day instead of adding confusing day markers
         if (Array.isArray(dailyPlan.meals)) {
-          dailyPlan.meals.forEach(meal => {
+          dailyPlan.meals.forEach((meal: any) => {
             // Only add day marker if meal name is too generic, otherwise keep original name
             if (meal.name && (meal.name.length < 15 || meal.name.includes('Recipe') || meal.name.includes('Meal'))) {
               meal.name = `${meal.name} (Day ${i+1})`;
@@ -2054,7 +2031,7 @@ export function registerRoutes(app: Express): Server {
         
         // Create recipes from AI-generated data and associate them with the meal plan
         const createdRecipes = await Promise.all(
-          dailyPlan.meals.map(async (meal, index) => {
+          dailyPlan.meals.map(async (meal: any, index: number) => {
             // Extract and normalize recipe data
             // Add safe defaults for all required fields
             const safeMealType = typeof meal.mealType === 'string' ? meal.mealType : 'other';
@@ -2070,7 +2047,7 @@ export function registerRoutes(app: Express): Server {
               }
             } else {
               // Generate proper Polish recipe names based on ingredients and meal type
-              const ingredients = Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [];
+              const ingredients = Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [] as string[];
               
               if (ingredients.length > 0) {
                 // Create Polish-style recipe names
@@ -2433,7 +2410,7 @@ export function registerRoutes(app: Express): Server {
         })
         .from(mealPlans)
         .where(eq(mealPlans.userId, req.user.id))
-        .orderBy(mealPlans.createdAt, 'desc'); // Get latest first
+  .orderBy(desc(mealPlans.createdAt)); // Get latest first
       
       // Only keep the latest meal plan for each date
       for (const plan of allUserMealPlans) {
@@ -2485,11 +2462,11 @@ export function registerRoutes(app: Express): Server {
       }, {} as Record<number, typeof allRecipes>);
 
       // Construct the plans with their recipes
-      const plans = userMealPlans.map(plan => {
+    const plans = userMealPlans.map((plan) => {
         const meals = mealPlanRecipes[plan.id] || [];
         return {
           ...plan,
-          meals: meals.map(meal => {
+      meals: meals.map((meal: any) => {
             // Process ingredients
             let ingredients = meal.ingredients;
             if (typeof ingredients === 'string') {
@@ -2502,23 +2479,23 @@ export function registerRoutes(app: Express): Server {
             }
             
             // Process instructions
-            let instructions = meal.instructions;
-            let instructionsArray = [];
+            let instructions = meal.instructions as unknown as string[] | string;
+            let instructionsArray: string[] = [];
             
             if (Array.isArray(instructions)) {
               instructionsArray = instructions;
             } else if (typeof instructions === 'string') {
               // Try to parse JSON string if it looks like an array
-              if (instructions.startsWith('[') && instructions.endsWith(']')) {
+              if ((instructions as string).startsWith('[') && (instructions as string).endsWith(']')) {
                 try {
-                  instructionsArray = JSON.parse(instructions);
+                  instructionsArray = JSON.parse(instructions as string);
                 } catch (e) {
                   console.warn(`Failed to parse instructions JSON for meal ${meal.id}:`, e);
-                  instructionsArray = instructions.split('\n').filter(line => line.trim() !== '');
+                  instructionsArray = (instructions as string).split('\n').filter((line: string) => line.trim() !== '');
                 }
-              } else if (instructions !== '{}' && instructions.trim() !== '') {
+              } else if ((instructions as string) !== '{}' && (instructions as string).trim() !== '') {
                 // If it's not empty and not a JSON object, split by newlines
-                instructionsArray = instructions.split('\n').filter(line => line.trim() !== '');
+                instructionsArray = (instructions as string).split('\n').filter((line: string) => line.trim() !== '');
               }
             }
             
@@ -2875,22 +2852,20 @@ export function registerRoutes(app: Express): Server {
       const savedRecipes = [];
 
       for (const [index, meal] of mealsToSave.entries()) {
-        // Create a new recipe for each meal
+        // Create a new recipe for each meal (respecting schema columns)
         const [newRecipe] = await db
           .insert(recipes)
           .values({
             userId: req.user.id,
             name: meal.name,
-            ingredients: meal.recipe.ingredients,
-            instructions: meal.recipe.instructions,
-            prepTime: meal.recipe.prepTime?.toString() || "15",
-            cookingTime: meal.recipe.prepTime?.toString() || "15", 
-            calories: meal.recipe.nutritionInfo.calories.toString(),
-            protein: meal.recipe.nutritionInfo.protein.toString(),
-            carbs: meal.recipe.nutritionInfo.carbs.toString(),
-            fat: meal.recipe.nutritionInfo.fat.toString(),
-            servings: "1",
-            difficulty: "Medium",
+            ingredients: Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [],
+            instructions: Array.isArray(meal.recipe?.instructions) ? meal.recipe.instructions : [],
+            nutritionInfo: meal.recipe?.nutritionInfo ? {
+              calories: Number(meal.recipe.nutritionInfo.calories) || 0,
+              protein: Number(meal.recipe.nutritionInfo.protein) || 0,
+              carbs: Number(meal.recipe.nutritionInfo.carbs) || 0,
+              fat: Number(meal.recipe.nutritionInfo.fat) || 0,
+            } : undefined,
             isPublic: false,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -2914,7 +2889,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Generate basic shopping list from ingredients
-      const shoppingListItems = [];
+  const listItems: any[] = [];
       const ingredientSet = new Set();
       
       // Collect all ingredients from meals
@@ -2925,19 +2900,21 @@ export function registerRoutes(app: Express): Server {
             const [newItem] = await db
               .insert(shoppingListItems)
               .values({
-                mealPlanId: newMealPlan.id,
+                userId: req.user.id,
+                meal_plan_id: newMealPlan.id,
+                name: ingredient,
                 ingredient: ingredient,
                 quantity: "1",
                 unit: "item",
                 category: "general",
                 isPurchased: false,
-                mealType: meal.mealType,
-                recipeName: meal.name,
-                recipeImage: savedRecipes.find(r => r.name === meal.name)?.imageUrl || ''
+                meal_type: meal.mealType,
+                recipe_name: meal.name,
+                recipe_image: savedRecipes.find(r => r.name === meal.name)?.imageUrl || ''
               })
               .returning();
-            
-            shoppingListItems.push(newItem);
+
+            listItems.push(newItem);
           }
         }
       }
@@ -2949,8 +2926,8 @@ export function registerRoutes(app: Express): Server {
           recipes: savedRecipes
         },
         shoppingList: {
-          items: shoppingListItems,
-          groupedItems: shoppingListItems.reduce((acc, item) => {
+          items: listItems,
+          groupedItems: listItems.reduce((acc, item) => {
             if (!acc[item.category]) {
               acc[item.category] = [];
             }
@@ -2959,8 +2936,7 @@ export function registerRoutes(app: Express): Server {
           }, {}),
           totalCost: 0
         },
-        // Include the fast meal plan for reference
-        mealPlan: fastMealResult
+        // Optimized meal plan details returned above
       });
 
     } catch (error) {
@@ -3060,12 +3036,21 @@ export function registerRoutes(app: Express): Server {
                            duration === 'week' ? 7 : 
                            duration === 'twoWeeks' ? 14 : 7;
 
-      // Use existing budget-first meal plan service with enhanced preferences
-      const { generateBudgetFirstMealPlan } = await import('./services/budget-first-meal-plan.ts');
-      const mealPlan = await generateBudgetFirstMealPlan({
-        ...preferences,
-        mealPlanDuration: duration
-      }, req.user.id);
+      // Use fast personalized meal generator for enhanced meal plan
+      const { generateFastPersonalizedMealPlan } = await import('./services/fast-meal-generator');
+      const daysMap: Record<string, number> = { '3days': 3, 'week': 7, 'twoWeeks': 14 };
+      const days = daysMap[duration] ?? 7;
+      const mealPlan = await generateFastPersonalizedMealPlan({
+        dietaryType: preferences.dietaryType || 'omnivore',
+        calorieTarget: preferences.calorieTarget || 2000,
+        mealsPerDay: preferences.mealsPerDay || 3,
+        allergies: preferences.allergies || [],
+        excludedIngredients: preferences.excludedIngredients || [],
+        maxCookingTime: preferences.maxCookingTime || 45,
+        budgetPreference: preferences.budgetPreference || 'medium',
+        preferredIngredients: preferences.preferredIngredients || [],
+        language
+      }, days);
 
       res.json({
         success: true,
@@ -3225,11 +3210,7 @@ export function registerRoutes(app: Express): Server {
       
       // Handle both possible data structures
       let language = 'en';
-      if (userProfile[0]?.users?.preferred_language) {
-        // Joined query structure
-        language = userProfile[0].users.preferred_language;
-        console.log("Using language from joined query structure (users.preferred_language):", language);
-      } else if (userProfile[0]?.preferred_language) {
+  if (userProfile[0]?.preferred_language) {
         // Direct query structure 
         language = userProfile[0].preferred_language;
         console.log("Using language from direct query structure (preferred_language):", language);
@@ -3312,15 +3293,16 @@ export function registerRoutes(app: Express): Server {
         .returning();
       
       // Create recipes for each meal
-      for (const meal of generatedMealData) {
+  for (const meal of generatedMealData) {
         const [newRecipe] = await db
           .insert(recipes)
           .values({
-            name: meal.name,
-            description: `${meal.mealType} for ${date}`,
-            ingredients: meal.recipe.ingredients,
-            instructions: meal.recipe.instructions,
-            nutritionInfo: meal.recipe.nutritionInfo,
+    userId: req.user.id,
+    name: meal.name,
+    description: `${meal.mealType} for ${date}`,
+    ingredients: Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [],
+    instructions: Array.isArray(meal.recipe?.instructions) ? meal.recipe.instructions : [],
+    nutritionInfo: meal.recipe?.nutritionInfo,
             createdAt: new Date(),
             updatedAt: new Date(),
             imageUrl: getRecipeImageUrl(meal.name, meal.mealType),
@@ -4457,83 +4439,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // PUT endpoint for updating a food log by ID
-  app.put("/api/food-logs/:id", async (req, res) => {
-    try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to update food log');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
-      const logId = parseInt(req.params.id);
-      if (isNaN(logId)) {
-        return res.status(400).json({ error: 'Invalid ID format' });
-      }
-
-      // Check if the food log exists and belongs to the user
-      const [existingLog] = await db
-        .select()
-        .from(foodLogs)
-        .where(
-          and(
-            eq(foodLogs.id, logId),
-            eq(foodLogs.userId, req.user.id)
-          )
-        )
-        .limit(1);
-
-      if (!existingLog) {
-        return res.status(404).json({ error: 'Food log not found or access denied' });
-      }
-
-      const { name, calories, protein, carbs, fat, components } = req.body;
-      
-      console.log('[Food Logs API] Updating food log:', {
-        logId,
-        userId: req.user.id,
-        name,
-        hasComponents: Array.isArray(components)
-      });
-
-      // Ensure required fields are present
-      if (!name || calories === undefined) {
-        return res.status(400).json({
-          error: 'Missing required fields',
-          message: 'Name and calories are required'
-        });
-      }
-
-      // Update the food log
-      const [updatedLog] = await db
-        .update(foodLogs)
-        .set({
-          name,
-          calories: calories.toString(),
-          protein: protein.toString(),
-          carbs: carbs.toString(),
-          fat: fat.toString(),
-          components: components || existingLog.components
-        })
-        .where(eq(foodLogs.id, logId))
-        .returning();
-
-      console.log('[Food Logs API] Food log updated successfully:', {
-        logId: updatedLog.id,
-        calories: updatedLog.calories,
-        protein: updatedLog.protein,
-        carbs: updatedLog.carbs,
-        fat: updatedLog.fat
-      });
-
-      res.json(updatedLog);
-    } catch (error) {
-      console.error('[Food Logs API] Error updating food log:', error);
-      res.status(500).json({
-        error: 'Failed to update food log',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
+  
 
   // DELETE endpoint for removing a food log
   app.delete("/api/food-logs/:id", async (req, res) => {
@@ -4718,13 +4624,13 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         });
       }
 
-      const profile = userProfile[0];
+  const profile = userProfile[0];
 
-      // Calculate macros based on stored preferences
-      const calories = profile.calories_goal || 2000;
-      const proteinPercentage = (profile.protein_goal || 30) / 100;
-      const carbsPercentage = (profile.carbs_goal || 40) / 100;
-      const fatPercentage = (profile.fat_goal || 30) / 100;
+  // Calculate macros based on stored preferences (camelCase fields in schema)
+  const calories = Number(profile.caloriesGoal) || 2000;
+  const proteinPercentage = (Number(profile.proteinGoal) || 30) / 100;
+  const carbsPercentage = (Number(profile.carbsGoal) || 40) / 100;
+  const fatPercentage = (Number(profile.fatGoal) || 30) / 100;
 
       const macros = {
         calories: calories,
@@ -4738,7 +4644,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       for (let week = 1; week <= 12; week++) {
         timeline.push({
           week: week,
-          weight: profile.current_weight ? parseFloat(profile.current_weight) : 70,
+          weight: profile.currentWeight ? parseFloat(profile.currentWeight as any) : 70,
           goal: `Tydzień ${week}`,
           energy: 85 + (week * 2) // Gradual energy increase
         });
@@ -4760,9 +4666,9 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const personalData = {
         age: 25, // Default if not available
         gender: "unspecified",
-        currentWeight: profile.current_weight ? parseFloat(profile.current_weight) : 70,
-        goalWeight: profile.goal_weight ? parseFloat(profile.goal_weight) : 70,
-        height: profile.height || 170,
+  currentWeight: profile.currentWeight ? parseFloat(profile.currentWeight as any) : 70,
+  goalWeight: profile.goalWeight ? parseFloat(profile.goalWeight as any) : 70,
+  height: profile.height ? Number(profile.height) : 170,
         activityLevel: "moderate",
         weightGoal: "maintain",
         perfectGoal: "health_improvement"
@@ -4905,7 +4811,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const dateString = today.toISOString().split('T')[0];
       const normalizedDate = new Date(`${dateString}T12:00:00.000Z`);
       
-      // Add water intake as a special type of food log
+      // Add water intake as a special type of food log (store in components)
       const [log] = await db
         .insert(foodLogs)
         .values({
@@ -4916,9 +4822,18 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           carbs: "0",
           fat: "0",
           date: normalizedDate,
-          // Store water amount in milliliters in the description field
-          description: `${amount}ml water`,
-          type: "water",
+          components: [
+            {
+              name: "water",
+              calories: 0,
+              protein: 0,
+              carbs: 0,
+              fat: 0,
+              quantity: amount,
+              servingSize: "ml",
+              details: { type: "water" }
+            }
+          ]
         })
         .returning();
 

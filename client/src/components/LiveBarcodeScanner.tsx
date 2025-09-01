@@ -7,6 +7,7 @@ import { lookupBarcode, ProductData } from '@/lib/barcode';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
+import { getCameraPermissionStatus, requestCameraPermission, type CameraPermissionState } from '@/lib/cameraPermissions';
 
 interface LiveBarcodeScannerProps {
   onClose: () => void;
@@ -44,6 +45,9 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
   const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cameraAttempts = useRef<number>(0);
   const { toast } = useToast();
+  const [permission, setPermission] = useState<CameraPermissionState>('prompt');
+  const [hasPermission, setHasPermission] = useState(false);
+  const [checkingPermission, setCheckingPermission] = useState(true);
 
   // Initialize barcode reader with enhanced settings
   useEffect(() => {
@@ -94,6 +98,32 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
     };
   }, []);
 
+  // Gate by permission before letting webcam initialize
+  useEffect(() => {
+    (async () => {
+      setCheckingPermission(true);
+      const status = await getCameraPermissionStatus();
+      setPermission(status);
+      setHasPermission(status === 'granted');
+      setCheckingPermission(false);
+    })();
+  }, []);
+
+  const handleEnableCamera = async () => {
+    const res = await requestCameraPermission({ facingMode: 'environment' });
+    if (res.granted) {
+      setPermission('granted');
+      setHasPermission(true);
+      setCameraPermissionDenied(false);
+      setError(null);
+    } else {
+      setPermission('denied');
+      setHasPermission(false);
+      setCameraPermissionDenied(true);
+      setError(res.error ?? 'Camera permission denied. Enable it in settings and try again.');
+    }
+  };
+
   // Set up camera status messages
   useEffect(() => {
     if (cameraPermissionDenied) {
@@ -119,7 +149,7 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
   // Scanning logic - detect and validate barcodes
   useEffect(() => {
     // Skip if conditions aren't right for scanning
-    if (!cameraReady || !webcamRef.current || !readerRef.current || !scanning || isProcessingBarcode) {
+  if (!hasPermission || !cameraReady || !webcamRef.current || !readerRef.current || !scanning || isProcessingBarcode) {
       return;
     }
     
@@ -218,7 +248,7 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
         clearTimeout(scanTimeoutRef.current);
       }
     };
-  }, [cameraReady, scanning, lastBarcode, detectedBarcodes, isProcessingBarcode, onScanSuccess, toast]);
+  }, [hasPermission, cameraReady, scanning, lastBarcode, detectedBarcodes, isProcessingBarcode, onScanSuccess, toast]);
 
   // Scan a Milka chocolate barcode as a fallback demo
   const handleDemoScan = async () => {
@@ -282,8 +312,28 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
           )}
         </div>
         
-        {/* Webcam component with optimized settings */}
-        <Webcam
+        {/* Permission gate */}
+        {!hasPermission && !checkingPermission ? (
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
+            <div className="text-white font-semibold text-center px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm mb-6">
+              Barcode Scanner
+            </div>
+            <p className="text-center text-white/80 mb-6 max-w-sm">
+              We need access to your camera to scan barcodes. You'll see your device's permission prompt.
+            </p>
+            <div className="flex gap-3">
+              <Button onClick={handleEnableCamera} className="bg-white text-black">Enable Camera</Button>
+              <Button onClick={onClose} variant="ghost" className="text-white">Cancel</Button>
+            </div>
+            {permission === 'denied' && (
+              <p className="text-center mt-4 text-sm text-red-300">
+                Permission denied. Please enable camera access in your browser/device settings.
+              </p>
+            )}
+          </div>
+        ) : (
+          /* Webcam component with optimized settings */
+          <Webcam
           ref={webcamRef}
           audio={false}
           videoConstraints={cameraConstraints}
@@ -323,7 +373,8 @@ export default function LiveBarcodeScanner({ onClose, onScanSuccess }: LiveBarco
           mirrored={false}
           screenshotFormat="image/jpeg"
           imageSmoothing={false} // Disable image smoothing for better barcode recognition
-        />
+  />
+  )}
         
         {/* Scanner UI overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/70 pointer-events-none">

@@ -53,9 +53,11 @@ const apiRequest = async (method: string, url: string, data?: any) => {
 
 // Custom query function
 const getQueryFn = (options?: { on401?: 'returnNull' }) => {
-  return async ({ queryKey }: { queryKey: string[] }) => {
-    const [endpoint, ...params] = queryKey;
-    const url = params.length > 0 ? `${endpoint}/${params.join('/')}` : endpoint;
+  return async ({ queryKey }: { queryKey: (string | number | null | undefined)[] }) => {
+    const [endpointRaw, ...params] = queryKey;
+    const endpoint = String(endpointRaw);
+    const safeParams = params.filter((p) => p !== null && p !== undefined).map((p) => encodeURIComponent(String(p)));
+    const url = safeParams.length > 0 ? `${endpoint}/${safeParams.join('/')}` : endpoint;
     
     try {
       const res = await fetch(url, {
@@ -126,7 +128,7 @@ export default function AdminDashboard() {
     isLoading: isLoadingUserProgress,
     error: userProgressError,
   } = useQuery({
-    queryKey: ["/api/admin/progress", selectedUserId],
+    queryKey: ["/api/admin/progress", selectedUserId ?? undefined],
     queryFn: getQueryFn(),
     enabled: !!selectedUserId && activeTab === "userDetail",
   });
@@ -137,7 +139,7 @@ export default function AdminDashboard() {
     isLoading: isLoadingUserFoodLogs,
     error: userFoodLogsError,
   } = useQuery({
-    queryKey: ["/api/admin/food-logs", selectedUserId],
+    queryKey: ["/api/admin/food-logs", selectedUserId ?? undefined],
     queryFn: getQueryFn(),
     enabled: !!selectedUserId && activeTab === "userFoodLogs",
   });
@@ -148,7 +150,7 @@ export default function AdminDashboard() {
     isLoading: isLoadingUserRecipes,
     error: userRecipesError,
   } = useQuery({
-    queryKey: ["/api/admin/recipes", selectedUserId],
+    queryKey: ["/api/admin/recipes", selectedUserId ?? undefined],
     queryFn: getQueryFn(),
     enabled: !!selectedUserId && activeTab === "userRecipes",
   });

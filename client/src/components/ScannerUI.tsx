@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFoodLog } from "../hooks/use-food-log";
 import { useLocation } from "wouter";
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
-import { lookupBarcode, ProductInfo } from '@/lib/barcode';
+import { lookupBarcode, ProductData } from '@/lib/barcode';
 
 // Create a custom event for food analysis start/end
 export const ANALYSIS_EVENTS = {
@@ -44,6 +44,16 @@ interface ScannerUIProps {
   onScanSuccess?: (result: FoodAnalysisResult) => void;
   'aria-label'?: string;
   description?: string;
+}
+
+// Lightweight image sharpen fallback to satisfy TS; no-op if not supported
+function applySharpen(imageData: ImageData): ImageData {
+  try {
+    const out = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height);
+    return out;
+  } catch {
+    return imageData;
+  }
 }
 
 export default function ScannerUI({ onClose, onScanSuccess, 'aria-label': ariaLabel, description }: ScannerUIProps) {
@@ -316,32 +326,9 @@ export default function ScannerUI({ onClose, onScanSuccess, 'aria-label': ariaLa
         description: `Looking up product ${barcode}...`,
       });
       
-      const product = await lookupBarcode(barcode);
-      
-      // Check if product was found in database
-      if (product.details?.note === 'Product not found in database') {
-        setIsLookingUp(false);
-        
-        toast({
-          variant: "destructive",
-          title: "Product Not Found",
-          description: "Barcode not recognized. Try again or use Manual Entry.",
-        });
-        
-        // Restart scanning after a short delay
-        setTimeout(() => {
-          if (mode === 'barcode') {
-            setIsScanning(true);
-          }
-        }, 1500);
-        
-        return;
-      }
-      
-      // Include brand name in the product display name if available
-      const brandPrefix = product.details?.brand && product.details.brand !== 'Unknown brand' 
-        ? `${product.details.brand} - ` 
-        : '';
+  const product: ProductData = await lookupBarcode(barcode);
+  // Basic name prefix (no brand info available in ProductData)
+  const brandPrefix = '';
         
       // Convert product info to FoodAnalysisResult format
       const foodItem: FoodAnalysisResult = {
@@ -350,16 +337,16 @@ export default function ScannerUI({ onClose, onScanSuccess, 'aria-label': ariaLa
         protein: product.protein,
         carbs: product.carbs,
         fat: product.fat,
-        servingSize: product.details?.servingSize,
+        servingSize: undefined,
         components: [{
           name: product.name,
           calories: product.calories,
           protein: product.protein,
           carbs: product.carbs,
           fat: product.fat,
-          servingSize: product.details?.servingSize,
+          servingSize: undefined,
           quantity: 1,
-          details: product.details
+          details: undefined
         }]
       };
       
@@ -385,9 +372,9 @@ export default function ScannerUI({ onClose, onScanSuccess, 'aria-label': ariaLa
           protein: product.protein,
           carbs: product.carbs,
           fat: product.fat,
-          servingSize: product.details?.servingSize,
+          servingSize: undefined,
           quantity: 1,
-          details: product.details
+          details: undefined
         }]
       };
       

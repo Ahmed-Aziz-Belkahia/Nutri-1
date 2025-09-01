@@ -90,19 +90,19 @@ const questions = [
   },
   {
     id: "preferredIngredients",
-    title: "Ulubione składniki",
-    description: "Oddziel przecinkami",
+    title: "Favorite ingredients",
+    description: "Separate with commas",
     type: "text",
-    placeholder: "np. kurczak, brokuły, ryż",
+    placeholder: "e.g. chicken, broccoli, rice",
     icon: <Leaf className="w-6 h-6 text-white" />,
     gradient: "from-green-500 to-emerald-500"
   },
   {
     id: "excludedIngredients",
-    title: "Składniki do unikania",
-    description: "Oddziel przecinkami",
+    title: "Ingredients to avoid",
+    description: "Separate with commas",
     type: "text",
-    placeholder: "np. grzyby, oliwki, papryka",
+    placeholder: "e.g. mushrooms, olives, peppers",
     icon: <X className="w-6 h-6 text-white" />,
     gradient: "from-red-500 to-pink-500"
   }
@@ -206,8 +206,8 @@ export default function SimpleMealPlanningQuiz() {
       queryClient.invalidateQueries({ queryKey: ['/api/shopping-list'] });
       
       toast({
-        title: "Plan posiłków utworzony!",
-        description: "Twój spersonalizowany plan posiłków jest gotowy.",
+        title: "Meal plan created!",
+        description: "Your personalized meal plan is ready.",
       });
       setLocation("/dashboard");
     },

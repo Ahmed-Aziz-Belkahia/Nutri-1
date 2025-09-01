@@ -41,7 +41,7 @@ router.post('/register', async (req: Request, res: Response) => {
         password: hashedPassword,
         // Initialize user fields with default values
         hasCompletedOnboarding: false,
-        lastActivityDate: new Date(),
+  lastActivityDate: new Date().toISOString().split('T')[0] as any,
         profileImage: null,
         preferred_language: 'en', // this one actually uses snake_case in the schema
         currentStreak: 0,

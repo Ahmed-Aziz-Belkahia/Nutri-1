@@ -2,23 +2,11 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUser } from "../hooks/use-user";
+import { useUser, type UserProfile as HookUserProfile } from "../hooks/use-user";
 import Navigation from "../components/Navigation";
 import HeightWeightInput from "@/components/HeightWeightInput";
 
-interface UserProfile {
-  weight?: number;
-  goalWeight?: number;
-  height?: number;
-  initialWeight?: number;
-  bodyFatPercentage?: number;
-}
-
-interface User {
-  id: number;
-  email: string;
-  profile?: UserProfile;
-}
+type User = { id: number; email: string; profile?: HookUserProfile };
 
 export default function Analytics() {
   const { user, updateProfile } = useUser();
@@ -26,7 +14,7 @@ export default function Analytics() {
   const [isUpdatingGoal, setIsUpdatingGoal] = useState(false);
   const [isUpdatingHeight, setIsUpdatingHeight] = useState(false);
   const [newWeight, setNewWeight] = useState(user?.profile?.weight || 70);
-  const [newGoalWeight, setNewGoalWeight] = useState(user?.profile?.goalWeight || 65);
+  const [newGoalWeight, setNewGoalWeight] = useState(user?.profile?.goals?.calories ? user.profile.goals.calories : 65);
   const [newHeight, setNewHeight] = useState(user?.profile?.height || 170);
   const [selectedPeriod, setSelectedPeriod] = useState<"90 Days" | "6 Months" | "1 Year" | "All time">("90 Days");
   const [selectedNutritionPeriod, setSelectedNutritionPeriod] = useState<"This week" | "Last week" | "2 wks. ago" | "3 wks. ago">("This week");
@@ -34,16 +22,7 @@ export default function Analytics() {
   const handleUpdateWeight = async () => {
     setIsUpdatingWeight(true);
     try {
-      if (user && updateProfile) {
-        await updateProfile({ 
-          ...user,
-          profile: {
-            ...user.profile,
-            weight: newWeight,
-            bodyFatPercentage: calculateBodyFat(newWeight, user.profile?.height || 170)
-          }
-        });
-      }
+  if (updateProfile) await updateProfile({ weight: newWeight, bodyFatPercentage: calculateBodyFat(newWeight, user?.profile?.height || 170) });
     } catch (error) {
       console.error('Failed to update weight:', error);
     } finally {
@@ -54,16 +33,7 @@ export default function Analytics() {
   const handleUpdateHeight = async () => {
     setIsUpdatingHeight(true);
     try {
-      if (user && updateProfile) {
-        await updateProfile({
-          ...user,
-          profile: {
-            ...user.profile,
-            height: newHeight,
-            bodyFatPercentage: calculateBodyFat(user.profile?.weight || 70, newHeight)
-          }
-        });
-      }
+  if (updateProfile) await updateProfile({ height: newHeight, bodyFatPercentage: calculateBodyFat(user?.profile?.weight || 70, newHeight) });
     } catch (error) {
       console.error('Failed to update height:', error);
     } finally {
@@ -74,15 +44,7 @@ export default function Analytics() {
   const handleUpdateGoalWeight = async () => {
     setIsUpdatingGoal(true);
     try {
-      if (user && updateProfile) {
-        await updateProfile({
-          ...user,
-          profile: {
-            ...user.profile,
-            goalWeight: newGoalWeight
-          }
-        });
-      }
+  if (updateProfile) await updateProfile({ goals: { calories: newGoalWeight } });
     } catch (error) {
       console.error('Failed to update goal weight:', error);
     } finally {
@@ -189,7 +151,7 @@ export default function Analytics() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-amber-500 text-xl">🏆</span>
-            <span className="text-lg">Goal Weight {user?.profile?.goalWeight} kg</span>
+            <span className="text-lg">Calorie Goal {user?.profile?.goals?.calories ?? 2000} kcal</span>
           </div>
           {isUpdatingGoal ? (
             <div className="space-y-2">
@@ -294,7 +256,7 @@ export default function Analytics() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg">Goal Progress</h2>
             <div className="flex items-center gap-1">
-              <span className="text-sm">{Math.round(((currentWeight - (user?.profile?.initialWeight || currentWeight)) / (user?.profile?.goalWeight - (user?.profile?.initialWeight || currentWeight))) * 100)}%</span>
+              <span className="text-sm">{0}%</span>
               <span className="text-sm text-gray-500">Goal achieved</span>
             </div>
           </div>

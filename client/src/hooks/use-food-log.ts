@@ -270,6 +270,23 @@ export function useFoodLog(selectedDate: Date = new Date()) {
     }
   });
 
+  // Simple water intake mutation
+  const addWater = async (amount: number) => {
+    const res = await fetch("/api/water-logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ amount }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Failed to add water log");
+    }
+    // Optionally refetch food logs to reflect any totals if needed
+    queryClient.invalidateQueries({ queryKey: ["/api/food-logs", dateString] });
+    return res.json();
+  };
+
   return {
     foodLogs: foodLogData?.logs || [],
     todayTotals: foodLogData?.totals || { calories: 0, protein: 0, carbs: 0, fat: 0 },
@@ -277,5 +294,6 @@ export function useFoodLog(selectedDate: Date = new Date()) {
     addFood: addFoodMutation.mutateAsync,
     logFood: addFoodMutation.mutateAsync, // Alias for addFood to match component expectations
     updateFood: (id: number, food: FoodAnalysis) => updateFoodMutation.mutateAsync({ id, food }),
+  addWater,
   };
 }

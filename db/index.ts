@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from "@db/schema";
 import { sql } from 'drizzle-orm';
+
+// Load environment variables
+dotenv.config();
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set. Creating a new database...");

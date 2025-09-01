@@ -17,75 +17,75 @@ interface MealTemplate {
   };
 }
 
-// Expanded Polish meal templates for variety
-const polishMealTemplates: MealTemplate[] = [
+// Expanded meal templates for variety
+const englishMealTemplates: MealTemplate[] = [
   // Breakfast options (7 different)
   {
-    name: "Jajecznica z pomidorami",
+    name: "Scrambled Eggs with Tomatoes",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["3 jajka", "1 pomidor", "masło", "sól", "pieprz"],
-      instructions: ["Podsmaż pomidor na maśle", "Dodaj roztrzepane jajka", "Smaż mieszając"],
+      ingredients: ["3 eggs", "1 tomato", "butter", "salt", "pepper"],
+      instructions: ["Sauté tomato in butter", "Add beaten eggs", "Cook while stirring"],
       prepTime: 10,
       nutritionInfo: { calories: 280, protein: 18, carbs: 6, fat: 20 }
     }
   },
   {
-    name: "Owsianka z owocami",
+    name: "Oatmeal with Fruits",
     mealType: "breakfast", 
     recipe: {
-      ingredients: ["50g płatków owsianych", "200ml mleka", "1 banan", "miód"],
-      instructions: ["Zalej płatki mlekiem", "Dodaj pokrojony banan", "Polej miodem"],
+      ingredients: ["50g oats", "200ml milk", "1 banana", "honey"],
+      instructions: ["Pour milk over oats", "Add sliced banana", "Drizzle with honey"],
       prepTime: 5,
       nutritionInfo: { calories: 320, protein: 12, carbs: 55, fat: 6 }
     }
   },
   {
-    name: "Tosty z awokado",
+    name: "Avocado Toast",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["2 kromki chleba", "1 awokado", "sól", "pieprz", "cytryna"],
-      instructions: ["Opiecz chleb", "Rozgnieć awokado z solą", "Posmaruj na tostach"],
+      ingredients: ["2 slices bread", "1 avocado", "salt", "pepper", "lemon"],
+      instructions: ["Toast bread", "Mash avocado with salt", "Spread on toast"],
       prepTime: 8,
       nutritionInfo: { calories: 350, protein: 8, carbs: 35, fat: 22 }
     }
   },
   {
-    name: "Omlet z serem",
+    name: "Cheese Omelet",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["3 jajka", "50g sera żółtego", "masło", "szczypiorek"],
-      instructions: ["Roztrzep jajka", "Usmaż omlet", "Dodaj ser i szczypiorek"],
+      ingredients: ["3 eggs", "50g yellow cheese", "butter", "chives"],
+      instructions: ["Beat eggs", "Cook omelet", "Add cheese and chives"],
       prepTime: 12,
       nutritionInfo: { calories: 380, protein: 25, carbs: 3, fat: 28 }
     }
   },
   {
-    name: "Kanapki z szynką",
+    name: "Ham Sandwiches",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["2 kromki chleba", "100g szynki", "masło", "ogórek", "pomidor"],
-      instructions: ["Posmaruj chleb masłem", "Dodaj szynkę", "Przygarnij warzywa"],
+      ingredients: ["2 slices bread", "100g ham", "butter", "cucumber", "tomato"],
+      instructions: ["Spread bread with butter", "Add ham", "Garnish with vegetables"],
       prepTime: 5,
       nutritionInfo: { calories: 320, protein: 20, carbs: 25, fat: 15 }
     }
   },
   {
-    name: "Płatki z jogurtem",
+    name: "Cereal with Yogurt",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["40g płatków kukurydzianych", "150ml jogurtu", "jagody", "miód"],
-      instructions: ["Zalej płatki jogurtem", "Dodaj jagody", "Polej miodem"],
+      ingredients: ["40g corn flakes", "150ml yogurt", "berries", "honey"],
+      instructions: ["Pour yogurt over cereal", "Add berries", "Drizzle with honey"],
       prepTime: 3,
       nutritionInfo: { calories: 290, protein: 10, carbs: 45, fat: 8 }
     }
   },
   {
-    name: "Sernik na zimno",
+    name: "Cold Cheesecake",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["200g twarogu", "1 łyżka miodu", "orzechy", "cynamon"],
-      instructions: ["Wymieszaj twaróg z miodem", "Dodaj orzechy", "Posyp cynamonem"],
+      ingredients: ["200g cottage cheese", "1 tbsp honey", "nuts", "cinnamon"],
+      instructions: ["Mix cottage cheese with honey", "Add nuts", "Sprinkle with cinnamon"],
       prepTime: 5,
       nutritionInfo: { calories: 340, protein: 28, carbs: 15, fat: 18 }
     }
@@ -93,31 +93,31 @@ const polishMealTemplates: MealTemplate[] = [
   
   // Lunch options
   {
-    name: "Sałatka z kurczakiem",
+    name: "Chicken Salad",
     mealType: "lunch",
     recipe: {
-      ingredients: ["150g piersi kurczaka", "sałata", "pomidor", "ogórek", "oliwa"],
-      instructions: ["Usmaż kurczaka", "Pokrój warzywa", "Wymieszaj z oliwą"],
+      ingredients: ["150g chicken breast", "lettuce", "tomato", "cucumber", "olive oil"],
+      instructions: ["Cook chicken", "Chop vegetables", "Mix with olive oil"],
       prepTime: 15,
       nutritionInfo: { calories: 380, protein: 35, carbs: 8, fat: 24 }
     }
   },
   {
-    name: "Makaron z sosem pomidorowym",
+    name: "Pasta with Tomato Sauce",
     mealType: "lunch",
     recipe: {
-      ingredients: ["80g makaronu", "150ml sosu pomidorowego", "parmezan", "bazylia"],
-      instructions: ["Ugotuj makaron", "Podgrzej sos", "Wymieszaj z parmezanem"],
+      ingredients: ["80g pasta", "150ml tomato sauce", "parmesan", "basil"],
+      instructions: ["Cook pasta", "Heat sauce", "Mix with parmesan"],
       prepTime: 12,
       nutritionInfo: { calories: 420, protein: 16, carbs: 65, fat: 12 }
     }
   },
   {
-    name: "Zupa pomidorowa z ryżem",
+    name: "Tomato Soup with Rice",
     mealType: "lunch",
     recipe: {
-      ingredients: ["300ml zupy pomidorowej", "50g ryżu", "śmietana", "natka"],
-      instructions: ["Ugotuj ryż", "Podgrzej zupę", "Dodaj śmietanę i natkę"],
+      ingredients: ["300ml tomato soup", "50g rice", "cream", "parsley"],
+      instructions: ["Cook rice", "Heat soup", "Add cream and parsley"],
       prepTime: 20,
       nutritionInfo: { calories: 340, protein: 8, carbs: 58, fat: 9 }
     }
@@ -125,31 +125,31 @@ const polishMealTemplates: MealTemplate[] = [
 
   // Dinner options
   {
-    name: "Kotlet schabowy z ziemniakami",
+    name: "Pork Cutlet with Potatoes",
     mealType: "dinner",
     recipe: {
-      ingredients: ["150g kotleta", "200g ziemniaków", "kapusta", "masło"],
-      instructions: ["Usmaż kotlet", "Ugotuj ziemniaki", "Podduś kapustę"],
+      ingredients: ["150g pork cutlet", "200g potatoes", "cabbage", "butter"],
+      instructions: ["Fry cutlet", "Boil potatoes", "Stew cabbage"],
       prepTime: 25,
       nutritionInfo: { calories: 520, protein: 32, carbs: 35, fat: 28 }
     }
   },
   {
-    name: "Ryba z warzywami",
+    name: "Fish with Vegetables",
     mealType: "dinner",
     recipe: {
-      ingredients: ["150g fileta rybnego", "brokuły", "marchewka", "olej", "cytryna"],
-      instructions: ["Usmaż rybę", "Ugotuj warzywa na parze", "Skrop cytryną"],
+      ingredients: ["150g fish fillet", "broccoli", "carrot", "oil", "lemon"],
+      instructions: ["Fry fish", "Steam vegetables", "Drizzle with lemon"],
       prepTime: 18,
       nutritionInfo: { calories: 320, protein: 28, carbs: 12, fat: 18 }
     }
   },
   {
-    name: "Pierogi z kapustą",
+    name: "Dumplings with Cabbage",
     mealType: "dinner",
     recipe: {
-      ingredients: ["8 pierogów", "kapusta kiszona", "cebula", "masło"],
-      instructions: ["Ugotuj pierogi", "Podsmaż kapustę z cebulą", "Podawaj razem"],
+      ingredients: ["8 dumplings", "sauerkraut", "onion", "butter"],
+      instructions: ["Boil dumplings", "Sauté cabbage with onion", "Serve together"],
       prepTime: 15,
       nutritionInfo: { calories: 450, protein: 12, carbs: 68, fat: 16 }
     }
@@ -175,7 +175,7 @@ export async function generateFastMealPlan(preferences: {
   const { calorieTarget, mealsPerDay } = preferences;
   
   // Use custom meals if provided, otherwise use default templates
-  const mealPool = preferences.customMeals || polishMealTemplates;
+  const mealPool = preferences.customMeals || englishMealTemplates;
   
   // Filter meals based on cooking time preference
   const maxTime = preferences.maxCookingTime || 30;
@@ -246,63 +246,63 @@ export async function generateFastWeeklyMealPlan(preferences: {
 const vegetarianMealTemplates: MealTemplate[] = [
   // Breakfast options
   {
-    name: "Omlet z serem i szpinakiem",
+    name: "Cheese and Spinach Omelet",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["3 jajka", "50g sera żółtego", "garść szpinaku", "masło"],
-      instructions: ["Roztrzep jajka", "Usmaż szpinak", "Dodaj jajka i ser"],
+      ingredients: ["3 eggs", "50g yellow cheese", "handful of spinach", "butter"],
+      instructions: ["Beat eggs", "Fry spinach", "Add eggs and cheese"],
       prepTime: 10,
       nutritionInfo: { calories: 320, protein: 22, carbs: 4, fat: 24 }
     }
   },
   {
-    name: "Owsianka z orzechami i owocami",
+    name: "Oatmeal with Nuts and Fruits",
     mealType: "breakfast",
     recipe: {
-      ingredients: ["50g płatków owsianych", "200ml mleka roślinnego", "orzechy", "jagody"],
-      instructions: ["Ugotuj owsiankę", "Dodaj orzechy", "Posyp jagodami"],
+      ingredients: ["50g oat flakes", "200ml plant milk", "nuts", "berries"],
+      instructions: ["Cook oatmeal", "Add nuts", "Sprinkle with berries"],
       prepTime: 8,
       nutritionInfo: { calories: 350, protein: 12, carbs: 45, fat: 14 }
     }
   },
   // Lunch options
   {
-    name: "Sałatka z quinoa i warzywami",
+    name: "Quinoa Salad with Vegetables",
     mealType: "lunch",
     recipe: {
-      ingredients: ["100g quinoa", "pomidory", "ogórek", "feta", "oliwa"],
-      instructions: ["Ugotuj quinoa", "Pokrój warzywa", "Wymieszaj z fetą"],
+      ingredients: ["100g quinoa", "tomatoes", "cucumber", "feta", "olive oil"],
+      instructions: ["Cook quinoa", "Chop vegetables", "Mix with feta"],
       prepTime: 15,
       nutritionInfo: { calories: 420, protein: 16, carbs: 52, fat: 18 }
     }
   },
   {
-    name: "Zupa krem z brokułów",
+    name: "Broccoli Cream Soup",
     mealType: "lunch",
     recipe: {
-      ingredients: ["400g brokułów", "cebula", "bulion warzywny", "śmietanka"],
-      instructions: ["Ugotuj brokuły", "Zblenduj", "Dodaj śmietankę"],
+      ingredients: ["400g broccoli", "onion", "vegetable broth", "cream"],
+      instructions: ["Cook broccoli", "Blend", "Add cream"],
       prepTime: 20,
       nutritionInfo: { calories: 280, protein: 12, carbs: 18, fat: 20 }
     }
   },
   // Dinner options
   {
-    name: "Makaron z sosem pomidorowym i bazylią",
+    name: "Pasta with Tomato Sauce and Basil",
     mealType: "dinner",
     recipe: {
-      ingredients: ["80g makaronu", "sos pomidorowy", "bazylia", "parmezan"],
-      instructions: ["Ugotuj makaron", "Podgrzej sos", "Dodaj bazylię i ser"],
+      ingredients: ["80g pasta", "tomato sauce", "basil", "parmesan"],
+      instructions: ["Cook pasta", "Heat sauce", "Add basil and cheese"],
       prepTime: 15,
       nutritionInfo: { calories: 450, protein: 18, carbs: 65, fat: 14 }
     }
   },
   {
-    name: "Warzywa na parze z ryżem",
+    name: "Steamed Vegetables with Rice",
     mealType: "dinner",
     recipe: {
-      ingredients: ["80g ryżu", "brokuły", "marchewka", "cukinia", "sos sojowy"],
-      instructions: ["Ugotuj ryż", "Ugotuj warzywa na parze", "Podawaj z sosem"],
+      ingredients: ["80g rice", "broccoli", "carrot", "zucchini", "soy sauce"],
+      instructions: ["Cook rice", "Steam vegetables", "Serve with sauce"],
       prepTime: 25,
       nutritionInfo: { calories: 380, protein: 10, carbs: 72, fat: 6 }
     }
@@ -342,31 +342,31 @@ export async function generateFastPersonalizedMealPlan(preferences: {
   // Create cuisine-specific templates based on preferences
   const asianMeals = [
     {
-      name: "Ryż smażony z warzywami",
+      name: "Fried Rice with Vegetables",
       mealType: "lunch",
       recipe: {
-        ingredients: ["ryż", "marchewka", "groszek", "jajka", "sos sojowy"],
-        instructions: ["Ugotuj ryż", "Usmaż warzywa", "Dodaj jajka i sos"],
+        ingredients: ["rice", "carrot", "peas", "eggs", "soy sauce"],
+        instructions: ["Cook rice", "Fry vegetables", "Add eggs and sauce"],
         prepTime: 20,
         nutritionInfo: { calories: 450, protein: 15, carbs: 75, fat: 8 }
       }
     },
     {
-      name: "Kurczak teriyaki",
+      name: "Teriyaki Chicken",
       mealType: "dinner", 
       recipe: {
-        ingredients: ["pierś kurczaka", "sos teriyaki", "ryż", "brokuły"],
-        instructions: ["Usmaż kurczaka", "Dodaj sos teriyaki", "Podawaj z ryżem"],
+        ingredients: ["chicken breast", "teriyaki sauce", "rice", "broccoli"],
+        instructions: ["Fry chicken", "Add teriyaki sauce", "Serve with rice"],
         prepTime: 25,
         nutritionInfo: { calories: 520, protein: 35, carbs: 45, fat: 12 }
       }
     },
     {
-      name: "Miso ramen",
+      name: "Miso Ramen",
       mealType: "dinner",
       recipe: {
-        ingredients: ["makaron ramen", "pasta miso", "jajko", "szczypiorek", "shiitake"],
-        instructions: ["Ugotuj makaron", "Przygotuj bulion miso", "Dodaj jajko i grzyby"],
+        ingredients: ["ramen noodles", "miso paste", "egg", "green onion", "shiitake"],
+        instructions: ["Cook noodles", "Prepare miso broth", "Add egg and mushrooms"],
         prepTime: 30,
         nutritionInfo: { calories: 480, protein: 20, carbs: 65, fat: 15 }
       }
@@ -376,11 +376,11 @@ export async function generateFastPersonalizedMealPlan(preferences: {
   // Use Asian meals if preference is Asian cuisine
   console.log('Checking cuisine preferences:', preferences.cuisinePreferences);
   
-  let availableMeals = polishMealTemplates;
+  let availableMeals = englishMealTemplates;
   
   if (preferences.cuisinePreferences && Array.isArray(preferences.cuisinePreferences)) {
     if (preferences.cuisinePreferences.includes('azjatycka')) {
-      availableMeals = [...polishMealTemplates, ...asianMeals];
+      availableMeals = [...englishMealTemplates, ...asianMeals];
       console.log('Using Asian cuisine meals - added', asianMeals.length, 'Asian dishes');
     }
   }

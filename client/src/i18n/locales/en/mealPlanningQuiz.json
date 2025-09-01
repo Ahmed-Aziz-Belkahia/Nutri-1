@@ -6,5 +6,159 @@
     "budget": "Budget",
     "skill": "Skill",
     "preferences": "Preferences"
+  },
+  "questions": {
+    "diet": {
+      "title": "What diet do you follow?",
+      "description": "This will help us create meals that match your eating style"
+    },
+    "health_goals": {
+      "title": "What are your health and wellness goals?",
+      "description": "Select all that apply to you",
+      "options": {
+        "weight_loss": "Weight loss",
+        "weight_gain": "Weight gain",
+        "maintenance": "Weight maintenance",
+        "muscle_building": "Muscle building",
+        "heart_health": "Heart health",
+        "energy": "Energy and vitality",
+        "diabetes": "Diabetes management",
+        "gut_health": "Gut health"
+      }
+    },
+    "activity": {
+      "title": "What is your activity level?",
+      "description": "This helps us determine your caloric needs",
+      "sedentary": "Sedentary lifestyle",
+      "light": "Lightly active",
+      "moderate": "Moderately active",
+      "active": "Very active",
+      "extreme": "Extremely active"
+    },
+    "calorie_target": {
+      "title": "What is your daily calorie goal?",
+      "description": "This helps us create meals with appropriate energy content"
+    },
+    "meals_per_day": {
+      "title": "How many meals do you prefer to eat per day?",
+      "description": "Including snacks"
+    },
+    "allergies": {
+      "title": "Do you have any food allergies or intolerances?",
+      "description": "We'll make sure to exclude these ingredients",
+      "common": "Common allergies:",
+      "options": {
+        "peanuts": "Peanuts",
+        "treeNuts": "Tree nuts",
+        "milk": "Milk",
+        "eggs": "Eggs",
+        "wheat": "Wheat",
+        "soy": "Soy",
+        "fish": "Fish",
+        "shellfish": "Shellfish",
+        "gluten": "Gluten",
+        "lactose": "Lactose",
+        "sesame": "Sesame"
+      }
+    },
+    "cuisine_preferences": {
+      "title": "What cuisines do you enjoy?",
+      "description": "Select all that you like to eat regularly",
+      "options": {
+        "italian": "Italian",
+        "mexican": "Mexican",
+        "asian": "Asian",
+        "mediterranean": "Mediterranean",
+        "indian": "Indian",
+        "american": "American",
+        "french": "French",
+        "middle_eastern": "Middle Eastern",
+        "african": "African",
+        "caribbean": "Caribbean"
+      }
+    },
+    "max_cooking_time": {
+      "title": "What is your maximum cooking time per meal?",
+      "description": "In minutes"
+    },
+    "mealBudget": {
+      "title": "What is your food budget?",
+      "description": "This will help us suggest appropriate recipes"
+    },
+    "ingredient_preferences": {
+      "title": "Any specific ingredients you love or hate?",
+      "description": "Tell us about your ingredient preferences"
+    },
+    "cooking_skill_level": {
+      "title": "How would you describe your cooking skill level?",
+      "description": "We'll match recipes to your experience"
+    },
+    "meal_plan_duration": {
+      "title": "How long should your meal plan be?",
+      "description": "Shorter periods generate faster with more detail. Longer plans may require more processing time."
+    },
+    "weekday_vs_weekend": {
+      "title": "Different meal plans for weekends?",
+      "description": "Select if you want special meals for weekends"
+    },
+    "cooking_equipment": {
+      "title": "What kitchen equipment do you have?",
+      "description": "We'll suggest recipes using your equipment",
+      "options": {
+        "stove": "Stove",
+        "oven": "Oven",
+        "microwave": "Microwave",
+        "blender": "Blender",
+        "food_processor": "Food processor",
+        "slow_cooker": "Slow cooker",
+        "pressure_cooker": "Pressure cooker",
+        "grill": "Grill",
+        "air_fryer": "Air fryer"
+      }
+    },
+    "special_requirements": {
+      "title": "Any other special requirements or notes?",
+      "description": "Tell us anything else that would help personalize your plan"
+    }
+  },
+  "navigation": {
+    "back": "Back",
+    "next": "Next",
+    "submit": "Create meal plan"
+  },
+  "validation": {
+    "complete_question": "Please complete this question",
+    "before_proceeding": "Please answer the current question before proceeding to the next."
+  },
+  "placeholders": {
+    "add_ingredient": "Add ingredient...",
+    "add_allergy": "Add allergy...",
+    "special_requirements": "E.g. meal timing preferences, cooking styles, etc."
+  },
+  "inputs": {
+    "add_allergy_placeholder": "Add allergy (e.g. peanuts)",
+    "add_ingredient_love": "Add ingredient you like",
+    "add_ingredient_avoid": "Add ingredient to avoid",
+    "additional_details": "Enter additional information or requirements",
+    "press_enter_to_add": "Press Enter to add"
+  },
+  "success": {
+    "title": "Success",
+    "description": "Your preferences have been saved and meal plan has been generated!"
+  },
+  "error": {
+    "title": "Error",
+    "auth_required": "Authentication required",
+    "redirecting_login": "Redirecting you to login...",
+    "auth_message": "You need to be logged in to create a meal plan. Please log in and try again."
+  },
+  "loading": {
+    "creating_plan": "Creating your personalized meal plan...",
+    "moment": "This may take a moment as we create custom recipes.",
+    "analyzing_preferences": "Analyzing your preferences...",
+    "exploring_recipes": "Exploring recipes that match your culinary preferences...",
+    "balancing_nutrition": "Balancing nutrition for your health goals...",
+    "crafting_meals": "Crafting delicious meals just for you...",
+    "finalizing": "Finalizing your personalized meal plan..."
   }
 }

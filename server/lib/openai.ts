@@ -64,9 +64,12 @@ Return a JSON object with this exact structure:
       response_format: { type: "json_object" }
     });
 
-    console.log('[OpenAI] Raw response:', response.choices[0].message.content);
-
-    const result = JSON.parse(response.choices[0].message.content);
+    const content = response.choices?.[0]?.message?.content ?? '';
+    console.log('[OpenAI] Raw response:', content);
+    if (!content || typeof content !== 'string') {
+      throw new Error('Empty content from OpenAI');
+    }
+    const result = JSON.parse(content);
     console.log('[OpenAI] Parsed result:', result);
     return result;
 
