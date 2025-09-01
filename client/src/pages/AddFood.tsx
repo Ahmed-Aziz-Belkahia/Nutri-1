@@ -606,7 +606,7 @@ export default function AddFood() {
                 <X className="h-5 w-5" />
               </button>
               
-              <div className="text-white text-base font-semibold">{t('addFood.title')}</div>
+              <div className="text-white text-base font-semibold">{t('addFood.title', { defaultValue: 'Add Food' })}</div>
               
               <div className="w-10 h-10"></div> {/* Spacer for alignment */}
             </div>
@@ -626,7 +626,7 @@ export default function AddFood() {
                   }`}
                 >
                   <Camera className="h-4 w-4" />
-                  <span>{t('addFood.camera')}</span>
+                  <span>{t('addFood.camera', { defaultValue: 'Camera' })}</span>
                 </button>
                 
                 <button
@@ -637,7 +637,7 @@ export default function AddFood() {
                       : "text-white/70 hover:text-white"}`}
                 >
                   <ImageIcon className="h-4 w-4" />
-                  <span>{t('addFood.gallery')}</span>
+                  <span>{t('addFood.gallery', { defaultValue: 'Gallery' })}</span>
                 </button>
                 
                 <button
@@ -649,7 +649,7 @@ export default function AddFood() {
                   }`}
                 >
                   <Pencil className="h-4 w-4" />
-                  <span>{t('addFood.manual')}</span>
+                  <span>{t('addFood.manual', { defaultValue: 'Manual' })}</span>
                 </button>
               </div>
             </div>
@@ -865,7 +865,7 @@ export default function AddFood() {
                   text-gray-600 hover:text-gray-800 hover:bg-white/60"
               >
                 <Camera className="h-4 w-4" />
-                <span>{t('addFood.camera')}</span>
+                <span>{t('addFood.camera', { defaultValue: 'Camera' })}</span>
               </motion.button>
               
               <motion.button
@@ -878,7 +878,7 @@ export default function AddFood() {
                   text-gray-600 hover:text-gray-800 hover:bg-white/60"
               >
                 <ImageIcon className="h-4 w-4" />
-                <span>{t('addFood.gallery')}</span>
+                <span>{t('addFood.gallery', { defaultValue: 'Gallery' })}</span>
               </motion.button>
               
               <motion.button
@@ -888,7 +888,7 @@ export default function AddFood() {
                   bg-gradient-to-r from-[#0E95A7] to-[#0CBACC] text-white shadow-md"
               >
                 <Pencil className="h-4 w-4" />
-                <span>{t('addFood.manual')}</span>
+                <span>{t('addFood.manual', { defaultValue: 'Manual' })}</span>
               </motion.button>
             </div>
           </div>
