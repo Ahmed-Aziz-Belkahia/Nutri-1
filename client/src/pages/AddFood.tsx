@@ -540,7 +540,7 @@ export default function AddFood() {
                 <Camera className="mr-2 h-4 w-4" />
                 Start Camera
               </Button>
-              <button onClick={handleGalleryClick} className="text-white/70 underline text-sm">Use Gallery Instead</button>
+              <button onClick={handleGalleryClick} className="text-white/70 underline text-sm">Use Device Camera (no live preview)</button>
             </div>
           )}
 
@@ -555,7 +555,7 @@ export default function AddFood() {
               <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
                 <Button variant="outline" onClick={handleGalleryClick} className="w-full">
                   <ImageIcon className="mr-2 h-4 w-4" />
-                  Use Gallery
+                  Open Device Camera
                 </Button>
                 <Button onClick={() => setActiveTab('manual')} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
                   <AlignLeft className="mr-2 h-4 w-4" />
@@ -581,7 +581,7 @@ export default function AddFood() {
                 </Button>
                 <Button variant="outline" onClick={handleGalleryClick} className="w-full">
                   <ImageIcon className="mr-2 h-4 w-4" />
-                  Use Gallery
+                  Open Device Camera
                 </Button>
               </div>
               <button
