@@ -22,6 +22,8 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Preserve server options (like allowedHosts, host) from vite.config.ts
+  const baseServer = (viteConfig as any).server ?? {};
   const vite = await createViteServer({
     ...viteConfig,
     configFile: false,
@@ -46,6 +48,7 @@ export async function setupVite(app: Express, server: Server) {
       },
     },
     server: {
+      ...baseServer,
       middlewareMode: true,
       hmr: { server },
     },
