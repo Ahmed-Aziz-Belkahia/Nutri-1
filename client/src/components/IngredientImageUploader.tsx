@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { Camera, Upload, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { requestCameraPermission } from "@/lib/cameraPermissions";
 
 interface IngredientImageUploaderProps {
   ingredientId: number;
@@ -47,12 +48,23 @@ export function IngredientImageUploader({
   
   // Function to show camera interface
   const handleTakePhoto = async () => {
+    // Ask for permission explicitly first to trigger OS-native prompt
+    const res = await requestCameraPermission({ facingMode: 'environment' });
+    if (!res.granted) {
+      toast({
+        title: "Camera Permission",
+        description: res.error || "Camera access was denied. Please enable it in your browser or device settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setShowCameraInterface(true);
-    
     try {
       if (videoRef.current) {
         const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' } 
+          video: { facingMode: 'environment' },
+          audio: false,
         });
         videoRef.current.srcObject = stream;
       }
