@@ -67,6 +67,12 @@ export default function AddFood() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { addFood } = useFoodLog();
+  // Heuristic to detect in-app browsers where camera may be blocked (FB/IG/TikTok/etc.)
+  const isInAppBrowser = (() => {
+    if (typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent || '';
+    return /(FBAN|FBAV|Instagram|Line|Snapchat|TikTok|Twitter|WeChat|Discord)/i.test(ua);
+  })();
   // Camera handling state
   const [cameraAttempts, setCameraAttempts] = useState(0);
   const [webcamKey, setWebcamKey] = useState(0);
@@ -76,21 +82,31 @@ export default function AddFood() {
     width: { ideal: 1280 },
     height: { ideal: 720 }
   });
-  // On some browsers (notably iOS Safari/in-app), getUserMedia must be triggered by a user gesture.
-  // We gate mounting the Webcam until we've requested permission at least once via a click.
+  // Gate mounting the Webcam until we've either confirmed permission is already granted
+  // or the user explicitly taps Enable Camera. This avoids autoplay overlays on Android/iOS.
   const [cameraReady, setCameraReady] = useState(false);
+  const [needsPlayGesture, setNeedsPlayGesture] = useState(false);
+  const isSecure = typeof window !== 'undefined' ? window.isSecureContext : true;
   useEffect(() => {
-    try {
-      const ua = navigator.userAgent || '';
-      const iOSLike = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1);
-      const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
-      // Auto-start camera on secure, non-iOS-like browsers where autoplay is reliable
-      if (!iOSLike && !insecure) {
-        setCameraReady(true);
+    let cancelled = false;
+    const checkPermission = async () => {
+      try {
+        const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
+        if (insecure) return; // Can't request on insecure contexts
+        if ('permissions' in navigator && (navigator as any).permissions?.query) {
+          const status = await (navigator as any).permissions.query({ name: 'camera' as any });
+          if (!cancelled && status?.state === 'granted') {
+            setCameraReady(true);
+          }
+        }
+      } catch {
+        // Ignore – we'll require a user gesture
       }
-    } catch {
-      // Fallback: don't auto-start
-    }
+    };
+    checkPermission();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   
   // Disable scrolling on mount, re-enable on unmount
@@ -158,8 +174,9 @@ export default function AddFood() {
   const requestNativeCameraPrompt = async () => {
     try {
       setCameraError(null);
-      // Trigger native prompt; stop tracks immediately and let react-webcam own the stream
-      const stream = await navigator.mediaDevices.getUserMedia({ video: cameraConstraints, audio: false as any });
+  // Trigger native prompt with a broad constraint first; stop tracks immediately
+  // Using { video: true } increases prompt reliability on Android
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false as any });
       stream.getTracks().forEach(t => t.stop());
       // After permission, try to pick a rear camera device on Android where facingMode can be ignored
       try {
@@ -191,6 +208,13 @@ export default function AddFood() {
       setCameraReady(true);
       setCameraAttempts(0);
       setWebcamKey((k) => k + 1);
+      // After mounting, attempt to start playback; if blocked, require tap
+      setTimeout(() => {
+        const video = (webcamRef.current as any)?.video as HTMLVideoElement | undefined;
+        if (video && (video.paused || video.readyState < 2)) {
+          video.play().catch(() => setNeedsPlayGesture(true));
+        }
+      }, 100);
     } catch (err) {
       console.error('Camera permission request failed:', err);
       setCameraError("Camera permission was blocked or denied. Open site/app settings to allow camera, or use Manual entry.");
@@ -214,6 +238,19 @@ export default function AddFood() {
         }
         return next;
       });
+    }
+  };
+
+  const kickstartPlayback = async () => {
+    try {
+      const video = (webcamRef.current as any)?.video as HTMLVideoElement | undefined;
+      if (video) {
+        await video.play();
+        setNeedsPlayGesture(false);
+      }
+    } catch (e) {
+      console.warn('Playback start blocked:', e);
+      setNeedsPlayGesture(true);
     }
   };
 
@@ -420,6 +457,13 @@ export default function AddFood() {
               audio={false}
               muted
               playsInline
+              autoPlay
+              controls={false}
+              // Clicking the video also attempts to start playback if needed
+              onClick={() => {
+                if (needsPlayGesture) kickstartPlayback();
+              }}
+              onPlay={() => setNeedsPlayGesture(false)}
               screenshotFormat="image/jpeg"
               videoConstraints={cameraConstraints}
               style={{
@@ -435,9 +479,22 @@ export default function AddFood() {
                 // Camera started successfully
                 setCameraError(null);
                 setCameraAttempts(0);
+                // Try to auto start playback; some Android contexts need a tap
+                const video = (webcamRef.current as any)?.video as HTMLVideoElement | undefined;
+                if (video) {
+                  video.play().catch(() => setNeedsPlayGesture(true));
+                }
               }}
               onUserMediaError={(error) => {
                 console.error('Camera Error:', error);
+                const name = (error as any)?.name || '';
+                const msg = (error as any)?.message || '';
+                if (/NotAllowedError|Permission/i.test(name) || /denied|blocked/i.test(msg)) {
+                  // Permission blocked or denied – surface enable overlay/instructions
+                  setCameraError("Camera permission is blocked or denied. Enable it in site settings, then try again.");
+                  setCameraReady(false);
+                  return;
+                }
                 // Progressive fallback attempts
                 setCameraAttempts((prev) => {
                   const next = prev + 1;
@@ -470,12 +527,51 @@ export default function AddFood() {
             />
           )}
 
+          {/* Secure context / playback gesture overlays */}
+          {cameraReady && needsPlayGesture && (
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-sm px-6 text-center">
+              <div className="text-white">
+                <h2 className="text-xl font-semibold mb-2">Tap to Start Camera</h2>
+                <p className="text-white/80 max-w-md mx-auto">
+                  Your browser requires a tap to start the camera stream.
+                </p>
+              </div>
+              <Button onClick={kickstartPlayback} className="bg-[#0E95A7] hover:bg-[#0D8495]">
+                <Camera className="mr-2 h-4 w-4" />
+                Start Camera
+              </Button>
+              <button onClick={handleGalleryClick} className="text-white/70 underline text-sm">Use Gallery Instead</button>
+            </div>
+          )}
+
+          {!isSecure && (
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-black/70 backdrop-blur-sm px-6 text-center">
+              <div className="text-white">
+                <h2 className="text-xl font-semibold mb-2">Camera Blocked</h2>
+                <p className="text-white/80 max-w-md mx-auto">
+                  This page isn’t using HTTPS, so the camera is blocked. Open the app over HTTPS or use Gallery/Manual.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+                <Button variant="outline" onClick={handleGalleryClick} className="w-full">
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  Use Gallery
+                </Button>
+                <Button onClick={() => setActiveTab('manual')} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
+                  <AlignLeft className="mr-2 h-4 w-4" />
+                  Manual Entry
+                </Button>
+              </div>
+            </div>
+          )}
+
           {!cameraReady && (
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-black/70 backdrop-blur-sm px-6 text-center">
-        <div className="text-white">
+              <div className="text-white">
                 <h2 className="text-2xl font-semibold mb-2">Enable Camera</h2>
                 <p className="text-white/80 max-w-md mx-auto">
-          Tap the button below to request camera access from your device. On Android, use Chrome and ensure the site is served over HTTPS. In some in‑app browsers (e.g. Facebook/TikTok), camera may be blocked.
+                  Tap the button below to request camera access. On Android, use Chrome and ensure HTTPS.
+                  {isInAppBrowser && ' Detected in‑app browser – please open in Chrome for camera support.'}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
@@ -519,7 +615,10 @@ export default function AddFood() {
             <div className="flex justify-center px-4 py-2">
               <div className="bg-black/40 backdrop-blur-md rounded-full p-1 border border-white/10 flex w-full max-w-xs">
                 <button
-                  onClick={() => setActiveTab("camera")}
+                  onClick={() => {
+                    setActiveTab("camera");
+                    if (!cameraReady) requestNativeCameraPrompt();
+                  }}
                   className={`flex items-center justify-center gap-1.5 flex-1 py-2 px-3 rounded-full text-sm font-medium transition-all ${
                     activeTab === "camera" 
                       ? "bg-gradient-to-r from-[#0E95A7] to-[#1E6F7D] text-white" 
@@ -758,7 +857,10 @@ export default function AddFood() {
             <div className="bg-gradient-to-r from-gray-50 to-gray-100/80 backdrop-blur rounded-2xl p-1.5 flex w-full max-w-sm shadow-inner border border-gray-200/50">
               <motion.button
                 whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveTab("camera")}
+                onClick={() => {
+                  setActiveTab("camera");
+                  if (!cameraReady) requestNativeCameraPrompt();
+                }}
                 className="flex items-center justify-center gap-2 flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200
                   text-gray-600 hover:text-gray-800 hover:bg-white/60"
               >
