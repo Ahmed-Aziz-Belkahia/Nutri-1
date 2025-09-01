@@ -274,7 +274,7 @@ export default function AddFood() {
 
       // Store the image data for later use
       localStorage.setItem('pendingFoodImage', screenshot);
-      localStorage.setItem('pendingFoodName', 'Analizowanie...');
+  localStorage.setItem('pendingFoodName', 'Analyzing...');
 
       // Immediately navigate to dashboard
       console.log('[AddFood] Navigating to dashboard...');
@@ -305,7 +305,7 @@ export default function AddFood() {
 
           // Store the image data for later use
           localStorage.setItem('pendingFoodImage', base64data);
-          localStorage.setItem('pendingFoodName', 'Analizowanie...');
+          localStorage.setItem('pendingFoodName', 'Analyzing...');
   
           // Immediately navigate to dashboard
           console.log('[AddFood] Navigating to dashboard after upload...');
@@ -536,11 +536,11 @@ export default function AddFood() {
                   Your browser requires a tap to start the camera stream.
                 </p>
               </div>
-              <Button onClick={kickstartPlayback} className="bg-[#0E95A7] hover:bg-[#0D8495]">
+              <Button type="button" onClick={kickstartPlayback} className="bg-[#0E95A7] hover:bg-[#0D8495]">
                 <Camera className="mr-2 h-4 w-4" />
                 Start Camera
               </Button>
-              <button onClick={handleGalleryClick} className="text-white/70 underline text-sm">Use Device Camera (no live preview)</button>
+              <button onClick={() => { setActiveTab('gallery'); handleGalleryClick(); }} className="text-white/70 underline text-sm">Use Device Camera (no live preview)</button>
             </div>
           )}
 
@@ -553,11 +553,11 @@ export default function AddFood() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
-                <Button variant="outline" onClick={handleGalleryClick} className="w-full">
+                <Button type="button" variant="outline" onClick={() => { setActiveTab('gallery'); handleGalleryClick(); }} className="w-full">
                   <ImageIcon className="mr-2 h-4 w-4" />
                   Open Device Camera
                 </Button>
-                <Button onClick={() => setActiveTab('manual')} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
+                <Button type="button" onClick={() => setActiveTab('manual')} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
                   <AlignLeft className="mr-2 h-4 w-4" />
                   Manual Entry
                 </Button>
@@ -575,11 +575,11 @@ export default function AddFood() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
-                <Button onClick={requestNativeCameraPrompt} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
+                <Button type="button" onClick={requestNativeCameraPrompt} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
                   <Camera className="mr-2 h-4 w-4" />
                   Enable Camera
                 </Button>
-                <Button variant="outline" onClick={handleGalleryClick} className="w-full">
+                <Button type="button" variant="outline" onClick={() => { setActiveTab('gallery'); handleGalleryClick(); }} className="w-full">
                   <ImageIcon className="mr-2 h-4 w-4" />
                   Open Device Camera
                 </Button>
@@ -630,7 +630,7 @@ export default function AddFood() {
                 </button>
                 
                 <button
-                  onClick={handleGalleryClick}
+                  onClick={() => { setActiveTab("gallery"); handleGalleryClick(); }}
                   className={`flex items-center justify-center gap-1.5 flex-1 py-2 px-3 rounded-full text-sm font-medium transition-all
                     ${activeTab === "gallery" 
                       ? "bg-gradient-to-r from-[#0E95A7] to-[#1E6F7D] text-white" 
@@ -865,7 +865,7 @@ export default function AddFood() {
                   text-gray-600 hover:text-gray-800 hover:bg-white/60"
               >
                 <Camera className="h-4 w-4" />
-                <span>Camera</span>
+                <span>{t('addFood.camera')}</span>
               </motion.button>
               
               <motion.button
@@ -878,7 +878,7 @@ export default function AddFood() {
                   text-gray-600 hover:text-gray-800 hover:bg-white/60"
               >
                 <ImageIcon className="h-4 w-4" />
-                <span>Gallery</span>
+                <span>{t('addFood.gallery')}</span>
               </motion.button>
               
               <motion.button
@@ -888,7 +888,7 @@ export default function AddFood() {
                   bg-gradient-to-r from-[#0E95A7] to-[#0CBACC] text-white shadow-md"
               >
                 <Pencil className="h-4 w-4" />
-                <span>Manual</span>
+                <span>{t('addFood.manual')}</span>
               </motion.button>
             </div>
           </div>
@@ -912,7 +912,7 @@ export default function AddFood() {
                   >
                     <div className="flex items-center justify-center">
                       <AlignLeft className="h-4 w-4 mr-2" />
-                      Analiza AI
+                      AI Analysis
                     </div>
                   </motion.button>
                   <motion.button
@@ -927,7 +927,7 @@ export default function AddFood() {
                   >
                     <div className="flex items-center justify-center">
                       <Pencil className="h-4 w-4 mr-2" />
-                      Ręczne Dodanie
+                      Manual Add
                     </div>
                   </motion.button>
                 </div>
@@ -948,11 +948,11 @@ export default function AddFood() {
                   <div className="flex items-center mb-2">
                     <div className="w-2 h-2 bg-gradient-to-r from-[#0E95A7] to-[#0CBACC] rounded-full mr-3" />
                     <h3 className="text-lg font-bold bg-gradient-to-r from-[#0E95A7] to-[#0CBACC] bg-clip-text text-transparent">
-                      Opisz Swoje Jedzenie
+                      Describe Your Food
                     </h3>
                   </div>
                   <p className="text-sm text-gray-600 ml-5">
-                    Bądź konkretny dla dokładnych informacji odżywczych
+                    Be specific for accurate nutrition information
                   </p>
                 </div>
                 
