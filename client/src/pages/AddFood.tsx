@@ -67,6 +67,31 @@ export default function AddFood() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { addFood } = useFoodLog();
+  // Camera handling state
+  const [cameraAttempts, setCameraAttempts] = useState(0);
+  const [webcamKey, setWebcamKey] = useState(0);
+  const [cameraConstraints, setCameraConstraints] = useState<any>({
+    facingMode: 'environment',
+    aspectRatio: 4/3,
+    width: { ideal: 1280 },
+    height: { ideal: 720 }
+  });
+  // On some browsers (notably iOS Safari/in-app), getUserMedia must be triggered by a user gesture.
+  // We gate mounting the Webcam until we've requested permission at least once via a click.
+  const [cameraReady, setCameraReady] = useState(false);
+  useEffect(() => {
+    try {
+      const ua = navigator.userAgent || '';
+      const iOSLike = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1);
+      const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
+      // Auto-start camera on secure, non-iOS-like browsers where autoplay is reliable
+      if (!iOSLike && !insecure) {
+        setCameraReady(true);
+      }
+    } catch {
+      // Fallback: don't auto-start
+    }
+  }, []);
   
   // Disable scrolling on mount, re-enable on unmount
   useEffect(() => {
@@ -125,6 +150,69 @@ export default function AddFood() {
         variant: "destructive",
         title: "Error",
         description: "Failed to add food to log",
+      });
+    }
+  };
+
+  // Explicitly request native camera permission via a user gesture and then mount Webcam
+  const requestNativeCameraPrompt = async () => {
+    try {
+      setCameraError(null);
+      // Trigger native prompt; stop tracks immediately and let react-webcam own the stream
+      const stream = await navigator.mediaDevices.getUserMedia({ video: cameraConstraints, audio: false as any });
+      stream.getTracks().forEach(t => t.stop());
+      // After permission, try to pick a rear camera device on Android where facingMode can be ignored
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(d => d.kind === 'videoinput');
+        // Prefer labels that include back/rear/environment
+        const rear = videoInputs.find(d => /back|rear|environment/i.test(d.label));
+        const fallbackRear = videoInputs.length > 1 ? videoInputs[videoInputs.length - 1] : videoInputs[0];
+        const chosen = rear || fallbackRear;
+        if (chosen && chosen.deviceId) {
+          setCameraConstraints({
+            aspectRatio: 4/3,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            deviceId: { exact: chosen.deviceId }
+          });
+        } else {
+          // Keep environment hint if we couldn't resolve a device id
+          setCameraConstraints({
+            facingMode: 'environment',
+            aspectRatio: 4/3,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          });
+        }
+      } catch {
+        // Ignore enumerateDevices failures; we'll rely on facingMode
+      }
+      setCameraReady(true);
+      setCameraAttempts(0);
+      setWebcamKey((k) => k + 1);
+    } catch (err) {
+      console.error('Camera permission request failed:', err);
+      setCameraError("Camera permission was blocked or denied. Open site/app settings to allow camera, or use Manual entry.");
+      // Prepare easier constraints for a subsequent attempt
+      setCameraAttempts((prev) => {
+        const next = prev + 1;
+        if (next === 1) {
+          setCameraConstraints({
+            facingMode: 'environment',
+            aspectRatio: 4/3,
+            width: { ideal: 640, max: 640 },
+            height: { ideal: 480, max: 480 }
+          });
+        } else if (next === 2) {
+          setCameraConstraints({
+            facingMode: 'user',
+            aspectRatio: 4/3,
+            width: { ideal: 640, max: 640 },
+            height: { ideal: 480, max: 480 }
+          });
+        }
+        return next;
       });
     }
   };
@@ -325,32 +413,87 @@ export default function AddFood() {
     return (
       <div className="h-screen w-full overflow-hidden fixed inset-0 bg-black" style={{ overflowY: 'hidden' }}>
         <div className="relative overflow-hidden h-full w-full">
-          <Webcam
-            ref={webcamRef}
-            audio={false}
-            screenshotFormat="image/jpeg"
-            videoConstraints={{
-              facingMode: "environment",
-              aspectRatio: 4/3,
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
-            }}
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover"
-            }}
-            onUserMediaError={(error) => {
-              console.error('Camera Error:', error);
-              setCameraError(
-                "We couldn't access your camera. Please check your camera permissions or try switching to manual entry."
-              );
-            }}
-          />
+          {cameraReady && (
+            <Webcam
+              key={webcamKey}
+              ref={webcamRef}
+              audio={false}
+              screenshotFormat="image/jpeg"
+              videoConstraints={cameraConstraints}
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover"
+              }}
+              onUserMedia={() => {
+                // Camera started successfully
+                setCameraError(null);
+                setCameraAttempts(0);
+              }}
+              onUserMediaError={(error) => {
+                console.error('Camera Error:', error);
+                // Progressive fallback attempts
+                setCameraAttempts((prev) => {
+                  const next = prev + 1;
+                  if (next === 1) {
+                    // Lower resolution, keep environment camera
+                    setCameraConstraints({
+                      facingMode: 'environment',
+                      aspectRatio: 4/3,
+                      width: { ideal: 640, max: 640 },
+                      height: { ideal: 480, max: 480 }
+                    });
+                    setWebcamKey((k) => k + 1);
+                  } else if (next === 2) {
+                    // Switch to front camera as a fallback
+                    setCameraConstraints({
+                      facingMode: 'user',
+                      aspectRatio: 4/3,
+                      width: { ideal: 640, max: 640 },
+                      height: { ideal: 480, max: 480 }
+                    });
+                    setWebcamKey((k) => k + 1);
+                  } else {
+                    setCameraError(
+                      "We couldn't access your camera. Check browser permissions (HTTPS required on mobile) or use manual entry."
+                    );
+                  }
+                  return next;
+                });
+              }}
+            />
+          )}
+
+          {!cameraReady && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-black/70 backdrop-blur-sm px-6 text-center">
+        <div className="text-white">
+                <h2 className="text-2xl font-semibold mb-2">Enable Camera</h2>
+                <p className="text-white/80 max-w-md mx-auto">
+          Tap the button below to request camera access from your device. On Android, use Chrome and ensure the site is served over HTTPS. In some in‑app browsers (e.g. Facebook/TikTok), camera may be blocked.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+                <Button onClick={requestNativeCameraPrompt} className="w-full bg-[#0E95A7] hover:bg-[#0D8495]">
+                  <Camera className="mr-2 h-4 w-4" />
+                  Enable Camera
+                </Button>
+                <Button variant="outline" onClick={handleGalleryClick} className="w-full">
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  Use Gallery
+                </Button>
+              </div>
+              <button
+                onClick={() => setActiveTab('manual')}
+                className="text-white/70 underline text-sm"
+              >
+                Switch to Manual Entry
+              </button>
+            </div>
+          )}
           
           {/* Backdrop overlay for better contrast with enhanced gradient */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/70 pointer-events-none"></div>
@@ -475,6 +618,7 @@ export default function AddFood() {
             type="file"
             ref={fileInputRef}
             accept="image/*"
+            capture="environment"
             className="hidden"
             onChange={handleFileUpload}
           />
@@ -540,14 +684,42 @@ export default function AddFood() {
           className="w-full"
         >
           <AlignLeft className="mr-2 h-4 w-4" />
-          Przełącz na Ręczne
+          Switch to Manual
         </Button>
         <Button
-          onClick={() => window.location.reload()}
+          onClick={async () => {
+            // If permission wasn't requested yet, do that first to surface the native prompt
+            if (!cameraReady) {
+              await requestNativeCameraPrompt();
+              return;
+            }
+            // Otherwise retry with next fallback and remount webcam
+            setCameraError(null);
+            setCameraAttempts((prev) => {
+              const next = prev + 1;
+              if (next === 1) {
+                setCameraConstraints({
+                  facingMode: 'environment',
+                  aspectRatio: 4/3,
+                  width: { ideal: 640, max: 640 },
+                  height: { ideal: 480, max: 480 }
+                });
+              } else {
+                setCameraConstraints({
+                  facingMode: 'user',
+                  aspectRatio: 4/3,
+                  width: { ideal: 640, max: 640 },
+                  height: { ideal: 480, max: 480 }
+                });
+              }
+              setWebcamKey((k) => k + 1);
+              return next;
+            });
+          }}
           className="w-full bg-[#0E95A7] hover:bg-[#0D8495]"
         >
           <Camera className="mr-2 h-4 w-4" />
-          Spróbuj Ponownie
+          Try Again
         </Button>
       </div>
     </div>
