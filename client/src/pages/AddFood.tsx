@@ -418,6 +418,8 @@ export default function AddFood() {
               key={webcamKey}
               ref={webcamRef}
               audio={false}
+              muted
+              playsInline
               screenshotFormat="image/jpeg"
               videoConstraints={cameraConstraints}
               style={{
