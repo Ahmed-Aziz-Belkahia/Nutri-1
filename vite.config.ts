@@ -16,6 +16,21 @@ export default defineConfig({
     },
   },
   root: path.resolve(__dirname, "client"),
+  server: {
+    // Listen on all interfaces and allow your public host
+    host: true,
+    allowedHosts: ["app.nutriai.online"],
+    // Uncomment and adjust if you proxy TLS and need HMR over wss
+    // hmr: {
+    //   host: "app.nutriai.online",
+    //   protocol: "wss",
+    //   port: 443,
+    // },
+  },
+  preview: {
+    host: true,
+    allowedHosts: ["app.nutriai.online"],
+  },
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
