@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Loader2, AlertCircle, Camera } from "lucide-react";
-import { getCameraPermissionStatus, requestCameraPermission, type CameraPermissionState } from "@/lib/cameraPermissions";
 
 interface CameraCaptureProps {
   onCapture: (photoUrl: string) => void;
@@ -17,9 +16,6 @@ export default function CameraCapture({ onClose, onCapture }: CameraCaptureProps
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [permissionDenied, setPermissionDenied] = useState(false);
-  const [permission, setPermission] = useState<CameraPermissionState>('prompt');
-  const [hasPermission, setHasPermission] = useState(false);
-  const [checkingPermission, setCheckingPermission] = useState(true);
 
   const initializeCamera = useCallback(async () => {
     try {
@@ -86,16 +82,7 @@ export default function CameraCapture({ onClose, onCapture }: CameraCaptureProps
   }, []);
 
   useEffect(() => {
-    (async () => {
-      setCheckingPermission(true);
-      const status = await getCameraPermissionStatus();
-      setPermission(status);
-      setHasPermission(status === 'granted');
-      setCheckingPermission(false);
-      if (status === 'granted') {
-        initializeCamera();
-      }
-    })();
+    initializeCamera();
     
     return () => {
       if (streamRef.current) {
@@ -105,21 +92,6 @@ export default function CameraCapture({ onClose, onCapture }: CameraCaptureProps
       }
     };
   }, [initializeCamera]);
-
-  const handleEnableCamera = async () => {
-    const res = await requestCameraPermission({ facingMode: 'user' });
-    if (res.granted) {
-      setPermission('granted');
-      setHasPermission(true);
-      setError(null);
-      initializeCamera();
-    } else {
-      setPermission('denied');
-      setHasPermission(false);
-      setPermissionDenied(true);
-      setError(res.error ?? 'Camera permission denied. Please enable in settings.');
-    }
-  };
 
   const capturePhoto = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || !isCaptureReady || isProcessing) {
@@ -179,37 +151,13 @@ export default function CameraCapture({ onClose, onCapture }: CameraCaptureProps
 
       {/* Full Screen Camera View */}
       <div className="relative w-full h-full">
-        {/* Permission gate */}
-        {!hasPermission && !checkingPermission ? (
-          <div className="flex flex-col items-center justify-center h-full text-white p-6">
-            <Camera className="w-16 h-16 mb-6 text-gray-400" />
-            <h3 className="text-2xl font-bold mb-4">Enable Camera</h3>
-            <p className="text-center text-gray-300 mb-8 text-lg max-w-sm">
-              We need access to your camera. You'll see your device's permission prompt.
-            </p>
-            <div className="flex gap-4">
-              <Button onClick={handleEnableCamera} className="bg-[#0CC5BA] text-white hover:bg-[#0BB5AA] px-8 py-3 text-lg">
-                Enable Camera
-              </Button>
-              <Button onClick={onClose} variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-3 text-lg">
-                Cancel
-              </Button>
-            </div>
-            {permission === 'denied' && (
-              <p className="text-center mt-4 text-sm text-red-300">
-                Permission denied. Please enable camera access in your browser/device settings.
-              </p>
-            )}
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="flex flex-col items-center justify-center h-full text-white p-6">
             <AlertCircle className="w-16 h-16 mb-6 text-red-400" />
             <h3 className="text-2xl font-bold mb-4">Camera Error</h3>
             <p className="text-center text-gray-300 mb-8 text-lg">{error}</p>
             <div className="flex gap-4">
-              <Button onClick={handleEnableCamera} className="bg-[#0CC5BA] text-white hover:bg-[#0BB5AA] px-8 py-3 text-lg">
-                Try Again
-              </Button>
+              
               <Button
                 onClick={onClose}
                 variant="outline"

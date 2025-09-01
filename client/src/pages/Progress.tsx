@@ -53,7 +53,6 @@ import {
   Loader2
 } from 'lucide-react';
 import { Link } from 'wouter';
-import { getCameraPermissionStatus, requestCameraPermission, type CameraPermissionState } from '@/lib/cameraPermissions';
 
 
 
@@ -62,9 +61,6 @@ function CameraCapture({ onClose, onPhotoCapture }: { onClose: () => void; onPho
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isCaptureReady, setIsCaptureReady] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [permission, setPermission] = useState<CameraPermissionState>('prompt');
-  const [hasPermission, setHasPermission] = useState(false);
-  const [checkingPermission, setCheckingPermission] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,20 +78,9 @@ function CameraCapture({ onClose, onPhotoCapture }: { onClose: () => void; onPho
         }
       } catch (err) {
         console.error("Error accessing camera: ", err);
-        setError('Failed to access camera');
       }
     };
-
-    (async () => {
-      setCheckingPermission(true);
-      const status = await getCameraPermissionStatus();
-      setPermission(status);
-      setHasPermission(status === 'granted');
-      setCheckingPermission(false);
-      if (status === 'granted') {
-        await startCamera();
-      }
-    })();
+    startCamera();
     
     return () => {
       if (stream) {
@@ -103,30 +88,6 @@ function CameraCapture({ onClose, onPhotoCapture }: { onClose: () => void; onPho
       }
     };
   }, []);
-
-  const handleEnableCamera = async () => {
-    const res = await requestCameraPermission({ facingMode: 'user' });
-    if (res.granted) {
-      setPermission('granted');
-      setHasPermission(true);
-      setError(null);
-      // Trigger actual camera stream
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => {});
-          setIsCaptureReady(true);
-        }
-      } catch (e: any) {
-        setError(e?.message || 'Failed to start camera');
-      }
-    } else {
-      setPermission('denied');
-      setHasPermission(false);
-      setError(res.error ?? 'Camera permission denied');
-    }
-  };
 
   const capturePhoto = useCallback(async () => {
     if (!videoRef.current || !canvasRef.current || !isCaptureReady || isProcessing) {
@@ -193,42 +154,25 @@ function CameraCapture({ onClose, onPhotoCapture }: { onClose: () => void; onPho
         </Button>
         
         <div className="relative aspect-[3/4] overflow-hidden bg-black rounded-xl">
-          {!hasPermission && !checkingPermission ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
-              <Camera className="w-12 h-12 mb-4 text-gray-300" />
-              <h3 className="text-lg font-semibold mb-2">Enable Camera</h3>
-              <p className="text-center text-white/80 mb-6">We need access to your camera to take a photo.</p>
-              <div className="flex gap-3">
-                <Button onClick={handleEnableCamera} className="bg-white text-black">Enable Camera</Button>
-                <Button onClick={onClose} variant="ghost" className="text-white">Cancel</Button>
-              </div>
-              {permission === 'denied' && (
-                <p className="text-center mt-3 text-sm text-red-300">Permission denied. Enable it in settings and try again.</p>
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-x-0 bottom-0 pb-8 flex justify-center">
+            <Button
+              className="w-16 h-16 rounded-full bg_white shadow-lg border-2 border-gray-200"
+              disabled={!isCaptureReady || isProcessing}
+              onClick={capturePhoto}
+            >
+              {isProcessing ? (
+                <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-[#0CC5BA]" />
               )}
-            </div>
-          ) : (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-x-0 bottom-0 pb-8 flex justify-center">
-                <Button
-                  className="w-16 h-16 rounded-full bg-white shadow-lg border-2 border-gray-200"
-                  disabled={!isCaptureReady || isProcessing}
-                  onClick={capturePhoto}
-                >
-                  {isProcessing ? (
-                    <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-[#0CC5BA]" />
-                  )}
-                </Button>
-              </div>
-            </>
-          )}
+            </Button>
+          </div>
         </div>
         
         <canvas ref={canvasRef} className="hidden" />

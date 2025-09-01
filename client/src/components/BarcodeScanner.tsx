@@ -4,7 +4,6 @@ import { ArrowLeft } from 'lucide-react';
 import Webcam from 'react-webcam';
 import { BrowserMultiFormatReader, DecodeHintType, BarcodeFormat, Result } from '@zxing/library';
 import { lookupBarcode } from '@/lib/barcode';
-import { getCameraPermissionStatus, requestCameraPermission, type CameraPermissionState } from '@/lib/cameraPermissions';
 
 // Interface for the component props
 interface BarcodeScannerProps {
@@ -22,9 +21,6 @@ export default function BarcodeScanner({ onClose, onScanSuccess }: BarcodeScanne
   const lastResultRef = useRef<string | null>(null);
   const processingRef = useRef(false);
   const cameraAttempts = useRef<number>(0);
-  const [permission, setPermission] = useState<CameraPermissionState>('prompt');
-  const [hasPermission, setHasPermission] = useState(false);
-  const [checkingPermission, setCheckingPermission] = useState(true);
   
   // Optimized low-resolution camera constraints for better performance
   const [cameraConstraints, setCameraConstraints] = useState({
@@ -68,34 +64,10 @@ export default function BarcodeScanner({ onClose, onScanSuccess }: BarcodeScanne
     };
   }, []);
 
-  // Gate by permission before initializing scanning
-  useEffect(() => {
-    (async () => {
-      setCheckingPermission(true);
-      const status = await getCameraPermissionStatus();
-      setPermission(status);
-      setHasPermission(status === 'granted');
-      setCheckingPermission(false);
-    })();
-  }, []);
-
-  const handleEnableCamera = async () => {
-    const res = await requestCameraPermission({ facingMode: 'environment' });
-    if (res.granted) {
-      setPermission('granted');
-      setHasPermission(true);
-      setError(null);
-    } else {
-      setPermission('denied');
-      setHasPermission(false);
-      setError(res.error ?? 'Camera permission denied. Enable it in settings and try again.');
-    }
-  };
-
   // Set up continuous scanning when camera is ready
   useEffect(() => {
     // Skip setup if conditions aren't right
-  if (!hasPermission || !cameraReady || !readerRef.current || !webcamRef.current || !scanning) {
+  if (!cameraReady || !readerRef.current || !webcamRef.current || !scanning) {
       return;
     }
     
@@ -150,7 +122,7 @@ export default function BarcodeScanner({ onClose, onScanSuccess }: BarcodeScanne
         scanIntervalRef.current = null;
       }
     };
-  }, [cameraReady, scanning, hasPermission]);
+  }, [cameraReady, scanning]);
   
   // Handle successful barcode detection
   const handleBarcodeResult = async (result: Result) => {
@@ -192,27 +164,7 @@ export default function BarcodeScanner({ onClose, onScanSuccess }: BarcodeScanne
     <div className="fixed inset-0 bg-black z-50">
       {/* Camera feed */}
       <div className="relative h-full w-full overflow-hidden">
-        {/* Permission gate */}
-        {!hasPermission && !checkingPermission ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
-            <div className="text-white font-semibold text-center px-4 py-2 rounded-full bg-black/50 backdrop-blur-sm mb-6">
-              Barcode Scanner
-            </div>
-            <p className="text-center text-white/80 mb-6 max-w-sm">
-              We need access to your camera to scan barcodes. You'll see your device's permission prompt.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={handleEnableCamera} className="px-4 py-2 rounded-full bg-white text-black font-medium">Enable Camera</button>
-              <button onClick={onClose} className="px-4 py-2 rounded-full bg-white/10 border border-white/30 text-white font-medium">Cancel</button>
-            </div>
-            {permission === 'denied' && (
-              <p className="text-center mt-4 text-sm text-red-300">
-                Permission denied. Please enable camera access in your browser/device settings.
-              </p>
-            )}
-          </div>
-        ) : (
-          <Webcam
+  <Webcam
           ref={webcamRef}
           audio={false}
           videoConstraints={cameraConstraints}
@@ -250,8 +202,7 @@ export default function BarcodeScanner({ onClose, onScanSuccess }: BarcodeScanne
           mirrored={false}
           imageSmoothing={false} // Disable image smoothing for better barcode detection
           screenshotFormat="image/jpeg"
-        />
-        )}
+  />
         
         {/* Overlay with scanner UI */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/70 pointer-events-none">
