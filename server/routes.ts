@@ -5545,6 +5545,67 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
 
+  // Delete user account
+  app.delete("/api/user/account", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const userId = req.user.id;
+      console.log(`Starting account deletion for user ${userId}`);
+
+      // Delete all user-related data in the correct order (foreign key constraints)
+      
+      // Delete user's food logs
+      await db.delete(foodLogs).where(eq(foodLogs.userId, userId));
+      console.log(`Deleted food logs for user ${userId}`);
+      
+      // Delete user's recipes  
+      await db.delete(recipes).where(eq(recipes.userId, userId));
+      console.log(`Deleted recipes for user ${userId}`);
+      
+      // Delete user's nutrition preferences
+      await db.delete(userNutritionPreferences).where(eq(userNutritionPreferences.userId, userId));
+      console.log(`Deleted nutrition preferences for user ${userId}`);
+      
+      // Delete user's progress photos
+      await db.delete(progressPhotos).where(eq(progressPhotos.userId, userId));
+      console.log(`Deleted progress photos for user ${userId}`);
+      
+      // Delete user's weight logs
+      await db.delete(weightLogs).where(eq(weightLogs.userId, userId));
+      console.log(`Deleted weight logs for user ${userId}`);
+
+      // Delete user's meal plans if they exist
+      try {
+        await db.delete(mealPlans).where(eq(mealPlans.userId, userId));
+        console.log(`Deleted meal plans for user ${userId}`);
+      } catch (error) {
+        console.log(`No meal plans to delete for user ${userId}`);
+      }
+
+      // Finally delete the user account
+      await db.delete(users).where(eq(users.id, userId));
+      console.log(`Deleted user account ${userId}`);
+
+      // Logout the user after account deletion
+      req.logout((err) => {
+        if (err) {
+          console.error('Error during logout after account deletion:', err);
+        }
+      });
+
+      res.json({ success: true, message: "Account deleted successfully" });
+    } catch (error) {
+      console.error('Error deleting user account:', error);
+      res.status(500).json({ 
+        error: 'Failed to delete account',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   //Remove duplicate onboarding endpoint.
 
   // Get current user

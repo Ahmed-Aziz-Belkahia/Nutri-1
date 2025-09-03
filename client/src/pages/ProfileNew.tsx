@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Camera, Star, Clock, Shield, Bell, HelpCircle, Loader2, Activity, Target, Scale, Ruler, ChevronRight, Edit2, Save, X, LogOut, Award, TrendingUp, Utensils, Dumbbell, Zap, Calendar, FileText, Heart } from "lucide-react";
+import { ChevronLeft, Camera, Star, Clock, Shield, Bell, HelpCircle, Loader2, Activity, Target, Scale, Ruler, ChevronRight, Edit2, Save, X, LogOut, Award, TrendingUp, Utensils, Dumbbell, Zap, Calendar, FileText, Heart, Trash2, AlertTriangle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
@@ -77,6 +77,11 @@ export default function Profile() {
   const [carbs, setCarbs] = useState<string>(profile?.carbsGoal?.toString() || '250');
   const [fat, setFat] = useState<string>(profile?.fatGoal?.toString() || '70');
   
+  // Delete account dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmationText, setConfirmationText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   // Update state values when profile changes
   useEffect(() => {
     if (profile) {
@@ -146,6 +151,54 @@ export default function Profile() {
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  // Delete account function
+  const handleDeleteAccount = async () => {
+    if (confirmationText !== 'DELETE') {
+      toast({
+        title: "Error",
+        description: "Please type 'DELETE' to confirm account deletion",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/user/account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete account');
+      }
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been permanently deleted.",
+      });
+
+      // Navigate to auth page after successful deletion
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setConfirmationText('');
     }
   };
 
@@ -752,7 +805,7 @@ export default function Profile() {
           </motion.section>
         )}
 
-        {/* Logout Button - With padding to ensure it's not covered by bottom nav */}
+        {/* Account Management Section - With padding to ensure it's not covered by bottom nav */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -782,13 +835,13 @@ export default function Profile() {
               </div>
               
               {/* Log Out */}
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                     <LogOut className="w-5 h-5 text-red-500" />
                   </div>
                   <div>
-                    <div className="text-base font-medium text-gray-900">Account</div>
+                    <div className="text-base font-medium text-gray-900">Sign Out</div>
                     <div className="text-sm text-gray-500">Sign out from your account</div>
                   </div>
                 </div>
@@ -811,6 +864,89 @@ export default function Profile() {
                 >
                   Log out
                 </Button>
+              </div>
+
+              {/* Delete Account */}
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <div className="text-base font-medium text-gray-900">Delete Account</div>
+                    <div className="text-sm text-gray-500">Permanently delete your account and all data</div>
+                  </div>
+                </div>
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    >
+                      Delete
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2 text-red-600">
+                        <AlertTriangle className="h-5 w-5" />
+                        Delete Account
+                      </DialogTitle>
+                      <DialogDescription className="text-base leading-relaxed">
+                        This action cannot be undone. This will permanently delete your account and remove all your data including:
+                        <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                          <li>Food logs and nutrition history</li>
+                          <li>Recipes and meal plans</li>
+                          <li>Weight logs and progress photos</li>
+                          <li>All profile information</li>
+                        </ul>
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmation" className="text-sm font-medium">
+                          Type <span className="font-bold text-red-600">DELETE</span> to confirm:
+                        </Label>
+                        <Input
+                          id="confirmation"
+                          value={confirmationText}
+                          onChange={(e) => setConfirmationText(e.target.value)}
+                          placeholder="Type DELETE here"
+                          className="border-red-200 focus:border-red-400 focus:ring-red-200"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setDeleteDialogOpen(false);
+                          setConfirmationText('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleDeleteAccount}
+                        disabled={confirmationText !== 'DELETE' || isDeleting}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        {isDeleting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Deleting...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Account
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </Card>
