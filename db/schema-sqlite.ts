@@ -243,52 +243,6 @@ export const passwordResetTokens = sqliteTable("password_reset_tokens", {
   usedAt: integer("used_at", { mode: 'timestamp' }),
 });
 
-// Badges schema
-export const badges = sqliteTable("badges", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  icon: text("icon").notNull(),
-  requirement: text("requirement", { mode: 'json' }).$type<{
-    type: 'weight_goal' | 'meal_variety';
-    threshold: number;
-  }>().notNull(),
-});
-
-// User badges junction table
-export const userBadges = sqliteTable("user_badges", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull().references(() => users.id),
-  badgeId: integer("badge_id").notNull().references(() => badges.id),
-  earnedAt: integer("earned_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
-});
-
-// Daily progress tracking
-export const dailyProgress = sqliteTable("daily_progress", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull().references(() => users.id),
-  date: text("date").notNull(),
-  caloriesLogged: integer("calories_logged", { mode: 'boolean' }).default(false),
-  waterLogged: integer("water_logged", { mode: 'boolean' }).default(false),
-  exerciseLogged: integer("exercise_logged", { mode: 'boolean' }).default(false),
-  weightLogged: integer("weight_logged", { mode: 'boolean' }).default(false),
-  completedTasks: integer("completed_tasks").default(0),
-  totalTasks: integer("total_tasks").default(0),
-});
-
-// Notifications table
-export const notifications = sqliteTable("notifications", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: integer("user_id").notNull().references(() => users.id),
-  type: text("type").notNull(), // 'badge', 'reminder', 'milestone'
-  title: text("title").notNull(),
-  message: text("message").notNull(),
-  isRead: integer("is_read", { mode: 'boolean' }).default(false),
-  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
-  scheduledFor: integer("scheduled_for", { mode: 'timestamp' }),
-  data: text("data", { mode: 'json' }),
-});
-
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   foodLogs: many(foodLogs),
@@ -297,19 +251,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   recipeComments: many(recipeComments),
   progressPhotos: many(progressPhotos),
   nutritionPreferences: many(userNutritionPreferences),
-  passwordResetTokens: many(passwordResetTokens),
-  badges: many(userBadges),
-  dailyProgress: many(dailyProgress),
-  notifications: many(notifications),
+  passwordResetTokens: many(passwordResetTokens)
 }));
 
 export const recipesRelations = relations(recipes, ({ many }) => ({
   likes: many(recipeLikes),
   comments: many(recipeComments),
-}));
-
-export const badgesRelations = relations(badges, ({ many }) => ({
-  userBadges: many(userBadges),
 }));
 
 export const userDietaryPreferencesRelations = relations(userDietaryPreferences, ({ one }) => ({
@@ -353,9 +300,6 @@ export type RecipeInMealPlan = typeof recipesInMealPlan.$inferSelect;
 export type InsertRecipeInMealPlan = typeof recipesInMealPlan.$inferInsert;
 export type ShoppingListItem = typeof shoppingListItems.$inferSelect;
 export type InsertShoppingListItem = typeof shoppingListItems.$inferInsert;
-export type Badge = typeof badges.$inferSelect;
-export type DailyProgress = typeof dailyProgress.$inferSelect;
-export type Notification = typeof notifications.$inferSelect;
 
 export const insertRecipeSchema = z.object({
   name: z.string().min(1, "Recipe name is required"),
@@ -372,40 +316,9 @@ export const insertRecipeSchema = z.object({
   isPublic: z.boolean().default(true),
 });
 
-export const insertBadgeSchema = z.object({
-  name: z.string().min(1, "Badge name is required"),
-  description: z.string().min(1, "Badge description is required"),
-  icon: z.string().min(1, "Badge icon is required"),
-  requirement: z.object({
-    type: z.enum(['weight_goal', 'meal_variety']),
-    threshold: z.number().positive(),
-  }),
-});
-
-export const insertDailyProgressSchema = z.object({
-  date: z.string(),
-  caloriesLogged: z.boolean().optional(),
-  waterLogged: z.boolean().optional(),
-  exerciseLogged: z.boolean().optional(),
-  weightLogged: z.boolean().optional(),
-  completedTasks: z.number().min(0).optional(),
-  totalTasks: z.number().min(0).optional(),
-});
-
-export const insertNotificationSchema = z.object({
-  type: z.enum(['badge', 'reminder', 'milestone']),
-  title: z.string().min(1, "Notification title is required"),
-  message: z.string().min(1, "Notification message is required"),
-  scheduledFor: z.string().optional(),
-  data: z.record(z.unknown()).optional(),
-});
-
 export const insertUserDietaryPreferencesSchema = createInsertSchema(userDietaryPreferences);
 export const insertMealPlanSchema = createInsertSchema(mealPlans);
 export const insertRecipeInMealPlanSchema = createInsertSchema(recipesInMealPlan);
 export const insertShoppingListItemSchema = createInsertSchema(shoppingListItems);
 
 export type InsertRecipe = z.infer<typeof insertRecipeSchema>;
-export type InsertBadge = z.infer<typeof insertBadgeSchema>;
-export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;
-export type InsertNotification = z.infer<typeof insertNotificationSchema>;

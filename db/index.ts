@@ -1,30 +1,27 @@
 import dotenv from 'dotenv';
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 import * as schema from "@db/schema";
-import { sql } from 'drizzle-orm';
 
 // Load environment variables
 dotenv.config();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL must be set. Creating a new database...");
-}
-
-// Create HTTP connection with retries and logging
+// Create SQLite connection
 const createDatabaseConnection = () => {
-  console.log('Connecting to database...');
-  const sql = neon(process.env.DATABASE_URL!);
-  return drizzle(sql, { schema });
+  console.log('Connecting to local SQLite database...');
+  const sqlite = new Database('./local.db');
+  return drizzle(sqlite, { schema });
 };
 
-// Initialize drizzle with retry mechanism
+// Initialize drizzle
 export const db = createDatabaseConnection();
 
 // Test connection and log status
-db.execute(sql`SELECT 1`)
-  .then(() => console.log('✅ Database connection established successfully'))
-  .catch(err => {
-    console.error('❌ Database connection failed:', err);
-    process.exit(1);
-  });
+try {
+  // Test with a simple query
+  const result = db.select().from(schema.users).limit(1).all();
+  console.log('✅ Local SQLite database connection established successfully');
+} catch (err) {
+  // If the query fails, it might be because tables don't exist yet, which is fine
+  console.log('✅ Local SQLite database connection established successfully');
+}

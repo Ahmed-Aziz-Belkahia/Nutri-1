@@ -1,24 +1,46 @@
 #!/bin/bash
 
-# Deployment preparation script for NutriAI
+echo "🚀 NutriApp VPS Deployment Script"
+echo "================================="
 
-echo "Starting NutriAI deployment preparation..."
+# Update system packages
+echo "📦 Updating system packages..."
+sudo apt update && sudo apt upgrade -y
 
-# Create necessary directories
-mkdir -p uploads
-echo "✅ Created uploads directory"
+# Install Node.js if not installed
+if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
 
-# Setup database using the automated script
-echo "Setting up database tables..."
-node create-tables-auto.js
+# Install PM2 for process management
+if ! command -v pm2 &> /dev/null; then
+    echo "📦 Installing PM2..."
+    sudo npm install -g pm2
+fi
 
-# Apply schema updates for missing columns
-echo "Updating database schema..."
-node update-schema.js
+# Install dependencies
+echo "📦 Installing dependencies..."
+npm install
 
-# Build application for production
-echo "Building the application..."
+# Run setup
+echo "🔧 Running setup..."
+npm run setup
+
+# Build the application
+echo "🏗️  Building application..."
 npm run build
 
-echo "✅ Deployment preparation completed!"
-echo "You can now deploy the application using the Replit deployment feature."
+# Start with PM2
+echo "🚀 Starting application with PM2..."
+pm2 stop nutriapp 2>/dev/null || true
+pm2 delete nutriapp 2>/dev/null || true
+pm2 start dist/index.js --name "nutriapp"
+pm2 save
+pm2 startup
+
+echo "✅ Deployment complete!"
+echo "🌐 Your NutriApp should be running on port 5000"
+echo "📊 Monitor with: pm2 status"
+echo "📝 View logs with: pm2 logs nutriapp"

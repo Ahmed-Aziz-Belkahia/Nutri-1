@@ -1,58 +1,147 @@
-# NutriAI Deployment Guide
+# NutriApp - Plug & Play Deployment Guide
 
-This document provides instructions for deploying the NutriAI application using Replit's deployment features.
+## 🚀 Quick Start
 
-## Prerequisites
+### Local Development
+```bash
+npm install
+npm run setup
+npm run dev
+```
 
-Before deploying, ensure you have:
+### VPS Deployment (Ubuntu/Debian)
+```bash
+# Clone your repository
+git clone <your-repo-url>
+cd NutriApp
 
-1. An OpenAI API key (for AI-powered features)
-2. PostgreSQL database credentials (automatically set up by Replit)
+# Run the automated deployment script
+chmod +x deploy.sh
+./deploy.sh
+```
 
-## Pre-Deployment Steps
+## 🛠️ Manual VPS Setup
 
-1. **Run the deployment preparation script**:
-   ```bash
-   ./deploy.sh
-   ```
-   This script will:
-   - Create necessary directories
-   - Build the application
-   - Set up the database schema
+### 1. Install Dependencies
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
 
-2. **Verify environment variables**:
-   Ensure these environment variables are properly set:
-   - `DATABASE_URL` (automatically set by Replit)
-   - `OPENAI_API_KEY` (must be added through Replit Secrets)
-   - `NODE_ENV` (set to "production" during deployment)
+# Install Node.js 18+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
 
-## Deployment Process
+# Install PM2 for process management
+sudo npm install -g pm2
+```
 
-1. Click the "Deploy" button in your Replit project dashboard
-2. Select the desired deployment settings
-3. Complete the deployment process as guided by Replit
+### 2. Setup Application
+```bash
+# Install dependencies
+npm install
 
-## Post-Deployment Verification
+# Run setup script (creates database, directories, etc.)
+npm run setup
 
-After deployment:
+# Build for production
+npm run build
+```
 
-1. Verify the application loads correctly
-2. Check that database connections are working
-3. Test the OpenAI integration by using one of the AI features
-4. Test user authentication flows
+### 3. Start Application
+```bash
+# Start with PM2
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup
+```
 
-## Troubleshooting
+## 📁 Project Structure
+```
+NutriApp/
+├── client/          # React frontend
+├── server/          # Express backend
+├── db/              # Database files
+├── uploads/         # User uploads
+├── logs/            # Application logs
+├── local.db         # SQLite database
+├── .env             # Environment variables
+└── setup.js         # Automated setup script
+```
 
-If you encounter any issues:
+## 🔧 Configuration
 
-1. Check the application logs in the Replit console
-2. Verify all environment variables are correctly set
-3. Ensure the database is properly initialized
-4. Check that all required directories (like `uploads`) exist
+### Environment Variables (.env)
+- **PORT**: Server port (default: 5000)
+- **JWT_SECRET**: Authentication secret (change in production!)
+- **OPENAI_API_KEY**: For AI features (optional)
+- **SENDGRID_API_KEY**: For email notifications (optional)
 
-## Additional Notes
+### API Keys (Optional)
+The app works without API keys but you can add:
+- OpenAI for AI meal planning
+- SendGrid for email notifications
+- Nutritionix for nutrition data
+- Google Cloud Vision for image recognition
 
-- The application uses the PostgreSQL database provisioned by Replit
-- Frontend assets are built using Vite
-- Server runs on Node.js with Express
-- For local development, use `npm run dev`
+## 🎯 Production Checklist
+
+- [ ] Change JWT_SECRET in .env
+- [ ] Set NODE_ENV=production
+- [ ] Configure firewall (open port 5000)
+- [ ] Set up reverse proxy (nginx recommended)
+- [ ] Configure SSL certificate
+- [ ] Set up regular database backups
+
+## 📊 Monitoring
+
+```bash
+# Check application status
+pm2 status
+
+# View logs
+pm2 logs nutriapp
+
+# Restart application
+pm2 restart nutriapp
+
+# Stop application
+pm2 stop nutriapp
+```
+
+## 🔄 Updates
+
+```bash
+# Pull latest changes
+git pull
+
+# Reinstall dependencies (if package.json changed)
+npm install
+
+# Rebuild and restart
+npm run build
+pm2 restart nutriapp
+```
+
+## 🆘 Troubleshooting
+
+### Database Issues
+- Database is automatically created by setup script
+- Located at: ./local.db
+- No external database dependencies
+
+### Port Issues
+- Default port: 5000
+- Change in .env: PORT=your-port
+- Ensure port is open in firewall
+
+### Permission Issues
+- Ensure uploads/ directory is writable
+- Check file permissions: chmod 755 uploads/
+
+## 📞 Support
+
+If you encounter issues:
+1. Check the logs: `pm2 logs nutriapp`
+2. Verify .env configuration
+3. Ensure all dependencies are installed
+4. Check system requirements (Node.js 18+)

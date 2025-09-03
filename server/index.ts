@@ -104,7 +104,8 @@ async function initializeApp() {
     while (retries > 0) {
       try {
         log("Testing database connection...");
-        await db.execute(sql`SELECT 1`);
+        // For SQLite with better-sqlite3, just test a simple query
+        const result = db.get(sql`SELECT 1 as test`);
         log("✅ Database connection successful");
         break;
       } catch (error) {
