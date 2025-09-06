@@ -700,6 +700,23 @@ export default function ProgressPage() {
                     </div>
                   </div>
                   
+                  {/* BMI Source Information */}
+                  <div className="mt-4 pt-4 border-t border-white/20">
+                    <div className="text-xs text-gray-400 mb-1">
+                      Formuła BMI: waga (kg) ÷ wzrost² (m²)
+                    </div>
+                    <a 
+                      href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
+                    >
+                      <span>Źródło: WHO</span>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
 
                 </div>
               </Card>

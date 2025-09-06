@@ -1,3 +1,49 @@
+// Medical and scientific sources for nutrition calculations
+export const NUTRITION_SOURCES = [
+  {
+    title: "Mifflin-St Jeor Equation for BMR",
+    organization: "National Institutes of Health (NIH)",
+    url: "https://www.niddk.nih.gov/bwp",
+    description: "Validated formula for calculating basal metabolic rate"
+  },
+  {
+    title: "Physical Activity Guidelines",
+    organization: "World Health Organization (WHO)",
+    url: "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+    description: "Guidelines for physical activity levels and energy expenditure"
+  },
+  {
+    title: "Dietary Guidelines for Americans",
+    organization: "U.S. Department of Health and Human Services",
+    url: "https://www.dietaryguidelines.gov/",
+    description: "Evidence-based recommendations for macronutrient distribution"
+  },
+  {
+    title: "Energy Requirements and Body Weight",
+    organization: "European Food Safety Authority (EFSA)",
+    url: "https://www.efsa.europa.eu/en/topics/topic/nutrition",
+    description: "Scientific guidance on energy requirements and weight management"
+  }
+];
+
+export const CALCULATION_METHODS = [
+  {
+    method: "Basal Metabolic Rate (BMR)",
+    formula: "Men: (10 × weight kg) + (6.25 × height cm) - (5 × age) + 5\nWomen: (10 × weight kg) + (6.25 × height cm) - (5 × age) - 161",
+    source: "Mifflin et al. (1990) American Journal of Clinical Nutrition"
+  },
+  {
+    method: "Total Daily Energy Expenditure (TDEE)",
+    formula: "TDEE = BMR × Activity Factor",
+    source: "Institute of Medicine Dietary Reference Intakes"
+  },
+  {
+    method: "Weight Loss/Gain Calculation",
+    formula: "1 kg body weight ≈ 7700 calories",
+    source: "Hall et al. (2011) The Lancet"
+  }
+];
+
 // Calculates Base Metabolic Rate (BMR) using Mifflin-St Jeor Equation
 function calculateBMR(age: number, weight: number, height: number, isMale: boolean = true): number {
   const baseCalories = 10 * weight + 6.25 * height - 5 * age;

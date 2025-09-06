@@ -16,9 +16,66 @@ export const BodyAnalysisSchema = z.object({
   bodyCompositionNotes: z.string().optional(),
   improvementSuggestions: z.array(z.string()).optional(),
   confidence: z.number().min(0).max(100),
+  sources: z.array(z.object({
+    title: z.string(),
+    organization: z.string(),
+    url: z.string(),
+    description: z.string()
+  })).optional(),
+  calculationMethods: z.array(z.object({
+    method: z.string(),
+    formula: z.string(),
+    source: z.string()
+  })).optional(),
 });
 
 export type BodyAnalysis = z.infer<typeof BodyAnalysisSchema>;
+
+// Medical and scientific sources for body composition analysis
+const MEDICAL_SOURCES = [
+  {
+    title: "Body Composition Assessment Guidelines",
+    organization: "World Health Organization (WHO)",
+    url: "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+    description: "WHO guidelines on body composition and obesity assessment"
+  },
+  {
+    title: "BMI Classification Standards",
+    organization: "Centers for Disease Control and Prevention (CDC)",
+    url: "https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html",
+    description: "Official BMI calculation and classification standards"
+  },
+  {
+    title: "Body Fat Percentage Guidelines",
+    organization: "American Council on Exercise (ACE)",
+    url: "https://www.acefitness.org/education-and-resources/lifestyle/tools-calculators/percent-body-fat-calculator/",
+    description: "Evidence-based body fat percentage ranges for health assessment"
+  },
+  {
+    title: "Mifflin-St Jeor Equation for Metabolic Rate",
+    organization: "National Institutes of Health (NIH)",
+    url: "https://www.niddk.nih.gov/bwp",
+    description: "Validated formula for calculating basal metabolic rate"
+  }
+];
+
+const CALCULATION_METHODS = [
+  {
+    method: "BMI Calculation",
+    formula: "BMI = weight (kg) ÷ height² (m²)",
+    source: "WHO Global Database on Body Mass Index"
+  },
+  {
+    method: "Body Fat Estimation (Male)",
+    formula: "Body Fat % = (1.20 × BMI) + (0.23 × age) - 16.2",
+    source: "Deurenberg et al. (1991) British Journal of Nutrition"
+  },
+  {
+    method: "Body Fat Estimation (Female)", 
+    formula: "Body Fat % = (1.20 × BMI) + (0.23 × age) - 5.4",
+    source: "Deurenberg et al. (1991) British Journal of Nutrition"
+  }
+];
 
 /**
  * Analyzes a body image to estimate body fat percentage and provide feedback
@@ -44,6 +101,10 @@ export async function analyzeBodyComposition(
     // Prompt engineering for better results
     const systemPrompt = `
       You are a fitness and nutrition assistant that provides hypothetical assessments based on given parameters.
+      
+      IMPORTANT SAFETY DISCLAIMER: All recommendations are for educational purposes only and should not replace 
+      professional medical advice. Users should consult healthcare providers before making health decisions.
+      
       The user will show an image of a physique and ask you to estimate what body composition metrics MIGHT be 
       associated with SIMILAR physiques (not the specific person in the image).
       
@@ -52,13 +113,18 @@ export async function analyzeBodyComposition(
       Instead, consider these general parameters as a starting point:
       - Weight: ${weight} kg
       - Height: ${height} cm
-      - BMI: ${bmi.toFixed(1)}
+      - BMI: ${bmi.toFixed(1)} (calculated using WHO standards)
       - Gender category: ${gender}
       - Age category: ${age}
       
       Based on the image showing a SIMILAR physique to what you might find in fitness reference materials,
       provide a hypothetical assessment of what typical body composition values might be for someone with 
       that general body structure. Use your knowledge of fitness and health to make educated assessments.
+      
+      All calculations should reference established medical formulas:
+      - BMI calculation follows WHO standards
+      - Body fat estimation uses Deurenberg et al. (1991) methodology
+      - All recommendations align with CDC and ACE guidelines
       
       IMPORTANT: Your response must ONLY contain a valid JSON object without any additional text, markdown, or explanation. 
       The JSON object must include these fields:
@@ -138,8 +204,12 @@ export async function analyzeBodyComposition(
       throw new Error('Failed to parse body analysis data');
     }
     
-    // Validate with Zod
-    const validatedData = BodyAnalysisSchema.parse(analysisData);
+    // Validate with Zod and add medical sources
+    const validatedData = BodyAnalysisSchema.parse({
+      ...analysisData,
+      sources: MEDICAL_SOURCES,
+      calculationMethods: CALCULATION_METHODS
+    });
     
     // Translate some common improvement suggestions to Polish if needed
     if (validatedData.improvementSuggestions && validatedData.improvementSuggestions.length > 0) {
@@ -233,7 +303,9 @@ export async function analyzeBodyComposition(
       bodyCompositionNotes: errorMessage,
       improvementSuggestions: suggestions,
       confidence: 40,
-      muscleMass: gender === 'male' ? "Umiarkowana" : "Umiarkowana"
+      muscleMass: gender === 'male' ? "Umiarkowana" : "Umiarkowana",
+      sources: MEDICAL_SOURCES,
+      calculationMethods: CALCULATION_METHODS
     };
   }
 }

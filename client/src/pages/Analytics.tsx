@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useUser, type UserProfile as HookUserProfile } from "../hooks/use-user";
 import Navigation from "../components/Navigation";
 import HeightWeightInput from "@/components/HeightWeightInput";
+import { ExternalLink, BookOpen } from 'lucide-react';
+import { NUTRITION_SOURCES, CALCULATION_METHODS } from '@/lib/nutrition';
 
 type User = { id: number; email: string; profile?: HookUserProfile };
 
@@ -18,6 +20,7 @@ export default function Analytics() {
   const [newHeight, setNewHeight] = useState(user?.profile?.height || 170);
   const [selectedPeriod, setSelectedPeriod] = useState<"90 Days" | "6 Months" | "1 Year" | "All time">("90 Days");
   const [selectedNutritionPeriod, setSelectedNutritionPeriod] = useState<"This week" | "Last week" | "2 wks. ago" | "3 wks. ago">("This week");
+  const [showSources, setShowSources] = useState(false);
 
   const handleUpdateWeight = async () => {
     setIsUpdatingWeight(true);
@@ -249,7 +252,88 @@ export default function Analytics() {
               <span>Overweight</span>
               <span className="text-right">Obese</span>
             </div>
+            
+            {/* BMI Source Information */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="text-xs text-gray-500 mb-1">
+                Formuła BMI: waga (kg) ÷ wzrost² (m²)
+              </div>
+              <a 
+                href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
+              >
+                <span>Źródło: WHO</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
           </div>
+        </Card>
+        
+        {/* Medical Sources Section */}
+        <Card className="p-4">
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-between p-0"
+            onClick={() => setShowSources(!showSources)}
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              <span className="font-medium">Źródła medyczne i formuły</span>
+            </div>
+            <span className="text-sm text-gray-500">
+              {showSources ? 'Ukryj' : 'Pokaż'}
+            </span>
+          </Button>
+          
+          {showSources && (
+            <div className="mt-4 space-y-4">
+              {/* Calculation Methods */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm text-gray-700">Metody obliczeń:</h4>
+                <div className="space-y-2">
+                  {CALCULATION_METHODS.map((method, index) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg text-sm">
+                      <div className="font-medium">{method.method}</div>
+                      <div className="text-gray-600 text-xs mt-1 whitespace-pre-line">{method.formula}</div>
+                      <div className="text-gray-500 text-xs mt-1">{method.source}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Medical Sources */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm text-gray-700">Źródła medyczne:</h4>
+                <div className="space-y-2">
+                  {NUTRITION_SOURCES.map((source, index) => (
+                    <a
+                      key={index}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm text-blue-900">{source.title}</div>
+                          <div className="text-xs text-blue-700 mt-1">{source.organization}</div>
+                          <div className="text-xs text-blue-600 mt-1">{source.description}</div>
+                        </div>
+                        <ExternalLink className="w-3 h-3 text-blue-600 mt-1 flex-shrink-0 ml-2" />
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-200">
+                Ta aplikacja przedstawia informacje medyczne wyłącznie w celach edukacyjnych. 
+                Zawsze skonsultuj się z lekarzem przed podejmowaniem decyzji dotyczących zdrowia.
+              </div>
+            </div>
+          )}
         </Card>
         {/* Goal Progress */}
         <Card className="p-4">

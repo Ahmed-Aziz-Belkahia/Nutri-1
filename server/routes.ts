@@ -1218,6 +1218,8 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Body composition analysis endpoint
+  // SAFETY NOTE: This endpoint provides health and medical recommendations 
+  // with proper citations from authoritative sources (WHO, CDC, ACE, NIH)
   app.post("/api/analyze-body", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {

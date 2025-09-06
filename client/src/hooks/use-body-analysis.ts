@@ -9,6 +9,17 @@ export interface BodyAnalysis {
   bodyCompositionNotes?: string;
   improvementSuggestions?: string[];
   confidence: number;
+  sources?: {
+    title: string;
+    organization: string;
+    url: string;
+    description: string;
+  }[];
+  calculationMethods?: {
+    method: string;
+    formula: string;
+    source: string;
+  }[];
 }
 
 export function useBodyAnalysis() {

@@ -704,7 +704,10 @@ export default function OnboardingQuiz() {
                                 scrollContainer.addEventListener('scroll', () => {
                                   const scrollLeft = scrollContainer.scrollLeft;
                                   const pixelsPerCm = 10;
-                                  const height = Math.round(100 + scrollLeft / pixelsPerCm);
+                                  const containerWidth = scrollContainer.clientWidth;
+                                  const centerOffset = containerWidth / 2;
+                                  const adjustedScrollLeft = scrollLeft + centerOffset - (1500); // 1500px is half of total width (3000px)
+                                  const height = Math.round(100 + adjustedScrollLeft / pixelsPerCm);
                                   const clampedHeight = Math.max(100, Math.min(250, height));
                                   setFormData(prev => ({ ...prev, height: clampedHeight }));
                                 });
@@ -1238,10 +1241,10 @@ export default function OnboardingQuiz() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
-                              className={`backdrop-blur-sm p-4 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm p-4 rounded-xl border-2 transition-all duration-300 ${
                                 formData.activityLevel === activity.value
-                                  ? 'bg-gradient-to-b from-green-500/80 to-emerald-500/80 text-white border-white/40 shadow-lg'
-                                  : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
+                                  ? 'bg-gradient-to-b from-green-500/80 to-emerald-500/80 text-white border-white/60 shadow-lg'
+                                  : 'bg-white/30 hover:bg-white/50 border-gray-300/40 text-gray-700 hover:border-gray-400/60'
                               }`}
                             >
                               <div className="text-lg font-semibold">{activity.label}</div>
@@ -1651,20 +1654,6 @@ export default function OnboardingQuiz() {
                                     transition={{ delay: 0.6 }}
                                     className="backdrop-blur-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-white/40 text-center"
                                   >
-                                    <motion.div
-                                      animate={{ 
-                                        rotate: [0, 5, -5, 5, 0],
-                                        scale: [1, 1.1, 1]
-                                      }}
-                                      transition={{ 
-                                        duration: 2,
-                                        repeat: Infinity,
-                                        repeatDelay: 3
-                                      }}
-                                      className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg"
-                                    >
-                                      <Star className="w-10 h-10 text-white" />
-                                    </motion.div>
                                     
                                     <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
                                       You're All Set!

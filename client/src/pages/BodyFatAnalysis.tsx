@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Percent, Info, Camera, ArrowLeft, Loader2 } from 'lucide-react';
+import { Percent, Info, Camera, ArrowLeft, Loader2, ExternalLink, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useBodyAnalysis } from '@/hooks/use-body-analysis';
@@ -15,6 +15,8 @@ export default function BodyFatAnalysis() {
   const { analyzeBody, updateProfileWithBodyFat, isLoading } = useBodyAnalysis();
   const { photos, updatePhotoType } = useProgressPhotos();
   const [isMarkingPhoto, setIsMarkingPhoto] = useState(false);
+  const [showSources, setShowSources] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
   
   // Find suitable photos for analysis
   const progressNowPhotos = photos?.filter(photo => photo.type === 'progress-now') || [];
@@ -127,6 +129,9 @@ export default function BodyFatAnalysis() {
           
           console.log('Analysis result:', result);
           
+          // Store the analysis result for displaying sources
+          setAnalysisResult(result);
+          
           // Update the user's profile with the new body fat percentage
           if (result.bodyFatPercentage) {
             await updateProfileWithBodyFat(result.bodyFatPercentage, result.bodyType);
@@ -139,10 +144,8 @@ export default function BodyFatAnalysis() {
               }),
             });
             
-            // Navigate back to progress page
-            setTimeout(() => {
-              setLocation('/progress-new');
-            }, 1500);
+            // Show sources automatically after analysis
+            setShowSources(true);
           }
         } catch (err) {
           console.error('Error analyzing body:', err);
@@ -270,6 +273,121 @@ export default function BodyFatAnalysis() {
             </Button>
           </div>
         )}
+      </Card>
+      
+      {/* Sources and Methods Section */}
+      <Card className="mt-4">
+        <div className="p-4">
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-between p-0"
+            onClick={() => setShowSources(!showSources)}
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              <span className="font-medium">Źródła medyczne i metody obliczeń</span>
+            </div>
+            <span className="text-sm text-gray-500">
+              {showSources ? 'Ukryj' : 'Pokaż'}
+            </span>
+          </Button>
+          
+          {showSources && (
+            <div className="mt-4 space-y-4">
+              {/* Calculation Methods */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm text-gray-700">Metody obliczeń:</h4>
+                <div className="space-y-2">
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm">
+                    <div className="font-medium">BMI (Body Mass Index)</div>
+                    <div className="text-gray-600 text-xs mt-1">BMI = waga (kg) ÷ wzrost² (m²)</div>
+                    <div className="text-gray-500 text-xs">Źródło: WHO Global Database on Body Mass Index</div>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded-lg text-sm">
+                    <div className="font-medium">Szacowanie tkanki tłuszczowej</div>
+                    <div className="text-gray-600 text-xs mt-1">
+                      Mężczyźni: % = (1.20 × BMI) + (0.23 × wiek) - 16.2<br/>
+                      Kobiety: % = (1.20 × BMI) + (0.23 × wiek) - 5.4
+                    </div>
+                    <div className="text-gray-500 text-xs">Źródło: Deurenberg et al. (1991) British Journal of Nutrition</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Medical Sources */}
+              <div>
+                <h4 className="font-medium mb-2 text-sm text-gray-700">Źródła medyczne:</h4>
+                <div className="space-y-2">
+                  {[
+                    {
+                      title: "Wytyczne WHO dotyczące składu ciała",
+                      organization: "World Health Organization (WHO)",
+                      url: "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"
+                    },
+                    {
+                      title: "Standardy klasyfikacji BMI",
+                      organization: "Centers for Disease Control and Prevention (CDC)",
+                      url: "https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html"
+                    },
+                    {
+                      title: "Wytyczne dotyczące procentu tkanki tłuszczowej",
+                      organization: "American Council on Exercise (ACE)",
+                      url: "https://www.acefitness.org/education-and-resources/lifestyle/tools-calculators/percent-body-fat-calculator/"
+                    }
+                  ].map((source, index) => (
+                    <a
+                      key={index}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm text-blue-900">{source.title}</div>
+                          <div className="text-xs text-blue-700 mt-1">{source.organization}</div>
+                        </div>
+                        <ExternalLink className="w-3 h-3 text-blue-600 mt-1 flex-shrink-0 ml-2" />
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Analysis Results Sources */}
+              {analysisResult?.sources && (
+                <div>
+                  <h4 className="font-medium mb-2 text-sm text-gray-700">Dodatkowe źródła z analizy:</h4>
+                  <div className="space-y-2">
+                    {analysisResult.sources.map((source: any, index: number) => (
+                      <a
+                        key={index}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-green-900">{source.title}</div>
+                            <div className="text-xs text-green-700 mt-1">{source.organization}</div>
+                            <div className="text-xs text-green-600 mt-1">{source.description}</div>
+                          </div>
+                          <ExternalLink className="w-3 h-3 text-green-600 mt-1 flex-shrink-0 ml-2" />
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-200">
+                Ta aplikacja przedstawia informacje medyczne wyłącznie w celach edukacyjnych. 
+                Zawsze skonsultuj się z lekarzem przed podejmowaniem decyzji dotyczących zdrowia.
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   );
