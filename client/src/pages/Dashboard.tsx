@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
@@ -79,24 +79,17 @@ function getUsername(email: string): string {
   return email.split('@')[0];
 }
 
-function getDaysOfWeek(t: Function) {
+function getDaysRange(t: Function, total: number = 31) { // 15 past, today, 15 future
   const today = new Date();
-  // Start 3 days before today to put today in the middle (position 4)
-  const weekStart = new Date(today);
-  weekStart.setDate(today.getDate() - 3);
-
-  return Array.from({ length: 7 }).map((_, index) => {
-    const date = new Date(weekStart);
-    date.setDate(weekStart.getDate() + index);
-    const dayNames = [
-      t('days.sun'), 
-      t('days.mon'), 
-      t('days.tue'), 
-      t('days.wed'), 
-      t('days.thu'), 
-      t('days.fri'), 
-      t('days.sat')
-    ];
+  const start = new Date(today);
+  start.setDate(today.getDate() - Math.floor(total / 2));
+  const dayNames = [
+    t('days.sun'), t('days.mon'), t('days.tue'), t('days.wed'),
+    t('days.thu'), t('days.fri'), t('days.sat')
+  ];
+  return Array.from({ length: total }).map((_, idx) => {
+    const date = new Date(start);
+    date.setDate(start.getDate() + idx);
     return {
       date,
       day: date.getDate(),
@@ -262,7 +255,21 @@ export default function Dashboard() {
     containScroll: 'trimSnaps',
     dragFree: true,
   });
-  const days = getDaysOfWeek(t);
+  const days = getDaysRange(t, 31);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const dayRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Auto scroll selected day into center view
+  useEffect(() => {
+    const key = selectedDate.toDateString();
+    const el = dayRefs.current[key];
+    const container = scrollContainerRef.current;
+    if (el && container) {
+      const elCenter = el.offsetLeft + el.offsetWidth / 2;
+      const target = elCenter - container.clientWidth / 2;
+      container.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+    }
+  }, [selectedDate]);
   const { data: profile } = useUserProfile();
 
   const { isActive: isPersistentGuideActive } = usePersistentGuide();
@@ -485,33 +492,45 @@ export default function Dashboard() {
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/30 shadow-sm"
+            className="relative bg-white/20 backdrop-blur-lg rounded-2xl py-3 px-1 border border-white/30 shadow-sm"
           >
-            <div className="grid grid-cols-7 gap-1">
-              {days.map((day, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: index * 0.03 }}
-                  onClick={() => handleDateChange(day.date)}
-                  className={`
-                    flex flex-col items-center justify-center py-3 px-1 cursor-pointer
-                    transition-all duration-200 rounded-xl
-                    ${isSelectedDate(day.date) 
-                      ? 'bg-emerald-500 text-white shadow-md' 
-                      : 'hover:bg-white/40 text-gray-700'
-                    }
-                  `}
-                >
-                  <span className={`text-xs font-medium mb-1 ${isSelectedDate(day.date) ? 'text-white' : 'text-gray-500'}`}>
-                    {day.dayName}
-                  </span>
-                  <span className={`text-lg font-bold ${isSelectedDate(day.date) ? 'text-white' : 'text-gray-800'}`}>
-                    {day.day}
-                  </span>
-                </motion.div>
-              ))}
+            {/* Gradient edges */}
+            <div className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white/70 to-transparent rounded-l-2xl" />
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white/70 to-transparent rounded-r-2xl" />
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-2 overflow-x-auto px-1 scroll-smooth no-scrollbar"
+            >
+              {days.map((day, index) => {
+                const key = day.date.toDateString();
+                return (
+                  <motion.div
+                    key={key}
+                    ref={el => { dayRefs.current[key] = el; }}
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: index * 0.01 }}
+                    onClick={() => handleDateChange(day.date)}
+                    className={`
+                      min-w-[56px] flex flex-col items-center justify-center py-2 px-1 cursor-pointer h-14
+                      transition-all duration-200 rounded-xl leading-tight border select-none
+                      ${isSelectedDate(day.date)
+                        ? 'bg-emerald-500 text-white shadow-md border-emerald-500'
+                        : day.isToday
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/70 hover:border-emerald-300'
+                          : 'bg-white/80 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <span className={`text-[10px] font-medium mb-0.5 ${isSelectedDate(day.date) ? 'text-white' : day.isToday ? 'text-emerald-600' : 'text-gray-500'}`}>
+                      {day.dayName}
+                    </span>
+                    <span className={`text-base font-semibold ${isSelectedDate(day.date) ? 'text-white' : day.isToday ? 'text-emerald-600' : 'text-gray-800'}`}>
+                      {day.day}
+                    </span>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
 

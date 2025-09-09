@@ -11,7 +11,7 @@ import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import LandingPage from "./pages/LandingPage";
 import Progress from "./pages/Progress";
-import ProgressNew from "./pages/ProgressNew";
+import ProgressNew from "./pages/Progress";
 import Settings from "./pages/Settings";
 import EnhancedDashboard from "./pages/EnhancedDashboard";
 import DetailedNutrition from "./pages/DetailedNutrition";

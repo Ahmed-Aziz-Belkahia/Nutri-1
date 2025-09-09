@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Camera, Star, Clock, Shield, Bell, HelpCircle, Loader2, Activity, Target, Scale, Ruler, ChevronRight, Edit2, Save, X, LogOut, Award, TrendingUp, Utensils, Dumbbell, Zap, Calendar, FileText, Heart, Trash2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Camera, Star, Clock, Shield, Bell, HelpCircle, Loader2, Activity, Target, Scale, Ruler, ChevronRight, Edit2, Save, X, LogOut, Award, TrendingUp, Utensils, Dumbbell, Zap, Calendar, FileText, Heart, Trash2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from 'axios';
 import type { UserProfile } from "@/types/User";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+// Removed AlertDialog in favor of custom themed modal
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -77,10 +78,20 @@ export default function Profile() {
   const [carbs, setCarbs] = useState<string>(profile?.carbsGoal?.toString() || '250');
   const [fat, setFat] = useState<string>(profile?.fatGoal?.toString() || '70');
   
-  // Delete account dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [confirmationText, setConfirmationText] = useState('');
+  // Delete account state
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Auto-redirect home after successful deletion modal appears
+  useEffect(() => {
+    if (showDeleteSuccess) {
+      const t = setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+      return () => clearTimeout(t);
+    }
+  }, [showDeleteSuccess]);
   
   // Update state values when profile changes
   useEffect(() => {
@@ -156,15 +167,6 @@ export default function Profile() {
 
   // Delete account function
   const handleDeleteAccount = async () => {
-    if (confirmationText !== 'DELETE') {
-      toast({
-        title: "Error",
-        description: "Please type 'DELETE' to confirm account deletion",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsDeleting(true);
     try {
       const response = await fetch('/api/user/account', {
@@ -178,15 +180,8 @@ export default function Profile() {
         throw new Error('Failed to delete account');
       }
 
-      toast({
-        title: "Account Deleted",
-        description: "Your account has been permanently deleted.",
-      });
-
-      // Navigate to auth page after successful deletion
-      setTimeout(() => {
-        window.location.href = '/auth';
-      }, 2000);
+      // Show custom modern success modal instead of default toast
+      setShowDeleteSuccess(true);
 
     } catch (error) {
       console.error('Error deleting account:', error);
@@ -197,8 +192,6 @@ export default function Profile() {
       });
     } finally {
       setIsDeleting(false);
-      setDeleteDialogOpen(false);
-      setConfirmationText('');
     }
   };
 
@@ -851,8 +844,8 @@ export default function Profile() {
                   onClick={async () => {
                     try {
                       await logout();
-                      // Explicitly navigate to auth page after logout
-                      window.location.href = '/auth';
+                      // Redirect to home after logout
+                      window.location.href = '/';
                     } catch (error) {
                       toast({
                         title: "Error",
@@ -877,76 +870,14 @@ export default function Profile() {
                     <div className="text-sm text-gray-500">Permanently delete your account and all data</div>
                   </div>
                 </div>
-                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
-                    >
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2 text-red-600">
-                        <AlertTriangle className="h-5 w-5" />
-                        Delete Account
-                      </DialogTitle>
-                      <DialogDescription className="text-base leading-relaxed">
-                        This action cannot be undone. This will permanently delete your account and remove all your data including:
-                        <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
-                          <li>Food logs and nutrition history</li>
-                          <li>Recipes and meal plans</li>
-                          <li>Weight logs and progress photos</li>
-                          <li>All profile information</li>
-                        </ul>
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="confirmation" className="text-sm font-medium">
-                          Type <span className="font-bold text-red-600">DELETE</span> to confirm:
-                        </Label>
-                        <Input
-                          id="confirmation"
-                          value={confirmationText}
-                          onChange={(e) => setConfirmationText(e.target.value)}
-                          placeholder="Type DELETE here"
-                          className="border-red-200 focus:border-red-400 focus:ring-red-200"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter className="gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setDeleteDialogOpen(false);
-                          setConfirmationText('');
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={handleDeleteAccount}
-                        disabled={confirmationText !== 'DELETE' || isDeleting}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        {isDeleting ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Deleting...
-                          </>
-                        ) : (
-                          <>
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete Account
-                          </>
-                        )}
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button
+                  variant="ghost"
+                  className="text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                  disabled={isDeleting}
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  Delete
+                </Button>
               </div>
             </div>
           </Card>
@@ -1109,6 +1040,126 @@ export default function Profile() {
           </div>
         </div>
       )}
+
+      {/* Account Deletion Confirm Modal - modern glassmorphic */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div 
+            className="fixed inset-0 z-[99998] flex items-center justify-center p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Dim/backdrop */}
+            <div className="absolute inset-0 bg-black/40" onClick={() => !isDeleting && setShowDeleteConfirm(false)} />
+
+            <motion.div 
+              initial={{ scale: 0.96, y: 8, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 160, damping: 16 }}
+              className="relative w-full max-w-md bg-white/80 backdrop-blur-2xl border border-white/40 shadow-2xl rounded-3xl overflow-hidden"
+            >
+              {/* Accent bar */}
+              <div className="h-1.5 bg-gradient-to-r from-red-500 via-pink-500 to-[#0CC5BA]" />
+              <div className="p-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                    <Trash2 className="w-5 h-5 text-red-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Delete Account</h3>
+                </div>
+                <p className="text-gray-600 mb-6">This action is permanent. All your data will be removed.</p>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="ghost"
+                    className="h-11 text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                    disabled={isDeleting}
+                    onClick={() => setShowDeleteConfirm(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="h-11 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={async () => {
+                      await handleDeleteAccount();
+                      setShowDeleteConfirm(false);
+                    }}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Deleting...
+                      </>
+                    ) : (
+                      'Delete'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Account Deletion Success Modal - modern full-screen popup */}
+      <AnimatePresence>
+        {showDeleteSuccess && (
+          <motion.div 
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 via-white to-[#0CC5BA]/30 backdrop-blur-xl" />
+
+            <motion.div 
+              initial={{ scale: 0.95, y: 10, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 140, damping: 16 }}
+              className="relative w-full max-w-md bg-white/90 backdrop-blur-xl border border-white/40 shadow-2xl rounded-3xl overflow-hidden"
+            >
+              {/* Top accent */}
+              <div className="h-1.5 bg-gradient-to-r from-red-500 via-pink-500 to-[#0CC5BA]" />
+
+              <div className="p-8 text-center">
+                <div className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center">
+                  <div className="relative">
+                    <div className="absolute inset-0 rounded-2xl bg-red-200 animate-ping opacity-30" />
+                    <Trash2 className="relative h-8 w-8 text-red-600" />
+                  </div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">Account deleted</h3>
+                <p className="text-gray-600 mt-2">
+                  Your account and all associated data were permanently removed.
+                </p>
+
+                <div className="mt-6 grid grid-cols-1 gap-3">
+                  <Button
+          className="h-11 bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white hover:opacity-90"
+          onClick={() => { window.location.href = '/'; }}
+                  >
+          Go Home
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="h-11 text-gray-600 hover:text-gray-800"
+          onClick={() => { setShowDeleteSuccess(false); window.location.href = '/'; }}
+                  >
+                    Close
+                  </Button>
+                </div>
+
+        <div className="mt-4 text-xs text-gray-400">You’ll be redirected home.</div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

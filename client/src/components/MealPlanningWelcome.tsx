@@ -48,36 +48,36 @@ export default function MealPlanningWelcome({ userPreferences }: MealPlanningWel
   const smartFeatures = [
     {
       icon: <Target className="w-5 h-5" />,
-      title: "Spersonalizowane cele",
-      description: "Na podstawie Twoich danych z onboardingu"
+      title: "Personalized goals",
+      description: "Based on your onboarding data"
     },
     {
       icon: <Globe className="w-5 h-5" />,
-      title: "Ulubione kuchnie", 
-      description: "Wybierz swoje preferowane style kulinarne"
+      title: "Favorite cuisines", 
+      description: "Choose your preferred culinary styles"
     },
     {
       icon: <ChefHat className="w-5 h-5" />,
-      title: "Poziom gotowania",
-      description: "Przepisy dopasowane do Twoich umiejętności"
+      title: "Cooking level",
+      description: "Recipes matched to your skills"
     },
     {
       icon: <Clock className="w-5 h-5" />,
-      title: "Czas przygotowania",
-      description: "Posiłki pasujące do Twojego stylu życia"
+      title: "Prep time",
+      description: "Meals that fit your lifestyle"
     }
   ];
 
   const basicFeatures = [
     {
       icon: <Apple className="w-5 h-5" />,
-      title: "Podstawowe preferencje",
-      description: "Typ diety, kalorie, alergie"
+      title: "Basic preferences",
+      description: "Diet type, calories, allergies"
     },
     {
       icon: <CalendarDays className="w-5 h-5" />,
-      title: "Szybkie generowanie",
-      description: "Plan na tydzień w kilka minut"
+      title: "Quick generation",
+      description: "A weekly plan in minutes"
     }
   ];
 
@@ -88,16 +88,16 @@ export default function MealPlanningWelcome({ userPreferences }: MealPlanningWel
       </div>
       <div>
         <h3 className="text-xl font-semibold text-[#0CC5BA] mb-2">
-          Brak planu posiłków
+          No meal plan yet
         </h3>
         <p className="text-gray-600 max-w-xs mx-auto mb-6">
-          Utwórz swój pierwszy plan posiłków, aby otrzymać spersonalizowane sugestie posiłków dostosowane do Twoich celów żywieniowych.
+          Create your first meal plan to get personalized meal suggestions aligned with your nutrition goals.
         </p>
         <Button 
           onClick={() => setLocation('/meal-planning-quiz')}
           className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white font-medium hover:from-blue-500 hover:to-[#0CC5BA] shadow-md px-6 py-2 rounded-lg"
         >
-          Utwórz plan posiłków
+          Create meal plan
         </Button>
       </div>
     </div>

@@ -10,6 +10,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { useProgressPhotos } from "@/hooks/use-progress-photos";
 import { useBodyAnalysis } from "@/hooks/use-body-analysis";
+import { useWeightLogs } from "@/hooks/use-weight-logs";
+import { ProgressOverview } from "@/components/progress/ProgressOverview";
+import { WeightTrendChart } from "@/components/progress/WeightTrendChart";
+import { SourcesDisclaimer } from "@/components/progress/SourcesDisclaimer";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import SimpleCameraCapture from "@/components/SimpleCameraCapture";
 
@@ -29,6 +33,7 @@ export default function UnifiedProgress() {
   const { user } = useUser();
   const { photos, isLoading: photosLoading, uploadPhoto, updatePhotoType, deletePhoto } = useProgressPhotos();
   const { analyzeBody, updateProfileWithBodyFat, isLoading: isAnalysisLoading } = useBodyAnalysis();
+  const { weightLogs, isLoading: isWeightLogsLoading } = useWeightLogs();
   const { data: userProfile, refetch: refetchUserProfile } = useUserProfile();
 
   // States
@@ -300,7 +305,7 @@ export default function UnifiedProgress() {
                   <Activity className="h-5 w-5 text-[#0CC5BA]" />
                 </div>
                 <h1 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">
-                  Postępy
+                  Progress
                 </h1>
               </div>
               
@@ -333,7 +338,26 @@ export default function UnifiedProgress() {
           </div>
         </motion.header>
 
-        <div className="mt-6 space-y-6 pb-24">
+        <div className="mt-6 space-y-6 pb-32">
+        {/* Overview + Trend */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="space-y-4"
+        >
+          <ProgressOverview
+            currentWeight={userProfile?.currentWeight ? parseFloat(userProfile.currentWeight as any) : undefined}
+            goalWeight={userProfile?.goalWeight ? parseFloat(userProfile.goalWeight as any) : undefined}
+            startWeight={weightLogs.length ? weightLogs[weightLogs.length - 1].weight : undefined}
+            bodyFatPercentage={userProfile?.bodyFatPercentage ? parseFloat(String(userProfile.bodyFatPercentage)) : undefined}
+          />
+          <WeightTrendChart
+            weightLogs={weightLogs}
+            goalWeight={userProfile?.goalWeight ? parseFloat(userProfile.goalWeight as any) : undefined}
+            loading={isWeightLogsLoading}
+          />
+        </motion.div>
         {/* Progress Photos Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -355,8 +379,8 @@ export default function UnifiedProgress() {
                   <Camera className="w-7 h-7 text-white" />
                 </motion.div>
                 <div>
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-600 bg-clip-text text-transparent">Zdjęcia Postępów</h3>
-                  <p className="text-sm text-gray-600 font-medium">Wizualne śledzenie Twojej podróży</p>
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-600 bg-clip-text text-transparent">Progress Photos</h3>
+                  <p className="text-sm text-gray-600 font-medium">Visual tracking of your journey</p>
                 </div>
               </div>
 
@@ -385,7 +409,7 @@ export default function UnifiedProgress() {
                         >
                           <Loader2 className="w-8 h-8 text-white" />
                         </motion.div>
-                        <div className="text-white text-xs font-medium">Przesyłanie...</div>
+                        <div className="text-white text-xs font-medium">Uploading...</div>
                       </div>
                     </div>
                     {/* Animated upload particles */}
@@ -457,13 +481,13 @@ export default function UnifiedProgress() {
                 >
                   <Camera className="w-8 h-8 text-white" />
                 </motion.div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">Brak Zdjęć</h4>
-                <p className="text-sm text-gray-600 mb-4 max-w-xs mx-auto">Dodaj pierwsze zdjęcie, aby rozpocząć śledzenie postępów</p>
+                <h4 className="text-lg font-bold text-gray-900 mb-2">No Photos</h4>
+                <p className="text-sm text-gray-600 mb-4 max-w-xs mx-auto">Add your first photo to start tracking progress</p>
                 
                 {/* Motivational badges */}
                 <div className="flex flex-wrap justify-center gap-2">
-                  <span className="px-3 py-1 bg-[#0CC5BA]/10 text-[#0CC5BA] rounded-full text-xs font-medium">Śledź Postępy</span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Bądź Zmotywowany</span>
+                  <span className="px-3 py-1 bg-[#0CC5BA]/10 text-[#0CC5BA] rounded-full text-xs font-medium">Track Progress</span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Stay Motivated</span>
                 </div>
               </div>
             )}
@@ -534,7 +558,7 @@ export default function UnifiedProgress() {
                           animate={{ opacity: [1, 0.7, 1] }}
                           transition={{ duration: 1.5, repeat: Infinity }}
                         >
-                          Przesyłanie...
+                          Uploading...
                         </motion.span>
                       </>
                     ) : (
@@ -545,7 +569,7 @@ export default function UnifiedProgress() {
                         >
                           <Upload className="w-5 h-5 mr-2" />
                         </motion.div>
-                        Wgraj Zdjęcie
+                        Upload Photo
                       </>
                     )}
                   </div>
@@ -556,7 +580,7 @@ export default function UnifiedProgress() {
           </Card>
         </motion.div>
 
-        {/* Body Fat Analysis Section */}
+  {/* Body Fat Analysis Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -577,8 +601,8 @@ export default function UnifiedProgress() {
                   <Activity className="w-7 h-7 text-white" />
                 </motion.div>
                 <div>
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">Analiza Ciała</h3>
-                  <p className="text-sm text-gray-600 font-medium">Analiza składu ciała oparta na AI</p>
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">Body Analysis</h3>
+                  <p className="text-sm text-gray-600 font-medium">AI-powered body composition analysis</p>
                 </div>
               </div>
 
@@ -590,13 +614,13 @@ export default function UnifiedProgress() {
                     <div className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">
                       {userProfile.bodyFatPercentage}%
                     </div>
-                    <div className="text-xs font-medium text-gray-600 mt-1">Tkanka Tłuszczowa</div>
+                    <div className="text-xs font-medium text-gray-600 mt-1">Body Fat</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-gray-900">
                       {userProfile.bodyType || 'Nieznany'}
                     </div>
-                    <div className="text-xs font-medium text-gray-600 mt-1">Typ Ciała</div>
+                    <div className="text-xs font-medium text-gray-600 mt-1">Body Type</div>
                   </div>
                 </div>
               </div>
@@ -614,7 +638,7 @@ export default function UnifiedProgress() {
               >
                 {(isAnalysisLoading || isMarkingPhoto) && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
                 <Percent className="w-5 h-5 mr-2" />
-                {isAnalysisLoading ? 'Analizowanie...' : isMarkingPhoto ? 'Przygotowywanie...' : 'Analizuj Skład Ciała'}
+                {isAnalysisLoading ? 'Analyzing...' : isMarkingPhoto ? 'Preparing...' : 'Analyze Body Composition'}
               </Button>
             </motion.div>
 
@@ -628,13 +652,22 @@ export default function UnifiedProgress() {
                   >
                     <Info className="w-5 h-5 text-white" />
                   </motion.div>
-                  <span className="font-semibold text-amber-800 text-base">Wymagane Zdjęcie</span>
+                  <span className="font-semibold text-amber-800 text-base">Photo Required</span>
                 </div>
-                <span className="text-amber-700 font-medium">Dodaj zdjęcie postępu, aby włączyć analizę ciała</span>
+                  <span className="text-amber-700 font-medium">Add a progress photo to enable body analysis</span>
               </div>
             )}
             </div>
           </Card>
+        </motion.div>
+
+        {/* Sources & Disclaimer */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <SourcesDisclaimer />
         </motion.div>
         </div>
       </div>
@@ -712,7 +745,7 @@ export default function UnifiedProgress() {
             
             <div className="text-center p-4 pb-2">
               <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">
-                Wyniki Analizy Ciała
+                Body Analysis Results
               </h2>
             </div>
             
@@ -726,8 +759,8 @@ export default function UnifiedProgress() {
                   <div className="text-lg font-bold text-gray-900 mb-2">
                     {bodyFatAnalysis.bodyType}
                   </div>
-                  <div className="text-xs font-medium text-gray-600 bg-white/60 rounded-full px-3 py-1 inline-block">
-                    Pewność: {Math.round(bodyFatAnalysis.confidence)}%
+                    <div className="text-xs font-medium text-gray-600 bg-white/60 rounded-full px-3 py-1 inline-block">
+                    Confidence: {Math.round(bodyFatAnalysis.confidence)}%
                   </div>
                 </div>
                 
@@ -739,7 +772,7 @@ export default function UnifiedProgress() {
                         <span className="text-white text-xs font-bold">M</span>
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs font-medium text-gray-600">Masa Mięśniowa</div>
+                        <div className="text-xs font-medium text-gray-600">Muscle Mass</div>
                         <div className="text-sm font-bold text-gray-900 truncate">{bodyFatAnalysis.muscleMass}</div>
                       </div>
                     </div>
@@ -751,7 +784,7 @@ export default function UnifiedProgress() {
                   <div className="bg-gradient-to-br from-amber-50/90 to-orange-100/40 rounded-xl p-4 border border-amber-100">
                     <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm">
                       <span className="text-amber-600 font-bold">!</span>
-                      Rekomendacje
+                      Recommendations
                     </h4>
                     <ul className="space-y-2">
                       {bodyFatAnalysis.improvementSuggestions.map((suggestion, index) => (
@@ -769,7 +802,7 @@ export default function UnifiedProgress() {
                   onClick={() => setShowBodyFatDialog(false)}
                   className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-[#0CC5BA] hover:from-blue-600 hover:via-blue-700 hover:to-[#0BB5AA] text-white rounded-xl py-3 font-semibold text-sm shadow-xl shadow-blue-500/25 hover:shadow-2xl transition-all duration-500 border-0"
                 >
-                  Rozumiem!
+                  Got it!
                 </Button>
               </div>
             ) : (

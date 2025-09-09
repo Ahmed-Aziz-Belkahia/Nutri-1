@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,7 +48,7 @@ const initialFormData: OnboardingData = {
   customGoal: '',
   gender: '',
   age: 0,
-  height: 0,
+  height: 170,
   weight: 0,
   goalWeight: 0,
   weightGoal: '',
@@ -105,6 +105,19 @@ export default function OnboardingQuiz() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Refs for scrollable pickers
+  const heightScrollRef = useRef<HTMLDivElement | null>(null);
+  const weightScrollRef = useRef<HTMLDivElement | null>(null);
+  const goalWeightScrollRef = useRef<HTMLDivElement | null>(null);
+  
+  // Calibration constants and refs (use refs so changes reflect without remount)
+  const WEIGHT_CAL = -10;
+  const GOAL_WEIGHT_CAL = -10;
+  const weightCALRef = useRef<number>(WEIGHT_CAL);
+  const goalWeightCALRef = useRef<number>(GOAL_WEIGHT_CAL);
+  weightCALRef.current = WEIGHT_CAL;
+  goalWeightCALRef.current = GOAL_WEIGHT_CAL;
   
   // Simple translation function for English
   const t = (key: string) => {
@@ -643,71 +656,73 @@ export default function OnboardingQuiz() {
                           <div 
                             className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-white/20 border border-white/30 p-4"
                             ref={(scrollContainer) => {
-                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                              if (!scrollContainer) return;
+                              heightScrollRef.current = scrollContainer;
+                              if (!scrollContainer.dataset.initialized) {
                                 scrollContainer.dataset.initialized = 'true';
-                                
-                                // Initial scroll position
-                                const targetHeight = formData.height || 170;
-                                const scrollPosition = (targetHeight - 100) * 10;
-                                setTimeout(() => {
+                                const pixelsPerCm = 10;
+                                const CAL = -4; // calibration in px to align center tick with displayed value
+
+                                // Initial scroll position: with 50% left padding, center aligns at scrollLeft distance
+                                const init = () => {
+                                  const targetHeight = formData.height || 170;
+                                  const scrollPosition = (targetHeight - 100) * pixelsPerCm - CAL;
                                   scrollContainer.scrollLeft = scrollPosition;
-                                }, 0);
-                                
+                                };
+                                // Delay to ensure layout is measured
+                                setTimeout(init, 0);
+
                                 // Variables for drag functionality
                                 let isDown = false;
                                 let startX = 0;
-                                let scrollLeft = 0;
-                                
+                                let startScrollLeft = 0;
+
                                 // Mouse events
                                 scrollContainer.addEventListener('mousedown', (e) => {
                                   isDown = true;
                                   scrollContainer.style.cursor = 'grabbing';
                                   startX = e.pageX - scrollContainer.offsetLeft;
-                                  scrollLeft = scrollContainer.scrollLeft;
+                                  startScrollLeft = scrollContainer.scrollLeft;
                                   e.preventDefault();
                                 });
-                                
+
                                 scrollContainer.addEventListener('mouseleave', () => {
                                   isDown = false;
                                   scrollContainer.style.cursor = 'grab';
                                 });
-                                
+
                                 scrollContainer.addEventListener('mouseup', () => {
                                   isDown = false;
                                   scrollContainer.style.cursor = 'grab';
                                 });
-                                
+
                                 scrollContainer.addEventListener('mousemove', (e) => {
                                   if (!isDown) return;
                                   e.preventDefault();
                                   const x = e.pageX - scrollContainer.offsetLeft;
                                   const walk = (x - startX) * 1.5; // Scroll speed multiplier
-                                  scrollContainer.scrollLeft = scrollLeft - walk;
+                                  scrollContainer.scrollLeft = startScrollLeft - walk;
                                 });
-                                
+
                                 // Touch events for mobile
                                 let touchStartX = 0;
                                 let touchScrollLeft = 0;
-                                
+
                                 scrollContainer.addEventListener('touchstart', (e) => {
                                   touchStartX = e.touches[0].pageX - scrollContainer.offsetLeft;
                                   touchScrollLeft = scrollContainer.scrollLeft;
                                 });
-                                
+
                                 scrollContainer.addEventListener('touchmove', (e) => {
                                   const x = e.touches[0].pageX - scrollContainer.offsetLeft;
                                   const walk = (x - touchStartX) * 1.5;
                                   scrollContainer.scrollLeft = touchScrollLeft - walk;
                                 });
-                                
-                                // Scroll event listener for height updates
+
+                                // Scroll event listener for height updates (computed from scrollLeft only)
                                 scrollContainer.addEventListener('scroll', () => {
                                   const scrollLeft = scrollContainer.scrollLeft;
-                                  const pixelsPerCm = 10;
-                                  const containerWidth = scrollContainer.clientWidth;
-                                  const centerOffset = containerWidth / 2;
-                                  const adjustedScrollLeft = scrollLeft + centerOffset - (1500); // 1500px is half of total width (3000px)
-                                  const height = Math.round(100 + adjustedScrollLeft / pixelsPerCm);
+                                  const height = Math.round(100 + (scrollLeft + CAL) / pixelsPerCm);
                                   const clampedHeight = Math.max(100, Math.min(250, height));
                                   setFormData(prev => ({ ...prev, height: clampedHeight }));
                                 });
@@ -717,7 +732,7 @@ export default function OnboardingQuiz() {
                           >
                             <div 
                               className="flex items-end h-16 select-none"
-                              style={{ width: '3000px', paddingLeft: '50%', paddingRight: '50%' }}
+                              style={{ width: '1510px', paddingLeft: '50%', paddingRight: '50%' }}
                             >
                               {/* Generate ruler marks */}
                               {Array.from({ length: 151 }, (_, i) => i + 100).map((cm) => (
@@ -758,14 +773,15 @@ export default function OnboardingQuiz() {
                               key={height}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => {
+                onClick={() => {
                                 setFormData(prev => ({ ...prev, height }));
-                                // Scroll to selected height
-                                const ruler = document.querySelector('[style*="width: 3000px"]') as HTMLElement;
-                                if (ruler && ruler.parentElement) {
+                                // Scroll to selected height aligning center
+                                const scroller = heightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerCm = 10;
-                                  const scrollPosition = (height - 100) * pixelsPerCm - ruler.parentElement.clientWidth / 2;
-                                  ruler.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                  const CAL = -4;
+                                  const scrollPosition = (height - 100) * pixelsPerCm - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
                               className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
@@ -790,12 +806,13 @@ export default function OnboardingQuiz() {
                               const height = value ? parseInt(value, 10) : 0;
                               if (height >= 100 && height <= 250) {
                                 setFormData(prev => ({ ...prev, height }));
-                                // Scroll to entered height
-                                const ruler = document.querySelector('[style*="width: 3000px"]') as HTMLElement;
-                                if (ruler && ruler.parentElement) {
+                                // Scroll to entered height aligning center
+                                const scroller = heightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerCm = 10;
-                                  const scrollPosition = (height - 100) * pixelsPerCm - ruler.parentElement.clientWidth / 2;
-                                  ruler.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                  const CAL = -4;
+                                  const scrollPosition = (height - 100) * pixelsPerCm - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }
                             }}
@@ -848,12 +865,15 @@ export default function OnboardingQuiz() {
                           <div 
                             className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-gradient-to-b from-white/20 to-white/10 border border-white/30 p-4"
                             ref={(scrollContainer) => {
-                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                              if (!scrollContainer) return;
+                              weightScrollRef.current = scrollContainer;
+                              if (!scrollContainer.dataset.initialized) {
                                 scrollContainer.dataset.initialized = 'true';
-                                
+                                const CAL = weightCALRef.current; // calibration in px
+
                                 // Initial scroll position
                                 const targetWeight = formData.weight || 70;
-                                const scrollPosition = (targetWeight - 30) * 20; // 20px per kg
+                                const scrollPosition = (targetWeight - 30) * 20 - CAL; // 20px per kg
                                 setTimeout(() => {
                                   scrollContainer.scrollLeft = scrollPosition;
                                 }, 0);
@@ -909,7 +929,7 @@ export default function OnboardingQuiz() {
                                 scrollContainer.addEventListener('scroll', () => {
                                   const scrollLeft = scrollContainer.scrollLeft;
                                   const pixelsPerKg = 20;
-                                  const weight = Math.round(30 + scrollLeft / pixelsPerKg);
+                                  const weight = Math.round(30 + (scrollLeft + weightCALRef.current) / pixelsPerKg);
                                   const clampedWeight = Math.max(30, Math.min(200, weight));
                                   setFormData(prev => ({ ...prev, weight: clampedWeight }));
                                 });
@@ -963,11 +983,12 @@ export default function OnboardingQuiz() {
                               onClick={() => {
                                 setFormData(prev => ({ ...prev, weight }));
                                 // Scroll to selected weight
-                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
-                                if (scale && scale.parentElement) {
+                                const scroller = weightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerKg = 20;
-                                  const scrollPosition = (weight - 30) * pixelsPerKg;
-                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                  const CAL = weightCALRef.current;
+                                  const scrollPosition = (weight - 30) * pixelsPerKg - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
                               className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
@@ -993,11 +1014,12 @@ export default function OnboardingQuiz() {
                               if (weight >= 30 && weight <= 200) {
                                 setFormData(prev => ({ ...prev, weight }));
                                 // Scroll to entered weight
-                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
-                                if (scale && scale.parentElement) {
+                                const scroller = weightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerKg = 20;
-                                  const scrollPosition = (weight - 30) * pixelsPerKg;
-                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                  const CAL = weightCALRef.current;
+                                  const scrollPosition = (weight - 30) * pixelsPerKg - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }
                             }}
@@ -1053,12 +1075,15 @@ export default function OnboardingQuiz() {
                           <div 
                             className="relative overflow-x-auto no-scrollbar rounded-xl backdrop-blur-sm bg-gradient-to-b from-white/20 to-white/10 border border-white/30 p-4"
                             ref={(scrollContainer) => {
-                              if (scrollContainer && !scrollContainer.dataset.initialized) {
+                              if (!scrollContainer) return;
+                              goalWeightScrollRef.current = scrollContainer;
+                              if (!scrollContainer.dataset.initialized) {
                                 scrollContainer.dataset.initialized = 'true';
-                                
+                                const CAL = goalWeightCALRef.current;
+
                                 // Initial scroll position
                                 const targetGoalWeight = formData.goalWeight || 65;
-                                const scrollPosition = (targetGoalWeight - 30) * 20; // 20px per kg
+                                const scrollPosition = (targetGoalWeight - 30) * 20 - CAL; // 20px per kg
                                 setTimeout(() => {
                                   scrollContainer.scrollLeft = scrollPosition;
                                 }, 0);
@@ -1114,7 +1139,7 @@ export default function OnboardingQuiz() {
                                 scrollContainer.addEventListener('scroll', () => {
                                   const scrollLeft = scrollContainer.scrollLeft;
                                   const pixelsPerKg = 20;
-                                  const goalWeight = Math.round(30 + scrollLeft / pixelsPerKg);
+                                  const goalWeight = Math.round(30 + (scrollLeft + goalWeightCALRef.current) / pixelsPerKg);
                                   const clampedGoalWeight = Math.max(30, Math.min(200, goalWeight));
                                   setFormData(prev => ({ ...prev, goalWeight: clampedGoalWeight }));
                                 });
@@ -1168,11 +1193,12 @@ export default function OnboardingQuiz() {
                               onClick={() => {
                                 setFormData(prev => ({ ...prev, goalWeight }));
                                 // Scroll to selected goal weight
-                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
-                                if (scale && scale.parentElement) {
+                                const scroller = goalWeightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerKg = 20;
-                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg;
-                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                  const CAL = goalWeightCALRef.current;
+                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
                               className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
@@ -1198,11 +1224,12 @@ export default function OnboardingQuiz() {
                               if (goalWeight >= 30 && goalWeight <= 200) {
                                 setFormData(prev => ({ ...prev, goalWeight }));
                                 // Scroll to entered goal weight
-                                const scale = document.querySelector('[style*="width: 3400px"]') as HTMLElement;
-                                if (scale && scale.parentElement) {
+                                const scroller = goalWeightScrollRef.current;
+                                if (scroller) {
                                   const pixelsPerKg = 20;
-                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg;
-                                  scale.parentElement.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                                  const CAL = goalWeightCALRef.current;
+                                  const scrollPosition = (goalWeight - 30) * pixelsPerKg - CAL;
+                                  scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }
                             }}

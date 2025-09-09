@@ -803,37 +803,42 @@ export default function Recipes() {
                     <CalendarDays className="w-6 h-6 mr-2 text-[#0CC5BA]" />
                     {t('mealPlan.selectDate', 'Select Date')}
                   </h2>
-                  <div className="flex overflow-x-auto pb-2 gap-2">
-                    {calendarDates.map((date, index) => {
-                      const isSelected = 
-                        selectedDate && 
-                        date.getDate() === selectedDate.getDate() && 
-                        date.getMonth() === selectedDate.getMonth();
-                      
-                      const dateStr = format(date, 'yyyy-MM-dd');
-                      const hasPlan = allMealPlansData?.plans?.some(p => p.date === dateStr);
-                      
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => handleDateSelect(date)}
-                          className={`flex flex-col items-center justify-center p-2 min-w-[60px] rounded-xl transition-all ${
-                            isSelected
-                              ? 'bg-emerald-500 text-white'
-                              : hasPlan
-                              ? 'bg-emerald-100 text-emerald-700'
-                              : 'bg-white/40 text-gray-700 border border-white/30 hover:bg-white/60'
-                          }`}
-                        >
-                          <span className="text-xs font-medium">
-                            {format(date, 'EEE')}
-                          </span>
-                          <span className={`text-lg font-bold ${isSelected ? 'text-white' : 'text-gray-900'}`}>
-                            {format(date, 'd')}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  <div className="relative">
+                    <div className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white/80 to-transparent rounded-l-xl" />
+                    <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white/80 to-transparent rounded-r-xl" />
+                    <div className="flex overflow-x-auto gap-2 pb-2 px-1 no-scrollbar scroll-smooth">
+                      {calendarDates.map((date, index) => {
+                        const isSelected = 
+                          selectedDate && 
+                          date.getDate() === selectedDate.getDate() && 
+                          date.getMonth() === selectedDate.getMonth();
+                        const dateStr = format(date, 'yyyy-MM-dd');
+                        const hasPlan = allMealPlansData?.plans?.some(p => p.date === dateStr);
+                        const isToday = new Date().toDateString() === date.toDateString();
+                        return (
+                          <button
+                            key={index}
+                            onClick={() => handleDateSelect(date)}
+                            className={`flex flex-col items-center justify-center py-2 px-1 min-w-[56px] h-14 rounded-xl transition-all border select-none leading-tight
+                              ${isSelected
+                                ? 'bg-emerald-500 text-white shadow-md border-emerald-500'
+                                : isToday
+                                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100/70 hover:border-emerald-300'
+                                  : hasPlan
+                                    ? 'bg-emerald-100 border-emerald-200 text-emerald-700 hover:bg-emerald-100/80'
+                                    : 'bg-white/80 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                              }`}
+                          >
+                            <span className={`text-[10px] font-medium mb-0.5 ${isSelected ? 'text-white' : isToday ? 'text-emerald-600' : 'text-gray-500'}`}>
+                              {format(date, 'EEE')}
+                            </span>
+                            <span className={`text-base font-semibold ${isSelected ? 'text-white' : isToday ? 'text-emerald-600' : 'text-gray-800'}`}>
+                              {format(date, 'd')}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 

@@ -14,10 +14,12 @@ import {
   badges,
   userBadges,
   recipeLikes,
+  recipeComments,
   mealPlans,
   recipesInMealPlan,
   shoppingListItems,
-  userDietaryPreferences
+  userDietaryPreferences,
+  passwordResetTokens
 } from "@db/schema";
 import { eq, desc, and, sql, inArray, gte, lte, or, asc, count, sum, avg, between, isNull, isNotNull } from "drizzle-orm";
 
@@ -5547,61 +5549,89 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
 
-  // Delete user account
+  // Delete user account with full dependency cleanup
   app.delete("/api/user/account", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const userId = req.user.id;
+    console.log(`[Account Deletion] Initiating deletion for user ${userId}`);
+
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
+      await db.transaction(async (tx) => {
+        // 1. Collect meal plan IDs (needed for junction & shopping items cleanup)
+        const mealPlanIds = await tx
+          .select({ id: mealPlans.id })
+          .from(mealPlans)
+          .where(eq(mealPlans.userId, userId));
+        const mealPlanIdValues = mealPlanIds.map(mp => mp.id);
 
-      const userId = req.user.id;
-      console.log(`Starting account deletion for user ${userId}`);
+        // 1b. Collect recipe IDs owned by the user (needed for likes/comments cleanup and junctions)
+        const ownedRecipes = await tx
+          .select({ id: recipes.id })
+          .from(recipes)
+          .where(eq(recipes.userId, userId));
+        const ownedRecipeIds = ownedRecipes.map(r => r.id);
 
-      // Delete all user-related data in the correct order (foreign key constraints)
-      
-      // Delete user's food logs
-      await db.delete(foodLogs).where(eq(foodLogs.userId, userId));
-      console.log(`Deleted food logs for user ${userId}`);
-      
-      // Delete user's recipes  
-      await db.delete(recipes).where(eq(recipes.userId, userId));
-      console.log(`Deleted recipes for user ${userId}`);
-      
-      // Delete user's nutrition preferences
-      await db.delete(userNutritionPreferences).where(eq(userNutritionPreferences.userId, userId));
-      console.log(`Deleted nutrition preferences for user ${userId}`);
-      
-      // Delete user's progress photos
-      await db.delete(progressPhotos).where(eq(progressPhotos.userId, userId));
-      console.log(`Deleted progress photos for user ${userId}`);
-      
-      // Delete user's weight logs
-      await db.delete(weightLogs).where(eq(weightLogs.userId, userId));
-      console.log(`Deleted weight logs for user ${userId}`);
-
-      // Delete user's meal plans if they exist
-      try {
-        await db.delete(mealPlans).where(eq(mealPlans.userId, userId));
-        console.log(`Deleted meal plans for user ${userId}`);
-      } catch (error) {
-        console.log(`No meal plans to delete for user ${userId}`);
-      }
-
-      // Finally delete the user account
-      await db.delete(users).where(eq(users.id, userId));
-      console.log(`Deleted user account ${userId}`);
-
-      // Logout the user after account deletion
-      req.logout((err) => {
-        if (err) {
-          console.error('Error during logout after account deletion:', err);
+        // 2. Delete junction & dependent records NOT directly keyed by user first
+        if (mealPlanIdValues.length > 0) {
+          await tx.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.mealPlanId, mealPlanIdValues));
+          console.log(`[Account Deletion] Deleted recipesInMealPlan for meal plans: ${mealPlanIdValues.join(',')}`);
         }
+
+        // Also delete any meal plan recipe entries that reference the user's recipes
+        if (ownedRecipeIds.length > 0) {
+          await tx.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.recipeId, ownedRecipeIds));
+        }
+
+        // 3. Delete records referencing recipes & user BEFORE deleting recipes
+        await tx.delete(recipeLikes).where(eq(recipeLikes.userId, userId));
+        await tx.delete(recipeComments).where(eq(recipeComments.userId, userId));
+        // Delete likes/comments pointing to the user's recipes (from other users)
+        if (ownedRecipeIds.length > 0) {
+          await tx.delete(recipeLikes).where(inArray(recipeLikes.recipeId, ownedRecipeIds));
+          await tx.delete(recipeComments).where(inArray(recipeComments.recipeId, ownedRecipeIds));
+        }
+        console.log('[Account Deletion] Deleted recipe likes & comments');
+
+        // 4. Delete shopping list items (may reference meal plans)
+        await tx.delete(shoppingListItems).where(eq(shoppingListItems.userId, userId));
+        console.log('[Account Deletion] Deleted shopping list items');
+
+        // 5. Delete meal plans
+        await tx.delete(mealPlans).where(eq(mealPlans.userId, userId));
+        console.log('[Account Deletion] Deleted meal plans');
+
+        // 6. Delete other user-linked data
+        await tx.delete(foodLogs).where(eq(foodLogs.userId, userId));
+        await tx.delete(weightLogs).where(eq(weightLogs.userId, userId));
+        await tx.delete(progressPhotos).where(eq(progressPhotos.userId, userId));
+        await tx.delete(userNutritionPreferences).where(eq(userNutritionPreferences.userId, userId));
+        await tx.delete(userDietaryPreferences).where(eq(userDietaryPreferences.userId, userId));
+        await tx.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
+        console.log('[Account Deletion] Deleted logs, photos, nutrition & dietary prefs, reset tokens');
+
+        // 7. Delete user's own recipes (after likes/comments removed)
+        await tx.delete(recipes).where(eq(recipes.userId, userId));
+        console.log('[Account Deletion] Deleted user recipes');
+
+        // TODO (optional): notifications, badges, userBadges if schema adds user FK later
+
+        // 8. Finally delete the user
+        await tx.delete(users).where(eq(users.id, userId));
+        console.log('[Account Deletion] Deleted user row');
       });
 
-      res.json({ success: true, message: "Account deleted successfully" });
+      // Logout after successful transaction
+      req.logout(err => {
+        if (err) console.error('[Account Deletion] Logout error:', err);
+      });
+
+      res.json({ success: true, message: 'Account deleted successfully' });
     } catch (error) {
-      console.error('Error deleting user account:', error);
-      res.status(500).json({ 
+      console.error('[Account Deletion] Error:', error);
+      res.status(500).json({
         error: 'Failed to delete account',
         message: error instanceof Error ? error.message : 'Unknown error'
       });

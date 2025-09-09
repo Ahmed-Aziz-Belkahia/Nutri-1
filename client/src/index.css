@@ -32,3 +32,12 @@ body.auth-page {
 body.camera-active {
   overflow: hidden !important;
 }
+
+/* Hide horizontal scrollbar for swipe areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
