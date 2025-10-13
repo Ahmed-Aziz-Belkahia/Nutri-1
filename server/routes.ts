@@ -4251,8 +4251,8 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(foodLogs.userId, req.user.id),
-            sql`${foodLogs.date} >= ${startOfDay.toISOString()}`,
-            sql`${foodLogs.date} < ${endOfDay.toISOString()}`
+            sql`${foodLogs.date} >= ${startOfDay.getTime()}`,
+            sql`${foodLogs.date} < ${endOfDay.getTime()}`
           )
         )
         .orderBy(desc(foodLogs.date));
