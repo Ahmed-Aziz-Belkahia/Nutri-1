@@ -80,19 +80,28 @@ echo "🔄 Step 5: Running database migrations..."
 # Check if migrations need to be run
 TABLE_INFO=$(sqlite3 local.db "PRAGMA table_info(recipes_in_meal_plan);" 2>/dev/null)
 
-if echo "$TABLE_INFO" | grep -q "order"; then
-    echo "✅ Database schema is up to date"
+# Check if we have "order" column (not "order_num")
+HAS_ORDER=$(echo "$TABLE_INFO" | grep -E '\|order\|' | grep -v order_num)
+HAS_ORDER_NUM=$(echo "$TABLE_INFO" | grep -E '\|order_num\|')
+
+if [ -n "$HAS_ORDER" ] && [ -z "$HAS_ORDER_NUM" ]; then
+    echo "✅ Database schema is up to date (order column exists)"
 else
-    echo "Adding missing columns to recipes_in_meal_plan..."
-    
-    # Run add columns migration
-    if node add-meal-plan-columns.js; then
-        echo "✅ Columns added successfully"
+    if [ -n "$HAS_ORDER_NUM" ]; then
+        echo "⚠️  Found order_num column, need to consolidate to order..."
     else
-        echo "⚠️  Migration failed, but continuing..."
+        echo "Adding missing columns to recipes_in_meal_plan..."
+        
+        # Run add columns migration
+        if node add-meal-plan-columns.js; then
+            echo "✅ Columns added successfully"
+        else
+            echo "⚠️  Migration failed, but continuing..."
+        fi
     fi
     
     # Run order column fix
+    echo "Running order column consolidation..."
     if node fix-order-column.js; then
         echo "✅ Order column consolidated"
     else
