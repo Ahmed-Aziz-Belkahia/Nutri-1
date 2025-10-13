@@ -1,9 +1,6 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
-import * as schema from "./db/schema.js";
-import { sql } from "drizzle-orm";
 
-console.log("🔄 Recreating database with Drizzle schema...");
+console.log("🔄 Recreating database with correct SQLite schema...");
 
 const dbPath = "./local.db";
 
@@ -15,9 +12,6 @@ console.log("✓ Created new database");
 sqlite.pragma("journal_mode = WAL");
 sqlite.pragma("busy_timeout = 30000");
 console.log("✓ Configured database settings");
-
-// Initialize Drizzle with schema
-const db = drizzle(sqlite, { schema });
 
 // Create all tables by executing the schema
 console.log("\n📦 Creating tables from TypeScript schema...");
