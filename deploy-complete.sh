@@ -57,17 +57,33 @@ echo "🗄️  Step 4: Setting up database..."
 if [ "$DB_HEALTHY" = false ]; then
     echo "Creating fresh database..."
     
-    # Try multiple methods to create database
-    if npm run db:push 2>/dev/null; then
-        echo "✅ Database created via drizzle push"
-    elif node setup.js 2>/dev/null; then
+    # Try multiple methods to create database, prioritize setup.js as it's most reliable
+    if node setup.js 2>/dev/null; then
         echo "✅ Database created via setup.js"
+    elif npm run db:push 2>/dev/null; then
+        echo "✅ Database created via drizzle push"
+        # Verify tables were created
+        TABLE_COUNT=$(sqlite3 local.db "SELECT count(*) FROM sqlite_master WHERE type='table';" 2>/dev/null)
+        if [ "$TABLE_COUNT" -eq 0 ]; then
+            echo "⚠️  Drizzle push didn't create tables, trying setup.js..."
+            node setup.js 2>/dev/null || echo "❌ Setup.js also failed"
+        fi
     elif node init-sqlite.js 2>/dev/null; then
         echo "✅ Database created via init-sqlite.js"
     else
         echo "❌ Failed to create database automatically"
-        echo "Please run manually: npm run db:push"
+        echo "Please run manually: node setup.js"
         exit 1
+    fi
+    
+    # Verify tables exist after creation
+    TABLE_COUNT=$(sqlite3 local.db "SELECT count(*) FROM sqlite_master WHERE type='table';" 2>/dev/null)
+    if [ "$TABLE_COUNT" -eq 0 ]; then
+        echo "❌ Database created but no tables found!"
+        echo "Please run manually: node setup.js"
+        exit 1
+    else
+        echo "✅ Database contains $TABLE_COUNT tables"
     fi
 else
     echo "✅ Using existing healthy database"
