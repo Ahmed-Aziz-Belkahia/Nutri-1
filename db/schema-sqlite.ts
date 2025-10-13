@@ -59,7 +59,7 @@ export const foodLogs = sqliteTable("food_logs", {
   protein: real("protein").notNull(),
   carbs: real("carbs").notNull(),
   fat: real("fat").notNull(),
-  date: integer("date", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  date: integer("date", { mode: 'timestamp_ms' }).notNull().default(sql`(strftime('%s', 'now') * 1000)`),
   image: text("image"),
   components: text("components", { mode: 'json' }).$type<Array<{
     name: string;
