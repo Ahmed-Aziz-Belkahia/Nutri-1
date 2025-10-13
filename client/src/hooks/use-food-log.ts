@@ -82,9 +82,9 @@ export function useFoodLog(selectedDate: Date = new Date()) {
       return data;
     },
     enabled: !!user,
-    refetchOnMount: false, // Don't refetch every time component mounts
+    refetchOnMount: true, // Refetch to ensure we have latest data
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
-    staleTime: 60000, // Consider data fresh for a full minute
+    staleTime: 10000, // Consider data fresh for 10 seconds (reduced from 60s)
     gcTime: 5 * 60 * 1000 // Cache for 5 minutes
   });
 
@@ -140,11 +140,19 @@ export function useFoodLog(selectedDate: Date = new Date()) {
       const updatedCacheData = queryClient.setQueryData<FoodLogsResponse>(
         ["/api/food-logs", dateString],
         (oldData) => {
+          console.log('[Food Log Hook] Cache BEFORE update:', {
+            hadOldData: !!oldData,
+            oldLogsCount: oldData?.logs?.length || 0,
+            oldLogIds: oldData?.logs?.map(l => l.id) || []
+          });
+          
           const newLogsArray = oldData ? [data.log, ...oldData.logs] : [data.log];
           
-          console.log('[Food Log Hook] Updated cache:', {
+          console.log('[Food Log Hook] Cache AFTER update:', {
             logsCount: newLogsArray.length,
+            logIds: newLogsArray.map(l => l.id),
             totals: data.totals,
+            newLogId: data.log.id,
             newLogComponents: data.log.components
           });
 
