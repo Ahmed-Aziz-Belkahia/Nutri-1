@@ -80,33 +80,51 @@ echo "🔄 Step 5: Running database migrations..."
 # Check if migrations need to be run
 TABLE_INFO=$(sqlite3 local.db "PRAGMA table_info(recipes_in_meal_plan);" 2>/dev/null)
 
-# Check if we have "order" column (not "order_num")
+# Check for all required columns
 HAS_ORDER=$(echo "$TABLE_INFO" | grep -E '\|order\|' | grep -v order_num)
 HAS_ORDER_NUM=$(echo "$TABLE_INFO" | grep -E '\|order_num\|')
+HAS_IS_FROZEN=$(echo "$TABLE_INFO" | grep -E '\|is_frozen\|')
+HAS_IS_COMPLETED=$(echo "$TABLE_INFO" | grep -E '\|is_completed\|')
+HAS_COMPLETED_AT=$(echo "$TABLE_INFO" | grep -E '\|completed_at\|')
+HAS_CREATED_AT=$(echo "$TABLE_INFO" | grep -E '\|created_at\|')
 
-if [ -n "$HAS_ORDER" ] && [ -z "$HAS_ORDER_NUM" ]; then
-    echo "✅ Database schema is up to date (order column exists)"
-else
-    if [ -n "$HAS_ORDER_NUM" ]; then
-        echo "⚠️  Found order_num column, need to consolidate to order..."
+NEEDS_MIGRATION=false
+
+# Check if we need to add columns
+if [ -z "$HAS_IS_FROZEN" ] || [ -z "$HAS_IS_COMPLETED" ] || [ -z "$HAS_COMPLETED_AT" ] || [ -z "$HAS_CREATED_AT" ]; then
+    NEEDS_MIGRATION=true
+    echo "⚠️  Missing some columns (is_frozen, is_completed, completed_at, created_at)"
+fi
+
+# Check if we need to fix order column
+if [ -n "$HAS_ORDER_NUM" ] && [ -z "$HAS_ORDER" ]; then
+    NEEDS_MIGRATION=true
+    echo "⚠️  Found order_num column, need to rename to order"
+elif [ -z "$HAS_ORDER" ] && [ -z "$HAS_ORDER_NUM" ]; then
+    NEEDS_MIGRATION=true
+    echo "⚠️  Missing order column entirely"
+fi
+
+if [ "$NEEDS_MIGRATION" = true ]; then
+    echo "Running migrations to fix schema..."
+    
+    # First, ensure all columns exist (adds order, is_frozen, is_completed, etc.)
+    echo "→ Adding missing columns..."
+    if node add-meal-plan-columns.js; then
+        echo "✅ Column migration completed"
     else
-        echo "Adding missing columns to recipes_in_meal_plan..."
-        
-        # Run add columns migration
-        if node add-meal-plan-columns.js; then
-            echo "✅ Columns added successfully"
-        else
-            echo "⚠️  Migration failed, but continuing..."
-        fi
+        echo "⚠️  Column migration failed, but continuing..."
     fi
     
-    # Run order column fix
-    echo "Running order column consolidation..."
+    # Then, consolidate order_num to order if needed
+    echo "→ Consolidating order column..."
     if node fix-order-column.js; then
         echo "✅ Order column consolidated"
     else
         echo "⚠️  Order column fix failed, but continuing..."
     fi
+else
+    echo "✅ Database schema is up to date (all columns present)"
 fi
 echo ""
 
