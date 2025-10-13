@@ -16,7 +16,7 @@ try {
 
   // Check if columns already exist
   const tableInfo = db.prepare("PRAGMA table_info(recipes_in_meal_plan)").all();
-  const columnNames = tableInfo.map((col: any) => col.name);
+  const columnNames = tableInfo.map((col) => col.name);
   
   console.log('Current columns:', columnNames);
 
