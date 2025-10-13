@@ -195,15 +195,20 @@ export default function SimpleMealPlanningQuiz() {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsGeneratingMealPlan(false);
       
       // Invalidate all meal plan related queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/meal-plans'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/meal-plans/today'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/meal-plans/all'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/recipes'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/shopping-list'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['/api/meal-plans'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/meal-plans/today'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/meal-plans/all'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/recipes'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/shopping-list'] })
+      ]);
+      
+      // Wait a moment for queries to refetch
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       toast({
         title: "Meal plan created!",

@@ -214,19 +214,21 @@ export default function MealPlanningQuiz() {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsGeneratingMealPlan(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
+      ]);
       
       toast({
         title: t("mealPlanningQuiz:success.title", "Success"),
         description: t("mealPlanningQuiz:success.description", "Your preferences have been saved and meal plan has been generated!"),
       });
       
-      setTimeout(() => {
-        setLocation("/meal-plan");
-      }, 100);
+      // Wait for queries to refetch before navigating
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setLocation("/meal-plan");
     },
     onError: (error) => {
       setIsGeneratingMealPlan(false);

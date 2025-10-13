@@ -217,20 +217,21 @@ export default function MealPlanningQuiz() {
         throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setIsGeneratingMealPlan(false);
-      queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
+      ]);
       
       toast({
         title: "Success!",
         description: "Your meal plan has been created!",
       });
       
-      // Navigate without forced refresh - let React Query handle the updates
-      setTimeout(() => {
-        setLocation("/");
-      }, 1000);
+      // Wait for queries to refetch before navigating
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setLocation("/");
     },
     onError: (error) => {
       setIsGeneratingMealPlan(false);

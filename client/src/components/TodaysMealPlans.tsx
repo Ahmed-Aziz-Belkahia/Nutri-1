@@ -86,9 +86,10 @@ export function TodaysMealPlans({ className, selectedDate }: TodaysMealPlansProp
       }
       return data;
     },
-    staleTime: 30000, // 30 seconds to allow smooth updates
+    staleTime: 10000, // 10 seconds - reduced from 30s for faster updates
     refetchInterval: 3000, // Check for new meal plans every 3 seconds
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
+    refetchOnMount: true // Always fetch fresh data when component mounts
   });
 
   const completeMealMutation = useMutation({
