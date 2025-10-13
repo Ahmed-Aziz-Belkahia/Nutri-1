@@ -119,11 +119,53 @@ export default function EnhancedAddFood() {
 
   // Handle manual form submission
   const onManualSubmit = async (data: ManualFoodForm) => {
-    console.log('Submitted food data:', data);
+    console.log('[EnhancedAddFood] Submitting food data:', data);
     
     try {
-      // Here you'd normally send this to your API
-      // For demo, we'll show success and redirect
+      // Prepare the food log data
+      const foodLogData = {
+        name: data.name,
+        calories: parseFloat(data.calories),
+        protein: parseFloat(data.protein),
+        carbs: parseFloat(data.carbs),
+        fat: parseFloat(data.fat),
+        image: capturedImage || null,
+        date: new Date().toISOString(),
+        components: [{
+          name: data.name,
+          calories: parseFloat(data.calories),
+          protein: parseFloat(data.protein),
+          carbs: parseFloat(data.carbs),
+          fat: parseFloat(data.fat),
+          servingSize: `${data.quantity} ${data.unit}`,
+          quantity: parseFloat(data.quantity),
+          details: {
+            type: 'main dish',
+            preparation: 'as served'
+          }
+        }]
+      };
+
+      console.log('[EnhancedAddFood] Sending POST request to /api/food-logs:', foodLogData);
+
+      // Send the food log to the API
+      const response = await fetch('/api/food-logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(foodLogData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save food log');
+      }
+
+      const result = await response.json();
+      console.log('[EnhancedAddFood] Food log saved successfully:', result);
+
       toast({
         title: "Food added successfully",
         description: `Added ${data.name} to your food log`,
@@ -134,11 +176,11 @@ export default function EnhancedAddFood() {
       }, 1000);
       
     } catch (error) {
-      console.error('Error adding food:', error);
+      console.error('[EnhancedAddFood] Error adding food:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add food. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to add food. Please try again.",
       });
     }
   };
