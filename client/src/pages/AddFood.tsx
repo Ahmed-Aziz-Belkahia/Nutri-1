@@ -93,16 +93,42 @@ export default function AddFood() {
       try {
         const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
         if (insecure) return; // Can't request on insecure contexts
+        
+        // First, try to check permission status
         if ('permissions' in navigator && (navigator as any).permissions?.query) {
-          const status = await (navigator as any).permissions.query({ name: 'camera' as any });
-          if (!cancelled && status?.state === 'granted') {
-            setCameraReady(true);
+          try {
+            const status = await (navigator as any).permissions.query({ name: 'camera' as any });
+            if (!cancelled && status?.state === 'granted') {
+              console.log('Camera permission already granted, auto-enabling camera');
+              setCameraReady(true);
+              return; // Permission already granted, no need to continue
+            }
+          } catch (err) {
+            console.log('Permission query not supported, trying direct access');
           }
         }
-      } catch {
+        
+        // If permission query not supported or permission not granted yet,
+        // try to directly access camera (some browsers auto-grant)
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          // Got stream successfully - permission is granted
+          stream.getTracks().forEach(t => t.stop());
+          if (!cancelled) {
+            console.log('Camera access successful, enabling camera');
+            setCameraReady(true);
+          }
+        } catch (err) {
+          console.log('Camera access failed, will show enable button');
+          // Permission not granted or camera unavailable
+          // Show the enable camera overlay
+        }
+      } catch (err) {
+        console.log('Permission check error:', err);
         // Ignore – we'll require a user gesture
       }
     };
+    
     checkPermission();
     return () => {
       cancelled = true;
