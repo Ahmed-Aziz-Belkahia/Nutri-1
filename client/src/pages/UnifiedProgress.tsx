@@ -846,7 +846,7 @@ export default function UnifiedProgress() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
           onClick={() => setShowPhotoDialog(false)}
         >
           <motion.div
@@ -854,7 +854,7 @@ export default function UnifiedProgress() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative max-w-4xl w-full max-h-[90vh] bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+            className="relative max-w-4xl w-full max-h-[90vh] bg-black rounded-3xl overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Image */}
@@ -925,7 +925,7 @@ export default function UnifiedProgress() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           onClick={() => setShowBodyFatDialog(false)}
         >
           <motion.div
@@ -933,11 +933,11 @@ export default function UnifiedProgress() {
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.9, y: 20, opacity: 0 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="bg-gradient-to-br from-white via-blue-50/30 to-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-blue-100/50"
+            className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
-            <div className="sticky top-0 z-10 flex justify-end p-4 bg-gradient-to-b from-white via-white to-transparent">
+            <div className="sticky top-0 z-10 flex justify-end p-4 bg-white">
               <motion.button
                 whileHover={{ scale: 1.1, rotate: 90 }}
                 whileTap={{ scale: 0.9 }}
