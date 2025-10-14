@@ -85,6 +85,7 @@ export default function AddFood() {
   // Gate mounting the Webcam until we've either confirmed permission is already granted
   // or the user explicitly taps Enable Camera. This avoids autoplay overlays on Android/iOS.
   const [cameraReady, setCameraReady] = useState(false);
+  const [checkingPermission, setCheckingPermission] = useState(true);
   const [needsPlayGesture, setNeedsPlayGesture] = useState(false);
   const isSecure = typeof window !== 'undefined' ? window.isSecureContext : true;
   useEffect(() => {
@@ -92,7 +93,10 @@ export default function AddFood() {
     const checkPermission = async () => {
       try {
         const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
-        if (insecure) return; // Can't request on insecure contexts
+        if (insecure) {
+          setCheckingPermission(false);
+          return; // Can't request on insecure contexts
+        }
         
         // First, try to check permission status
         if ('permissions' in navigator && (navigator as any).permissions?.query) {
@@ -101,6 +105,7 @@ export default function AddFood() {
             if (!cancelled && status?.state === 'granted') {
               console.log('Camera permission already granted, auto-enabling camera');
               setCameraReady(true);
+              setCheckingPermission(false);
               return; // Permission already granted, no need to continue
             }
           } catch (err) {
@@ -117,15 +122,21 @@ export default function AddFood() {
           if (!cancelled) {
             console.log('Camera access successful, enabling camera');
             setCameraReady(true);
+            setCheckingPermission(false);
           }
         } catch (err) {
           console.log('Camera access failed, will show enable button');
           // Permission not granted or camera unavailable
           // Show the enable camera overlay
+          if (!cancelled) {
+            setCheckingPermission(false);
+          }
         }
       } catch (err) {
         console.log('Permission check error:', err);
-        // Ignore – we'll require a user gesture
+        if (!cancelled) {
+          setCheckingPermission(false);
+        }
       }
     };
     
@@ -591,7 +602,7 @@ export default function AddFood() {
             </div>
           )}
 
-          {!cameraReady && (
+          {!cameraReady && !checkingPermission && (
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-black/70 backdrop-blur-sm px-6 text-center">
               <div className="text-white">
                 <h2 className="text-2xl font-semibold mb-2">Enable Camera</h2>
@@ -616,6 +627,14 @@ export default function AddFood() {
               >
                 Switch to Manual Entry
               </button>
+            </div>
+          )}
+          
+          {/* Loading state while checking camera permission */}
+          {checkingPermission && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/70 backdrop-blur-sm px-6">
+              <Loader2 className="w-8 h-8 text-white animate-spin" />
+              <p className="text-white/80 text-sm">Checking camera access...</p>
             </div>
           )}
           
