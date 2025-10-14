@@ -45,8 +45,35 @@ export default function UnifiedProgress() {
   const [isMarkingPhoto, setIsMarkingPhoto] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  
+  // Track last analyzed photos to prevent duplicate analyses
+  const [lastAnalyzedPhotos, setLastAnalyzedPhotos] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('lastAnalyzedPhotos');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error('Error loading lastAnalyzedPhotos from localStorage:', error);
+      return [];
+    }
+  });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Listen for storage events (cross-tab updates)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'lastAnalyzedPhotos' && e.newValue) {
+        try {
+          setLastAnalyzedPhotos(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error('Error parsing lastAnalyzedPhotos from storage event:', error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Get photos organized by type
   const latestPhotos = photos?.filter(photo => photo.type === 'latest') || [];
@@ -55,6 +82,20 @@ export default function UnifiedProgress() {
 
   // Get the best photo for body analysis
   const bestPhotoForAnalysis = latestPhotos[0] || progressPhotos[0] || allPhotos[0];
+  
+  // Check if photos have changed since last analysis
+  const currentPhotoUrls = allPhotos.map(p => p.photoUrl).sort();
+  const sortedLastAnalyzed = [...lastAnalyzedPhotos].sort();
+  const photosHaveChanged = 
+    currentPhotoUrls.length !== sortedLastAnalyzed.length ||
+    currentPhotoUrls.some((url, index) => url !== sortedLastAnalyzed[index]);
+
+  console.log('Photo change detection:', {
+    currentPhotoUrls,
+    lastAnalyzedPhotos,
+    photosHaveChanged,
+    hasPhotos: allPhotos.length > 0
+  });
 
   // Handle camera capture
   const handleCameraCapture = async (imageData: string) => {
@@ -246,6 +287,12 @@ export default function UnifiedProgress() {
         await updateProfileWithBodyFat(analysis.bodyFatPercentage, analysis.bodyType);
         refetchUserProfile();
       }
+      
+      // Save current photo URLs to prevent duplicate analysis
+      const photoUrls = allPhotos.map(p => p.photoUrl);
+      setLastAnalyzedPhotos(photoUrls);
+      localStorage.setItem('lastAnalyzedPhotos', JSON.stringify(photoUrls));
+      console.log('Saved analyzed photos to localStorage:', photoUrls);
     } catch (error) {
       console.error('Body analysis failed:', error);
       toast({
@@ -633,7 +680,7 @@ export default function UnifiedProgress() {
             >
               <Button
                 onClick={handleBodyFatAnalysis}
-                disabled={isAnalysisLoading || isMarkingPhoto || !bestPhotoForAnalysis}
+                disabled={isAnalysisLoading || isMarkingPhoto || !bestPhotoForAnalysis || !photosHaveChanged}
                 className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-[#0CC5BA] hover:from-blue-600 hover:via-blue-700 hover:to-[#0BB5AA] text-white rounded-2xl py-4 font-semibold text-base shadow-xl shadow-blue-500/25 hover:shadow-2xl transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed border-0"
               >
                 {(isAnalysisLoading || isMarkingPhoto) && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
@@ -655,6 +702,23 @@ export default function UnifiedProgress() {
                   <span className="font-semibold text-amber-800 text-base">Photo Required</span>
                 </div>
                   <span className="text-amber-700 font-medium">Add a progress photo to enable body analysis</span>
+              </div>
+            )}
+            
+            {/* Warning when photos haven't changed */}
+            {bestPhotoForAnalysis && !photosHaveChanged && (
+              <div className="mt-5 p-5 text-sm text-center bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-purple-50/40 rounded-2xl border-2 border-blue-100/50 shadow-lg backdrop-blur-sm">
+                <div className="flex items-center justify-center mb-3">
+                  <motion.div 
+                    className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center mr-3 shadow-lg"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Info className="w-5 h-5 text-white" />
+                  </motion.div>
+                  <span className="font-semibold text-blue-800 text-base">Already Analyzed</span>
+                </div>
+                  <span className="text-blue-700 font-medium">Upload a new photo to analyze again</span>
               </div>
             )}
             </div>
