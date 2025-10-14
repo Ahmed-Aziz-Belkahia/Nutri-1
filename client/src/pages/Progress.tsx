@@ -188,8 +188,9 @@ export default function ProgressPage() {
   const [location, setLocation] = useLocation();
   const { weightLogs, addWeightLog } = useWeightLogs();
 
-  const { photos, addPhoto, deletePhoto, isLoading: photosLoading, hasUploadedToday, todayPhoto, replacePhoto } = useProgressPhotos();
+  const { photos, addPhoto, deletePhoto, isLoading: photosLoading, hasUploadedToday, todayPhoto, replacePhoto, isAddingPhoto, isReplacingPhoto } = useProgressPhotos();
   const [isDeletingPhoto, setIsDeletingPhoto] = useState(false);
+  const isUploadingPhoto = isAddingPhoto || isReplacingPhoto;
   
   useEffect(() => {
     console.log('Progress photos from hook:', photos);
@@ -463,6 +464,9 @@ export default function ProgressPage() {
           description: "Failed to save photo",
           variant: "destructive",
         });
+      } finally {
+        // Clear the file input to allow uploading the same file again if needed
+        e.target.value = '';
       }
     };
     
@@ -787,19 +791,39 @@ export default function ProgressPage() {
                   
                   <div className="flex gap-2">
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90"
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={handleCameraOpen}
+                      disabled={isUploadingPhoto}
                     >
-                      <Camera className="w-4 h-4 mr-2" />
-                      {hasUploadedToday ? 'Replace Photo' : 'Take Photo'}
+                      {isUploadingPhoto ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-4 h-4 mr-2" />
+                          {hasUploadedToday ? 'Replace Photo' : 'Take Photo'}
+                        </>
+                      )}
                     </Button>
                     <Button 
                       variant="outline"
-                      className="flex-1 border-emerald-500 text-emerald-600 hover:bg-emerald-50"
+                      className="flex-1 border-emerald-500 text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => document.getElementById('photo-upload')?.click()}
+                      disabled={isUploadingPhoto}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {hasUploadedToday ? 'Replace Photo' : 'Upload Photo'}
+                      {isUploadingPhoto ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {hasUploadedToday ? 'Replace Photo' : 'Upload Photo'}
+                        </>
+                      )}
                     </Button>
                     <input
                       id="photo-upload"
@@ -807,6 +831,7 @@ export default function ProgressPage() {
                       accept="image/*"
                       className="hidden"
                       onChange={handlePhotoUpload}
+                      disabled={isUploadingPhoto}
                     />
                   </div>
                   
