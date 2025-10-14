@@ -1034,6 +1034,28 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
+      // Check if user already uploaded a photo today
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const existingTodayPhoto = await db
+        .select()
+        .from(progressPhotos)
+        .where(
+          and(
+            eq(progressPhotos.userId, req.user.id),
+            eq(progressPhotos.photoDate, today)
+          )
+        )
+        .limit(1);
+
+      if (existingTodayPhoto && existingTodayPhoto.length > 0) {
+        console.log('User already uploaded a photo today:', existingTodayPhoto[0].id);
+        return res.status(400).json({ 
+          error: 'Daily limit reached',
+          message: 'You can only upload one photo per day. Please use the replace endpoint to update today\'s photo.',
+          existingPhotoId: existingTodayPhoto[0].id
+        });
+      }
+
       console.log('Received progress photo request:', {
         hasPhoto: !!req.body.photo,
         type: req.body.type,

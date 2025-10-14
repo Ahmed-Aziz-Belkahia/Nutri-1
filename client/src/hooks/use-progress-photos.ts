@@ -48,11 +48,11 @@ export function useProgressPhotos() {
       };
     },
     // Improved caching strategy for better performance
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnWindowFocus: true,  // Refetch when window gains focus to check for new uploads
+    refetchOnMount: true,         // Always refetch on mount to get latest state
     refetchInterval: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000 // 10 minutes - using gcTime instead of deprecated cacheTime
+    staleTime: 1 * 60 * 1000,    // Reduced to 1 minute for more frequent updates
+    gcTime: 10 * 60 * 1000       // 10 minutes - using gcTime instead of deprecated cacheTime
   });
 
   const photos = data?.photos || [];
@@ -105,7 +105,9 @@ export function useProgressPhotos() {
     onSuccess: (data) => {
       console.log('Mutation succeeded, data:', data);
       console.log('Invalidating photos query cache...');
+      // Invalidate and immediately refetch to get updated hasUploadedToday status
       queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
+      queryClient.refetchQueries({ queryKey: ["/api/progress-photos"] });
     },
     onError: (error) => {
       console.error('Mutation error handler:', error);
@@ -196,6 +198,7 @@ export function useProgressPhotos() {
     onSuccess: () => {
       console.log('Photo replacement succeeded');
       queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
+      queryClient.refetchQueries({ queryKey: ["/api/progress-photos"] });
     },
     onError: (error) => {
       console.error('Photo replacement failed:', error);
