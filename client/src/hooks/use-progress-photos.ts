@@ -85,9 +85,35 @@ export function useProgressPhotos() {
         console.log('API response status:', response.status, response.statusText);
 
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Upload error response:', errorText);
-          throw new Error(errorText);
+          const errorData = await response.json();
+          console.log('Upload error response:', errorData);
+          
+          // If we hit the daily limit, automatically use replace instead
+          if (errorData.error === 'Daily limit reached' && errorData.existingPhotoId) {
+            console.log('Daily limit reached, automatically replacing photo:', errorData.existingPhotoId);
+            
+            // Call the replace endpoint instead
+            const replaceResponse = await fetch(`/api/progress-photos/${errorData.existingPhotoId}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                photo: data.photoUrl,
+                type: data.type,
+                caption: data.caption
+              }),
+              credentials: "include"
+            });
+            
+            if (!replaceResponse.ok) {
+              throw new Error(await replaceResponse.text());
+            }
+            
+            return await replaceResponse.json();
+          }
+          
+          throw new Error(JSON.stringify(errorData));
         }
 
         const result = await response.json();
