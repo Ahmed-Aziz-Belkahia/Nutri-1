@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Percent, Info, Camera, ArrowLeft, Loader2, ExternalLink, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,16 +28,37 @@ export default function BodyFatAnalysis() {
     }
   });
   
+  // Update lastAnalyzedPhotos when localStorage changes (e.g., from another tab/component)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem('lastAnalyzedPhotos');
+        if (stored) {
+          setLastAnalyzedPhotos(JSON.parse(stored));
+        }
+      } catch {
+        // Ignore errors
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+  
   // Check if current photos are different from last analyzed
-  const currentPhotoUrls = photos?.map(p => p.photoUrl) || [];
+  const currentPhotoUrls = photos?.map(p => p.photoUrl).sort() || [];
+  const sortedLastAnalyzed = [...lastAnalyzedPhotos].sort();
+  
   const photosHaveChanged = 
-    currentPhotoUrls.length !== lastAnalyzedPhotos.length ||
-    currentPhotoUrls.some(url => !lastAnalyzedPhotos.includes(url));
+    currentPhotoUrls.length !== sortedLastAnalyzed.length ||
+    currentPhotoUrls.some((url, index) => url !== sortedLastAnalyzed[index]);
   
   console.log('Photo change detection:', {
     currentPhotoUrls,
-    lastAnalyzedPhotos,
-    photosHaveChanged
+    sortedLastAnalyzed,
+    photosHaveChanged,
+    lengthMatch: currentPhotoUrls.length === sortedLastAnalyzed.length,
+    urlsMatch: currentPhotoUrls.every((url, index) => url === sortedLastAnalyzed[index])
   });
   
   // Find suitable photos for analysis
