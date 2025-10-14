@@ -431,9 +431,22 @@ export default function UnifiedProgress() {
                 </div>
               </div>
 
+            {/* Photo Count Badge */}
+            {allPhotos.length > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-[#0CC5BA]/10 to-blue-100/50 rounded-full border border-[#0CC5BA]/20">
+                  <Camera className="w-3.5 h-3.5 text-[#0CC5BA]" />
+                  <span className="text-xs font-semibold text-gray-700">
+                    {allPhotos.length} {allPhotos.length === 1 ? 'Photo' : 'Photos'}
+                  </span>
+                </div>
+                <div className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent"></div>
+              </div>
+            )}
+
             {/* Photo Grid with Upload Preview */}
             {allPhotos.length > 0 || uploadPreview ? (
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {/* Upload Preview - Shows first when uploading */}
                 {uploadPreview && (
                   <motion.div
@@ -493,50 +506,99 @@ export default function UnifiedProgress() {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: (uploadPreview ? index + 1 : index) * 0.1 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group"
+                    className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group shadow-lg hover:shadow-2xl transition-all duration-300"
                     onClick={() => {
                       setSelectedPhoto(photo);
                       setShowPhotoDialog(true);
                     }}
                   >
+                    {/* Image with enhanced hover effect */}
                     <img
                       src={photo.photoUrl}
                       alt="Progress photo"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <div className="text-white text-xs font-medium">
-                          {new Date(photo.createdAt).toLocaleDateString()}
+                    
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {/* Date badge */}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/30">
+                            <div className="text-white text-xs font-bold">
+                              {new Date(photo.createdAt).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </div>
+                          </div>
+                          {photo.type === 'progress-now' && (
+                            <div className="bg-[#0CC5BA]/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-[#0CC5BA]/30">
+                              <div className="text-white text-xs font-bold flex items-center gap-1">
+                                <Activity className="w-3 h-3" />
+                                Analyzed
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        {photo.type === 'progress-now' && (
-                          <div className="text-white/80 text-xs">Body Analysis</div>
-                        )}
+                      </div>
+                      
+                      {/* View icon */}
+                      <div className="absolute top-3 right-3">
+                        <div className="bg-white/20 backdrop-blur-md p-2 rounded-full border border-white/30">
+                          <Eye className="w-4 h-4 text-white" />
+                        </div>
                       </div>
                     </div>
-                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Eye className="w-4 h-4 text-white" />
+                    
+                    {/* Index badge - top left */}
+                    <div className="absolute top-3 left-3">
+                      <div className="bg-black/40 backdrop-blur-md px-2 py-1 rounded-lg border border-white/20">
+                        <span className="text-white text-xs font-bold">#{allPhotos.length - index}</span>
+                      </div>
                     </div>
                   </motion.div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 px-4 bg-gradient-to-br from-gray-50/80 to-blue-50/50 rounded-2xl border border-gray-200/50 mb-6">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#0CC5BA]/20"
-                >
-                  <Camera className="w-8 h-8 text-white" />
-                </motion.div>
-                <h4 className="text-lg font-bold text-gray-900 mb-2">No Photos</h4>
-                <p className="text-sm text-gray-600 mb-4 max-w-xs mx-auto">Add your first photo to start tracking progress</p>
-                
-                {/* Motivational badges */}
-                <div className="flex flex-wrap justify-center gap-2">
-                  <span className="px-3 py-1 bg-[#0CC5BA]/10 text-[#0CC5BA] rounded-full text-xs font-medium">Track Progress</span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">Stay Motivated</span>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-12 px-6 bg-gradient-to-br from-gray-50/90 via-blue-50/50 to-[#0CC5BA]/5 rounded-3xl border-2 border-dashed border-gray-300/50 mb-6 relative overflow-hidden"
+              >
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 opacity-5">
+                  <div className="absolute top-4 left-4 w-16 h-16 border-2 border-[#0CC5BA] rounded-full animate-pulse"></div>
+                  <div className="absolute bottom-4 right-4 w-20 h-20 border-2 border-blue-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 border-2 border-[#0CC5BA] rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
                 </div>
-              </div>
+                
+                <div className="relative z-10">
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#0CC5BA] via-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-[#0CC5BA]/30"
+                  >
+                    <Camera className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <h4 className="text-xl font-bold text-gray-900 mb-2">Start Your Journey</h4>
+                  <p className="text-sm text-gray-600 mb-5 max-w-xs mx-auto leading-relaxed">
+                    Take your first progress photo and watch your transformation unfold
+                  </p>
+                  
+                  {/* Motivational badges with icons */}
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <div className="px-4 py-2 bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 text-[#0CC5BA] rounded-xl text-xs font-semibold border border-[#0CC5BA]/20 flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5" />
+                      Track Progress
+                    </div>
+                    <div className="px-4 py-2 bg-gradient-to-r from-blue-100/80 to-blue-50 text-blue-700 rounded-xl text-xs font-semibold border border-blue-200/50 flex items-center gap-1.5">
+                      <Percent className="w-3.5 h-3.5" />
+                      AI Analysis
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             )}
 
             {/* Action Button with Enhanced Upload Animation */}
@@ -655,19 +717,50 @@ export default function UnifiedProgress() {
 
             {/* Current Stats */}
             {userProfile?.bodyFatPercentage && (
-              <div className="bg-gradient-to-br from-blue-50/90 via-[#0CC5BA]/10 to-blue-100/40 rounded-2xl p-5 mb-6 border-2 border-blue-100/50 shadow-lg backdrop-blur-sm">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">
-                      {userProfile.bodyFatPercentage}%
+              <div className="bg-gradient-to-br from-blue-50/90 via-[#0CC5BA]/10 to-blue-100/40 rounded-2xl p-6 mb-6 border-2 border-blue-100/50 shadow-lg backdrop-blur-sm relative overflow-hidden">
+                {/* Animated background accent */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#0CC5BA]/20 to-transparent rounded-full blur-2xl"></div>
+                
+                <div className="relative z-10">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    {/* Body Fat Card */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-blue-100/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-[#0CC5BA] flex items-center justify-center">
+                          <Percent className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-gray-600">Body Fat</span>
+                      </div>
+                      <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">
+                        {userProfile.bodyFatPercentage}%
+                      </div>
                     </div>
-                    <div className="text-xs font-medium text-gray-600 mt-1">Body Fat</div>
+                    
+                    {/* Body Type Card */}
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 shadow-md border border-blue-100/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center">
+                          <Activity className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-gray-600">Body Type</span>
+                      </div>
+                      <div className="text-lg font-bold text-gray-900 leading-tight">
+                        {userProfile.bodyType || 'Not Set'}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-900">
-                      {userProfile.bodyType || 'Nieznany'}
+                  
+                  {/* Progress indicator */}
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min(userProfile.bodyFatPercentage, 100)}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className="h-full bg-gradient-to-r from-blue-500 to-[#0CC5BA]"
+                      />
                     </div>
-                    <div className="text-xs font-medium text-gray-600 mt-1">Body Type</div>
+                    <span className="font-semibold">{userProfile.bodyFatPercentage}%</span>
                   </div>
                 </div>
               </div>
@@ -747,10 +840,23 @@ export default function UnifiedProgress() {
 
 
 
-      {/* Photo View Dialog - Custom Modal */}
+      {/* Photo View Dialog - Enhanced Modal */}
       {showPhotoDialog && selectedPhoto && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setShowPhotoDialog(false)}>
-          <div className="relative max-w-4xl w-full max-h-[90vh] bg-black rounded-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
+          onClick={() => setShowPhotoDialog(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="relative max-w-4xl w-full max-h-[90vh] bg-gradient-to-br from-gray-900 to-black rounded-3xl overflow-hidden shadow-2xl border border-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Image */}
             <img
               src={selectedPhoto.photoUrl}
@@ -763,119 +869,209 @@ export default function UnifiedProgress() {
             />
             
             {/* Control buttons */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <button
+            <div className="absolute top-4 right-4 flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => handleDeletePhoto(selectedPhoto.photoUrl)}
-                className="w-10 h-10 rounded-full bg-red-500/80 hover:bg-red-600 backdrop-blur-sm flex items-center justify-center transition-colors"
+                className="w-12 h-12 rounded-2xl bg-red-500/90 hover:bg-red-600 backdrop-blur-md flex items-center justify-center transition-colors shadow-lg border border-red-400/30"
               >
-                <Trash2 className="w-4 h-4 text-white" />
-              </button>
-              <button
+                <Trash2 className="w-5 h-5 text-white" />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setShowPhotoDialog(false)}
-                className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+                className="w-12 h-12 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md flex items-center justify-center transition-colors shadow-lg border border-white/20"
               >
-                <X className="w-4 h-4 text-white" />
-              </button>
+                <X className="w-5 h-5 text-white" />
+              </motion.button>
             </div>
             
-            {/* Photo info */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
-              <div className="text-white font-semibold text-lg">
-                {new Date(selectedPhoto.createdAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </div>
-              <div className="text-white/80 text-sm mt-1">
-                {selectedPhoto.type === 'progress-now' ? 'Used for body analysis' : 'Progress photo'}
+            {/* Photo info - Enhanced */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/95 via-black/80 to-transparent p-8 backdrop-blur-sm">
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-white font-bold text-2xl mb-2">
+                    {new Date(selectedPhoto.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {selectedPhoto.type === 'progress-now' ? (
+                      <div className="flex items-center gap-2 bg-[#0CC5BA]/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#0CC5BA]/30">
+                        <Activity className="w-4 h-4 text-[#0CC5BA]" />
+                        <span className="text-[#0CC5BA] text-sm font-semibold">Body Analysis Photo</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 bg-blue-500/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-blue-400/30">
+                        <Camera className="w-4 h-4 text-blue-300" />
+                        <span className="text-blue-200 text-sm font-semibold">Progress Photo</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
-      {/* Body Fat Analysis Results Modal */}
+      {/* Body Fat Analysis Results Modal - Enhanced */}
       {showBodyFatDialog && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setShowBodyFatDialog(false)}>
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowBodyFatDialog(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.9, y: 20, opacity: 0 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="bg-gradient-to-br from-white via-blue-50/30 to-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-blue-100/50"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Close button */}
-            <button
-              onClick={() => setShowBodyFatDialog(false)}
-              className="absolute right-4 top-4 z-10 w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
-            >
-              <span className="text-gray-600 text-sm">×</span>
-            </button>
+            <div className="sticky top-0 z-10 flex justify-end p-4 bg-gradient-to-b from-white via-white to-transparent">
+              <motion.button
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowBodyFatDialog(false)}
+                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-2xl flex items-center justify-center transition-colors shadow-md"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </motion.button>
+            </div>
             
-            <div className="text-center p-4 pb-2">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent">
-                Body Analysis Results
+            <div className="text-center px-6 pb-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring" }}
+                className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 via-[#0CC5BA] to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30"
+              >
+                <Activity className="w-8 h-8 text-white" />
+              </motion.div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent mb-1">
+                Analysis Complete
               </h2>
+              <p className="text-sm text-gray-600">Your body composition results</p>
             </div>
             
             {bodyFatAnalysis ? (
-              <div className="px-4 pb-4 space-y-4">
-                {/* Main Results */}
-                <div className="text-center p-6 bg-gradient-to-br from-blue-50/90 via-[#0CC5BA]/10 to-blue-100/40 rounded-2xl border-2 border-blue-100/50 shadow-lg backdrop-blur-sm">
-                  <div className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-[#0CC5BA] bg-clip-text text-transparent mb-2">
-                    {bodyFatAnalysis.bodyFatPercentage}%
+              <div className="px-6 pb-6 space-y-4">
+                {/* Main Results - Enhanced */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-center p-8 bg-gradient-to-br from-blue-50/90 via-[#0CC5BA]/10 to-blue-100/40 rounded-3xl border-2 border-blue-100/50 shadow-xl backdrop-blur-sm relative overflow-hidden"
+                >
+                  {/* Animated background elements */}
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-[#0CC5BA]/20 to-transparent rounded-full blur-2xl animate-pulse"></div>
+                  <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-blue-200/30 to-transparent rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                  
+                  <div className="relative z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.4, type: "spring" }}
+                      className="text-6xl font-extrabold bg-gradient-to-r from-blue-600 via-[#0CC5BA] to-blue-600 bg-clip-text text-transparent mb-3"
+                    >
+                      {bodyFatAnalysis.bodyFatPercentage}%
+                    </motion.div>
+                    <div className="text-xl font-bold text-gray-900 mb-3">
+                      {bodyFatAnalysis.bodyType}
+                    </div>
+                    <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-md border border-blue-100/50">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs font-semibold text-gray-700">
+                        {Math.round(bodyFatAnalysis.confidence)}% Confidence
+                      </span>
+                    </div>
                   </div>
-                  <div className="text-lg font-bold text-gray-900 mb-2">
-                    {bodyFatAnalysis.bodyType}
-                  </div>
-                    <div className="text-xs font-medium text-gray-600 bg-white/60 rounded-full px-3 py-1 inline-block">
-                    Confidence: {Math.round(bodyFatAnalysis.confidence)}%
-                  </div>
-                </div>
+                </motion.div>
                 
                 {/* Additional Info */}
                 {bodyFatAnalysis.muscleMass && (
-                  <div className="bg-gradient-to-br from-green-50/90 to-emerald-100/40 rounded-xl p-3 border border-green-100">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-gradient-to-br from-emerald-50/90 to-green-100/40 rounded-2xl p-4 border-2 border-emerald-100/50 shadow-lg"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs font-bold">M</span>
+                      <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Activity className="w-6 h-6 text-white" />
                       </div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-medium text-gray-600">Muscle Mass</div>
-                        <div className="text-sm font-bold text-gray-900 truncate">{bodyFatAnalysis.muscleMass}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs font-semibold text-emerald-600 mb-1">Muscle Mass</div>
+                        <div className="text-base font-bold text-gray-900">{bodyFatAnalysis.muscleMass}</div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 )}
                 
                 {/* Recommendations */}
                 {bodyFatAnalysis.improvementSuggestions && bodyFatAnalysis.improvementSuggestions.length > 0 && (
-                  <div className="bg-gradient-to-br from-amber-50/90 to-orange-100/40 rounded-xl p-4 border border-amber-100">
-                    <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm">
-                      <span className="text-amber-600 font-bold">!</span>
-                      Recommendations
-                    </h4>
-                    <ul className="space-y-2">
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="bg-gradient-to-br from-amber-50/90 to-orange-100/40 rounded-2xl p-5 border-2 border-amber-100/50 shadow-lg"
+                  >
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-md">
+                        <Info className="w-4 h-4 text-white" />
+                      </div>
+                      <h4 className="font-bold text-gray-900 text-base">Recommendations</h4>
+                    </div>
+                    <ul className="space-y-3">
                       {bodyFatAnalysis.improvementSuggestions.map((suggestion, index) => (
-                        <li key={index} className="text-xs text-gray-700 flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                          <span className="font-medium leading-relaxed">{suggestion}</span>
-                        </li>
+                        <motion.li
+                          key={index}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.7 + index * 0.1 }}
+                          className="text-sm text-gray-700 flex items-start gap-3 bg-white/60 p-3 rounded-xl"
+                        >
+                          <span className="w-2 h-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mt-2 flex-shrink-0"></span>
+                          <span className="font-medium leading-relaxed flex-1">{suggestion}</span>
+                        </motion.li>
                       ))}
                     </ul>
-                  </div>
+                  </motion.div>
                 )}
                 
                 {/* Action Button */}
-                <Button
-                  onClick={() => setShowBodyFatDialog(false)}
-                  className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-[#0CC5BA] hover:from-blue-600 hover:via-blue-700 hover:to-[#0BB5AA] text-white rounded-xl py-3 font-semibold text-sm shadow-xl shadow-blue-500/25 hover:shadow-2xl transition-all duration-500 border-0"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Got it!
-                </Button>
+                  <Button
+                    onClick={() => setShowBodyFatDialog(false)}
+                    className="w-full bg-gradient-to-r from-blue-500 via-blue-600 to-[#0CC5BA] hover:from-blue-600 hover:via-blue-700 hover:to-[#0BB5AA] text-white rounded-2xl py-4 font-bold text-base shadow-xl shadow-blue-500/25 hover:shadow-2xl transition-all duration-500 border-0"
+                  >
+                    Got it! 🎉
+                  </Button>
+                </motion.div>
               </div>
             ) : (
-              <div className="px-4 pb-4">
-                <p>Loading analysis...</p>
+              <div className="px-6 pb-6 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto text-[#0CC5BA] mb-3" />
+                <p className="text-gray-600">Analyzing your body composition...</p>
               </div>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
