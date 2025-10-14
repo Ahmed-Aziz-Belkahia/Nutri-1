@@ -18,6 +18,28 @@ export default function BodyFatAnalysis() {
   const [showSources, setShowSources] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   
+  // Load last analyzed photos from localStorage
+  const [lastAnalyzedPhotos, setLastAnalyzedPhotos] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('lastAnalyzedPhotos');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  
+  // Check if current photos are different from last analyzed
+  const currentPhotoUrls = photos?.map(p => p.photoUrl) || [];
+  const photosHaveChanged = 
+    currentPhotoUrls.length !== lastAnalyzedPhotos.length ||
+    currentPhotoUrls.some(url => !lastAnalyzedPhotos.includes(url));
+  
+  console.log('Photo change detection:', {
+    currentPhotoUrls,
+    lastAnalyzedPhotos,
+    photosHaveChanged
+  });
+  
   // Find suitable photos for analysis
   const progressNowPhotos = photos?.filter(photo => photo.type === 'progress-now') || [];
   console.log('Progress-now photos for analysis:', progressNowPhotos);
@@ -136,6 +158,12 @@ export default function BodyFatAnalysis() {
           if (result.bodyFatPercentage) {
             await updateProfileWithBodyFat(result.bodyFatPercentage, result.bodyType);
             
+            // Store current photo URLs as "last analyzed" in localStorage
+            const currentUrls = photos?.map(p => p.photoUrl) || [];
+            setLastAnalyzedPhotos(currentUrls);
+            localStorage.setItem('lastAnalyzedPhotos', JSON.stringify(currentUrls));
+            console.log('Stored analyzed photo URLs:', currentUrls);
+            
             // Show success message
             toast({
               title: t('progress.analysisComplete'),
@@ -247,14 +275,27 @@ export default function BodyFatAnalysis() {
               {isMarkingPhoto ? 'Przygotowywanie zdjęcia...' : 'Użyj tego zdjęcia do analizy'}
             </Button>
           ) : (
-            <Button
-              onClick={handleCheckBodyFat}
-              className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-full py-6 font-medium text-base"
-              disabled={isLoading || !hasPhotos}
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? 'Analizowanie...' : 'Sprawdź procent tkanki tłuszczowej'}
-            </Button>
+            <div className="space-y-2">
+              {!photosHaveChanged && hasPhotos && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-700 mb-2">
+                  ℹ️ Photos haven't changed since last analysis. Upload a new photo to analyze again.
+                </div>
+              )}
+              
+              <Button
+                onClick={handleCheckBodyFat}
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-full py-6 font-medium text-base disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled={isLoading || !hasPhotos || !photosHaveChanged}
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? 'Analizowanie...' : 'Sprawdź procent tkanki tłuszczowej'}
+              </Button>
+              {!photosHaveChanged && hasPhotos && (
+                <p className="text-xs text-gray-500 text-center">
+                  Zdjęcia nie zmieniły się od ostatniej analizy. Dodaj nowe zdjęcie, aby przeprowadzić ponowną analizę.
+                </p>
+              )}
+            </div>
           )}
         </div>
         

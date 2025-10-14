@@ -170,6 +170,7 @@ export const progressPhotos = sqliteTable("progress_photos", {
   photoUrl: text("photo_url").notNull(),
   caption: text("caption"),
   type: text("type").notNull(),
+  photoDate: text("photo_date").notNull().default(sql`(date('now'))`), // YYYY-MM-DD format
   createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 

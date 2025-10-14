@@ -1002,7 +1002,21 @@ export function registerRoutes(app: Express): Server {
         types: photos.map(p => p.type)
       });
 
-      res.json(photos);
+      // Check if user uploaded a photo today
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const todayPhoto = photos.find(p => p.photoDate === today);
+      
+      console.log('Today check:', {
+        today,
+        hasUploadedToday: !!todayPhoto,
+        todayPhotoId: todayPhoto?.id
+      });
+
+      res.json({
+        photos,
+        hasUploadedToday: !!todayPhoto,
+        todayPhoto: todayPhoto || null
+      });
     } catch (error) {
       console.error('Error fetching progress photos:', error);
       res.status(500).json({
@@ -1070,8 +1084,10 @@ export function registerRoutes(app: Express): Server {
       }
 
       try {
-        // Insert new progress photo
+        // Insert new progress photo with today's date
         console.log(`Inserting photo record for user ${req.user.id} with URL ${imageUrl}`);
+        
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
         
         const [photo] = await db
           .insert(progressPhotos)
@@ -1080,6 +1096,7 @@ export function registerRoutes(app: Express): Server {
             photoUrl: imageUrl,
             type: req.body.type || 'latest',
             caption: req.body.caption || null,
+            photoDate: today,
             createdAt: new Date()
           })
           .returning();
@@ -1150,6 +1167,122 @@ export function registerRoutes(app: Express): Server {
       console.error('Error updating photo type:', error);
       res.status(500).json({
         error: 'Failed to update photo type',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Replace progress photo endpoint - for updating today's photo
+  app.put("/api/progress-photos/:id", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        console.log('Authentication failed for progress photo replacement');
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const photoId = parseInt(req.params.id);
+      if (isNaN(photoId)) {
+        return res.status(400).json({ error: 'Invalid photo ID' });
+      }
+
+      console.log('Received photo replacement request:', {
+        photoId,
+        hasPhoto: !!req.body.photo,
+        userId: req.user.id
+      });
+
+      // Verify the photo belongs to the user
+      const existingPhoto = await db
+        .select()
+        .from(progressPhotos)
+        .where(
+          and(
+            eq(progressPhotos.id, photoId),
+            eq(progressPhotos.userId, req.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!existingPhoto || existingPhoto.length === 0) {
+        return res.status(404).json({ error: 'Photo not found or unauthorized' });
+      }
+
+      const oldPhotoUrl = existingPhoto[0].photoUrl;
+      let newImageUrl: string | null = null;
+
+      // Handle base64 image from request body
+      if (req.body.photo) {
+        try {
+          const base64Data = req.body.photo.replace(/^data:image\/\w+;base64,/, '');
+          const buffer = Buffer.from(base64Data, 'base64');
+
+          // Create uploads directory if it doesn't exist
+          const uploadsDir = path.join(process.cwd(), 'uploads');
+          await fs.mkdir(uploadsDir, { recursive: true });
+
+          // Generate unique filename
+          const filename = `progress-${req.user.id}-${Date.now()}.jpg`;
+          const filepath = path.join(uploadsDir, filename);
+
+          console.log(`Saving replacement photo for user ${req.user.id} to ${filepath}`);
+
+          // Process and save image
+          await sharp(buffer)
+            .resize(800, 800, {
+              fit: 'inside',
+              withoutEnlargement: true
+            })
+            .jpeg({ quality: 90 })
+            .toFile(filepath);
+
+          newImageUrl = `/uploads/${filename}`;
+          console.log('Successfully saved replacement image to filesystem:', newImageUrl);
+        } catch (err) {
+          console.error('Error processing replacement image:', err);
+          throw new Error('Failed to process image: ' + (err instanceof Error ? err.message : String(err)));
+        }
+      }
+
+      if (!newImageUrl) {
+        console.error('No image URL generated, invalid image data');
+        return res.status(400).json({ error: 'No valid image provided' });
+      }
+
+      // Update the photo record
+      const [updatedPhoto] = await db
+        .update(progressPhotos)
+        .set({
+          photoUrl: newImageUrl,
+          caption: req.body.caption || existingPhoto[0].caption,
+          type: req.body.type || existingPhoto[0].type,
+          // Keep the same photoDate - we're just replacing today's photo
+        })
+        .where(
+          and(
+            eq(progressPhotos.id, photoId),
+            eq(progressPhotos.userId, req.user.id)
+          )
+        )
+        .returning();
+
+      // Delete old photo file if it exists in uploads directory
+      if (oldPhotoUrl.startsWith('/uploads/')) {
+        try {
+          const oldFilepath = path.join(process.cwd(), oldPhotoUrl);
+          await fs.unlink(oldFilepath);
+          console.log(`Deleted old photo file: ${oldFilepath}`);
+        } catch (err) {
+          console.error('Error deleting old photo file:', err);
+          // Don't fail the request if file deletion fails
+        }
+      }
+
+      console.log('Successfully replaced progress photo:', updatedPhoto);
+      res.json(updatedPhoto);
+    } catch (error) {
+      console.error('Error replacing progress photo:', error);
+      res.status(500).json({
+        error: 'Failed to replace progress photo',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
     }

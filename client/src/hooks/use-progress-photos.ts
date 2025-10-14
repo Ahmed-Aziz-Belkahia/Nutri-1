@@ -4,7 +4,11 @@ import type { ProgressPhoto } from "@db/schema";
 export function useProgressPhotos() {
   const queryClient = useQueryClient();
 
-  const { data: photos = [], isLoading } = useQuery<ProgressPhoto[]>({
+  const { data, isLoading } = useQuery<{ 
+    photos: ProgressPhoto[]; 
+    hasUploadedToday: boolean; 
+    todayPhoto: ProgressPhoto | null 
+  }>({
     queryKey: ["/api/progress-photos"],
     queryFn: async () => {
       console.log('Fetching progress photos...');
@@ -14,12 +18,16 @@ export function useProgressPhotos() {
       if (!response.ok) {
         throw new Error("Failed to fetch photos");
       }
-      const data = await response.json();
-      console.log('Fetched photos:', data);
+      const result = await response.json();
+      console.log('Fetched photos response:', result);
+      
+      // Handle both old format (array) and new format (object with photos array)
+      const photosArray = Array.isArray(result) ? result : result.photos || [];
+      const hasUploadedToday = result.hasUploadedToday || false;
+      const todayPhoto = result.todayPhoto || null;
       
       // Ensure each photo URL is properly formatted with absolute path if needed
-      return data.map((photo: ProgressPhoto) => {
-        // Ensure the URL is absolute and properly formed
+      const formattedPhotos = photosArray.map((photo: ProgressPhoto) => {
         const photoUrl = photo.photoUrl || '';
         const formattedUrl = photoUrl.startsWith('http') 
           ? photoUrl 
@@ -27,16 +35,17 @@ export function useProgressPhotos() {
             ? photoUrl 
             : `/${photoUrl}`;
         
-        console.log('Processing photo URL:', {
-          original: photo.photoUrl,
-          formatted: formattedUrl
-        });
-        
         return {
           ...photo,
           photoUrl: formattedUrl
         };
       });
+      
+      return {
+        photos: formattedPhotos,
+        hasUploadedToday,
+        todayPhoto
+      };
     },
     // Improved caching strategy for better performance
     refetchOnWindowFocus: false,
@@ -45,6 +54,10 @@ export function useProgressPhotos() {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000 // 10 minutes - using gcTime instead of deprecated cacheTime
   });
+
+  const photos = data?.photos || [];
+  const hasUploadedToday = data?.hasUploadedToday || false;
+  const todayPhoto = data?.todayPhoto || null;
 
   const addPhoto = useMutation({
     mutationFn: async (data: { photoUrl: string; type?: 'latest' | 'favorite' | 'first' | 'progress-now'; caption?: string }) => {
@@ -153,6 +166,42 @@ export function useProgressPhotos() {
     }
   });
 
+  const replacePhoto = useMutation({
+    mutationFn: async (data: { photoId: number; photoUrl: string; type?: string; caption?: string }) => {
+      console.log('Replacing photo:', data.photoId);
+      
+      const response = await fetch(`/api/progress-photos/${data.photoId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          photo: data.photoUrl,
+          type: data.type,
+          caption: data.caption
+        }),
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Replace error response:', errorText);
+        throw new Error(errorText);
+      }
+
+      const result = await response.json();
+      console.log('Replace successful, API response:', result);
+      return result;
+    },
+    onSuccess: () => {
+      console.log('Photo replacement succeeded');
+      queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
+    },
+    onError: (error) => {
+      console.error('Photo replacement failed:', error);
+    }
+  });
+
   const uploadPhoto = async (photoDataUrl: string, type?: 'latest' | 'favorite' | 'first' | 'progress-now', caption?: string) => {
     console.log('uploadPhoto called with:', { 
       hasData: !!photoDataUrl, 
@@ -166,12 +215,16 @@ export function useProgressPhotos() {
 
   return {
     photos,
+    hasUploadedToday,
+    todayPhoto,
     isLoading,
     addPhoto: addPhoto.mutateAsync,
     isAddingPhoto: addPhoto.isPending,
     updatePhotoType: updatePhotoType.mutateAsync,
     deletePhoto: deletePhoto.mutateAsync,
     isDeletingPhoto: deletePhoto.isPending,
+    replacePhoto: replacePhoto.mutateAsync,
+    isReplacingPhoto: replacePhoto.isPending,
     uploadPhoto
   };
 }

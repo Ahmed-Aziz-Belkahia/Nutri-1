@@ -188,7 +188,7 @@ export default function ProgressPage() {
   const [location, setLocation] = useLocation();
   const { weightLogs, addWeightLog } = useWeightLogs();
 
-  const { photos, addPhoto, deletePhoto, isLoading: photosLoading } = useProgressPhotos();
+  const { photos, addPhoto, deletePhoto, isLoading: photosLoading, hasUploadedToday, todayPhoto, replacePhoto } = useProgressPhotos();
   const [isDeletingPhoto, setIsDeletingPhoto] = useState(false);
   
   useEffect(() => {
@@ -340,6 +340,8 @@ export default function ProgressPage() {
     try {
       console.log('Starting photo capture process, photoUrl length:', photoUrl.length);
       console.log('PhotoUrl starts with:', photoUrl.substring(0, 30) + '...');
+      console.log('Has uploaded today:', hasUploadedToday);
+      console.log('Today photo:', todayPhoto);
       
       setCapturedImage(photoUrl);
       
@@ -351,23 +353,40 @@ export default function ProgressPage() {
       
       console.log('Photo format valid, sending to server...');
       
-      const uploadResult = await addPhoto({ 
-        photoUrl: photoUrl,
-        type: "latest",
-        caption: "Progress photo"
-      });
+      // If user already uploaded today, replace the existing photo
+      if (hasUploadedToday && todayPhoto) {
+        console.log('Replacing existing photo with ID:', todayPhoto.id);
+        const uploadResult = await replacePhoto({ 
+          photoId: todayPhoto.id,
+          photoUrl: photoUrl,
+          type: "latest",
+          caption: "Progress photo"
+        });
+        
+        console.log('Photo successfully replaced on server, result:', uploadResult);
+        
+        toast({
+          title: "Photo updated",
+          description: "Your progress photo has been replaced successfully",
+        });
+      } else {
+        // Otherwise, add a new photo
+        console.log('Adding new photo');
+        const uploadResult = await addPhoto({ 
+          photoUrl: photoUrl,
+          type: "latest",
+          caption: "Progress photo"
+        });
+        
+        console.log('Photo successfully saved to server, result:', uploadResult);
+        
+        toast({
+          title: "Photo saved",
+          description: "Your progress photo has been uploaded successfully",
+        });
+      }
       
-      console.log('Photo successfully saved to server, result:', uploadResult);
-      
-      // No need for window.location.reload() - React Query will handle the refresh
-      console.log('Photo saved, React Query will refresh automatically');
-      
-      toast({
-        title: "Photo saved",
-        description: "Your progress photo has been uploaded successfully",
-      });
-      
-      // XP award removed
+      console.log('Photo operation completed, React Query will refresh automatically');
     } catch (error) {
       console.error('Error in handlePhotoCapture:', error);
       toast({
@@ -402,21 +421,41 @@ export default function ProgressPage() {
         }
         
         console.log('File format valid, sending to server...');
+        console.log('Has uploaded today:', hasUploadedToday);
+        console.log('Today photo:', todayPhoto);
         
-        await addPhoto({
-          photoUrl: base64String,
-          type: "latest",
-          caption: "Uploaded photo"
-        });
-        
-        console.log('Photo successfully saved to server via upload');
-        
-        toast({
-          title: "Photo saved",
-          description: "Your progress photo has been uploaded successfully",
-        });
-        
-        // XP award removed
+        // If user already uploaded today, replace the existing photo
+        if (hasUploadedToday && todayPhoto) {
+          console.log('Replacing existing photo with ID:', todayPhoto.id);
+          await replacePhoto({
+            photoId: todayPhoto.id,
+            photoUrl: base64String,
+            type: "latest",
+            caption: "Uploaded photo"
+          });
+          
+          console.log('Photo successfully replaced on server via upload');
+          
+          toast({
+            title: "Photo updated",
+            description: "Your progress photo has been replaced successfully",
+          });
+        } else {
+          // Otherwise, add a new photo
+          console.log('Adding new photo');
+          await addPhoto({
+            photoUrl: base64String,
+            type: "latest",
+            caption: "Uploaded photo"
+          });
+          
+          console.log('Photo successfully saved to server via upload');
+          
+          toast({
+            title: "Photo saved",
+            description: "Your progress photo has been uploaded successfully",
+          });
+        }
       } catch (error) {
         console.error('Error in handlePhotoUpload:', error);
         toast({
@@ -740,13 +779,19 @@ export default function ProgressPage() {
                 </div>
                 
                 <div className="space-y-4">
+                  {hasUploadedToday && (
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-700">
+                      ✓ You've uploaded a photo today. You can replace it with a new one.
+                    </div>
+                  )}
+                  
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90"
                       onClick={handleCameraOpen}
                     >
                       <Camera className="w-4 h-4 mr-2" />
-                      Take Photo
+                      {hasUploadedToday ? 'Replace Photo' : 'Take Photo'}
                     </Button>
                     <Button 
                       variant="outline"
@@ -754,7 +799,7 @@ export default function ProgressPage() {
                       onClick={() => document.getElementById('photo-upload')?.click()}
                     >
                       <Upload className="w-4 h-4 mr-2" />
-                      Upload Photo
+                      {hasUploadedToday ? 'Replace Photo' : 'Upload Photo'}
                     </Button>
                     <input
                       id="photo-upload"
