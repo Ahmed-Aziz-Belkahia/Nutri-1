@@ -84,63 +84,13 @@ export default function AddFood() {
   });
   // Gate mounting the Webcam until we've either confirmed permission is already granted
   // or the user explicitly taps Enable Camera. This avoids autoplay overlays on Android/iOS.
-  const [cameraReady, setCameraReady] = useState(false);
-  const [checkingPermission, setCheckingPermission] = useState(true);
+  const [cameraReady, setCameraReady] = useState(true); // Start as true, set to false only if there's an error
   const [needsPlayGesture, setNeedsPlayGesture] = useState(false);
   const isSecure = typeof window !== 'undefined' ? window.isSecureContext : true;
   useEffect(() => {
     let cancelled = false;
-    const checkPermission = async () => {
-      try {
-        const insecure = typeof window !== 'undefined' ? !window.isSecureContext : false;
-        if (insecure) {
-          setCheckingPermission(false);
-          return; // Can't request on insecure contexts
-        }
-        
-        // First, try to check permission status
-        if ('permissions' in navigator && (navigator as any).permissions?.query) {
-          try {
-            const status = await (navigator as any).permissions.query({ name: 'camera' as any });
-            if (!cancelled && status?.state === 'granted') {
-              console.log('Camera permission already granted, auto-enabling camera');
-              setCameraReady(true);
-              setCheckingPermission(false);
-              return; // Permission already granted, no need to continue
-            }
-          } catch (err) {
-            console.log('Permission query not supported, trying direct access');
-          }
-        }
-        
-        // If permission query not supported or permission not granted yet,
-        // try to directly access camera (some browsers auto-grant)
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-          // Got stream successfully - permission is granted
-          stream.getTracks().forEach(t => t.stop());
-          if (!cancelled) {
-            console.log('Camera access successful, enabling camera');
-            setCameraReady(true);
-            setCheckingPermission(false);
-          }
-        } catch (err) {
-          console.log('Camera access failed, will show enable button');
-          // Permission not granted or camera unavailable
-          // Show the enable camera overlay
-          if (!cancelled) {
-            setCheckingPermission(false);
-          }
-        }
-      } catch (err) {
-        console.log('Permission check error:', err);
-        if (!cancelled) {
-          setCheckingPermission(false);
-        }
-      }
-    };
-    
-    checkPermission();
+    // No need to check permission upfront - just let the Webcam component handle it
+    // If it fails, the onUserMediaError callback will be triggered
     return () => {
       cancelled = true;
     };
@@ -602,7 +552,7 @@ export default function AddFood() {
             </div>
           )}
 
-          {!cameraReady && !checkingPermission && (
+          {!cameraReady && (
             <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-5 bg-black/70 backdrop-blur-sm px-6 text-center">
               <div className="text-white">
                 <h2 className="text-2xl font-semibold mb-2">Enable Camera</h2>
@@ -627,14 +577,6 @@ export default function AddFood() {
               >
                 Switch to Manual Entry
               </button>
-            </div>
-          )}
-          
-          {/* Loading state while checking camera permission */}
-          {checkingPermission && (
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/70 backdrop-blur-sm px-6">
-              <Loader2 className="w-8 h-8 text-white animate-spin" />
-              <p className="text-white/80 text-sm">Checking camera access...</p>
             </div>
           )}
           
