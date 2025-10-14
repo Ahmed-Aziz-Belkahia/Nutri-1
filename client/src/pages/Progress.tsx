@@ -789,51 +789,74 @@ export default function ProgressPage() {
                     </div>
                   )}
                   
-                  <div className="flex gap-2">
+                  {!hasUploadedToday ? (
+                    // Show both Take and Upload buttons only if no photo uploaded today
+                    <div className="flex gap-2">
+                      <Button 
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleCameraOpen}
+                        disabled={isUploadingPhoto}
+                      >
+                        {isUploadingPhoto ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Camera className="w-4 h-4 mr-2" />
+                            Take Photo
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="flex-1 border-emerald-500 text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => document.getElementById('photo-upload')?.click()}
+                        disabled={isUploadingPhoto}
+                      >
+                        {isUploadingPhoto ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            Upload Photo
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    // Show only Change Image button if photo already uploaded today
                     <Button 
-                      className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={handleCameraOpen}
-                      disabled={isUploadingPhoto}
-                    >
-                      {isUploadingPhoto ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Camera className="w-4 h-4 mr-2" />
-                          {hasUploadedToday ? 'Replace Photo' : 'Take Photo'}
-                        </>
-                      )}
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      className="flex-1 border-emerald-500 text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={() => document.getElementById('photo-upload')?.click()}
                       disabled={isUploadingPhoto}
                     >
                       {isUploadingPhoto ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Uploading...
+                          Updating...
                         </>
                       ) : (
                         <>
                           <Upload className="w-4 h-4 mr-2" />
-                          {hasUploadedToday ? 'Replace Photo' : 'Upload Photo'}
+                          Change Today's Photo
                         </>
                       )}
                     </Button>
-                    <input
-                      id="photo-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePhotoUpload}
-                      disabled={isUploadingPhoto}
-                    />
-                  </div>
+                  )}
+                  
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                    disabled={isUploadingPhoto}
+                  />
                   
                   <div className="grid grid-cols-3 gap-3 mt-4">
                     {/* Latest Photo */}
