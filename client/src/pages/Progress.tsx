@@ -192,6 +192,16 @@ export default function ProgressPage() {
   const [isDeletingPhoto, setIsDeletingPhoto] = useState(false);
   const isUploadingPhoto = isAddingPhoto || isReplacingPhoto;
   
+  // Debug logs to track the state
+  useEffect(() => {
+    console.log('Progress page state:', {
+      hasUploadedToday,
+      todayPhoto,
+      photosCount: photos?.length || 0,
+      isUploadingPhoto
+    });
+  }, [hasUploadedToday, todayPhoto, photos, isUploadingPhoto]);
+  
   useEffect(() => {
     console.log('Progress photos from hook:', photos);
   }, [photos]);
