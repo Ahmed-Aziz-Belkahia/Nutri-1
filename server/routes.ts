@@ -2020,7 +2020,7 @@ export function registerRoutes(app: Express): Server {
           
         const actualPrefs = userDietPrefs[0] || {};
         
-        // Use simplified preferences that match the schema
+        // Use simplified preferences that match the schema, INCLUDING quiz answers
         const currentPrefs = {
           ...actualPrefs,
           dietaryType: dietaryType || actualPrefs.dietaryType || 'balanced',
@@ -2030,7 +2030,11 @@ export function registerRoutes(app: Express): Server {
           excludedIngredients: excludedIngredients || actualPrefs.excludedIngredients || [],
           maxCookingTime: maxCookingTime || actualPrefs.maxCookingTime || 30,
           budgetPreference: budgetPreference || actualPrefs.budgetPreference || 'medium',
-          preferredIngredients: preferredIngredients || actualPrefs.preferredIngredients || []
+          preferredIngredients: preferredIngredients || actualPrefs.preferredIngredients || [],
+          // Add quiz-specific answers that were missing
+          healthGoals: healthGoals || actualPrefs.healthGoals || [],
+          cuisinePreferences: cuisinePreferences || actualPrefs.cuisinePreferences || [],
+          cookingSkillLevel: cookingSkillLevel || actualPrefs.cookingSkillLevel || 'intermediate'
         };
         
         console.log('Using current user preferences:', {
@@ -5232,10 +5236,66 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           budgetPreference: budgetPreference || 'medium',
           allergies: allergies || [],
           excludedIngredients: excludedIngredients || [],
-          preferredIngredients: preferredIngredients || []
+          preferredIngredients: preferredIngredients || [],
+          // Add the quiz-specific fields that were missing
+          healthGoals: healthGoals || [],
+          cuisinePreferences: cuisinePreferences || [],
+          cookingSkillLevel: cookingSkillLevel || 'intermediate'
         };
         
-        // Store the essential information in userNutritionPreferences instead
+        // IMPORTANT: Save to userDietaryPreferences table (not just userNutritionPreferences)
+        // This is where the meal plan generator looks for preferences
+        try {
+          // Try to insert new dietary preferences
+          const [newDietPrefs] = await db
+            .insert(userDietaryPreferences)
+            .values({
+              userId: req.user.id,
+              dietaryType: dietPrefs.dietaryType,
+              calorieTarget: dietPrefs.calorieTarget,
+              mealsPerDay: dietPrefs.mealsPerDay,
+              allergies: dietPrefs.allergies,
+              excludedIngredients: dietPrefs.excludedIngredients,
+              preferredIngredients: dietPrefs.preferredIngredients,
+              maxCookingTime: dietPrefs.maxCookingTime,
+              budgetPreference: dietPrefs.budgetPreference,
+              healthGoals: typeof healthGoals === 'string' ? healthGoals : JSON.stringify(healthGoals || []),
+              cuisinePreferences: typeof cuisinePreferences === 'string' ? cuisinePreferences : JSON.stringify(cuisinePreferences || []),
+              cookingSkillLevel: dietPrefs.cookingSkillLevel,
+              updatedAt: new Date()
+            })
+            .returning();
+          
+          dietaryPreferences = newDietPrefs;
+          console.log("Inserted dietary preferences with quiz answers:", newDietPrefs);
+        } catch (insertError) {
+          console.log("Dietary preferences insert failed, attempting update:", insertError);
+          
+          // If insert fails, update existing record
+          const [updatedDietPrefs] = await db
+            .update(userDietaryPreferences)
+            .set({
+              dietaryType: dietPrefs.dietaryType,
+              calorieTarget: dietPrefs.calorieTarget,
+              mealsPerDay: dietPrefs.mealsPerDay,
+              allergies: dietPrefs.allergies,
+              excludedIngredients: dietPrefs.excludedIngredients,
+              preferredIngredients: dietPrefs.preferredIngredients,
+              maxCookingTime: dietPrefs.maxCookingTime,
+              budgetPreference: dietPrefs.budgetPreference,
+              healthGoals: typeof healthGoals === 'string' ? healthGoals : JSON.stringify(healthGoals || []),
+              cuisinePreferences: typeof cuisinePreferences === 'string' ? cuisinePreferences : JSON.stringify(cuisinePreferences || []),
+              cookingSkillLevel: dietPrefs.cookingSkillLevel,
+              updatedAt: new Date()
+            })
+            .where(eq(userDietaryPreferences.userId, req.user.id))
+            .returning();
+          
+          dietaryPreferences = updatedDietPrefs;
+          console.log("Updated dietary preferences with quiz answers:", updatedDietPrefs);
+        }
+        
+        // Also update the userNutritionPreferences for backwards compatibility
         const [updatedPrefs] = await db
           .update(userNutritionPreferences)
           .set({
@@ -5249,14 +5309,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           .where(eq(userNutritionPreferences.userId, req.user.id))
           .returning();
         
-        // Use the updated nutrition preferences as our dietary preferences
-        dietaryPreferences = {
-          ...dietPrefs,
-          id: updatedPrefs.id,
-          userId: updatedPrefs.userId,
-        };
-        
-        console.log("Updated nutrition preferences with dietary data:", dietaryPreferences);
+        console.log("Also updated nutrition preferences for backwards compatibility");
       } catch (dietaryError) {
         console.error("Error saving dietary preferences:", dietaryError);
         // Continue even if there's an error with dietary preferences

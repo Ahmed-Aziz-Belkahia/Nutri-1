@@ -142,6 +142,14 @@ if [ "$NEEDS_MIGRATION" = true ]; then
 else
     echo "✅ Database schema is up to date (all columns present)"
 fi
+
+# Always run quiz fields migration (safe to run multiple times)
+echo "→ Adding quiz fields to dietary preferences..."
+if node migrations/add-quiz-fields-to-preferences.js; then
+    echo "✅ Quiz fields migration completed"
+else
+    echo "⚠️  Quiz fields migration failed, but continuing..."
+fi
 echo ""
 
 # Step 6: Fix database permissions

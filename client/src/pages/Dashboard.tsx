@@ -18,6 +18,8 @@ import useEmblaCarousel from 'embla-carousel-react';
 import MacroChart from "@/components/MacroChart";
 import { TodaysMealPlans } from "@/components/TodaysMealPlans";
 import { format, parse, isValid } from 'date-fns';
+import PullToRefresh from "@/components/PullToRefresh";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 // Dropdown menu removed - profile picture links directly to profile page
 
 import { Progress } from "@/components/ui/progress";
@@ -202,6 +204,14 @@ export default function Dashboard() {
   const { user } = useUser();
   // XP functionality removed
   const awardXP = async () => {}; // Empty function as placeholder
+
+  // Pull-to-refresh functionality
+  const dateString = format(selectedDate, 'yyyy-MM-dd');
+  const handleRefresh = usePullToRefresh([
+    ["/api/food-logs", dateString],
+    ["/api/user"],
+    [`/api/meal-plans/${dateString}`]
+  ]);
 
   // State for analyzing meal
   const [analyzingMeal, setAnalyzingMeal] = useState<{
@@ -431,11 +441,12 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden pb-20">
-      
-      {/* Minimalist background elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden pb-20">
+        
+        {/* Minimalist background elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
     
       <div className="max-w-md mx-auto relative z-10 pt-6 px-4">
         {/* Minimalist Header */}
@@ -751,5 +762,6 @@ export default function Dashboard() {
         </motion.main>
       </div>
     </div>
+    </PullToRefresh>
   );
 }

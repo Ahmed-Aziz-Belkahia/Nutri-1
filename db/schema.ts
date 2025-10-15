@@ -186,6 +186,10 @@ export const userDietaryPreferences = sqliteTable("user_dietary_preferences", {
   excludedIngredients: text("excluded_ingredients", { mode: 'json' }).$type<string[]>(),
   maxCookingTime: integer("max_cooking_time"),
   budgetPreference: text("budget_preference"),
+  // Quiz-specific fields that were missing
+  healthGoals: text("health_goals", { mode: 'json' }).$type<string[] | string>(),
+  cuisinePreferences: text("cuisine_preferences", { mode: 'json' }).$type<string[] | string>(),
+  cookingSkillLevel: text("cooking_skill_level"),
   updatedAt: integer("updated_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 
