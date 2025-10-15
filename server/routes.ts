@@ -2040,49 +2040,50 @@ export function registerRoutes(app: Express): Server {
         console.log('Using current user preferences:', {
           dietaryType: currentPrefs.dietaryType,
           allergies: currentPrefs.allergies,
-          calorieTarget: currentPrefs.calorieTarget
+          calorieTarget: currentPrefs.calorieTarget,
+          healthGoals: currentPrefs.healthGoals,
+          cuisinePreferences: currentPrefs.cuisinePreferences,
+          cookingSkillLevel: currentPrefs.cookingSkillLevel
         });
         
-        // Generate a simple meal plan with basic structure
-        console.log('Generating simplified meal plan...');
+        // Use OpenAI to generate AI-based meal plan with user preferences
+        console.log(`Generating AI-based meal plan with OpenAI for ${durationDays} days...`);
         
-        const weeklyMealPlan = {
-          plan: Array.from({ length: durationDays }, (_, i) => ({
-            totalDailyCalories: currentPrefs.calorieTarget,
-            meals: [
-              {
-                name: `Śniadanie - Dzień ${i + 1}`,
-                mealType: 'breakfast',
-                recipe: {
-                  ingredients: ['2 jajka', '1 kromka chleba', 'masło'],
-                  instructions: ['Usmaż jajka', 'Podawaj z chlebem'],
-                  prepTime: 10,
-                  nutritionInfo: { calories: Math.round(currentPrefs.calorieTarget * 0.25), protein: 15, carbs: 25, fat: 12 }
-                }
-              },
-              {
-                name: `Obiad - Dzień ${i + 1}`,
-                mealType: 'lunch',
-                recipe: {
-                  ingredients: ['kurczak', 'ryż', 'warzywa'],
-                  instructions: ['Ugotuj ryż', 'Usmaż kurczaka', 'Dodaj warzywa'],
-                  prepTime: 25,
-                  nutritionInfo: { calories: Math.round(currentPrefs.calorieTarget * 0.45), protein: 30, carbs: 40, fat: 15 }
-                }
-              },
-              {
-                name: `Kolacja - Dzień ${i + 1}`,
-                mealType: 'dinner',
-                recipe: {
-                  ingredients: ['sałata', 'pomidor', 'oliwa'],
-                  instructions: ['Przygotuj sałatkę', 'Dodaj oliwę'],
-                  prepTime: 10,
-                  nutritionInfo: { calories: Math.round(currentPrefs.calorieTarget * 0.3), protein: 8, carbs: 15, fat: 18 }
-                }
-              }
-            ]
-          }))
-        };
+        const { generateMealPlanWithRecipes } = await import('./services/openai');
+        
+        // Generate meal plans for each day
+        const dailyPlans = [];
+        for (let day = 0; day < durationDays; day++) {
+          console.log(`Generating AI meal plan for day ${day + 1}/${durationDays}...`);
+          
+          const dayPlan = await generateMealPlanWithRecipes({
+            dietaryType: currentPrefs.dietaryType,
+            calorieTarget: currentPrefs.calorieTarget,
+            mealsPerDay: currentPrefs.mealsPerDay,
+            allergies: currentPrefs.allergies,
+            excludedIngredients: currentPrefs.excludedIngredients,
+            maxCookingTime: currentPrefs.maxCookingTime,
+            budgetPreference: currentPrefs.budgetPreference,
+            preferredIngredients: currentPrefs.preferredIngredients,
+            healthGoals: currentPrefs.healthGoals,
+            cuisinePreferences: currentPrefs.cuisinePreferences,
+            cookingSkillLevel: currentPrefs.cookingSkillLevel,
+            language: language
+          });
+          
+          dailyPlans.push({
+            date: new Date(Date.now() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            meals: dayPlan.meals,
+            totalCalories: dayPlan.totalCalories
+          });
+          
+          // Small delay to avoid rate limits
+          if (day < durationDays - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
+        const weeklyMealPlan = { plan: dailyPlans };
         
         // Handle AI meal plan data structure properly
         console.log('AI meal plan structure:', { 
@@ -2094,7 +2095,10 @@ export function registerRoutes(app: Express): Server {
         
         if (weeklyMealPlan && weeklyMealPlan.plan && Array.isArray(weeklyMealPlan.plan)) {
           // Use AI-generated meal plan directly if it has the correct structure
-          mealPlanData = weeklyMealPlan;
+          mealPlanData = { 
+            plan: weeklyMealPlan.plan,
+            totalCost: 0 // AI doesn't calculate cost
+          };
         } else {
           // Transform if needed - handle case where weeklyMealPlan is the plan array directly
           const planArray = Array.isArray(weeklyMealPlan) ? weeklyMealPlan : 
@@ -2102,18 +2106,18 @@ export function registerRoutes(app: Express): Server {
           
           mealPlanData = {
             plan: planArray.slice(0, durationDays),
-            totalCost: weeklyMealPlan?.totalCost || 0
+            totalCost: 0
           };
         }
         
-        console.log('Generated FAST meal plan in under 3 seconds:', { 
+        console.log('Generated AI meal plan with OpenAI:', { 
           daysGenerated: mealPlanData.plan?.length || 0,
           totalDays: durationDays,
-          generationType: 'FAST_TEMPLATES'
+          generationType: 'AI_OPENAI'
         });
-      } catch (error) {
-        console.error('Error generating FAST meal plan:', error);
-        throw new Error(`FAST meal plan generation failed: ${error.message}`);
+      } catch (error: any) {
+        console.error('Error generating AI meal plan:', error);
+        throw new Error(`AI meal plan generation failed: ${error?.message || 'Unknown error'}`);
       }
 
       // Process each day in the meal plan and save to database
