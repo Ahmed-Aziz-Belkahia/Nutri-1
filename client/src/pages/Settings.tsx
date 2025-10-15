@@ -5,10 +5,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@/hooks/use-user";
 import { toast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import PullToRefresh from "@/components/PullToRefresh";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { logout, user } = useUser(); // Added user to destructured object
+
+  // Pull to refresh setup
+  const handleRefresh = usePullToRefresh([
+    ['/api/user/profile']
+  ]);
 
   const handleLogout = async () => {
     try {
@@ -73,12 +80,13 @@ export default function Settings() {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-white to-gray-50"
-    >
+    <PullToRefresh onRefresh={handleRefresh}>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-gradient-to-br from-white to-gray-50"
+      >
       {/* Glassmorphic Header */}
       <header className="sticky top-0 backdrop-blur-xl bg-white/70 border-b border-white/20 z-10">
         <div className="px-4 py-4">
@@ -184,6 +192,7 @@ export default function Settings() {
           ))}
         </motion.div>
       </div>
-    </motion.div>
+      </motion.div>
+    </PullToRefresh>
   );
 }

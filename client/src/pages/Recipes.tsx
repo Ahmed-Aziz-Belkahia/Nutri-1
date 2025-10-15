@@ -46,6 +46,8 @@ import { z } from "zod";
 import ImprovedShoppingList from "@/pages/ImprovedShoppingList";
 import EmbeddedShoppingList from "@/components/EmbeddedShoppingList";
 import MealPlanningWelcome from "@/components/MealPlanningWelcome";
+import PullToRefresh from "@/components/PullToRefresh";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -133,6 +135,14 @@ export default function Recipes() {
   const [filterMode, setFilterMode] = useState<"all" | "lowCalorie" | "highProtein" | "balanced">("all");
   const username = user?.email ? user.email.split('@')[0] : 'User';
   const userInitial = username.charAt(0).toUpperCase();
+  
+  // Pull to refresh setup
+  const handleRefresh = usePullToRefresh([
+    ['/api/recipes/user'],
+    ['/api/recipes/saved'],
+    ['/api/meal-plans/today'],
+    ['/api/meal-plans/all']
+  ]);
   
   // Meal plan state
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -554,10 +564,11 @@ export default function Recipes() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden">
-      {/* Minimal, soft background accents */}
-      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50/50 via-white to-green-50/30 relative overflow-hidden">
+        {/* Minimal, soft background accents */}
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-emerald-100/30 filter blur-3xl opacity-60" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-green-100/25 filter blur-3xl opacity-50" />
 
       <div className="max-w-md mx-auto relative z-10 pt-6 px-4">
         {/* Minimal header to match Dashboard */}
@@ -1151,6 +1162,7 @@ export default function Recipes() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }

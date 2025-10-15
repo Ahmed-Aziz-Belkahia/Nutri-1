@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
+import PullToRefresh from "@/components/PullToRefresh";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 interface FoodLog {
   id: number;
@@ -35,6 +37,11 @@ export default function AllMeals() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [, navigate] = useLocation();
+  
+  // Pull to refresh setup
+  const handleRefresh = usePullToRefresh([
+    ['/api/food-logs']
+  ]);
   
   // Redirect to onboarding if user hasn't completed it
   useEffect(() => {
@@ -168,7 +175,8 @@ export default function AllMeals() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5 p-6">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <motion.h1
@@ -295,6 +303,7 @@ export default function AllMeals() {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }

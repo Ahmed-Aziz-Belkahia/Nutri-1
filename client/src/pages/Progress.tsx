@@ -26,6 +26,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NumberWheel } from '@/components/NumberWheel';
+import PullToRefresh from '@/components/PullToRefresh';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import {
   ChevronLeft,
   ChevronDown,
@@ -191,6 +193,13 @@ export default function ProgressPage() {
   const { photos, addPhoto, deletePhoto, isLoading: photosLoading, hasUploadedToday, todayPhoto, replacePhoto, isAddingPhoto, isReplacingPhoto } = useProgressPhotos();
   const [isDeletingPhoto, setIsDeletingPhoto] = useState(false);
   const isUploadingPhoto = isAddingPhoto || isReplacingPhoto;
+  
+  // Pull to refresh setup
+  const handleRefresh = usePullToRefresh([
+    ['/api/progress-photos'],
+    ['/api/weight-logs'],
+    ['/api/user/profile']
+  ]);
   
   // Debug logs to track the state
   useEffect(() => {
@@ -524,12 +533,13 @@ export default function ProgressPage() {
 
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Subtle emerald blobs background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-600/20 blur-3xl" />
-      </div>
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Subtle emerald blobs background */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-600/20 blur-3xl" />
+        </div>
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -1174,6 +1184,7 @@ export default function ProgressPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </PullToRefresh>
   );
 }

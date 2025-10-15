@@ -3,12 +3,20 @@ import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import PremiumShoppingList from '@/components/PremiumShoppingList';
 import { Home, Search, Calendar, User, Book } from 'lucide-react';
+import PullToRefresh from '@/components/PullToRefresh';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 
 const PremiumShoppingListPage = () => {
   const [activeTab, setActiveTab] = useState('shopping');
   
+  // Pull to refresh setup
+  const handleRefresh = usePullToRefresh([
+    ['/api/shopping-list']
+  ]);
+  
   return (
-    <div className="min-h-screen bg-white relative pb-20">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen bg-white relative pb-20">
       {/* Main content */}
       <div className="container max-w-md mx-auto px-4 pb-24">
         <PremiumShoppingList />
@@ -84,7 +92,8 @@ const PremiumShoppingListPage = () => {
           <path d="M12 5V19M5 12H19" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </motion.button>
-    </div>
+      </div>
+    </PullToRefresh>
   );
 };
 
