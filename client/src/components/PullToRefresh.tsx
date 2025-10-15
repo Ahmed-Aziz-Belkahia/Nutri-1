@@ -9,143 +9,147 @@ interface PullToRefreshProps {
 }
 
 export default function PullToRefresh({ onRefresh, children, disabled = false }: PullToRefreshProps) {
-  const [isPulling, setIsPulling] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const startY = useRef(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const currentY = useRef(0);
+  const isDragging = useRef(false);
   const controls = useAnimation();
 
-  const threshold = 80; // Distance to trigger refresh
-  const maxPull = 120; // Maximum pull distance
+  const threshold = 70; // Distance to trigger refresh (standard mobile threshold)
+  const maxPull = 150; // Maximum pull distance
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container || disabled) return;
-
-    let isTouching = false;
-    let startScrollTop = 0;
+    if (disabled) return;
 
     const handleTouchStart = (e: TouchEvent) => {
-      // Only start if we're at the top of the scroll
-      if (container.scrollTop === 0 && !isRefreshing) {
+      // Only start if we're at the top of the page
+      if (window.scrollY === 0 && !isRefreshing) {
         startY.current = e.touches[0].clientY;
-        startScrollTop = container.scrollTop;
-        isTouching = true;
+        currentY.current = startY.current;
+        isDragging.current = true;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (!isTouching || isRefreshing) return;
+      if (!isDragging.current || isRefreshing) return;
 
-      const currentY = e.touches[0].clientY;
-      const diff = currentY - startY.current;
+      currentY.current = e.touches[0].clientY;
+      const diff = currentY.current - startY.current;
 
-      // Only pull down if at top and pulling down
-      if (diff > 0 && container.scrollTop === 0) {
+      // Only allow pulling down when at top
+      if (diff > 0 && window.scrollY === 0) {
+        // Prevent default scrolling behavior
         e.preventDefault();
-        setIsPulling(true);
         
-        // Apply easing to pull distance
-        const easedDiff = Math.min(diff * 0.5, maxPull);
-        setPullDistance(easedDiff);
+        // Apply resistance (rubber band effect)
+        const resistance = 0.4;
+        const distance = Math.min(diff * resistance, maxPull);
         
+        setPullDistance(distance);
         controls.start({
-          y: easedDiff,
-          transition: { duration: 0 }
+          y: distance,
+          transition: { type: 'spring', stiffness: 300, damping: 30 }
         });
       }
     };
 
     const handleTouchEnd = async () => {
-      if (!isTouching) return;
+      if (!isDragging.current) return;
       
-      isTouching = false;
-      setIsPulling(false);
+      isDragging.current = false;
 
+      // Trigger refresh if pulled past threshold
       if (pullDistance >= threshold && !isRefreshing) {
-        // Trigger refresh
         setIsRefreshing(true);
         
-        // Animate to refresh position
-        await controls.start({
+        // Keep at threshold position during refresh
+        controls.start({
           y: threshold,
-          transition: { duration: 0.2 }
+          transition: { type: 'spring', stiffness: 300, damping: 30 }
         });
 
         try {
           await onRefresh();
         } finally {
-          // Animate back
+          // Snap back to top
           await controls.start({
             y: 0,
-            transition: { duration: 0.3 }
+            transition: { type: 'spring', stiffness: 300, damping: 25 }
           });
           
           setIsRefreshing(false);
           setPullDistance(0);
         }
       } else {
-        // Snap back
+        // Snap back without refreshing
         controls.start({
           y: 0,
-          transition: { duration: 0.3 }
+          transition: { type: 'spring', stiffness: 300, damping: 25 }
         });
         setPullDistance(0);
       }
     };
 
-    // Add event listeners
-    container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd);
+    // Attach to window for proper mobile behavior
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      container.removeEventListener('touchstart', handleTouchStart);
-      container.removeEventListener('touchmove', handleTouchMove);
-      container.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [controls, disabled, isRefreshing, onRefresh, pullDistance, threshold]);
 
-  const spinnerOpacity = Math.min(pullDistance / threshold, 1);
-  const spinnerRotation = (pullDistance / threshold) * 180;
+  // Calculate spinner opacity and rotation based on pull distance
+  const progress = Math.min(pullDistance / threshold, 1);
+  const spinnerScale = progress * 1.2;
+  const spinnerRotation = progress * 360;
 
   return (
-    <div 
-      ref={containerRef}
-      className="relative h-full overflow-y-auto overscroll-none"
-      style={{ 
-        WebkitOverflowScrolling: 'touch',
-        touchAction: 'pan-y'
-      }}
-    >
-      {/* Pull to refresh indicator */}
+    <>
+      {/* Pull to refresh indicator - fixed at top */}
       <div 
-        className="absolute top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-50"
+        className="fixed top-0 left-0 right-0 flex items-center justify-center pointer-events-none z-[9999]"
         style={{ 
-          height: `${Math.max(pullDistance, 0)}px`,
-          opacity: spinnerOpacity
+          transform: `translateY(${pullDistance > 0 ? pullDistance - 50 : -50}px)`,
+          opacity: pullDistance > 10 ? 1 : 0,
+          transition: isDragging.current ? 'none' : 'all 0.3s ease'
         }}
       >
         <motion.div
-          initial={{ scale: 0 }}
           animate={{ 
-            scale: spinnerOpacity,
-            rotate: isRefreshing ? 360 : spinnerRotation
+            rotate: isRefreshing ? 360 : spinnerRotation,
+            scale: spinnerScale
           }}
           transition={{ 
-            rotate: isRefreshing ? { duration: 1, repeat: Infinity, ease: "linear" } : { duration: 0 }
+            rotate: isRefreshing 
+              ? { duration: 1, repeat: Infinity, ease: "linear" } 
+              : { duration: 0 },
+            scale: { type: 'spring', stiffness: 300, damping: 20 }
           }}
-          className="w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center"
+          className="w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center border border-gray-100"
         >
-          <Loader2 className="w-5 h-5 text-[#0CC5BA]" />
+          <Loader2 className={`w-6 h-6 text-[#0CC5BA] ${isRefreshing ? 'animate-spin' : ''}`} />
         </motion.div>
+        
+        {/* Pull hint text */}
+        {pullDistance > 0 && !isRefreshing && (
+          <div 
+            className="absolute -bottom-8 text-xs text-gray-500 font-medium"
+            style={{ opacity: Math.min(pullDistance / threshold, 1) }}
+          >
+            {pullDistance >= threshold ? 'Release to refresh' : 'Pull to refresh'}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
-      <motion.div animate={controls}>
+      {/* Content with pull animation */}
+      <motion.div animate={controls} className="min-h-screen">
         {children}
       </motion.div>
-    </div>
+    </>
   );
 }
