@@ -51,13 +51,31 @@ try {
   // Run drizzle-kit push to create database from schema (--force to skip confirmation)
   execSync('npx drizzle-kit push --force', {
     cwd: __dirname,
-    stdio: 'inherit',
+    stdio: 'pipe', // Changed from 'inherit' to capture output
     env: { ...process.env, NODE_ENV: 'production' }
   });
-  dbCreated = true;
+  
+  // Check if database file was actually created
+  if (fs.existsSync(dbPath)) {
+    const Database = (await import('better-sqlite3')).default;
+    const db = new Database(dbPath);
+    const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type='table'`).all();
+    db.close();
+    
+    if (tables.length > 0) {
+      console.log('✅ drizzle-kit created database successfully\n');
+      dbCreated = true;
+    } else {
+      console.log('⚠️  drizzle-kit created database but no tables found\n');
+    }
+  }
 } catch (error) {
-  console.error('\n❌ drizzle-kit push failed:', error.message);
-  console.error('\nTrying emergency fallback: emergency-create-db.js...\n');
+  console.error('⚠️  drizzle-kit push failed\n');
+}
+
+// If drizzle-kit failed, use emergency method
+if (!dbCreated) {
+  console.error('🚨 Trying emergency fallback: emergency-create-db.js...\n');
   
   try {
     execSync('node emergency-create-db.js', {
