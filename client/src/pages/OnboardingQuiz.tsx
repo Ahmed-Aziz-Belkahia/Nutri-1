@@ -719,12 +719,19 @@ export default function OnboardingQuiz() {
                                   scrollContainer.scrollLeft = touchScrollLeft - walk;
                                 });
 
-                                // Scroll event listener for height updates (computed from scrollLeft only)
+                                // Scroll event listener for height updates (throttled with requestAnimationFrame)
+                                let scrollTicking = false;
                                 scrollContainer.addEventListener('scroll', () => {
-                                  const scrollLeft = scrollContainer.scrollLeft;
-                                  const height = Math.round(100 + (scrollLeft + CAL) / pixelsPerCm);
-                                  const clampedHeight = Math.max(100, Math.min(250, height));
-                                  setFormData(prev => ({ ...prev, height: clampedHeight }));
+                                  if (!scrollTicking) {
+                                    requestAnimationFrame(() => {
+                                      const scrollLeft = scrollContainer.scrollLeft;
+                                      const height = Math.round(100 + (scrollLeft + CAL) / pixelsPerCm);
+                                      const clampedHeight = Math.max(100, Math.min(250, height));
+                                      setFormData(prev => ({ ...prev, height: clampedHeight }));
+                                      scrollTicking = false;
+                                    });
+                                    scrollTicking = true;
+                                  }
                                 });
                               }
                             }}
@@ -925,13 +932,20 @@ export default function OnboardingQuiz() {
                                   scrollContainer.scrollLeft = touchScrollLeft - walk;
                                 });
                                 
-                                // Scroll event listener for weight updates
+                                // Scroll event listener for weight updates (throttled with requestAnimationFrame)
+                                let weightScrollTicking = false;
                                 scrollContainer.addEventListener('scroll', () => {
-                                  const scrollLeft = scrollContainer.scrollLeft;
-                                  const pixelsPerKg = 20;
-                                  const weight = Math.round(30 + (scrollLeft + weightCALRef.current) / pixelsPerKg);
-                                  const clampedWeight = Math.max(30, Math.min(200, weight));
-                                  setFormData(prev => ({ ...prev, weight: clampedWeight }));
+                                  if (!weightScrollTicking) {
+                                    requestAnimationFrame(() => {
+                                      const scrollLeft = scrollContainer.scrollLeft;
+                                      const pixelsPerKg = 20;
+                                      const weight = Math.round(30 + (scrollLeft + weightCALRef.current) / pixelsPerKg);
+                                      const clampedWeight = Math.max(30, Math.min(200, weight));
+                                      setFormData(prev => ({ ...prev, weight: clampedWeight }));
+                                      weightScrollTicking = false;
+                                    });
+                                    weightScrollTicking = true;
+                                  }
                                 });
                               }
                             }}
@@ -1135,13 +1149,20 @@ export default function OnboardingQuiz() {
                                   scrollContainer.scrollLeft = touchScrollLeft - walk;
                                 });
                                 
-                                // Scroll event listener for goal weight updates
+                                // Scroll event listener for goal weight updates (throttled with requestAnimationFrame)
+                                let goalWeightScrollTicking = false;
                                 scrollContainer.addEventListener('scroll', () => {
-                                  const scrollLeft = scrollContainer.scrollLeft;
-                                  const pixelsPerKg = 20;
-                                  const goalWeight = Math.round(30 + (scrollLeft + goalWeightCALRef.current) / pixelsPerKg);
-                                  const clampedGoalWeight = Math.max(30, Math.min(200, goalWeight));
-                                  setFormData(prev => ({ ...prev, goalWeight: clampedGoalWeight }));
+                                  if (!goalWeightScrollTicking) {
+                                    requestAnimationFrame(() => {
+                                      const scrollLeft = scrollContainer.scrollLeft;
+                                      const pixelsPerKg = 20;
+                                      const goalWeight = Math.round(30 + (scrollLeft + goalWeightCALRef.current) / pixelsPerKg);
+                                      const clampedGoalWeight = Math.max(30, Math.min(200, goalWeight));
+                                      setFormData(prev => ({ ...prev, goalWeight: clampedGoalWeight }));
+                                      goalWeightScrollTicking = false;
+                                    });
+                                    goalWeightScrollTicking = true;
+                                  }
                                 });
                               }
                             }}
