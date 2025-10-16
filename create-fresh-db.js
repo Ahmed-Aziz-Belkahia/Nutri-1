@@ -80,17 +80,28 @@ try {
   console.log('\n🎉 Fresh database ready to use!\n');
   
 } catch (error) {
-  console.error('\n❌ Failed to create database:', error.message);
-  console.error('\nTrying fallback method: setup.js...\n');
+  console.error('\n❌ drizzle-kit push failed:', error.message);
+  console.error('\nTrying emergency fallback: emergency-create-db.js...\n');
   
   try {
-    execSync('node setup.js', {
+    execSync('node emergency-create-db.js', {
       cwd: __dirname,
       stdio: 'inherit'
     });
-    console.log('\n✅ Database created using setup.js\n');
+    console.log('\n✅ Database created using emergency method\n');
   } catch (fallbackError) {
-    console.error('\n❌ All methods failed:', fallbackError.message);
-    process.exit(1);
+    console.error('\n❌ Emergency method also failed:', fallbackError.message);
+    console.error('\nLast resort: setup.js...\n');
+    
+    try {
+      execSync('node setup.js', {
+        cwd: __dirname,
+        stdio: 'inherit'
+      });
+      console.log('\n✅ Database created using setup.js\n');
+    } catch (finalError) {
+      console.error('\n❌ All methods failed!');
+      process.exit(1);
+    }
   }
 }
