@@ -150,6 +150,14 @@ if node migrations/add-quiz-fields-to-preferences.js; then
 else
     echo "⚠️  Quiz fields migration failed, but continuing..."
 fi
+
+# Always run photo_date migration (safe to run multiple times)
+echo "→ Adding photo_date column to progress_photos..."
+if node migrations/add-photo-date-column.js; then
+    echo "✅ Photo date migration completed"
+else
+    echo "⚠️  Photo date migration failed, but continuing..."
+fi
 echo ""
 
 # Step 6: Fix database permissions
