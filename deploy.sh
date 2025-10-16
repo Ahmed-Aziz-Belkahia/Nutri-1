@@ -28,6 +28,15 @@ npm install
 echo "🔧 Running setup..."
 npm run setup
 
+# Run database migrations
+echo "🗄️  Running database migrations..."
+if [ -f "add-age-gender-migration.js" ]; then
+    node add-age-gender-migration.js
+    echo "✅ Database migrations completed"
+else
+    echo "⚠️  No migration script found, skipping..."
+fi
+
 # Build the application
 echo "🏗️  Building application..."
 npm run build
