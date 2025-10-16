@@ -140,10 +140,22 @@ export function mergeIngredients(ingredients: Array<{
     return name
       .toLowerCase()
       .trim()
+      // Remove temperature descriptors
+      .replace(/\b(hot|cold|warm|frozen|chilled|room temperature)\b/gi, '')
       // Remove common descriptors that don't affect the core ingredient
-      .replace(/\b(fresh|frozen|dried|chopped|diced|sliced|minced|grated|shredded|cooked|raw|organic|large|small|medium)\b/gi, '')
+      .replace(/\b(fresh|frozen|dried|chopped|diced|sliced|minced|grated|shredded|cooked|raw|organic|large|small|medium|whole|halved|quartered|cubed)\b/gi, '')
+      // Remove preparation methods
+      .replace(/\b(boiled|steamed|roasted|grilled|fried|baked|sautéed|blanched|toasted)\b/gi, '')
+      // Remove quality descriptors
+      .replace(/\b(ripe|unripe|fresh|stale|soft|hard|firm|tender)\b/gi, '')
+      // Remove packaging/form descriptors
+      .replace(/\b(canned|jarred|bottled|packaged|boxed)\b/gi, '')
       // Remove parenthetical descriptions
       .replace(/\([^)]*\)/g, '')
+      // Remove commas and extra punctuation
+      .replace(/[,;]/g, '')
+      // Normalize plurals - convert to singular
+      .replace(/\b(\w+)s\b/g, '$1') // Simple plural removal (seeds -> seed, kernels -> kernel)
       // Remove extra whitespace
       .replace(/\s+/g, ' ')
       .trim();
