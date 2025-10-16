@@ -63,13 +63,15 @@ print_info "Installing dependencies..."
 npm install
 print_status "Dependencies installed"
 
-# Run database migrations
-print_info "Running database migrations..."
+# Push database schema changes (drizzle-kit will apply all schema updates)
+print_info "Applying database schema changes..."
+npm run db:push
+print_status "Database schema updated"
+
+# Run any custom migrations (for backward compatibility)
 if [ -f "add-age-gender-migration.js" ]; then
+    print_info "Running custom migrations..."
     node add-age-gender-migration.js
-    print_status "Database migrations completed"
-else
-    print_warning "No migration script found, skipping..."
 fi
 
 # Build the application

@@ -28,13 +28,14 @@ npm install
 echo "🔧 Running setup..."
 npm run setup
 
-# Run database migrations
-echo "🗄️  Running database migrations..."
+# Push database schema changes (drizzle-kit will apply all schema updates)
+echo "🗄️  Applying database schema changes..."
+npm run db:push
+
+# Run any custom migrations (for backward compatibility)
 if [ -f "add-age-gender-migration.js" ]; then
+    echo "🔧 Running custom migrations..."
     node add-age-gender-migration.js
-    echo "✅ Database migrations completed"
-else
-    echo "⚠️  No migration script found, skipping..."
 fi
 
 # Build the application
