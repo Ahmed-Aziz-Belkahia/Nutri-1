@@ -330,6 +330,11 @@ export async function generateMealPlanWithRecipes(preferences: {
   
   console.log(`Generating meal plan in English language`);
   
+  // Ensure arrays are properly formatted
+  const allergies = Array.isArray(preferences.allergies) ? preferences.allergies : [];
+  const healthGoals = Array.isArray(preferences.healthGoals) ? preferences.healthGoals : [];
+  const cuisinePreferences = Array.isArray(preferences.cuisinePreferences) ? preferences.cuisinePreferences : [];
+  
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -350,9 +355,9 @@ Guidelines:
         content: `Create a simple 1-day meal plan with ${preferences.mealsPerDay} meals (${preferences.calorieTarget} calories total).
           
           Diet: ${preferences.dietaryType}
-          Allergies: ${preferences.allergies.join(', ') || 'None'}
-          Health Goals: ${preferences.healthGoals?.join(', ') || 'General health'}
-          Cuisine Preferences: ${preferences.cuisinePreferences?.join(', ') || 'Any'}
+          Allergies: ${allergies.join(', ') || 'None'}
+          Health Goals: ${healthGoals.join(', ') || 'General health'}
+          Cuisine Preferences: ${cuisinePreferences.join(', ') || 'Any'}
           Cooking Skill Level: ${preferences.cookingSkillLevel || 'intermediate'}
           
           Create ${preferences.mealsPerDay} simple meals:

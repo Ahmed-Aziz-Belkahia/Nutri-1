@@ -2009,20 +2009,23 @@ export function registerRoutes(app: Express): Server {
           
         const actualPrefs = userDietPrefs[0] || {};
         
+        // Helper to ensure array type
+        const ensureArray = (value: any) => Array.isArray(value) ? value : [];
+        
         // Use simplified preferences that match the schema, INCLUDING quiz answers
         const currentPrefs = {
           ...actualPrefs,
           dietaryType: dietaryType || actualPrefs.dietaryType || 'balanced',
           calorieTarget: calorieTarget || actualPrefs.calorieTarget || 2000,
           mealsPerDay: mealsPerDay || actualPrefs.mealsPerDay || 3,
-          allergies: allergies || actualPrefs.allergies || [],
-          excludedIngredients: excludedIngredients || actualPrefs.excludedIngredients || [],
+          allergies: ensureArray(allergies || actualPrefs.allergies),
+          excludedIngredients: ensureArray(excludedIngredients || actualPrefs.excludedIngredients),
           maxCookingTime: maxCookingTime || actualPrefs.maxCookingTime || 30,
           budgetPreference: budgetPreference || actualPrefs.budgetPreference || 'medium',
-          preferredIngredients: preferredIngredients || actualPrefs.preferredIngredients || [],
-          // Add quiz-specific answers that were missing
-          healthGoals: healthGoals || actualPrefs.healthGoals || [],
-          cuisinePreferences: cuisinePreferences || actualPrefs.cuisinePreferences || [],
+          preferredIngredients: ensureArray(preferredIngredients || actualPrefs.preferredIngredients),
+          // Add quiz-specific answers that were missing - ensure arrays
+          healthGoals: ensureArray(healthGoals || actualPrefs.healthGoals),
+          cuisinePreferences: ensureArray(cuisinePreferences || actualPrefs.cuisinePreferences),
           cookingSkillLevel: cookingSkillLevel || actualPrefs.cookingSkillLevel || 'intermediate'
         };
         
