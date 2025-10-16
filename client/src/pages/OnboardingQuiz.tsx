@@ -346,10 +346,10 @@ export default function OnboardingQuiz() {
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 100 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             className="w-full"
           >
             <div className="w-full">
@@ -387,11 +387,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements - Green theme */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         <div className="space-y-4">
                           {[
                             { value: 'weight_loss', label: 'Weight Loss', desc: 'Reach your ideal weight' },
@@ -403,7 +403,7 @@ export default function OnboardingQuiz() {
                               key={goal.value}
                               whileHover={{ scale: 1.01, y: -2 }}
                               whileTap={{ scale: 0.99 }}
-                              className={`relative backdrop-blur-xl rounded-xl p-5 cursor-pointer transition-all duration-300 ${
+                              className={`relative rounded-xl p-5 cursor-pointer transition-all duration-150 ${
                                 formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
                                   ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20 shadow-xl ring-2 ring-green-400 ring-offset-2 border border-white/40' 
                                   : 'bg-white/30 hover:bg-white/50 shadow-lg hover:shadow-xl border border-white/20'
@@ -417,7 +417,7 @@ export default function OnboardingQuiz() {
                               }}
                             >
                               <div className="flex items-center space-x-4">
-                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-150 ${
                                   formData.perfectGoal.length === 1 && formData.perfectGoal[0] === goal.value
                                     ? 'bg-gradient-to-r from-green-500 to-emerald-500 border-transparent' 
                                     : 'border-gray-300 bg-white/50'
@@ -451,7 +451,7 @@ export default function OnboardingQuiz() {
                               transition={{ duration: 0.4, ease: "easeOut" }}
                               className="mt-6"
                             >
-                              <div className="backdrop-blur-xl bg-white/50 rounded-xl p-5 shadow-xl border border-white/30">
+                              <div className="bg-white/95 rounded-xl p-5 shadow-xl border border-white/30">
                                 <label className="block text-sm font-medium text-gray-700 mb-3">
                                   Please specify your goal
                                 </label>
@@ -460,7 +460,7 @@ export default function OnboardingQuiz() {
                                   placeholder="Enter your custom goal..."
                                   value={formData.customGoal || ''}
                                   onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
-                                  className="w-full p-4 bg-white/60 backdrop-blur-sm border border-gray-200 rounded-xl focus:border-green-400 focus:ring-2 focus:ring-green-100 focus:outline-none transition-all duration-300 placeholder:text-gray-400"
+                                  className="w-full p-4 bg-white/60 backdrop-blur-sm border border-gray-200 rounded-xl focus:border-green-400 focus:ring-2 focus:ring-green-100 focus:outline-none transition-all duration-150 placeholder:text-gray-400"
                                   autoFocus
                                 />
                               </div>
@@ -487,7 +487,7 @@ export default function OnboardingQuiz() {
                           key={gender.value}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                          className={`flex items-center space-x-3 p-3 border-2 rounded-xl cursor-pointer transition-all duration-150 ${
                             formData.gender === gender.value 
                               ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-purple-100 shadow-lg' 
                               : 'border-gray-200 hover:border-purple-300 hover:bg-gray-50'
@@ -511,11 +511,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Age display with glassmorphic effect */}
                         <div className="flex flex-col items-center mb-8">
                           <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
@@ -589,7 +589,7 @@ export default function OnboardingQuiz() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => setFormData(prev => ({ ...prev, age }))}
-                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-150 ${
                                 formData.age === age
                                   ? 'bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
@@ -612,7 +612,7 @@ export default function OnboardingQuiz() {
                                 setFormData(prev => ({ ...prev, age }));
                               }
                             }}
-                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-300"
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-green-400/50 focus:border-transparent transition-all duration-150"
                             min="13"
                             max="80"
                             placeholder="Age"
@@ -629,11 +629,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-teal-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-cyan-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-teal-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-cyan-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Height display with glassmorphic effect */}
                         <div className="flex flex-col items-center mb-8">
                           <div className="backdrop-blur-md bg-white/60 rounded-2xl p-6 shadow-lg border border-white/30 mb-4">
@@ -784,7 +784,7 @@ export default function OnboardingQuiz() {
                                   scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
-                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-150 ${
                                 formData.height === height
                                   ? 'bg-gradient-to-r from-teal-500/80 to-cyan-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
@@ -816,7 +816,7 @@ export default function OnboardingQuiz() {
                                 }
                               }
                             }}
-                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-transparent transition-all duration-300"
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:border-transparent transition-all duration-150"
                             min="100"
                             max="250"
                             placeholder="Height"
@@ -833,11 +833,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-indigo-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-indigo-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Weight display with scale-like design */}
                         <div className="flex flex-col items-center mb-8">
                           {/* Scale display */}
@@ -991,7 +991,7 @@ export default function OnboardingQuiz() {
                                   scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
-                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-150 ${
                                 formData.weight === weight
                                   ? 'bg-gradient-to-r from-blue-500/80 to-indigo-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
@@ -1023,7 +1023,7 @@ export default function OnboardingQuiz() {
                                 }
                               }
                             }}
-                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300"
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-150"
                             min="30"
                             max="200"
                             placeholder="Weight"
@@ -1040,11 +1040,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-amber-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-orange-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-amber-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-orange-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Goal Weight display with scale-like design */}
                         <div className="flex flex-col items-center mb-8">
                           {/* Scale display with target icon */}
@@ -1201,7 +1201,7 @@ export default function OnboardingQuiz() {
                                   scroller.scrollTo({ left: scrollPosition, behavior: 'smooth' });
                                 }
                               }}
-                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-300 ${
+                              className={`backdrop-blur-sm py-3 px-4 rounded-xl border transition-all duration-150 ${
                                 formData.goalWeight === goalWeight
                                   ? 'bg-gradient-to-r from-amber-500/80 to-orange-500/80 text-white border-white/40 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-white/20 text-gray-700'
@@ -1233,7 +1233,7 @@ export default function OnboardingQuiz() {
                                 }
                               }
                             }}
-                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-300"
+                            className="backdrop-blur-sm bg-white/50 border border-white/30 rounded-xl px-4 py-2 text-center w-24 focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-150"
                             min="30"
                             max="200"
                             placeholder="Goal"
@@ -1250,11 +1250,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements - Green theme */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         
                         {/* Activity Level Cards - 3 options */}
                         <div className="grid grid-cols-3 gap-4">
@@ -1268,7 +1268,7 @@ export default function OnboardingQuiz() {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => setFormData(prev => ({ ...prev, activityLevel: activity.value }))}
-                              className={`backdrop-blur-sm p-4 rounded-xl border-2 transition-all duration-300 ${
+                              className={`backdrop-blur-sm p-4 rounded-xl border-2 transition-all duration-150 ${
                                 formData.activityLevel === activity.value
                                   ? 'bg-gradient-to-b from-green-500/80 to-emerald-500/80 text-white border-white/60 shadow-lg'
                                   : 'bg-white/30 hover:bg-white/50 border-gray-300/40 text-gray-700 hover:border-gray-400/60'
@@ -1347,11 +1347,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements - Green theme */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         <div className="text-center">
                           {/* Profile Picture Container */}
                           <div className="mx-auto h-40 w-40 relative mb-6">
@@ -1395,7 +1395,7 @@ export default function OnboardingQuiz() {
                           {/* Upload button with glassmorphism */}
                           <Label
                             htmlFor="profile-image"
-                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white rounded-xl hover:from-green-600/80 hover:to-emerald-600/80 cursor-pointer transition-all duration-300 backdrop-blur-md border border-white/30 shadow-lg"
+                            className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white rounded-xl hover:from-green-600/80 hover:to-emerald-600/80 cursor-pointer transition-all duration-150 backdrop-blur-md border border-white/30 shadow-lg"
                           >
                             <Camera className="w-5 h-5 mr-2" />
                             <span className="font-semibold">
@@ -1451,11 +1451,11 @@ export default function OnboardingQuiz() {
                     {/* Glassmorphic Card Container */}
                     <div className="relative">
                       {/* Background decorative elements - Green theme */}
-                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+                      <div className="absolute -top-20 -left-20 w-40 h-40 bg-green-400 rounded-full blur-2xl opacity-15"></div>
+                      <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-400 rounded-full blur-2xl opacity-15"></div>
                       
                       {/* Main glassmorphic card */}
-                      <div className="backdrop-blur-xl bg-white/40 rounded-3xl p-8 shadow-2xl border border-white/20">
+                      <div className="bg-white/95 rounded-3xl p-8 shadow-2xl border border-white/20">
                         {/* Page Indicators - Green theme */}
                         <div className="flex justify-center space-x-3 mb-8">
                           {[1, 2].map((page) => (
@@ -1463,7 +1463,7 @@ export default function OnboardingQuiz() {
                               key={page}
                               initial={{ scale: 0.8 }}
                               animate={{ scale: visionBoardPage >= page ? 1 : 0.8 }}
-                              className={`w-10 h-2 rounded-full transition-all duration-300 ${
+                              className={`w-10 h-2 rounded-full transition-all duration-150 ${
                                 visionBoardPage >= page 
                                   ? 'bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg' 
                                   : 'bg-gray-300/50'
@@ -1741,7 +1741,7 @@ export default function OnboardingQuiz() {
                       variant="ghost"
                       onClick={handleBack}
                       disabled={step === 8 && visionBoardPage === 0}
-                      className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-300"
+                      className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-150"
                     >
                       <span className="mr-2 text-lg">←</span>
                       Back
@@ -1751,7 +1751,7 @@ export default function OnboardingQuiz() {
                   <Button
                     onClick={handleNext}
                     disabled={isNextDisabled() || mutation.isPending}
-                    className="backdrop-blur-xl bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap border border-white/20 hover:from-green-600/80 hover:to-emerald-600/80"
+                    className="bg-gradient-to-r from-green-500/80 to-emerald-500/80 text-white px-8 py-4 rounded-2xl text-base font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 min-w-fit whitespace-nowrap border border-white/20 hover:from-green-600/80 hover:to-emerald-600/80"
                   >
                     {mutation.isPending ? (
                       <div className="flex items-center">
