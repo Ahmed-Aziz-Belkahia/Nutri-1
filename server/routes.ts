@@ -2523,16 +2523,6 @@ export function registerRoutes(app: Express): Server {
           recipeCount: createdRecipes.length 
         });
 
-        // Generate shopping list for this meal plan
-        try {
-          console.log(`Generating shopping list for meal plan ID ${mealPlan.id}`);
-          const { generateShoppingListFromMealPlan } = await import('./services/shopping-list-generator');
-          const shoppingList = await generateShoppingListFromMealPlan(mealPlan.id, req.user.id);
-          console.log(`Successfully created shopping list with ${shoppingList.items.length} items for meal plan ${mealPlan.id}`);
-        } catch (shoppingListError) {
-          console.error(`Error generating shopping list for meal plan ${mealPlan.id}:`, shoppingListError);
-        }
-
         // Add to generated plans
         generatedPlans.push({
           id: mealPlan.id,
@@ -2541,6 +2531,17 @@ export function registerRoutes(app: Express): Server {
           status: mealPlan.status,
           meals: createdRecipes
         });
+      }
+
+      // Generate shopping list for ALL meal plans in the week (after loop completes)
+      try {
+        console.log(`Generating weekly shopping list for ${generatedPlans.length} meal plans`);
+        const { generateWeeklyShoppingList } = await import('./services/shopping-list-generator');
+        const mealPlanIds = generatedPlans.map(p => p.id);
+        const shoppingList = await generateWeeklyShoppingList(mealPlanIds, req.user.id);
+        console.log(`Successfully created weekly shopping list with ${shoppingList.items.length} items`);
+      } catch (shoppingListError) {
+        console.error(`Error generating weekly shopping list:`, shoppingListError);
       }
 
       res.json({
