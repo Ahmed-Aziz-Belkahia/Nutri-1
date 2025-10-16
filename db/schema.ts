@@ -82,6 +82,8 @@ export type SelectFoodLog = typeof foodLogs.$inferSelect;
 export const userNutritionPreferences = sqliteTable("user_nutrition_preferences", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull().references(() => users.id),
+  age: integer("age"),
+  gender: text("gender"),
   currentWeight: real("current_weight").notNull(),
   goalWeight: real("goal_weight").notNull(),
   height: real("height").notNull(),

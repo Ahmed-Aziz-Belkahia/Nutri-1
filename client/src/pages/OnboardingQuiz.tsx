@@ -203,6 +203,8 @@ export default function OnboardingQuiz() {
       
       // Create profile data matching the backend expectation
       const profileData = {
+        age: data.age,
+        gender: data.gender,
         height: height,
         weight: weight,
         goalWeight: goalWeight,

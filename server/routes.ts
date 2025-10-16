@@ -133,6 +133,8 @@ export function registerRoutes(app: Express): Server {
       // Update user preferences using Drizzle ORM for better safety
       await db.insert(userNutritionPreferences).values({
         userId: userId,
+        age: profileData.age,
+        gender: profileData.gender,
         height: profileData.height,
         currentWeight: profileData.weight,
         goalWeight: profileData.goalWeight,
