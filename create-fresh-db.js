@@ -46,8 +46,8 @@ console.log('🏗️  Creating new database from db/schema.ts...');
 console.log('Running: npx drizzle-kit push\n');
 
 try {
-  // Run drizzle-kit push to create database from schema
-  execSync('npx drizzle-kit push', {
+  // Run drizzle-kit push to create database from schema (--force to skip confirmation)
+  execSync('npx drizzle-kit push --force', {
     cwd: __dirname,
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'production' }
