@@ -92,33 +92,69 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
   const currentDay = progress?.currentDay || 0;
   const totalDays = progress?.totalDays || dayCount;
   const currentMessage = progress?.message || 'Starting meal plan generation';
+  const backendStep = progress?.step || 'analyzing';
   
-  // Determine which step we're on based on currentDay
+  // Determine which step we're on based on backend step and currentDay
   let currentStepIndex = 0;
-  if (currentDay === 0) {
-    currentStepIndex = 0; // initializing/calculating
-  } else if (currentDay <= totalDays) {
-    currentStepIndex = 1 + currentDay; // 2 initial steps + day steps
-  } else {
+  if (backendStep === 'analyzing') {
+    currentStepIndex = 0;
+  } else if (backendStep === 'calculating') {
+    currentStepIndex = 1;
+  } else if (backendStep === 'generating' && currentDay > 0) {
+    currentStepIndex = 1 + currentDay; // 2 initial steps + current day
+  } else if (backendStep === 'saving') {
     currentStepIndex = progressSteps.length - 2; // saving step
+  } else if (backendStep === 'optimizing') {
+    currentStepIndex = progressSteps.length - 3; // optimizing step
   }
   
-  // Calculate accurate progress percentage
-  const progressPercent = currentDay === 0 ? 5 :
-                          currentDay <= totalDays ? (currentDay / totalDays) * 90 :
-                          95;
+  // Calculate accurate progress percentage based on actual day progress
+  let progressPercent = 5;
+  if (backendStep === 'analyzing') {
+    progressPercent = 5;
+  } else if (backendStep === 'calculating') {
+    progressPercent = 10;
+  } else if (backendStep === 'generating' && currentDay > 0) {
+    progressPercent = 10 + ((currentDay / totalDays) * 75); // 10% to 85%
+  } else if (backendStep === 'optimizing') {
+    progressPercent = 90;
+  } else if (backendStep === 'saving') {
+    progressPercent = 95;
+  }
   
   // Mark steps as completed based on actual progress
   useEffect(() => {
     const completed: string[] = [];
-    if (currentDay > 0) {
-      completed.push('analyzing', 'calculating');
+    
+    // Mark analyzing as complete if we're past it
+    if (backendStep !== 'analyzing') {
+      completed.push('analyzing');
+    }
+    
+    // Mark calculating as complete if we're past it
+    if (backendStep !== 'analyzing' && backendStep !== 'calculating') {
+      completed.push('calculating');
+    }
+    
+    // Mark completed days
+    if (backendStep === 'generating' && currentDay > 0) {
       for (let i = 1; i < currentDay; i++) {
         completed.push(`day${i}`);
       }
     }
+    
+    // If saving or optimizing, mark all days complete
+    if (backendStep === 'optimizing' || backendStep === 'saving' || backendStep === 'completed') {
+      for (let i = 1; i <= totalDays; i++) {
+        completed.push(`day${i}`);
+      }
+      if (backendStep === 'saving' || backendStep === 'completed') {
+        completed.push('optimizing');
+      }
+    }
+    
     setCompletedSteps(completed);
-  }, [currentDay]);
+  }, [currentDay, backendStep, totalDays]);
 
   return (
     <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center p-3">

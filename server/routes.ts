@@ -2075,15 +2075,31 @@ export function registerRoutes(app: Express): Server {
         const { generateMealPlanWithRecipes } = await import('./services/openai');
         const { updateMealPlanProgress, clearMealPlanProgress } = await import('./services/meal-plan-progress');
         
-        // Initialize progress tracking
+        // Step 1: Initialize progress tracking
         updateMealPlanProgress(
           req.user.id,
-          'initializing',
-          'Starting meal plan generation',
+          'analyzing',
+          'Analyzing preferences',
           0,
           durationDays,
           false
         );
+        
+        // Small delay to show analyzing step
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Step 2: Calculating
+        updateMealPlanProgress(
+          req.user.id,
+          'calculating',
+          'Calculating macros',
+          0,
+          durationDays,
+          false
+        );
+        
+        // Small delay to show calculating step
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Generate meal plans for each day
         const dailyPlans = [];
