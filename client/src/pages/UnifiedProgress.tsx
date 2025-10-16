@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
@@ -85,19 +85,23 @@ export default function UnifiedProgress() {
   // Get the best photo for body analysis
   const bestPhotoForAnalysis = latestPhotos[0] || progressPhotos[0] || allPhotos[0];
   
-  // Check if photos have changed since last analysis
-  const currentPhotoUrls = allPhotos.map(p => p.photoUrl).sort();
-  const sortedLastAnalyzed = [...lastAnalyzedPhotos].sort();
-  const photosHaveChanged = 
-    currentPhotoUrls.length !== sortedLastAnalyzed.length ||
-    currentPhotoUrls.some((url, index) => url !== sortedLastAnalyzed[index]);
-
-  console.log('Photo change detection:', {
-    currentPhotoUrls,
-    lastAnalyzedPhotos,
-    photosHaveChanged,
-    hasPhotos: allPhotos.length > 0
-  });
+  // Check if photos have changed since last analysis - wrapped in useMemo for reactivity
+  const photosHaveChanged = useMemo(() => {
+    const currentPhotoUrls = allPhotos.map(p => p.photoUrl).sort();
+    const sortedLastAnalyzed = [...lastAnalyzedPhotos].sort();
+    const hasChanged = 
+      currentPhotoUrls.length !== sortedLastAnalyzed.length ||
+      currentPhotoUrls.some((url, index) => url !== sortedLastAnalyzed[index]);
+    
+    console.log('Photo change detection:', {
+      currentPhotoUrls,
+      lastAnalyzedPhotos,
+      photosHaveChanged: hasChanged,
+      hasPhotos: allPhotos.length > 0
+    });
+    
+    return hasChanged;
+  }, [allPhotos, lastAnalyzedPhotos]);
 
   // Handle camera capture
   const handleCameraCapture = async (imageData: string) => {
