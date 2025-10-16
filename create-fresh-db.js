@@ -43,7 +43,9 @@ try {
 
 // Step 3: Create fresh database using drizzle-kit push
 console.log('🏗️  Creating new database from db/schema.ts...');
-console.log('Running: npx drizzle-kit push\n');
+console.log('Running: npx drizzle-kit push --force\n');
+
+let dbCreated = false;
 
 try {
   // Run drizzle-kit push to create database from schema (--force to skip confirmation)
@@ -52,33 +54,7 @@ try {
     stdio: 'inherit',
     env: { ...process.env, NODE_ENV: 'production' }
   });
-  
-  console.log('\n✅ Database created successfully!\n');
-  
-  // Step 4: Verify database
-  if (!fs.existsSync(dbPath)) {
-    console.log('❌ Database file was not created!\n');
-    process.exit(1);
-  }
-  
-  // Import sqlite to check tables
-  const Database = (await import('better-sqlite3')).default;
-  const db = new Database(dbPath);
-  
-  const tables = db.prepare(`
-    SELECT name FROM sqlite_master 
-    WHERE type='table' 
-    ORDER BY name
-  `).all();
-  
-  console.log(`📊 Database contains ${tables.length} tables:`);
-  tables.forEach(table => {
-    console.log(`   - ${table.name}`);
-  });
-  
-  db.close();
-  console.log('\n🎉 Fresh database ready to use!\n');
-  
+  dbCreated = true;
 } catch (error) {
   console.error('\n❌ drizzle-kit push failed:', error.message);
   console.error('\nTrying emergency fallback: emergency-create-db.js...\n');
@@ -88,7 +64,7 @@ try {
       cwd: __dirname,
       stdio: 'inherit'
     });
-    console.log('\n✅ Database created using emergency method\n');
+    dbCreated = true;
   } catch (fallbackError) {
     console.error('\n❌ Emergency method also failed:', fallbackError.message);
     console.error('\nLast resort: setup.js...\n');
@@ -98,10 +74,42 @@ try {
         cwd: __dirname,
         stdio: 'inherit'
       });
-      console.log('\n✅ Database created using setup.js\n');
+      dbCreated = true;
     } catch (finalError) {
       console.error('\n❌ All methods failed!');
       process.exit(1);
     }
   }
 }
+
+// Step 4: Verify database was created
+if (!dbCreated) {
+  console.error('\n❌ Database creation failed!\n');
+  process.exit(1);
+}
+
+console.log('\n✅ Database created successfully!\n');
+
+// Verify database file exists
+if (!fs.existsSync(dbPath)) {
+  console.log('❌ Database file was not created!\n');
+  process.exit(1);
+}
+
+// Import sqlite to check tables
+const Database = (await import('better-sqlite3')).default;
+const db = new Database(dbPath);
+
+const tables = db.prepare(`
+  SELECT name FROM sqlite_master 
+  WHERE type='table' 
+  ORDER BY name
+`).all();
+
+console.log(`📊 Database contains ${tables.length} tables:`);
+tables.forEach(table => {
+  console.log(`   - ${table.name}`);
+});
+
+db.close();
+console.log('\n🎉 Fresh database ready to use!\n');
