@@ -135,30 +135,75 @@ export function mergeIngredients(ingredients: Array<{
     mealTypes: string[];
   }>();
   
-  // Normalize ingredient names (lowercase, remove extra spaces)
+  // Normalize ingredient names for better matching
   const normalizeIngredientName = (name: string): string => {
-    return name.toLowerCase().trim();
+    return name
+      .toLowerCase()
+      .trim()
+      // Remove common descriptors that don't affect the core ingredient
+      .replace(/\b(fresh|frozen|dried|chopped|diced|sliced|minced|grated|shredded|cooked|raw|organic|large|small|medium)\b/gi, '')
+      // Remove parenthetical descriptions
+      .replace(/\([^)]*\)/g, '')
+      // Remove extra whitespace
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+  
+  // Normalize units for better matching
+  const normalizeUnit = (unit: string): string => {
+    const unitMap: Record<string, string> = {
+      'cup': 'cup',
+      'cups': 'cup',
+      'c': 'cup',
+      'tbsp': 'tablespoon',
+      'tablespoon': 'tablespoon',
+      'tablespoons': 'tablespoon',
+      'tsp': 'teaspoon',
+      'teaspoon': 'teaspoon',
+      'teaspoons': 'teaspoon',
+      'oz': 'ounce',
+      'ounce': 'ounce',
+      'ounces': 'ounce',
+      'lb': 'pound',
+      'lbs': 'pound',
+      'pound': 'pound',
+      'pounds': 'pound',
+      'g': 'gram',
+      'gram': 'gram',
+      'grams': 'gram',
+      'kg': 'kilogram',
+      'kilogram': 'kilogram',
+      'kilograms': 'kilogram',
+      'ml': 'milliliter',
+      'milliliter': 'milliliter',
+      'milliliters': 'milliliter',
+      'l': 'liter',
+      'liter': 'liter',
+      'liters': 'liter',
+      'piece': 'unit',
+      'pieces': 'unit',
+      'whole': 'unit',
+      '': 'unit'
+    };
+    
+    const normalized = unit.toLowerCase().trim();
+    return unitMap[normalized] || normalized;
   };
   
   // Process each ingredient
   for (const ingredient of ingredients) {
     const normalizedName = normalizeIngredientName(ingredient.name);
+    const normalizedUnit = normalizeUnit(ingredient.unit);
+    
+    // Create a key combining name and unit for more accurate matching
+    const key = `${normalizedName}|${normalizedUnit}`;
     
     // Check if we already have this ingredient
-    if (mergedMap.has(normalizedName)) {
-      const existing = mergedMap.get(normalizedName)!;
+    if (mergedMap.has(key)) {
+      const existing = mergedMap.get(key)!;
       
-      // Only add quantities if units match
-      if (existing.unit.toLowerCase() === ingredient.unit.toLowerCase()) {
-        existing.quantity += ingredient.quantity;
-      } else {
-        // If units don't match, keep separate listing but track both in meals
-        existing.meals.push(ingredient.mealName || 'Unknown meal');
-        if (ingredient.mealType && !existing.mealTypes.includes(ingredient.mealType)) {
-          existing.mealTypes.push(ingredient.mealType);
-        }
-        continue;
-      }
+      // Add quantities (units are already matched via the key)
+      existing.quantity += ingredient.quantity;
       
       // Track which meals use this ingredient
       if (ingredient.mealName && !existing.meals.includes(ingredient.mealName)) {
@@ -172,9 +217,9 @@ export function mergeIngredients(ingredients: Array<{
       
     } else {
       // Add new ingredient
-      mergedMap.set(normalizedName, {
+      mergedMap.set(key, {
         quantity: ingredient.quantity,
-        unit: ingredient.unit,
+        unit: normalizedUnit,
         name: ingredient.name, // Keep original name with proper capitalization
         meals: ingredient.mealName ? [ingredient.mealName] : [],
         mealTypes: ingredient.mealType ? [ingredient.mealType] : []
