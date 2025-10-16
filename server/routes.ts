@@ -1744,6 +1744,37 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Get meal plan generation progress
+  app.get("/api/meal-plans/progress", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { getMealPlanProgress } = await import('./services/meal-plan-progress');
+      const progress = getMealPlanProgress(req.user.id);
+
+      if (!progress) {
+        return res.json({ 
+          inProgress: false,
+          message: 'No generation in progress'
+        });
+      }
+
+      res.json({
+        inProgress: !progress.completed,
+        step: progress.step,
+        currentDay: progress.currentDay,
+        totalDays: progress.totalDays,
+        message: progress.message,
+        timestamp: progress.timestamp
+      });
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+      res.status(500).json({ error: 'Failed to fetch progress' });
+    }
+  });
+
   // Create meal plan endpoint - UPDATED with AI-generated personalized meal plans
   app.post("/api/meal-plans", async (req, res) => {
     try {
@@ -2042,10 +2073,31 @@ export function registerRoutes(app: Express): Server {
         console.log(`Generating AI-based meal plan with OpenAI for ${durationDays} days...`);
         
         const { generateMealPlanWithRecipes } = await import('./services/openai');
+        const { updateMealPlanProgress, clearMealPlanProgress } = await import('./services/meal-plan-progress');
+        
+        // Initialize progress tracking
+        updateMealPlanProgress(
+          req.user.id,
+          'initializing',
+          'Starting meal plan generation',
+          0,
+          durationDays,
+          false
+        );
         
         // Generate meal plans for each day
         const dailyPlans = [];
         for (let day = 0; day < durationDays; day++) {
+          // Update progress before generating each day
+          updateMealPlanProgress(
+            req.user.id,
+            'generating',
+            `Generating meals for day ${day + 1}`,
+            day + 1,
+            durationDays,
+            false
+          );
+          
           console.log(`Generating AI meal plan for day ${day + 1}/${durationDays}...`);
           
           const dayPlan = await generateMealPlanWithRecipes({
@@ -2074,6 +2126,16 @@ export function registerRoutes(app: Express): Server {
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
+        
+        // Update progress: all days generated, now saving
+        updateMealPlanProgress(
+          req.user.id,
+          'saving',
+          'Saving meal plan to database',
+          durationDays,
+          durationDays,
+          false
+        );
         
         const weeklyMealPlan = { plan: dailyPlans };
         
@@ -2107,8 +2169,22 @@ export function registerRoutes(app: Express): Server {
           totalDays: durationDays,
           generationType: 'AI_OPENAI'
         });
+        
+        // Mark progress as completed
+        updateMealPlanProgress(
+          req.user.id,
+          'completed',
+          'Meal plan generated successfully',
+          durationDays,
+          durationDays,
+          true
+        );
       } catch (error: any) {
         console.error('Error generating AI meal plan:', error);
+        
+        // Clear progress on error
+        clearMealPlanProgress(req.user.id);
+        
         throw new Error(`AI meal plan generation failed: ${error?.message || 'Unknown error'}`);
       }
 
