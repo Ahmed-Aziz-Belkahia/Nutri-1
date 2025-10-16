@@ -86,6 +86,7 @@ export default function AddFood() {
   // or the user explicitly taps Enable Camera. This avoids autoplay overlays on Android/iOS.
   const [cameraReady, setCameraReady] = useState(true); // Start as true, set to false only if there's an error
   const [needsPlayGesture, setNeedsPlayGesture] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(true); // Track camera initialization
   const isSecure = typeof window !== 'undefined' ? window.isSecureContext : true;
   useEffect(() => {
     let cancelled = false;
@@ -436,7 +437,7 @@ export default function AddFood() {
   const renderScannerView = () => {
     return (
       <div className="h-screen w-full overflow-hidden fixed inset-0 bg-black" style={{ overflowY: 'hidden' }}>
-        <div className="relative overflow-hidden h-full w-full">
+        <div className="relative overflow-hidden h-full w-full bg-black">
           {cameraReady && (
             <Webcam
               key={webcamKey}
@@ -446,6 +447,7 @@ export default function AddFood() {
               playsInline
               autoPlay
               controls={false}
+              className={cameraLoading ? 'invisible' : 'visible'}
               // Clicking the video also attempts to start playback if needed
               onClick={() => {
                 if (needsPlayGesture) kickstartPlayback();
@@ -460,12 +462,16 @@ export default function AddFood() {
                 transform: "translate(-50%, -50%)",
                 width: "100%",
                 height: "100%",
-                objectFit: "cover"
+                objectFit: "cover",
+                opacity: cameraLoading ? 0 : 1,
+                transition: "opacity 0.3s ease-in-out",
+                visibility: cameraLoading ? 'hidden' : 'visible'
               }}
               onUserMedia={() => {
                 // Camera started successfully
                 setCameraError(null);
                 setCameraAttempts(0);
+                setCameraLoading(false); // Hide loading overlay
                 // Try to auto start playback; some Android contexts need a tap
                 const video = (webcamRef.current as any)?.video as HTMLVideoElement | undefined;
                 if (video) {
@@ -493,6 +499,7 @@ export default function AddFood() {
                       width: { ideal: 640, max: 640 },
                       height: { ideal: 480, max: 480 }
                     });
+                    setCameraLoading(true); // Show loading again on retry
                     setWebcamKey((k) => k + 1);
                   } else if (next === 2) {
                     // Switch to front camera as a fallback
@@ -502,6 +509,7 @@ export default function AddFood() {
                       width: { ideal: 640, max: 640 },
                       height: { ideal: 480, max: 480 }
                     });
+                    setCameraLoading(true); // Show loading again on retry
                     setWebcamKey((k) => k + 1);
                   } else {
                     setCameraError(
@@ -512,6 +520,17 @@ export default function AddFood() {
                 });
               }}
             />
+          )}
+
+          {/* Camera loading overlay - beautiful spinner instead of ugly gray play icon */}
+          {cameraReady && cameraLoading && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-[#0CC5BA]/30 border-t-[#0CC5BA] rounded-full animate-spin" />
+                <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-[#0CC5BA]" />
+              </div>
+              <p className="text-white/70 mt-4 text-sm">Initializing camera...</p>
+            </div>
           )}
 
           {/* Secure context / playback gesture overlays */}
