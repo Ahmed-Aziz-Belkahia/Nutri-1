@@ -111,6 +111,7 @@ const questions = [
 export default function SimpleMealPlanningQuiz() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isGeneratingMealPlan, setIsGeneratingMealPlan] = useState(false);
+  const [mealPlanDays, setMealPlanDays] = useState<number>(7); // Track days for progress
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -228,12 +229,17 @@ export default function SimpleMealPlanningQuiz() {
   });
 
   const onSubmit = async (data: MealPlanPreferencesForm) => {
+    // Calculate days from duration (matching backend logic)
+    const duration = "week"; // Default to week - could be extended to ask user
+    const daysCount = duration === '3days' ? 3 : duration === 'week' ? 7 : duration === 'twoWeeks' ? 14 : 7;
+    setMealPlanDays(daysCount);
+    
     setIsGeneratingMealPlan(true);
     await saveMealPlanPreferences.mutateAsync(data);
   };
 
   if (isGeneratingMealPlan) {
-    return <MealPlanGenerationProgress />;
+    return <MealPlanGenerationProgress dayCount={mealPlanDays} />;
   }
 
   const renderQuestionContent = () => {

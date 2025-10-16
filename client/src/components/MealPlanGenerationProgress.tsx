@@ -27,28 +27,31 @@ const getProgressSteps = (dayCount: number = 7): ProgressStep[] => {
   const steps: ProgressStep[] = [
     {
       id: 'analyzing',
-      title: 'Analizowanie preferencji',
-      description: 'Przetwarzanie celów żywieniowych',
+      title: 'Analyzing preferences',
+      description: 'Processing nutritional goals',
       icon: <Brain className="w-5 h-5" />,
-      duration: 800
+      duration: 500
     },
     {
       id: 'calculating',
-      title: 'Obliczanie składników',
-      description: 'Ustalanie optymalnych makro',
+      title: 'Calculating macros',
+      description: 'Setting optimal macros',
       icon: <Target className="w-5 h-5" />,
-      duration: 1000
+      duration: 500
     }
   ];
 
   // Add dynamic day steps based on plan length
+  // Backend takes ~1-2 seconds per day for AI generation + 1 second delay between days
+  const perDayDuration = 2500; // Realistic timing for OpenAI API call + delay
+  
   for (let i = 1; i <= dayCount; i++) {
     steps.push({
       id: `day${i}`,
-      title: `Tworzenie Dzień ${i}`,
-      description: `Generowanie posiłków na ${i === 1 ? 'pierwszy' : i === 2 ? 'drugi' : i === 3 ? 'trzeci' : `${i}. dzień`}`,
+      title: `Generating Day ${i}`,
+      description: `Creating meals for day ${i}`,
       icon: <Calendar className="w-5 h-5" />,
-      duration: 1800
+      duration: perDayDuration
     });
   }
 
@@ -56,17 +59,17 @@ const getProgressSteps = (dayCount: number = 7): ProgressStep[] => {
   steps.push(
     {
       id: 'optimizing',
-      title: 'Optymalizacja równowagi',
-      description: `Dostrojenie odżywiania ${dayCount === 3 ? 'weekendu' : dayCount === 7 ? 'tygodnia' : `${dayCount} dni`}`,
+      title: 'Optimizing balance',
+      description: `Fine-tuning nutrition for ${dayCount} days`,
       icon: <Flame className="w-5 h-5" />,
-      duration: 1000
+      duration: 800
     },
     {
       id: 'saving',
-      title: 'Zapisywanie planu',
-      description: 'Przechowywanie wszystkiego',
+      title: 'Saving plan',
+      description: 'Storing everything',
       icon: <Save className="w-5 h-5" />,
-      duration: 1200
+      duration: 1000
     }
   );
 
@@ -237,10 +240,12 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
           <div className="text-center pt-4 border-t border-gray-100">
             <div className="flex items-center justify-center space-x-2 text-gray-500 mb-2">
               <Clock className="w-4 h-4" />
-              <span className="text-xs">Estimated time: 10-20 seconds</span>
+              <span className="text-xs">
+                Estimated time: {dayCount === 3 ? '10-15' : dayCount === 7 ? '20-30' : '40-60'} seconds
+              </span>
             </div>
             <p className="text-gray-500 text-xs">
-              Using optimized AI for fast, accurate meal planning
+              Generating {dayCount} days of personalized meals with AI
             </p>
           </div>
         </div>
