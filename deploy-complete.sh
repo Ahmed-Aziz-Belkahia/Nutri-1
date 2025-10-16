@@ -93,6 +93,14 @@ echo ""
 # Step 5: Run migrations to add missing columns
 echo "🔄 Step 5: Running database migrations..."
 
+# First, push all schema changes from db/schema.ts
+echo "→ Applying schema changes from db/schema.ts..."
+if npm run db:push 2>/dev/null; then
+    echo "✅ Schema changes applied (age, gender, and other new columns)"
+else
+    echo "⚠️  Schema push failed, trying custom migrations..."
+fi
+
 # Check if migrations need to be run
 TABLE_INFO=$(sqlite3 local.db "PRAGMA table_info(recipes_in_meal_plan);" 2>/dev/null)
 
