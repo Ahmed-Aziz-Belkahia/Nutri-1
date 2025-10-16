@@ -17,6 +17,7 @@ import { SourcesDisclaimer } from "@/components/progress/SourcesDisclaimer";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import SimpleCameraCapture from "@/components/SimpleCameraCapture";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 interface BodyAnalysis {
   bodyFatPercentage: number;
@@ -76,6 +77,13 @@ export default function UnifiedProgress() {
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Pull-to-refresh functionality
+  const handleRefresh = usePullToRefresh([
+    '/api/progress-photos',
+    '/api/weight-logs',
+    '/api/user-profile'
+  ]);
 
   // Get photos organized by type
   const latestPhotos = photos?.filter(photo => photo.type === 'latest') || [];

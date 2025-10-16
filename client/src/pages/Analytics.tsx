@@ -7,6 +7,7 @@ import Navigation from "../components/Navigation";
 import HeightWeightInput from "@/components/HeightWeightInput";
 import { ExternalLink, BookOpen } from 'lucide-react';
 import { NUTRITION_SOURCES, CALCULATION_METHODS } from '@/lib/nutrition';
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 type User = { id: number; email: string; profile?: HookUserProfile };
 
@@ -21,6 +22,12 @@ export default function Analytics() {
   const [selectedPeriod, setSelectedPeriod] = useState<"90 Days" | "6 Months" | "1 Year" | "All time">("90 Days");
   const [selectedNutritionPeriod, setSelectedNutritionPeriod] = useState<"This week" | "Last week" | "2 wks. ago" | "3 wks. ago">("This week");
   const [showSources, setShowSources] = useState(false);
+
+  // Pull-to-refresh functionality
+  const handleRefresh = usePullToRefresh([
+    '/api/user',
+    '/api/user-profile'
+  ]);
 
   const handleUpdateWeight = async () => {
     setIsUpdatingWeight(true);

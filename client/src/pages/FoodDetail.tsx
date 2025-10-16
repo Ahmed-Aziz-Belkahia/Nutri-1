@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
 import FoodDetailView from "@/components/FoodDetailView";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 interface FoodResponse {
   id: number;
@@ -22,6 +23,9 @@ export default function FoodDetail() {
     queryKey: [`/api/food-logs/${foodId}`],
     enabled: !!foodId,
   });
+
+  // Pull-to-refresh functionality
+  const handleRefresh = usePullToRefresh([`/api/food-logs/${foodId}`]);
 
   if (isLoading) {
     return (

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useFoodLog } from "../hooks/use-food-log";
 import { useUserProfile } from "../hooks/use-user-profile";
 import { Progress } from "@/components/ui/progress";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { 
   Zap, 
   ChevronLeft, 
@@ -63,6 +64,12 @@ export default function DetailedNutrition() {
   const { foodLogs, isLoadingLogs } = useFoodLog(selectedDate);
   const { data: profile } = useUserProfile();
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Pull-to-refresh functionality
+  const handleRefresh = usePullToRefresh([
+    '/api/food-logs',
+    '/api/user-profile'
+  ]);
 
   if (isLoadingLogs) {
     return (

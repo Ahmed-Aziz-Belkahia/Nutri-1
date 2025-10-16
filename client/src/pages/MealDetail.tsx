@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FoodComponent, FoodComponentDetails, Meal } from '../types/food';
 import { ComponentEditor } from '../components/ComponentEditor';
 import { useUser } from "@/hooks/use-user";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
 // Format the serving size string according to requirements
 function formatServingSize(servingSize?: string, quantity?: number): string {
@@ -335,6 +336,9 @@ export default function MealDetail() {
     },
     enabled: mealId > 0
   });
+
+  // Pull-to-refresh functionality
+  const handleRefresh = usePullToRefresh([`/api/food-logs/${mealId}`]);
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
