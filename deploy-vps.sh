@@ -63,6 +63,15 @@ print_info "Installing dependencies..."
 npm install
 print_status "Dependencies installed"
 
+# Run database migrations
+print_info "Running database migrations..."
+if [ -f "add-age-gender-migration.js" ]; then
+    node add-age-gender-migration.js
+    print_status "Database migrations completed"
+else
+    print_warning "No migration script found, skipping..."
+fi
+
 # Build the application
 print_info "Building application..."
 npm run build
