@@ -87,6 +87,18 @@ export default function UnifiedProgress() {
   
   // Check if photos have changed since last analysis - wrapped in useMemo for reactivity
   const photosHaveChanged = useMemo(() => {
+    // If there are no photos, can't analyze
+    if (allPhotos.length === 0) {
+      return false;
+    }
+    
+    // If never analyzed before, enable analysis
+    if (lastAnalyzedPhotos.length === 0) {
+      console.log('Photo change detection: Never analyzed before, enabling button');
+      return true;
+    }
+    
+    // Check if photos have changed
     const currentPhotoUrls = allPhotos.map(p => p.photoUrl).sort();
     const sortedLastAnalyzed = [...lastAnalyzedPhotos].sort();
     const hasChanged = 
