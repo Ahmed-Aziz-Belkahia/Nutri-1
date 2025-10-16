@@ -14,6 +14,7 @@ import { useWeightLogs } from "@/hooks/use-weight-logs";
 import { ProgressOverview } from "@/components/progress/ProgressOverview";
 import { WeightTrendChart } from "@/components/progress/WeightTrendChart";
 import { SourcesDisclaimer } from "@/components/progress/SourcesDisclaimer";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import SimpleCameraCapture from "@/components/SimpleCameraCapture";
 
@@ -30,6 +31,7 @@ export default function UnifiedProgress() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { user } = useUser();
   const { photos, isLoading: photosLoading, uploadPhoto, updatePhotoType, deletePhoto } = useProgressPhotos();
   const { analyzeBody, updateProfileWithBodyFat, isLoading: isAnalysisLoading } = useBodyAnalysis();
@@ -104,6 +106,11 @@ export default function UnifiedProgress() {
     
     try {
       await uploadPhoto(imageData, 'latest');
+      
+      // Explicitly refetch photos to update the analyze button state
+      await queryClient.invalidateQueries({ queryKey: ['/api/progress-photos'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/progress-photos'] });
+      
       toast({
         title: "Success!",
         description: "Progress photo uploaded",
@@ -174,6 +181,10 @@ export default function UnifiedProgress() {
 
     try {
       await uploadPhoto(base64String, 'latest');
+      
+      // Explicitly refetch photos to update the analyze button state
+      await queryClient.invalidateQueries({ queryKey: ['/api/progress-photos'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/progress-photos'] });
       
       toast({
         title: "Success!",
