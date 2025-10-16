@@ -5591,8 +5591,8 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       // Return combined data with more detailed logging
       const profile = {
         ...preferences[0],
-        // Override with latest weight log if available
-        currentWeight: latestWeightLog?.weight?.toString() || preferences[0].currentWeight?.toString(),
+        // Override with latest weight log if available (keep as number, not string)
+        currentWeight: latestWeightLog?.weight || preferences[0].currentWeight,
         latestWeightLog: latestWeightLog ? {
           weight: latestWeightLog.weight,
           loggedAt: latestWeightLog.loggedAt,

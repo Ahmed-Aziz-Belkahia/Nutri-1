@@ -3,6 +3,8 @@ import { z } from "zod";
 export const UserProfileSchema = z.object({
   id: z.number(),
   userId: z.number(),
+  age: z.number().nullable(),
+  gender: z.string().nullable(),
   height: z.number().nullable(),
   currentWeight: z.number().nullable(),
   goalWeight: z.number().nullable(),
