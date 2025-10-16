@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import fs from "fs";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -376,7 +377,6 @@ Guidelines:
   console.log("OpenAI raw response:", content.slice(0, 500) + '...');
   
   // Save the full raw response to a log file for debugging
-  const fs = require('fs');
   const logPath = './openai-response-log.json';
   try {
     fs.writeFileSync(logPath, content);
