@@ -87,6 +87,37 @@ export function registerMealPlanRoutes(app: Express) {
     }
   });
 
+  // Get meal plan generation progress - Must be before :date route
+  app.get("/api/meal-plans/progress", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { getMealPlanProgress } = await import('./services/meal-plan-progress');
+      const progress = getMealPlanProgress(req.user.id);
+
+      if (!progress) {
+        return res.json({ 
+          inProgress: false,
+          message: 'No generation in progress'
+        });
+      }
+
+      res.json({
+        inProgress: !progress.completed,
+        step: progress.step,
+        currentDay: progress.currentDay,
+        totalDays: progress.totalDays,
+        message: progress.message,
+        timestamp: progress.timestamp
+      });
+    } catch (error) {
+      console.error('Error fetching progress:', error);
+      res.status(500).json({ error: 'Failed to fetch progress' });
+    }
+  });
+
   // Get meal plan by specific date - This endpoint handles date-specific meal plan requests
   app.get("/api/meal-plans/:date", async (req, res) => {
     try {
