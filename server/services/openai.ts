@@ -324,46 +324,36 @@ export async function generateMealPlanWithRecipes(preferences: {
   }>;
   totalCalories: number;
 }> {
-  // Determine language for meal plan generation
-  const language = preferences.language || 'en';
-  const isPolish = language === 'pl';
+  // Determine language for meal plan generation - FORCE ENGLISH
+  const language = 'en'; // Always use English
+  const isPolish = false; // Never use Polish
   
-  console.log(`Generating meal plan in ${isPolish ? 'Polish' : 'English'} language`);
+  console.log(`Generating meal plan in English language`);
   
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
       {
         role: "system",
-        content: `You are a nutrition expert creating simple, quick meal plans. ${isPolish ? 'WAŻNE: Twórz wszystkie plany posiłków, przepisy i instrukcje w języku polskim z autentycznymi polskimi potrawami.' : 'Create meal plans in English.'}
+        content: `You are a nutrition expert creating simple, quick meal plans. Create meal plans in English.
 
 Guidelines:
 1) Create simple, practical meals that are quick to prepare
 2) Use common, easily available ingredients
 3) Keep cooking times under 30 minutes
-4) ${isPolish ? 'Używaj polskich nazw potraw i składników. Przykłady: "Jajecznica z ziołami", "Kotlet schabowy z ziemniakami", "Rosół z makaronem"' : 'Use descriptive meal names like "Herb Scrambled Eggs", "Grilled Chicken Breast", "Vegetable Soup"'}
+4) Use descriptive meal names like "Herb Scrambled Eggs", "Grilled Chicken Breast", "Vegetable Soup"
 5) Focus on nutritional balance rather than complexity
-6) ${isPolish ? 'Stosuj polskie jednostki miary (łyżka, szklanka, kg)' : 'Use standard measurements'}`
+6) Use standard measurements (cups, tablespoons, etc.)`
       },
       {
         role: "user",
-        content: isPolish 
-          ? `Stwórz prosty plan posiłków na 1 dzień z ${preferences.mealsPerDay} posiłkami (${preferences.calorieTarget} kalorii dziennie).
-          
-          Dieta: ${preferences.dietaryType}
-          Alergie: ${preferences.allergies.join(', ') || 'Brak'}
-          
-          Stwórz ${preferences.mealsPerDay} proste polskie posiłki:
-          ${preferences.mealsPerDay >= 1 ? '- 1 śniadanie' : ''}
-          ${preferences.mealsPerDay >= 2 ? '- 1 obiad' : ''}
-          ${preferences.mealsPerDay >= 3 ? '- 1 kolacja' : ''}
-          ${preferences.mealsPerDay >= 4 ? '- 1 przekąska' : ''}
-          
-          Format JSON: {"meals": [{"name": "Nazwa posiłku", "mealType": "breakfast/lunch/dinner/snack", "recipe": {"ingredients": ["składnik1", "składnik2"], "instructions": ["krok1", "krok2"], "prepTime": 15, "nutritionInfo": {"calories": 400, "protein": 20, "carbs": 30, "fat": 10}}}], "totalCalories": ${preferences.calorieTarget}}`
-          : `Create a simple 1-day meal plan with ${preferences.mealsPerDay} meals (${preferences.calorieTarget} calories total).
+        content: `Create a simple 1-day meal plan with ${preferences.mealsPerDay} meals (${preferences.calorieTarget} calories total).
           
           Diet: ${preferences.dietaryType}
           Allergies: ${preferences.allergies.join(', ') || 'None'}
+          Health Goals: ${preferences.healthGoals?.join(', ') || 'General health'}
+          Cuisine Preferences: ${preferences.cuisinePreferences?.join(', ') || 'Any'}
+          Cooking Skill Level: ${preferences.cookingSkillLevel || 'intermediate'}
           
           Create ${preferences.mealsPerDay} simple meals:
           ${preferences.mealsPerDay >= 1 ? '- 1 breakfast' : ''}

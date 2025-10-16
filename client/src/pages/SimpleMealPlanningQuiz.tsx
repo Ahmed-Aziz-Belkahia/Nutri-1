@@ -34,22 +34,22 @@ interface MealPlanPreferencesForm {
 const questions = [
   {
     id: "dietaryType",
-    title: "Jakiej diety przestrzegasz?",
-    description: "Wybierz styl żywienia",
+    title: "What diet do you follow?",
+    description: "Choose your eating style",
     type: "select",
     options: [
-      { value: "omnivore", label: "Wszejadność" },
-      { value: "vegetarian", label: "Wegetarianizm" },
-      { value: "vegan", label: "Weganizm" },
-      { value: "pescetarian", label: "Pescetarianizm" }
+      { value: "omnivore", label: "Omnivore" },
+      { value: "vegetarian", label: "Vegetarian" },
+      { value: "vegan", label: "Vegan" },
+      { value: "pescetarian", label: "Pescetarian" }
     ],
     icon: <Utensils className="w-6 h-6 text-white" />,
     gradient: "from-green-500 to-emerald-500"
   },
   {
     id: "calorieTarget",
-    title: "Ile kalorii dziennie?",
-    description: "Podaj cel kaloryczny",
+    title: "Daily calorie goal?",
+    description: "Enter your target calories",
     type: "number",
     placeholder: "2000",
     icon: <Flame className="w-6 h-6 text-white" />,
@@ -57,34 +57,34 @@ const questions = [
   },
   {
     id: "mealsPerDay",
-    title: "Ile posiłków dziennie?",
-    description: "Wliczając przekąski",
+    title: "Meals per day?",
+    description: "Including snacks",
     type: "select",
     options: [
-      { value: 1, label: "1 posiłek" },
-      { value: 2, label: "2 posiłki" },
-      { value: 3, label: "3 posiłki" },
-      { value: 4, label: "4 posiłki" },
-      { value: 5, label: "5 posiłków" }
+      { value: 1, label: "1 meal" },
+      { value: 2, label: "2 meals" },
+      { value: 3, label: "3 meals" },
+      { value: 4, label: "4 meals" },
+      { value: 5, label: "5 meals" }
     ],
     icon: <Clock className="w-6 h-6 text-white" />,
     gradient: "from-purple-500 to-indigo-500"
   },
   {
     id: "allergies",
-    title: "Alergie i nietolerancje",
-    description: "Oddziel przecinkami",
+    title: "Allergies & intolerances",
+    description: "Separate with commas",
     type: "text",
-    placeholder: "np. gluten, orzechy, laktoza",
+    placeholder: "e.g. gluten, nuts, lactose",
     icon: <AlertTriangle className="w-6 h-6 text-white" />,
     gradient: "from-yellow-500 to-orange-500"
   },
   {
     id: "cuisinePreferences",
-    title: "Ulubione kuchnie",
-    description: "Oddziel przecinkami",
+    title: "Favorite cuisines",
+    description: "Separate with commas",
     type: "text",
-    placeholder: "np. włoska, azjatycka, polska",
+    placeholder: "e.g. Italian, Asian, Mexican",
     icon: <Globe className="w-6 h-6 text-white" />,
     gradient: "from-cyan-500 to-blue-500"
   },
@@ -304,7 +304,7 @@ export default function SimpleMealPlanningQuiz() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Planowanie Posiłków
+            Meal Planning
           </motion.h1>
           
           <motion.p 
@@ -313,7 +313,7 @@ export default function SimpleMealPlanningQuiz() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            Krok {currentStep + 1} z {questions.length}
+            Step {currentStep + 1} of {questions.length}
           </motion.p>
           
           <motion.div 
@@ -337,7 +337,7 @@ export default function SimpleMealPlanningQuiz() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
           >
-            {Math.round(((currentStep + 1) / questions.length) * 100)}% ukończone
+            {Math.round(((currentStep + 1) / questions.length) * 100)}% complete
           </motion.p>
         </div>
 
@@ -396,14 +396,14 @@ export default function SimpleMealPlanningQuiz() {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Wstecz
+              Back
             </Button>
 
             <Button
               onClick={handleNext}
               className="flex items-center gap-2 bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] hover:from-[#0CC5BA]/90 hover:to-[#0091ff]/90"
             >
-              {isLastStep ? "Utwórz Plan" : "Dalej"}
+              {isLastStep ? "Create Plan" : "Next"}
               {!isLastStep && <ArrowRight className="w-4 h-4" />}
             </Button>
           </motion.div>

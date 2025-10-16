@@ -1982,21 +1982,10 @@ export function registerRoutes(app: Express): Server {
         .from(users)
         .where(eq(users.id, req.user.id));
       
-      // Get user's preferred language
-      // Debug the structure to verify language preference path
-      console.log("User profile structure for monthly meal plan:", JSON.stringify(userProfile[0], null, 2));
+      // Always use English for meal plan generation
+      const language = 'en';
       
-      // Handle both possible data structures
-  let language = 'pl'; // Default to Polish
-  if (userProfile[0]?.preferred_language) {
-        // Direct query structure 
-        language = userProfile[0].preferred_language;
-        console.log("Using language from direct query structure (preferred_language):", language);
-      } else {
-        console.log("No language preference found for monthly meal plan, using Polish default:", language);
-      }
-      
-      console.log(`Generating monthly meal plan in language: ${language}`);
+      console.log(`Generating meal plan in English`);
       
       // Determine duration in days first
       const durationDays = mealPlanDuration === '3days' ? 3 :
@@ -2068,7 +2057,7 @@ export function registerRoutes(app: Express): Server {
             healthGoals: currentPrefs.healthGoals,
             cuisinePreferences: currentPrefs.cuisinePreferences,
             cookingSkillLevel: currentPrefs.cookingSkillLevel,
-            language: language
+            language: 'en' // Always use English
           });
           
           dailyPlans.push({
