@@ -1,56 +1,50 @@
 #!/bin/bash
 
-echo "🚀 NutriApp VPS Deployment Script"
-echo "================================="
+# Simple deployment script for Nutri-AI
+# Database management is done manually with: node emergency-create-db.js
 
-# Update system packages
-echo "📦 Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+set -e  # Exit on error
 
-# Install Node.js if not installed
-if ! command -v node &> /dev/null; then
-    echo "📦 Installing Node.js..."
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-fi
+echo "� Deploying Nutri-AI..."
+echo ""
 
-# Install PM2 for process management
-if ! command -v pm2 &> /dev/null; then
-    echo "📦 Installing PM2..."
-    sudo npm install -g pm2
-fi
-
-# Install dependencies
+# Step 1: Install dependencies
 echo "📦 Installing dependencies..."
 npm install
+echo "✅ Done"
+echo ""
 
-# Run setup
-echo "🔧 Running setup..."
-npm run setup
-
-# Push database schema changes (drizzle-kit will apply all schema updates)
-echo "🗄️  Applying database schema changes..."
-npm run db:push
-
-# Run any custom migrations (for backward compatibility)
-if [ -f "add-age-gender-migration.js" ]; then
-    echo "🔧 Running custom migrations..."
-    node add-age-gender-migration.js
-fi
-
-# Build the application
+# Step 2: Build application  
 echo "🏗️  Building application..."
 npm run build
+echo "✅ Done"
+echo ""
 
-# Start with PM2
-echo "🚀 Starting application with PM2..."
-pm2 stop nutriapp 2>/dev/null || true
-pm2 delete nutriapp 2>/dev/null || true
-pm2 start dist/index.js --name "nutriapp"
-pm2 save
-pm2 startup
+# Step 3: Set permissions (if database exists)
+if [ -f "local.db" ]; then
+    echo "� Setting database permissions..."
+    chmod 664 local.db 2>/dev/null || true
+    [ -f "local.db-wal" ] && chmod 664 local.db-wal 2>/dev/null || true
+    [ -f "local.db-shm" ] && chmod 664 local.db-shm 2>/dev/null || true
+    echo "✅ Done"
+    echo ""
+fi
 
-echo "✅ Deployment complete!"
-echo "🌐 Your NutriApp should be running on port 5000"
-echo "📊 Monitor with: pm2 status"
-echo "📝 View logs with: pm2 logs nutriapp"
+# Step 4: Restart PM2
+echo "� Restarting PM2..."
+if pm2 list | grep -q "myapp"; then
+    pm2 restart myapp
+else
+    pm2 start ecosystem.config.js
+    pm2 save
+fi
+echo "✅ Done"
+echo ""
+
+echo "🎉 Deployment complete!"
+echo ""
+echo "📝 Useful commands:"
+echo "   • View logs: pm2 logs myapp"
+echo "   • Check status: pm2 status"
+echo "   • Recreate DB: node emergency-create-db.js"
+echo ""
