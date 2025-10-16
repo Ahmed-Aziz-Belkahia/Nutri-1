@@ -93,32 +93,36 @@ echo ""
 # Step 5: Recreate database from scratch (fresh schema)
 echo "🔄 Step 5: Recreating database with latest schema..."
 
-echo "⚠️  Backing up old database..."
-if [ -f "local.db" ]; then
-    BACKUP_NAME="local.db.backup.$(date +%Y%m%d_%H%M%S)"
-    cp local.db "$BACKUP_NAME"
-    echo "✅ Backup created: $BACKUP_NAME"
-fi
-
-echo "→ Removing old database files..."
-rm -f local.db local.db-wal local.db-shm
-
-echo "→ Creating fresh database from schema..."
-if npm run db:push 2>/dev/null; then
-    echo "✅ Database created with latest schema (age, gender, and all columns)"
+# Use the create-fresh-db.js script which handles everything
+if node create-fresh-db.js; then
+    echo "✅ Database created successfully"
 else
-    echo "⚠️  Schema push failed, trying setup.js..."
-    if node setup.js; then
-        echo "✅ Database created via setup.js"
+    echo "❌ Database creation failed!"
+    echo "Attempting emergency restore from backup..."
+    
+    # Try to find the most recent backup
+    LATEST_BACKUP=$(ls -t local.db.backup.* 2>/dev/null | head -n1)
+    if [ -n "$LATEST_BACKUP" ]; then
+        cp "$LATEST_BACKUP" local.db
+        echo "✅ Restored from backup: $LATEST_BACKUP"
     else
-        echo "❌ Failed to create database"
+        echo "❌ No backup available. Deployment failed!"
         exit 1
     fi
 fi
 
-# Verify database
+# Verify database exists and has tables
+if [ ! -f "local.db" ]; then
+    echo "❌ Database file does not exist!"
+    exit 1
+fi
+
 TABLE_COUNT=$(sqlite3 local.db "SELECT count(*) FROM sqlite_master WHERE type='table';" 2>/dev/null)
-echo "✅ Database contains $TABLE_COUNT tables"
+if [ -z "$TABLE_COUNT" ] || [ "$TABLE_COUNT" -eq 0 ]; then
+    echo "❌ Database exists but has no tables!"
+    exit 1
+fi
+echo "✅ Database verified: $TABLE_COUNT tables found"
 
 # Skip all the migration checks - we have a fresh database!
 
