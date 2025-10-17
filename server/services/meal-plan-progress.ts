@@ -27,6 +27,27 @@ export function updateMealPlanProgress(
   totalDays?: number,
   completed: boolean = false
 ) {
+  // Get existing progress
+  const existing = progressStore.get(userId);
+  
+  // Only update if:
+  // 1. No existing progress, OR
+  // 2. New progress is further along (higher day number), OR
+  // 3. Same day but different step, OR
+  // 4. Marking as completed
+  const shouldUpdate = 
+    !existing ||
+    completed ||
+    !currentDay ||
+    !existing.currentDay ||
+    currentDay > existing.currentDay ||
+    (currentDay === existing.currentDay && step !== existing.step);
+  
+  if (!shouldUpdate) {
+    console.log(`[Progress] User ${userId}: Skipping outdated update (day ${currentDay} vs current ${existing.currentDay})`);
+    return;
+  }
+  
   const update: ProgressUpdate = {
     userId,
     step,
