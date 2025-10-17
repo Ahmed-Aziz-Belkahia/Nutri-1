@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -68,6 +68,7 @@ export default function MealPlan() {
     return new Date();
   });
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
 
   // Fetch today's meal plan
   const { data: todayMealPlanData, isLoading: isTodayLoading, error: todayError } = useQuery<{ hasPlan: boolean; plan?: MealPlan }>({
@@ -175,6 +176,12 @@ export default function MealPlan() {
       } else if (data.plan) {
         setSelectedPlan(data.plan);
       }
+      
+      // Invalidate shopping list cache to show updated items immediately
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/shopping-list"],
+        refetchType: 'active'
+      });
     },
     onError: (error) => {
       toast({

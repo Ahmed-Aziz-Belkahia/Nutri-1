@@ -57,13 +57,19 @@ export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: 
   // Ask AI to consolidate all ingredients into a shopping list
   const prompt = `You are a shopping list generator. Given a list of recipes for an entire week, consolidate all ingredients into a single shopping list.
 
-IMPORTANT RULES:
-1. Merge duplicate ingredients (e.g., "chicken breast 6oz" + "chicken breast boneless 8oz" = "chicken breast 400g")
-2. Convert all measurements to metric (grams, ml, liters)
-3. Remove qualifiers like "boneless", "skinless", "ripe", etc - just the core ingredient
-4. Sum quantities correctly across all recipes
-5. Use singular form (e.g., "avocado" not "avocados")
-6. Keep ingredient names simple and clean
+CRITICAL RULES - DO NOT REPEAT ANY INGREDIENT:
+1. If the same ingredient appears in different forms, combine them into ONE item (e.g., "banana" + "banana sliced" = "banana")
+2. Merge ALL variations of the same ingredient (e.g., "chicken breast 6oz" + "chicken breast boneless 8oz" = "chicken breast 400g")
+3. Remove ALL qualifiers and preparation methods: boneless, skinless, sliced, diced, chopped, ripe, fresh, frozen
+4. Convert all measurements to metric (grams, ml, liters). 1 oz = 28g, 1 cup = 240ml
+5. Use singular form always (e.g., "banana" not "bananas", "avocado" not "avocados")
+6. Sum quantities correctly across ALL recipes
+7. Each ingredient should appear ONLY ONCE in the final list
+
+Examples of correct consolidation:
+- "banana" + "banana sliced" + "bananas 2" → "banana 5 unit"
+- "chicken breast boneless 6oz" + "chicken breast 8oz" → "chicken breast 400g"
+- "avocado ripe" + "avocado" + "avocados 2" → "avocado 4 unit"
 
 Here are the recipes for the week:
 ${recipesForAI.map((r, i) => `
@@ -72,18 +78,14 @@ Ingredients:
 ${r.ingredients.map(ing => `- ${ing}`).join('\n')}
 `).join('\n')}
 
-Return ONLY a JSON array of consolidated ingredients in this format:
+Return ONLY a JSON array of consolidated ingredients in this EXACT format:
 [
   {"name": "chicken breast", "quantity": 800, "unit": "g"},
-  {"name": "avocado", "quantity": 3, "unit": "unit"},
+  {"name": "banana", "quantity": 5, "unit": "unit"},
   {"name": "olive oil", "quantity": 100, "unit": "ml"}
 ]
 
-Make sure to:
-- Combine "chicken breast boneless" + "chicken breast" → "chicken breast"
-- Convert oz to grams (1oz = 28g)
-- Sum all quantities properly
-- Remove variations like "ripe", "fresh", "chopped" from names`;
+REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
 
   try {
     const completion = await openai.chat.completions.create({

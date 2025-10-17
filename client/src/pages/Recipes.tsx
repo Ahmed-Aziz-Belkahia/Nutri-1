@@ -300,6 +300,12 @@ export default function Recipes() {
     onSuccess: () => {
       allMealPlansRefetch();
       
+      // Invalidate shopping list cache to show updated items immediately
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/shopping-list"],
+        refetchType: 'active'
+      });
+      
       toast({
         title: t('mealPlan.generated', 'Plan generated!'),
         description: t('mealPlan.generatedDescription', 'Your meal plan has been created successfully.'),
