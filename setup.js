@@ -32,6 +32,23 @@ const initializeDatabase = () => {
   console.log('🗄️  Initializing SQLite database...');
   
   const dbPath = path.join(__dirname, 'local.db');
+  
+  // Check if database already exists with tables
+  if (fs.existsSync(dbPath)) {
+    try {
+      const sqlite = new Database(dbPath);
+      const tables = sqlite.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+      sqlite.close();
+      
+      if (tables.length > 5) {
+        console.log('   ✅ Database already exists with tables, skipping initialization...\n');
+        return;
+      }
+    } catch (error) {
+      console.log('   ⚠️  Existing database appears corrupted, recreating...');
+    }
+  }
+  
   const sqlite = new Database(dbPath);
   
   const createTablesSQL = `
