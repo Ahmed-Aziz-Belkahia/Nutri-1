@@ -54,40 +54,47 @@ export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: 
     };
   });
   
+  // Flatten all ingredients into a single list
+  const allIngredients = recipesForAI.flatMap(r => 
+    r.ingredients.map(ing => `${ing} (for ${r.servings} servings)`)
+  );
+  
+  console.log(`Total ingredients to consolidate: ${allIngredients.length}`);
+  
   // Ask AI to consolidate all ingredients into a shopping list
-  const prompt = `You are a shopping list generator. Given a list of recipes for an entire week, consolidate all ingredients into a single shopping list.
+  const prompt = `You are a smart grocery shopping assistant. I need you to consolidate this list of ingredients from multiple recipes into a single, clean shopping list.
 
-CRITICAL RULES - DO NOT REPEAT ANY INGREDIENT:
-1. If the same ingredient appears in different forms, combine them into ONE item (e.g., "banana" + "banana sliced" = "banana")
-2. Merge ALL variations of the same ingredient (e.g., "chicken breast 6oz" + "chicken breast boneless 8oz" = "chicken breast 400g")
-3. Remove ALL qualifiers and preparation methods: boneless, skinless, sliced, diced, chopped, ripe, fresh, frozen
-4. Convert all measurements to metric (grams, ml, liters). 1 oz = 28g, 1 cup = 240ml
-5. Use singular form always (e.g., "banana" not "bananas", "avocado" not "avocados")
-6. Sum quantities correctly across ALL recipes
-7. Each ingredient should appear ONLY ONCE in the final list
+RULES:
+1. Combine duplicate ingredients (same item = one entry)
+2. Add up all quantities 
+3. Remove descriptors like "fresh", "ripe", "chopped", "diced", "boneless"
+4. Convert everything to metric (oz → grams, cups → ml)
+5. Use singular form (banana not bananas)
 
-Examples of correct consolidation:
-- "banana" + "banana sliced" + "bananas 2" → "banana 5 unit"
-- "chicken breast boneless 6oz" + "chicken breast 8oz" → "chicken breast 400g"
-- "avocado ripe" + "avocado" + "avocados 2" → "avocado 4 unit"
+Example:
+Input: ["2 ripe bananas", "1 banana sliced", "3 bananas"]
+Output: {"name": "banana", "quantity": 6, "unit": "unit"}
 
-Here are the recipes for the week:
-${recipesForAI.map((r, i) => `
-Recipe ${i + 1}: ${r.name} (${r.servings} servings)
-Ingredients:
-${r.ingredients.map(ing => `- ${ing}`).join('\n')}
-`).join('\n')}
+Input: ["6oz chicken breast boneless", "8oz chicken breast"]  
+Output: {"name": "chicken breast", "quantity": 392, "unit": "g"}
 
-Return a JSON object with an "ingredients" array in this EXACT format:
+Here are ALL the ingredients from the week's recipes:
+
+${allIngredients.map((ing, i) => `${i + 1}. ${ing}`).join('\n')}
+
+Return ONLY a JSON object with this exact structure:
 {
-  "ingredients": [
-    {"name": "chicken breast", "quantity": 800, "unit": "g"},
-    {"name": "banana", "quantity": 5, "unit": "unit"},
-    {"name": "olive oil", "quantity": 100, "unit": "ml"}
+  "shoppingList": [
+    {"name": "ingredient name", "quantity": number, "unit": "g|ml|unit|kg|L"},
+    {"name": "ingredient name", "quantity": number, "unit": "g|ml|unit|kg|L"}
   ]
 }
 
-REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
+IMPORTANT: 
+- Each ingredient should appear EXACTLY ONCE
+- Combine "chicken breast" + "chicken breast boneless" into ONE "chicken breast" entry
+- Combine "banana" + "banana sliced" + "bananas" into ONE "banana" entry
+- Return valid JSON only, no explanation text`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -95,14 +102,14 @@ REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
       messages: [
         {
           role: "system",
-          content: "You are a helpful assistant that consolidates shopping lists. Always return valid JSON arrays."
+          content: "You are a grocery shopping assistant that creates consolidated shopping lists. You always return valid JSON in the exact format requested."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.3,
+      temperature: 0.2,
       response_format: { type: "json_object" }
     });
     
@@ -130,9 +137,15 @@ REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
       // Handle multiple possible response formats
       consolidatedIngredients = Array.isArray(parsed) 
         ? parsed 
-        : (parsed.ingredients || parsed.items || parsed.list || parsed.shopping || parsed.shoppingList || []);
+        : (parsed.shoppingList || parsed.ingredients || parsed.items || parsed.list || parsed.shopping || []);
       
       console.log(`Extracted ${consolidatedIngredients.length} items from AI response`);
+      
+      // Validate that we got actual items
+      if (!Array.isArray(consolidatedIngredients) || consolidatedIngredients.length === 0) {
+        console.error('AI returned empty or invalid shopping list, falling back to manual parsing');
+        return await generateWeeklyShoppingListFallback(mealPlanIds, userId);
+      }
     } catch (e) {
       console.error('Failed to parse AI response:', e);
       // Fallback to manual parsing
