@@ -9,13 +9,13 @@ echo "🚀 Complete Deployment Starting..."
 echo ""
 
 # Install dependencies
-echo "📦 Step 1/4: Installing dependencies..."
+echo "📦 Step 1/5: Installing dependencies..."
 npm install
 echo "✅ Done"
 echo ""
 
 # Build application
-echo "🏗️  Step 2/4: Building application..."
+echo "🏗️  Step 2/5: Building application..."
 npm run build
 echo "✅ Done"
 echo ""
