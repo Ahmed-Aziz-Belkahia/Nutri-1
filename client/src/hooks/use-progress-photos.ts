@@ -51,7 +51,7 @@ export function useProgressPhotos() {
     refetchOnWindowFocus: true,  // Refetch when window gains focus to check for new uploads
     refetchOnMount: true,         // Always refetch on mount to get latest state
     refetchInterval: false,
-    staleTime: 1 * 60 * 1000,    // Reduced to 1 minute for more frequent updates
+    staleTime: 0,                 // Set to 0 to always consider data stale for immediate updates
     gcTime: 10 * 60 * 1000       // 10 minutes - using gcTime instead of deprecated cacheTime
   });
 

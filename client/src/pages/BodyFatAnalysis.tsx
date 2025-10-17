@@ -7,6 +7,7 @@ import { useBodyAnalysis } from '@/hooks/use-body-analysis';
 import { useProgressPhotos } from '@/hooks/use-progress-photos';
 import { useToast } from '@/hooks/use-toast';
 import { useLocation } from 'wouter';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function BodyFatAnalysis() {
   const { t } = useTranslation();
@@ -17,6 +18,13 @@ export default function BodyFatAnalysis() {
   const [isMarkingPhoto, setIsMarkingPhoto] = useState(false);
   const [showSources, setShowSources] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
+  
+  // Force refetch photos when component mounts to ensure we have the latest data
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    console.log('BodyFatAnalysis component mounted, forcing photo refresh');
+    queryClient.invalidateQueries({ queryKey: ["/api/progress-photos"] });
+  }, [queryClient]);
   
   // Load last analyzed photos from localStorage
   const [lastAnalyzedPhotos, setLastAnalyzedPhotos] = useState<string[]>(() => {
