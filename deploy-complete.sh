@@ -23,24 +23,25 @@ echo ""
 # Check database schema and recreate if corrupted
 echo "🔍 Step 3/5: Checking database schema..."
 if [ -f "local.db" ]; then
-    # Check for the critical 'order' column (not 'order_num')
-    ORDER_CHECK=$(sqlite3 local.db "PRAGMA table_info(recipes_in_meal_plan);" 2>/dev/null | grep -c "order|INTEGER" || echo "0")
-    # Check for age column
-    AGE_CHECK=$(sqlite3 local.db "PRAGMA table_info(user_nutrition_preferences);" 2>/dev/null | grep -c "age|INTEGER" || echo "0")
+    # Check for critical columns that match Drizzle schema
+    ORDER_CHECK=$(sqlite3 local.db "PRAGMA table_info(recipes_in_meal_plan);" 2>/dev/null | grep -c '"order"|INTEGER' || echo "0")
+    CALORIE_CHECK=$(sqlite3 local.db "PRAGMA table_info(user_nutrition_preferences);" 2>/dev/null | grep -c "daily_calorie_goal|INTEGER" || echo "0")
+    USER_ID_CHECK=$(sqlite3 local.db "PRAGMA table_info(recipes);" 2>/dev/null | grep -c "user_id|INTEGER" || echo "0")
+    CAPTION_CHECK=$(sqlite3 local.db "PRAGMA table_info(progress_photos);" 2>/dev/null | grep -c "caption|TEXT" || echo "0")
     
-    if [ "$ORDER_CHECK" -eq "0" ] || [ "$AGE_CHECK" -eq "0" ]; then
-        echo "⚠️  Database schema is outdated or corrupted"
-        echo "🗑️  Recreating database with correct schema..."
+    if [ "$ORDER_CHECK" -eq "0" ] || [ "$CALORIE_CHECK" -eq "0" ] || [ "$USER_ID_CHECK" -eq "0" ] || [ "$CAPTION_CHECK" -eq "0" ]; then
+        echo "⚠️  Database schema doesn't match Drizzle TypeScript definitions"
+        echo "🗑️  Regenerating database from Drizzle schema..."
         rm -f local.db local.db-wal local.db-shm
-        node force-recreate-db.js
-        echo "✅ Database recreated successfully"
+        node generate-db-from-drizzle.js
+        echo "✅ Database regenerated from Drizzle schema"
     else
-        echo "✅ Database schema is correct"
+        echo "✅ Database schema matches Drizzle definitions"
     fi
 else
-    echo "⚠️  No database found, creating new one..."
-    node force-recreate-db.js
-    echo "✅ Database created"
+    echo "⚠️  No database found, creating from Drizzle schema..."
+    node generate-db-from-drizzle.js
+    echo "✅ Database created from Drizzle schema"
 fi
 echo ""
 
