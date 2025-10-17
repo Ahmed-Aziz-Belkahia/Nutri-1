@@ -78,12 +78,14 @@ Ingredients:
 ${r.ingredients.map(ing => `- ${ing}`).join('\n')}
 `).join('\n')}
 
-Return ONLY a JSON array of consolidated ingredients in this EXACT format:
-[
-  {"name": "chicken breast", "quantity": 800, "unit": "g"},
-  {"name": "banana", "quantity": 5, "unit": "unit"},
-  {"name": "olive oil", "quantity": 100, "unit": "ml"}
-]
+Return a JSON object with an "ingredients" array in this EXACT format:
+{
+  "ingredients": [
+    {"name": "chicken breast", "quantity": 800, "unit": "g"},
+    {"name": "banana", "quantity": 5, "unit": "unit"},
+    {"name": "olive oil", "quantity": 100, "unit": "ml"}
+  ]
+}
 
 REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
 
@@ -109,12 +111,28 @@ REMEMBER: Each ingredient name should appear ONLY ONCE. No duplicates allowed!`;
       throw new Error('No response from AI');
     }
     
+    console.log('AI Shopping List Raw Response:', responseContent.substring(0, 500)); // Log first 500 chars
+    
     // Parse the AI response
     let consolidatedIngredients: Array<{name: string; quantity: number; unit: string}> = [];
     try {
       const parsed = JSON.parse(responseContent);
-      // Handle if AI returns {ingredients: [...]} or just [...]
-      consolidatedIngredients = Array.isArray(parsed) ? parsed : (parsed.ingredients || []);
+      console.log('Parsed AI response structure:', {
+        isArray: Array.isArray(parsed),
+        keys: Object.keys(parsed),
+        hasIngredients: 'ingredients' in parsed,
+        hasItems: 'items' in parsed,
+        hasList: 'list' in parsed,
+        hasShopping: 'shopping' in parsed,
+        hasShoppingList: 'shoppingList' in parsed
+      });
+      
+      // Handle multiple possible response formats
+      consolidatedIngredients = Array.isArray(parsed) 
+        ? parsed 
+        : (parsed.ingredients || parsed.items || parsed.list || parsed.shopping || parsed.shoppingList || []);
+      
+      console.log(`Extracted ${consolidatedIngredients.length} items from AI response`);
     } catch (e) {
       console.error('Failed to parse AI response:', e);
       // Fallback to manual parsing
