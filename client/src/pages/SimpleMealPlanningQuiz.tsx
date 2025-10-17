@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -115,6 +115,7 @@ export default function SimpleMealPlanningQuiz() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isSubmittingRef = useRef(false); // Prevent double submission
 
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<MealPlanPreferencesForm>({
     defaultValues: {
@@ -198,6 +199,7 @@ export default function SimpleMealPlanningQuiz() {
     },
     onSuccess: async () => {
       setIsGeneratingMealPlan(false);
+      isSubmittingRef.current = false; // Reset flag on success
       
       // Invalidate all meal plan related queries to refresh data
       await Promise.all([
@@ -208,17 +210,30 @@ export default function SimpleMealPlanningQuiz() {
         queryClient.invalidateQueries({ queryKey: ['/api/shopping-list'] })
       ]);
       
-      // Wait a moment for queries to refetch
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Prefetch shopping list to ensure it's loaded before navigation
+      try {
+        await queryClient.prefetchQuery({
+          queryKey: ['/api/shopping-list'],
+          queryFn: async () => {
+            const res = await fetch('/api/shopping-list', { credentials: 'include' });
+            if (!res.ok) throw new Error('Failed to fetch shopping list');
+            return res.json();
+          }
+        });
+        console.log('✅ Shopping list prefetched successfully');
+      } catch (error) {
+        console.error('Failed to prefetch shopping list:', error);
+      }
       
       toast({
         title: "Meal plan created!",
-        description: "Your personalized meal plan is ready.",
+        description: "Your personalized meal plan and shopping list are ready.",
       });
       setLocation("/dashboard");
     },
     onError: (error) => {
       setIsGeneratingMealPlan(false);
+      isSubmittingRef.current = false; // Reset flag on error
       console.error("Meal plan creation error:", error);
       toast({
         title: "Plan Creation Error",
@@ -229,13 +244,28 @@ export default function SimpleMealPlanningQuiz() {
   });
 
   const onSubmit = async (data: MealPlanPreferencesForm) => {
-    // Calculate days from duration (matching backend logic)
-    const duration = "week"; // Default to week - could be extended to ask user
-    const daysCount = duration === '3days' ? 3 : duration === 'week' ? 7 : duration === 'twoWeeks' ? 14 : 7;
-    setMealPlanDays(daysCount);
+    // Prevent double submission
+    if (isSubmittingRef.current) {
+      console.log('⚠️  Already generating meal plan, preventing duplicate submission');
+      return;
+    }
     
-    setIsGeneratingMealPlan(true);
-    await saveMealPlanPreferences.mutateAsync(data);
+    isSubmittingRef.current = true;
+    
+    try {
+      // Calculate days from duration (matching backend logic)
+      const duration = "week"; // Default to week - could be extended to ask user
+      const daysCount = duration === '3days' ? 3 : duration === 'week' ? 7 : duration === 'twoWeeks' ? 14 : 7;
+      setMealPlanDays(daysCount);
+      
+      setIsGeneratingMealPlan(true);
+      await saveMealPlanPreferences.mutateAsync(data);
+    } catch (error) {
+      // Reset flag on error
+      isSubmittingRef.current = false;
+      setIsGeneratingMealPlan(false);
+      throw error;
+    }
   };
 
   if (isGeneratingMealPlan) {
