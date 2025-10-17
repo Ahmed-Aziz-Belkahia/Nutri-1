@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS recipes_in_meal_plan (
     recipe_id INTEGER NOT NULL,
     meal_type TEXT NOT NULL,
     serving_size REAL DEFAULT 1.0 NOT NULL,
-    order_num INTEGER DEFAULT 0 NOT NULL,
+    "order" INTEGER DEFAULT 0 NOT NULL,
     is_frozen INTEGER DEFAULT true,
     is_completed INTEGER DEFAULT false,
     completed_at INTEGER,
