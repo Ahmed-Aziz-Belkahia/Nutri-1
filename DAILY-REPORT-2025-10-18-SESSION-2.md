@@ -105,15 +105,20 @@ After: JWT with HTTP-only cookies, refresh token rotation, API usage tracking re
 
 **Next Steps (In Progress):**
 
-- [ ] Delete old local.db and reinitialize with new schema
-- [ ] Run database migration script
+- [ ] Deploy to VPS (146.190.166.34)
+- [ ] Backup existing VPS database
+- [ ] Delete old database on VPS
+- [ ] Pull latest code with JWT implementation
+- [ ] Run npm install for new dependencies
+- [ ] Initialize fresh database with new schema
+- [ ] Restart PM2 server
+- [ ] Test auth endpoints on VPS
 - [ ] Update all protected routes in server/routes.ts (50+ locations)
 - [ ] Create frontend JWT auth hook (use-jwt-auth.tsx)
 - [ ] Create Axios interceptor for automatic token attachment
 - [ ] Replace all fetch() calls with Axios
 - [ ] Test complete auth flow (register → login → refresh → logout)
 - [ ] Remove old Passport dependencies
-- [ ] Deploy to VPS with new auth system
 
 **Git Commits:**
 
