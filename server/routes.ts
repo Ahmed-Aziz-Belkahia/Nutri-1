@@ -3672,57 +3672,50 @@ export function registerRoutes(app: Express): Server {
       const { type = 'day' } = req.query;
       console.log(`Fetching shopping list for date: ${date}, user: ${req.user.id}, type: ${type}`);
       
+      // Simply return the shopping list from database (already generated during meal plan creation)
+      const items = await db
+        .select()
+        .from(shoppingListItems)
+        .where(eq(shoppingListItems.userId, req.user.id))
+        .orderBy(shoppingListItems.category, shoppingListItems.name);
+      
+      console.log(`Found ${items.length} shopping list items for user ${req.user.id}`);
+      
+      // Group items by category for better organization
+      const groupedItems: Record<string, typeof items> = {};
+      for (const item of items) {
+        const category = item.category || 'Other';
+        if (!groupedItems[category]) {
+          groupedItems[category] = [];
+        }
+        groupedItems[category].push(item);
+      }
+      
+      return res.json({
+        items,
+        groupedItems,
+        totalItems: items.length
+      });
+    } catch (error) {
+      console.error('Error fetching shopping list:', error);
+      res.status(500).json({
+        error: 'Failed to fetch shopping list',
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
+  });
+  
+  // Legacy endpoint - kept for backward compatibility but simplified
+  app.get("/api/shopping-list/:date/old", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const { date } = req.params;
+      const { type = 'day' } = req.query;
+      
       if (type === 'week') {
-        // Generate weekly shopping list
-        const startDate = new Date(date);
-        const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        
-        console.log(`Generating weekly shopping list from ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`);
-        
-        const weeklyMealPlans = await db
-          .select()
-          .from(mealPlans)
-          .where(and(
-            eq(mealPlans.userId, req.user.id),
-            gte(mealPlans.date, startDate.toISOString().split('T')[0]),
-            lte(mealPlans.date, endDate.toISOString().split('T')[0])
-          ));
-        
-        console.log(`Found ${weeklyMealPlans.length} meal plans for the week`);
-        
-        if (weeklyMealPlans.length === 0) {
-          return res.json({ items: [], groupedItems: {} });
-        }
-        
-        const allRecipes = [];
-        const allMealPlanIds = weeklyMealPlans.map(plan => plan.id);
-        
-        for (const mealPlanId of allMealPlanIds) {
-          const mealPlanRecipes = await db
-            .select({
-              recipe: recipes,
-              mealType: recipesInMealPlan.mealType,
-              servingSize: recipesInMealPlan.servingSize
-            })
-            .from(recipesInMealPlan)
-            .innerJoin(recipes, eq(recipesInMealPlan.recipeId, recipes.id))
-            .where(eq(recipesInMealPlan.mealPlanId, mealPlanId));
-          
-          allRecipes.push(...mealPlanRecipes);
-        }
-        
-        console.log(`Found ${allRecipes.length} total recipes for weekly shopping list`);
-        
-        if (allRecipes.length === 0) {
-          return res.json({ items: [], groupedItems: {} });
-        }
-        
-        const weeklyShoppingList = await generateWeeklyShoppingList(allRecipes);
-        console.log(`Generated weekly shopping list with ${weeklyShoppingList.items.length} items`);
-        
-        return res.json(weeklyShoppingList);
-      } else {
         // Daily shopping list logic
         const [mealPlan] = await db
           .select()
