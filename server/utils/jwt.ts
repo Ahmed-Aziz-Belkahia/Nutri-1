@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { db } from '@db';
 import { users, refreshTokens } from '@db/schema';
-import { eq, and, gt } from 'drizzle-orm';
+import { eq, and, gt, lt } from 'drizzle-orm';
 
 // JWT Configuration
 const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET || 'nutri-ai-access-secret-key-change-in-production';
@@ -120,7 +120,8 @@ export async function storeRefreshToken(
     await db.insert(refreshTokens).values({
       userId,
       token,
-      expiresAt
+      expiresAt: Math.floor(expiresAt.getTime() / 1000) as any, // Convert to Unix timestamp (seconds)
+      createdAt: Math.floor(Date.now() / 1000) as any // Convert to Unix timestamp (seconds)
     });
     console.log(`[JWT] Stored refresh token for user ${userId}`);
   } catch (error) {
@@ -134,13 +135,14 @@ export async function storeRefreshToken(
  */
 export async function verifyRefreshTokenInDB(token: string): Promise<boolean> {
   try {
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds)
     const [tokenRecord] = await db
       .select()
       .from(refreshTokens)
       .where(
         and(
           eq(refreshTokens.token, token),
-          gt(refreshTokens.expiresAt, new Date()),
+          gt(refreshTokens.expiresAt, currentTime as any),
           eq(refreshTokens.isRevoked, false)
         )
       )
@@ -190,9 +192,10 @@ export async function revokeAllUserTokens(userId: number): Promise<void> {
  */
 export async function cleanupExpiredTokens(): Promise<void> {
   try {
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds)
     const result = await db
       .delete(refreshTokens)
-      .where(gt(new Date(), refreshTokens.expiresAt));
+      .where(lt(refreshTokens.expiresAt, currentTime as any));
     
     console.log('[JWT] Cleaned up expired refresh tokens');
   } catch (error) {
