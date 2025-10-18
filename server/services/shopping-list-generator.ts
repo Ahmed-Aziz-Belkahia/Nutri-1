@@ -62,39 +62,59 @@ export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: 
   console.log(`Total ingredients to consolidate: ${allIngredients.length}`);
   
   // Ask AI to consolidate all ingredients into a shopping list
-  const prompt = `You are a smart grocery shopping assistant. I need you to consolidate this list of ingredients from multiple recipes into a single, clean shopping list.
+  const prompt = `You are a smart grocery shopping assistant. Consolidate ingredients into a clean shopping list.
 
-RULES:
-1. Combine duplicate ingredients (same item = one entry)
-2. Add up all quantities 
-3. Remove descriptors like "fresh", "ripe", "chopped", "diced", "boneless"
-4. Convert everything to metric (oz → grams, cups → ml)
-5. Use singular form (banana not bananas)
+CRITICAL CONSOLIDATION RULES - EACH INGREDIENT MUST APPEAR EXACTLY ONCE:
 
-Example:
-Input: ["2 ripe bananas", "1 banana sliced", "3 bananas"]
-Output: {"name": "banana", "quantity": 6, "unit": "unit"}
+1. CUCUMBER = cucumber, cucumber sliced, cucumber diced, cucumber slices (ALL → "cucumber")
+2. OLIVE OIL = olive oil, extra virgin olive oil, EVOO (ALL → "olive oil")
+3. CHERRY TOMATO = cherry tomatoes, cherry tomato halved, cherry tomatoes halved (ALL → "cherry tomato")
+4. FETA CHEESE = feta, feta cheese, feta cheese crumbled, crumbled feta (ALL → "feta cheese")
+5. BUTTER = butter, unsalted butter (ALL → "butter")
+6. AVOCADO = avocado, avocado sliced, avocado pitted, ripe avocado (ALL → "avocado")
+7. PARMESAN = parmesan, parmesan cheese, grated parmesan, parmesan grated (ALL → "parmesan cheese")
+8. SOY SAUCE = soy sauce, low sodium soy sauce (ALL → "soy sauce")
+9. GARLIC = garlic, garlic cloves, garlic minced, garlic clove (ALL → "garlic")
+10. LEMON JUICE = lemon juice, fresh lemon juice, juice of lemon (ALL → "lemon juice")
 
-Input: ["6oz chicken breast boneless", "8oz chicken breast"]  
-Output: {"name": "chicken breast", "quantity": 392, "unit": "g"}
+CONVERSION RULES:
+- 1 cup = 240ml
+- 1 tablespoon = 15ml
+- 1 teaspoon = 5ml
+- 1 oz = 28g
+- 1/2 cup = 120ml
+- 1/4 cup = 60ml
+- 1 pound = 454g
 
-Here are ALL the ingredients from the week's recipes:
+STRIP ALL DESCRIPTORS:
+✗ "fresh spinach" → ✓ "spinach"
+✗ "boneless chicken breast" → ✓ "chicken breast"
+✗ "ripe banana" → ✓ "banana"
+✗ "chopped parsley" → ✓ "parsley"
+✗ "sliced cucumber" → ✓ "cucumber"
+
+EXAMPLES:
+Input: ["1/2 cucumber sliced", "1/3 cucumber diced", "1/4 cup cucumber slices"]
+Output: {"name": "cucumber", "quantity": 1, "unit": "unit"}
+
+Input: ["2 tablespoons olive oil", "1/4 cup olive oil", "1 tbsp olive oil"]
+Output: {"name": "olive oil", "quantity": 105, "unit": "ml"}
+
+Input: ["3 eggs", "6 large eggs", "2 eggs"]
+Output: {"name": "egg", "quantity": 11, "unit": "unit"}
+
+Here are ALL the ingredients (${allIngredients.length} total):
 
 ${allIngredients.map((ing, i) => `${i + 1}. ${ing}`).join('\n')}
 
-Return ONLY a JSON object with this exact structure:
+Return ONLY JSON - no text before or after:
 {
   "shoppingList": [
-    {"name": "ingredient name", "quantity": number, "unit": "g|ml|unit|kg|L"},
-    {"name": "ingredient name", "quantity": number, "unit": "g|ml|unit|kg|L"}
+    {"name": "ingredient", "quantity": number, "unit": "g|ml|unit|kg|L"}
   ]
 }
 
-IMPORTANT: 
-- Each ingredient should appear EXACTLY ONCE
-- Combine "chicken breast" + "chicken breast boneless" into ONE "chicken breast" entry
-- Combine "banana" + "banana sliced" + "bananas" into ONE "banana" entry
-- Return valid JSON only, no explanation text`;
+VERIFY: Each ingredient name appears ONLY ONCE in your output. If you see duplicates, you did it wrong.`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -102,14 +122,14 @@ IMPORTANT:
       messages: [
         {
           role: "system",
-          content: "You are a grocery shopping assistant that creates consolidated shopping lists. You always return valid JSON in the exact format requested."
+          content: "You are a grocery shopping consolidation expert. Your ONLY job is to merge duplicate ingredients. CRITICAL: Each ingredient must appear EXACTLY ONCE in the output. If cucumber appears 5 times in input, it must appear ONCE in output with the summed quantity. NO EXCEPTIONS."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.2,
+      temperature: 0.1,
       response_format: { type: "json_object" }
     });
     
