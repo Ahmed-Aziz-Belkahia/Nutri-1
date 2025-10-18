@@ -13,10 +13,6 @@ export function registerMealPlanRoutes(app: Express) {
   // Get today's meal plan - This endpoint must be defined before the :date route
   app.get("/api/meal-plans/today", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      
-      console.log('Fetching meal plan for today');
-      console.log('User ID:', req.user.id);
-      
       // Get today's date in YYYY-MM-DD format
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
@@ -42,11 +38,9 @@ export function registerMealPlanRoutes(app: Express) {
         .limit(1);
       
       if (!todayPlan.length) {
-        console.log(`No meal plan found for today (${todayStr})`);
+        // Don't log missing meal plans - this is expected behavior
         return res.json({ hasPlan: false });
       }
-      
-      console.log(`Found meal plan with ID: ${todayPlan[0].id} for today (${todayStr})`);
       
       // Get associated recipes for today's meal plan
       const mealRecipes = await db
@@ -116,10 +110,7 @@ export function registerMealPlanRoutes(app: Express) {
   // Get meal plan by specific date - This endpoint handles date-specific meal plan requests
   app.get("/api/meal-plans/:date", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-
       const dateRequested = req.params.date;
-      console.log('Fetching meal plan for date:', dateRequested);
-      console.log('User ID:', req.user.id);
       
       // Special handling for "all" which should return all meal plans
       if (dateRequested === 'all') {

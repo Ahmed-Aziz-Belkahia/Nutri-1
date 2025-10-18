@@ -91,11 +91,20 @@ app.use((req, res, next) => {
   res.on("finish", () => {
     const duration = Date.now() - start;
     
-    // Skip logging for noisy endpoints
-    if (path === '/api/meal-plans/progress' || 
-        path === '/api/auth/me' ||
-        path === '/api/user-nutrition-preferences' ||
-        path === '/api/recipes') {
+    // Skip logging for noisy endpoints that are polled frequently
+    const noisyEndpoints = [
+      '/api/meal-plans/progress',
+      '/api/meal-plans/today',
+      '/api/auth/me',
+      '/api/user-nutrition-preferences',
+      '/api/user/profile',
+      '/api/recipes',
+      '/api/progress-photos',
+      '/api/food-logs',
+      '/api/weight-logs'
+    ];
+    
+    if (noisyEndpoints.includes(path)) {
       return;
     }
     

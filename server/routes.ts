@@ -943,30 +943,15 @@ export function registerRoutes(app: Express): Server {
   // Update the get progress photos endpoint
   app.get("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-
-      console.log('Fetching progress photos for user:', req.user!.id);
-
       const photos = await db
         .select()
         .from(progressPhotos)
         .where(eq(progressPhotos.userId, req.user!.id))
         .orderBy(desc(progressPhotos.createdAt));
 
-      console.log('Found photos in database:', {
-        count: photos.length,
-        photoUrls: photos.map(p => p.photoUrl),
-        types: photos.map(p => p.type)
-      });
-
       // Check if user uploaded a photo today
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       const todayPhoto = photos.find(p => p.photoDate === today);
-      
-      console.log('Today check:', {
-        today,
-        hasUploadedToday: !!todayPhoto,
-        todayPhotoId: todayPhoto?.id
-      });
 
       res.json({
         photos,
@@ -5351,7 +5336,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         } : null
       };
       
-      console.log("Returning profile data:", JSON.stringify(profile));
       res.json(profile);
     } catch (error) {
       console.error("Error fetching user profile:", error);
