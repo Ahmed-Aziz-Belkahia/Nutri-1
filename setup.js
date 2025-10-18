@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    has_completed_onboarding INTEGER DEFAULT false,
+    has_completed_onboarding INTEGER DEFAULT 0,
     last_activity_date TEXT,
     profile_image TEXT,
     preferred_language TEXT DEFAULT 'en',
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS users (
     longest_streak INTEGER,
     experience_points INTEGER,
     level INTEGER,
-    is_admin INTEGER DEFAULT false
+    is_admin INTEGER DEFAULT 0
 );
 
 -- Food logs table
