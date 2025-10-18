@@ -49,6 +49,7 @@ export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export type InsertUser = z.infer<typeof registerSchema>;
 export type LoginUser = z.infer<typeof loginSchema>;
+export type SelectUser = typeof users.$inferSelect;
 
 // Food logs schema
 export const foodLogs = sqliteTable("food_logs", {
@@ -416,3 +417,61 @@ export type InsertRecipe = z.infer<typeof insertRecipeSchema>;
 export type InsertBadge = z.infer<typeof insertBadgeSchema>;
 export type InsertDailyProgress = z.infer<typeof insertDailyProgressSchema>;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+// Refresh tokens schema (for JWT authentication)
+export const refreshTokens = sqliteTable("refresh_tokens", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: text("token").notNull().unique(),
+  expiresAt: integer("expires_at", { mode: 'timestamp' }).notNull(),
+  isRevoked: integer("is_revoked", { mode: 'boolean' }).default(false).notNull(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+});
+
+export const insertRefreshTokenSchema = createInsertSchema(refreshTokens);
+export const selectRefreshTokenSchema = createSelectSchema(refreshTokens);
+export type InsertRefreshToken = typeof refreshTokens.$inferInsert;
+export type SelectRefreshToken = typeof refreshTokens.$inferSelect;
+
+// API usage tracking schema (for token limitations and rate limiting)
+export const apiUsageTracking = sqliteTable("api_usage_tracking", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
+  endpoint: text("endpoint").notNull(), // e.g., "/api/meal-plans", "/api/analyze-body-fat"
+  tokensUsed: integer("tokens_used").notNull().default(0), // OpenAI tokens consumed
+  costUsd: real("cost_usd").notNull().default(0), // Estimated cost in USD
+  requestDate: integer("request_date", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  model: text("model"), // e.g., "gpt-4o-mini", "gpt-4o"
+  status: text("status").notNull().default("success"), // success, error, rate_limited
+  metadata: text("metadata", { mode: 'json' }).$type<{
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
+    responseTime?: number;
+    errorMessage?: string;
+  }>(),
+});
+
+export const insertApiUsageTrackingSchema = createInsertSchema(apiUsageTracking);
+export const selectApiUsageTrackingSchema = createSelectSchema(apiUsageTracking);
+export type InsertApiUsageTracking = typeof apiUsageTracking.$inferInsert;
+export type SelectApiUsageTracking = typeof apiUsageTracking.$inferSelect;
+
+// User token limits schema (for premium tiers and usage limits)
+export const userTokenLimits = sqliteTable("user_token_limits", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: integer("user_id").notNull().unique().references(() => users.id, { onDelete: 'cascade' }),
+  tier: text("tier").notNull().default("free"), // free, premium, enterprise
+  dailyTokenLimit: integer("daily_token_limit").notNull().default(10000), // Tokens per day
+  monthlyTokenLimit: integer("monthly_token_limit").notNull().default(200000), // Tokens per month
+  dailyUsed: integer("daily_used").notNull().default(0),
+  monthlyUsed: integer("monthly_used").notNull().default(0),
+  lastResetDaily: integer("last_reset_daily", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  lastResetMonthly: integer("last_reset_monthly", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  updatedAt: integer("updated_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+});
+
+export const insertUserTokenLimitsSchema = createInsertSchema(userTokenLimits);
+export const selectUserTokenLimitsSchema = createSelectSchema(userTokenLimits);
+export type InsertUserTokenLimits = typeof userTokenLimits.$inferInsert;
+export type SelectUserTokenLimits = typeof userTokenLimits.$inferSelect;

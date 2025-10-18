@@ -4,16 +4,27 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { db } from "@db";
 import { sql } from "drizzle-orm";
-import { setupAuth } from "./auth";
 import { createServer } from "http";
 import path from "path";
 import fs from 'fs/promises';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import jwtAuthRoutes from './routes/jwt-auth';
 
 // Load environment variables from .env file
 dotenv.config();
 
 const app = express();
+
+// Security headers with helmet
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Cookie parser middleware (required for JWT cookies)
+app.use(cookieParser());
 
 // Parse allowed origins from environment or use permissive setting in development
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
@@ -130,10 +141,11 @@ async function initializeApp() {
     // Create HTTP server and register routes
     const server = createServer(app);
 
-    // Setup authentication before routes
-    setupAuth(app);
+    // Register JWT authentication routes
+    app.use('/api/auth', jwtAuthRoutes);
+    log("✅ JWT authentication routes registered");
 
-    // Register routes after auth setup
+    // Register application routes
     registerRoutes(app);
 
     // Error handling middleware
