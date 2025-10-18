@@ -105,14 +105,15 @@ After: JWT with HTTP-only cookies, refresh token rotation, API usage tracking re
 
 **Next Steps (In Progress):**
 
-- [ ] Deploy to VPS (146.190.166.34)
-- [ ] Backup existing VPS database
-- [ ] Delete old database on VPS
-- [ ] Pull latest code with JWT implementation
-- [ ] Run npm install for new dependencies
-- [ ] Initialize fresh database with new schema
-- [ ] Restart PM2 server
-- [ ] Test auth endpoints on VPS
+- [x] Deploy to VPS (146.190.166.34) ✅ SUCCESS
+- [x] Backup existing VPS database ✅ (136K backup created)
+- [x] Delete old database on VPS ✅
+- [x] Pull latest code with JWT implementation ✅
+- [x] Run npm install for new dependencies ✅
+- [x] Initialize fresh database with new schema ✅
+- [x] Restart PM2 server ✅ (restart #361, online)
+- [ ] Test auth endpoints on VPS 🔄 IN PROGRESS
+- [ ] Verify database tables created
 - [ ] Update all protected routes in server/routes.ts (50+ locations)
 - [ ] Create frontend JWT auth hook (use-jwt-auth.tsx)
 - [ ] Create Axios interceptor for automatic token attachment
