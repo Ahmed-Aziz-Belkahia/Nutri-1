@@ -66,7 +66,7 @@ const uploadsDir = path.join(process.cwd(), 'uploads');
 if (!existsSync(uploadsDir)) {
   mkdirSync(uploadsDir, { recursive: true });
 }
-
+import type { Request, Response, NextFunction } from 'express';
 import aiRoutes from './routes/ai';
 import authRoutes from './routes/auth';
 
@@ -89,7 +89,8 @@ const upload = multer({
 const handleUpload = upload.single('profileImage');
 
 export function registerRoutes(app: Express): Server {
-  // JWT authentication is now handled by requireAuth middleware in routes
+  // Setup auth first
+  setupAuth(app);
 
   // Setup static file serving for uploads
   app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -314,7 +315,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add text-based food analysis endpoint
-  app.post("/api/analyze-food-text", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/analyze-food-text", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -382,7 +383,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add analyze-ingredients endpoint
-  app.post("/api/analyze-ingredients", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/analyze-ingredients", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -436,7 +437,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get user's recipes
-  app.get("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/recipes", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -444,14 +445,14 @@ export function registerRoutes(app: Express): Server {
 
       const type = req.query.type as string || 'created';
       
-      console.log(`Fetching ${type} recipes for user ${req.user!.id}`);
+      console.log(`Fetching ${type} recipes for user ${req.user.id}`);
       
       // Get recipes based on type - using a more efficient query
       // Create a subquery to get liked recipe IDs first to avoid expensive EXISTS check
       const likedRecipeIds = await db
         .select({ id: recipeLikes.recipeId })
         .from(recipeLikes)
-        .where(eq(recipeLikes.userId, req.user!.id));
+        .where(eq(recipeLikes.userId, req.user.id));
       
       // Create a Set for O(1) lookups
       const likedIds = new Set(likedRecipeIds.map(r => r.id));
@@ -462,7 +463,7 @@ export function registerRoutes(app: Express): Server {
         .from(recipes)
         .where(
           and(
-            eq(recipes.userId, req.user!.id),
+            eq(recipes.userId, req.user.id),
             type === 'saved' ? eq(recipes.source, 'saved') : eq(recipes.source, 'created')
           )
         )
@@ -488,7 +489,7 @@ export function registerRoutes(app: Express): Server {
 
   // Add the recipe saving endpoint after the existing recipe routes
   // Create new recipe endpoint
-  app.post("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/recipes", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -500,7 +501,7 @@ export function registerRoutes(app: Express): Server {
       const [newRecipe] = await db
         .insert(recipes)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           name,
           description,
           ingredients: Array.isArray(ingredients) ? ingredients : [],
@@ -532,7 +533,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get favorite recipes
-  app.get("/api/recipes/favorites", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/recipes/favorites", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -549,7 +550,7 @@ export function registerRoutes(app: Express): Server {
         .from(recipes)
         .where(
           and(
-            eq(recipes.userId, req.user!.id),
+            eq(recipes.userId, req.user.id),
             eq(recipes.isPublic, true)
           )
         )
@@ -567,7 +568,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get recent meals
-  app.get("/api/food-logs/recent", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/food-logs/recent", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -581,7 +582,7 @@ export function registerRoutes(app: Express): Server {
         date: foodLogs.date,
       })
         .from(foodLogs)
-        .where(eq(foodLogs.userId, req.user!.id))
+        .where(eq(foodLogs.userId, req.user.id))
         .orderBy(desc(foodLogs.date))
         .limit(3);
 
@@ -605,7 +606,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get global top recipes sorted by likes
-  app.get("/api/recipes/top", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/recipes/top", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -634,7 +635,7 @@ export function registerRoutes(app: Express): Server {
           isLiked: sql`EXISTS(
             SELECT 1 FROM ${recipeLikes} 
             WHERE ${recipeLikes.recipeId} = ${recipes.id} 
-            AND ${recipeLikes.userId} = ${req.user!.id}
+            AND ${recipeLikes.userId} = ${req.user.id}
           )`,
         })
         .from(recipes)
@@ -653,7 +654,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add liked recipes endpoint
-  app.get("/api/recipes/liked", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/recipes/liked", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -669,7 +670,7 @@ export function registerRoutes(app: Express): Server {
           likesCount: recipes.likesCount,
         })
         .from(recipes)
-        .innerJoin(recipeLikes, and(eq(recipeLikes.recipeId, recipes.id), eq(recipeLikes.userId, req.user!.id)))
+        .innerJoin(recipeLikes, and(eq(recipeLikes.recipeId, recipes.id), eq(recipeLikes.userId, req.user.id)))
         .orderBy(desc(recipes.likesCount))
         .limit(10);
 
@@ -689,7 +690,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Recipe generation endpoint - UPDATED
-  app.post("/api/generate-recipe", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/generate-recipe", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -718,7 +719,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Update the recipe generation endpoint to include preferences
-  app.post("/api/generate-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/generate-recipes", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -747,7 +748,7 @@ export function registerRoutes(app: Express): Server {
       console.log('Generating recipes for ingredients:', ingredientNames);
       
       // Get the user's preferred language
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const userProfileResult = await db.query.users.findFirst({
         where: eq(users.id, userId)
       });
@@ -825,7 +826,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Create sample recipes
-  app.post("/api/sample-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/sample-recipes", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -894,7 +895,7 @@ export function registerRoutes(app: Express): Server {
         sampleRecipes.map(recipe =>
           db.insert(recipes).values({
             ...recipe,
-            userId: req.user!.id,
+            userId: req.user.id,
             likesCount: 0,
             commentsCount: 0,
           }).returning()
@@ -912,7 +913,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add sample sandwich recipe
-  app.post("/api/add-sandwich-recipe", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/add-sandwich-recipe", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -954,7 +955,7 @@ export function registerRoutes(app: Express): Server {
         .insert(recipes)
         .values({
           ...sandwichRecipe,
-          userId: req.user!.id,
+          userId: req.user.id,
         })
         .returning();
 
@@ -970,18 +971,18 @@ export function registerRoutes(app: Express): Server {
 
 
   // Update the get progress photos endpoint
-  app.get("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/progress-photos", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log('Fetching progress photos for user:', req.user!.id);
+      console.log('Fetching progress photos for user:', req.user.id);
 
       const photos = await db
         .select()
         .from(progressPhotos)
-        .where(eq(progressPhotos.userId, req.user!.id))
+        .where(eq(progressPhotos.userId, req.user.id))
         .orderBy(desc(progressPhotos.createdAt));
 
       console.log('Found photos in database:', {
@@ -1015,7 +1016,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Update the progress photos POST endpoint - removed handleUpload middleware since we're handling base64 directly
-  app.post("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/progress-photos", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.log('Authentication failed for progress photo upload');
@@ -1029,7 +1030,7 @@ export function registerRoutes(app: Express): Server {
         .from(progressPhotos)
         .where(
           and(
-            eq(progressPhotos.userId, req.user!.id),
+            eq(progressPhotos.userId, req.user.id),
             eq(progressPhotos.photoDate, today)
           )
         )
@@ -1050,7 +1051,7 @@ export function registerRoutes(app: Express): Server {
         bodyKeys: Object.keys(req.body),
         bodyPhotoLength: req.body.photo ? req.body.photo.length : 0,
         authStatus: req.isAuthenticated(),
-        userId: req.user!.id
+        userId: req.user.id
       });
 
       let imageUrl: string | null = null;
@@ -1066,10 +1067,10 @@ export function registerRoutes(app: Express): Server {
           await fs.mkdir(uploadsDir, { recursive: true });
 
           // Generate unique filename
-          const filename = `progress-${req.user!.id}-${Date.now()}.jpg`;
+          const filename = `progress-${req.user.id}-${Date.now()}.jpg`;
           const filepath = path.join(uploadsDir, filename);
 
-          console.log(`Saving photo for user ${req.user!.id} to ${filepath}`);
+          console.log(`Saving photo for user ${req.user.id} to ${filepath}`);
 
           // Process and save image
           await sharp(buffer)
@@ -1095,14 +1096,14 @@ export function registerRoutes(app: Express): Server {
 
       try {
         // Insert new progress photo with today's date
-        console.log(`Inserting photo record for user ${req.user!.id} with URL ${imageUrl}`);
+        console.log(`Inserting photo record for user ${req.user.id} with URL ${imageUrl}`);
         
         const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
         
         const [photo] = await db
           .insert(progressPhotos)
           .values({
-            userId: req.user!.id,
+            userId: req.user.id,
             photoUrl: imageUrl,
             type: req.body.type || 'latest',
             caption: req.body.caption || null,
@@ -1117,7 +1118,7 @@ export function registerRoutes(app: Express): Server {
         const savedPhotos = await db
           .select()
           .from(progressPhotos)
-          .where(eq(progressPhotos.userId, req.user!.id))
+          .where(eq(progressPhotos.userId, req.user.id))
           .orderBy(desc(progressPhotos.createdAt))
           .limit(1);
           
@@ -1138,7 +1139,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add the new PUT endpoint for updating photo type
-  app.put("/api/progress-photos/type", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.put("/api/progress-photos/type", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1167,7 +1168,7 @@ export function registerRoutes(app: Express): Server {
         .set({ type })
         .where(
           and(
-            eq(progressPhotos.userId, req.user!.id),
+            eq(progressPhotos.userId, req.user.id),
             eq(progressPhotos.photoUrl, photoUrl)
           )
         );
@@ -1183,7 +1184,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Replace progress photo endpoint - for updating today's photo
-  app.put("/api/progress-photos/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.put("/api/progress-photos/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.log('Authentication failed for progress photo replacement');
@@ -1198,7 +1199,7 @@ export function registerRoutes(app: Express): Server {
       console.log('Received photo replacement request:', {
         photoId,
         hasPhoto: !!req.body.photo,
-        userId: req.user!.id
+        userId: req.user.id
       });
 
       // Verify the photo belongs to the user
@@ -1208,7 +1209,7 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(progressPhotos.id, photoId),
-            eq(progressPhotos.userId, req.user!.id)
+            eq(progressPhotos.userId, req.user.id)
           )
         )
         .limit(1);
@@ -1231,10 +1232,10 @@ export function registerRoutes(app: Express): Server {
           await fs.mkdir(uploadsDir, { recursive: true });
 
           // Generate unique filename
-          const filename = `progress-${req.user!.id}-${Date.now()}.jpg`;
+          const filename = `progress-${req.user.id}-${Date.now()}.jpg`;
           const filepath = path.join(uploadsDir, filename);
 
-          console.log(`Saving replacement photo for user ${req.user!.id} to ${filepath}`);
+          console.log(`Saving replacement photo for user ${req.user.id} to ${filepath}`);
 
           // Process and save image
           await sharp(buffer)
@@ -1270,7 +1271,7 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(progressPhotos.id, photoId),
-            eq(progressPhotos.userId, req.user!.id)
+            eq(progressPhotos.userId, req.user.id)
           )
         )
         .returning();
@@ -1299,7 +1300,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Delete progress photo endpoint
-  app.delete("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.delete("/api/progress-photos", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1314,14 +1315,14 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
-      console.log(`Deleting photo: ${photoUrl} for user: ${req.user!.id}`);
+      console.log(`Deleting photo: ${photoUrl} for user: ${req.user.id}`);
 
       // Delete the photo record from database
       const deleteResult = await db
         .delete(progressPhotos)
         .where(
           and(
-            eq(progressPhotos.userId, req.user!.id),
+            eq(progressPhotos.userId, req.user.id),
             eq(progressPhotos.photoUrl, photoUrl)
           )
         )
@@ -1365,7 +1366,7 @@ export function registerRoutes(app: Express): Server {
   // Body composition analysis endpoint
   // SAFETY NOTE: This endpoint provides health and medical recommendations 
   // with proper citations from authoritative sources (WHO, CDC, ACE, NIH)
-  app.post("/api/analyze-body", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/analyze-body", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1447,7 +1448,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get user's badges
-  app.get("/api/user/badges", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/user/badges", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1463,7 +1464,7 @@ export function registerRoutes(app: Express): Server {
         })
         .from(userBadges)
         .innerJoin(badges, eq(userBadges.badgeId, badges.id))
-        .where(eq(userBadges.userId, req.user!.id))
+        .where(eq(userBadges.userId, req.user.id))
         .orderBy(desc(userBadges.earnedAt))
         .limit(10);
 
@@ -1478,7 +1479,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get user's notifications
-  app.get("/api/notifications", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/notifications", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1487,7 +1488,7 @@ export function registerRoutes(app: Express): Server {
       const userNotifications = await db
         .select()
         .from(notifications)
-        .where(eq(notifications.userId, req.user!.id))
+        .where(eq(notifications.userId, req.user.id))
         .orderBy(desc(notifications.createdAt))
         .limit(20);
 
@@ -1502,7 +1503,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Mark notification as read
-  app.post("/api/notifications/:id/read", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/notifications/:id/read", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1515,7 +1516,7 @@ export function registerRoutes(app: Express): Server {
         .from(notifications)
         .where(and(
           eq(notifications.id, notificationId),
-          eq(notifications.userId, req.user!.id)
+          eq(notifications.userId, req.user.id)
         ))
         .limit(1);
 
@@ -1624,7 +1625,7 @@ export function registerRoutes(app: Express): Server {
 
   // Update an existing recipe
   // DELETE recipe endpoint
-  app.delete("/api/recipes/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.delete("/api/recipes/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1639,7 +1640,7 @@ export function registerRoutes(app: Express): Server {
       const recipe = await db.query.recipes.findFirst({
         where: and(
           eq(recipes.id, recipeId),
-          eq(recipes.userId, req.user!.id)
+          eq(recipes.userId, req.user.id)
         )
       });
 
@@ -1650,7 +1651,7 @@ export function registerRoutes(app: Express): Server {
       // Delete the recipe
       await db.delete(recipes).where(eq(recipes.id, recipeId));
 
-      console.log(`Recipe ${recipeId} deleted by user ${req.user!.id}`);
+      console.log(`Recipe ${recipeId} deleted by user ${req.user.id}`);
       res.json({ success: true, message: 'Recipe deleted successfully' });
     } catch (error) {
       console.error('Error deleting recipe:', error);
@@ -1661,7 +1662,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.put("/api/recipes/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.put("/api/recipes/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1679,7 +1680,7 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(recipes.id, recipeId),
-            eq(recipes.userId, req.user!.id)
+            eq(recipes.userId, req.user.id)
           )
         )
         .limit(1);
@@ -1733,7 +1734,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Create meal plan endpoint - UPDATED with AI-generated personalized meal plans
-  app.post("/api/meal-plans", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -1751,7 +1752,7 @@ export function registerRoutes(app: Express): Server {
             .from(mealPlans)
             .where(
               and(
-                eq(mealPlans.userId, req.user!.id),
+                eq(mealPlans.userId, req.user.id),
                 eq(mealPlans.date, targetDate)
               )
             );
@@ -1776,12 +1777,12 @@ export function registerRoutes(app: Express): Server {
             const userPrefs = await db
               .select()
               .from(userDietaryPreferences)
-              .where(eq(userDietaryPreferences.userId, req.user!.id));
+              .where(eq(userDietaryPreferences.userId, req.user.id));
             
             const userProfile = await db
               .select()
               .from(users)
-              .where(eq(users.id, req.user!.id))
+              .where(eq(users.id, req.user.id))
               .leftJoin(
                 userNutritionPreferences,
                 eq(userNutritionPreferences.userId, users.id)
@@ -1868,7 +1869,7 @@ export function registerRoutes(app: Express): Server {
               mealData.map(async (mealInfo, index) => {
                 // Store both ingredients and instructions as arrays
                 const recipeData = {
-                  userId: req.user!.id,
+                  userId: req.user.id,
                   name: mealInfo.name,
                   ingredients: Array.isArray(mealInfo.recipe?.ingredients) ? mealInfo.recipe.ingredients : [],
                   instructions: Array.isArray(mealInfo.recipe?.instructions) ? mealInfo.recipe.instructions : [],
@@ -1968,7 +1969,7 @@ export function registerRoutes(app: Express): Server {
       const userProfile = await db
         .select()
         .from(users)
-        .where(eq(users.id, req.user!.id));
+        .where(eq(users.id, req.user.id));
       
       // Always use English for meal plan generation
       const language = 'en';
@@ -1991,7 +1992,7 @@ export function registerRoutes(app: Express): Server {
         const userDietPrefs = await db
           .select()
           .from(userDietaryPreferences)
-          .where(eq(userDietaryPreferences.userId, req.user!.id))
+          .where(eq(userDietaryPreferences.userId, req.user.id))
           .orderBy(desc(userDietaryPreferences.updatedAt))
           .limit(1);
           
@@ -2034,7 +2035,7 @@ export function registerRoutes(app: Express): Server {
         
         // Step 1: Initialize progress tracking
         updateMealPlanProgress(
-          req.user!.id,
+          req.user.id,
           'analyzing',
           'Analyzing preferences',
           0,
@@ -2047,7 +2048,7 @@ export function registerRoutes(app: Express): Server {
         
         // Step 2: Calculating
         updateMealPlanProgress(
-          req.user!.id,
+          req.user.id,
           'calculating',
           'Calculating macros',
           0,
@@ -2063,7 +2064,7 @@ export function registerRoutes(app: Express): Server {
         for (let day = 0; day < durationDays; day++) {
           // Update progress before generating each day
           updateMealPlanProgress(
-            req.user!.id,
+            req.user.id,
             'generating',
             `Generating meals for day ${day + 1}`,
             day + 1,
@@ -2102,7 +2103,7 @@ export function registerRoutes(app: Express): Server {
         
         // Update progress: all days generated, now saving
         updateMealPlanProgress(
-          req.user!.id,
+          req.user.id,
           'saving',
           'Saving meal plan to database',
           durationDays,
@@ -2145,7 +2146,7 @@ export function registerRoutes(app: Express): Server {
         
         // Mark progress as completed
         updateMealPlanProgress(
-          req.user!.id,
+          req.user.id,
           'completed',
           'Meal plan generated successfully',
           durationDays,
@@ -2156,7 +2157,7 @@ export function registerRoutes(app: Express): Server {
         console.error('Error generating AI meal plan:', error);
         
         // Clear progress on error
-        clearMealPlanProgress(req.user!.id);
+        clearMealPlanProgress(req.user.id);
         
         throw new Error(`AI meal plan generation failed: ${error?.message || 'Unknown error'}`);
       }
@@ -2200,7 +2201,7 @@ export function registerRoutes(app: Express): Server {
           .from(mealPlans)
           .where(
             and(
-              eq(mealPlans.userId, req.user!.id),
+              eq(mealPlans.userId, req.user.id),
               eq(mealPlans.date, dateStr)
             )
           );
@@ -2213,7 +2214,7 @@ export function registerRoutes(app: Express): Server {
           console.log('Creating meal plan with calories:', totalCals, 'date:', dateStr);
           
           [mealPlan] = await db.insert(mealPlans).values({
-            userId: req.user!.id,
+            userId: req.user.id,
             date: dateStr,
             totalCalories: totalCals,
             status: 'active',
@@ -2463,7 +2464,7 @@ export function registerRoutes(app: Express): Server {
             // Ensure instructions and ingredients are arrays before saving
             const recipeToSave = {
               ...recipeData,
-              userId: req.user!.id,
+              userId: req.user.id,
               source: "ai-generated",
               createdAt: new Date(),
               updatedAt: new Date(),
@@ -2524,7 +2525,7 @@ export function registerRoutes(app: Express): Server {
         console.log(`Generating weekly shopping list for ${generatedPlans.length} meal plans`);
         const { generateWeeklyShoppingList } = await import('./services/shopping-list-generator');
         const mealPlanIds = generatedPlans.map(p => p.id);
-        const shoppingList = await generateWeeklyShoppingList(mealPlanIds, req.user!.id);
+        const shoppingList = await generateWeeklyShoppingList(mealPlanIds, req.user.id);
         console.log(`Successfully created weekly shopping list with ${shoppingList.items.length} items`);
       } catch (shoppingListError) {
         console.error(`Error generating weekly shopping list:`, shoppingListError);
@@ -2599,7 +2600,7 @@ export function registerRoutes(app: Express): Server {
   }
 
   // Get all meal plans endpoint
-  app.get("/api/meal-plans/all", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/meal-plans/all", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -2618,7 +2619,7 @@ export function registerRoutes(app: Express): Server {
           createdAt: mealPlans.createdAt
         })
         .from(mealPlans)
-        .where(eq(mealPlans.userId, req.user!.id))
+        .where(eq(mealPlans.userId, req.user.id))
   .orderBy(desc(mealPlans.createdAt)); // Get latest first
       
       // Only keep the latest meal plan for each date
@@ -2744,7 +2745,7 @@ export function registerRoutes(app: Express): Server {
   
   // Endpoint to generate optimized meal plan with integrated shopping list
   // Generate a meal plan with budget-first approach (ingredients first, then meals)
-  app.post("/api/meal-plans/generate-budget-first", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/generate-budget-first", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -2766,7 +2767,7 @@ export function registerRoutes(app: Express): Server {
       const userDietaryData = await db
         .select()
         .from(userDietaryPreferences)
-        .where(eq(userDietaryPreferences.userId, req.user!.id))
+        .where(eq(userDietaryPreferences.userId, req.user.id))
         .limit(1);
 
       if (!userDietaryData.length) {
@@ -2782,7 +2783,7 @@ export function registerRoutes(app: Express): Server {
       const userNutritionData = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .where(eq(userNutritionPreferences.userId, req.user.id))
         .limit(1);
 
       // Default calorie target if not found
@@ -2863,7 +2864,7 @@ export function registerRoutes(app: Express): Server {
           const [newMealPlan] = await db
             .insert(mealPlans)
             .values({
-              userId: req.user!.id, 
+              userId: req.user.id, 
               date: currentDateStr,
               totalCalories: planDay.totalDailyCalories,
               status: 'active',
@@ -2883,7 +2884,7 @@ export function registerRoutes(app: Express): Server {
             const [newRecipe] = await db
               .insert(recipes)
               .values({
-                userId: req.user!.id,
+                userId: req.user.id,
                 name: meal.name,
                 description: `Generated for ${meal.mealType} on ${currentDateStr}`,
                 instructions: Array.isArray(meal.recipe.instructions) ? meal.recipe.instructions : [meal.recipe.instructions],
@@ -2923,7 +2924,7 @@ export function registerRoutes(app: Express): Server {
           // Generate shopping list for the first day/meal plan
           if (i === 0) {
             const generateShoppingList = (await import('./services/shopping-list-generator')).generateShoppingListFromMealPlan;
-            await generateShoppingList(newMealPlan.id, req.user!.id);
+            await generateShoppingList(newMealPlan.id, req.user.id);
             console.log(`Generated shopping list for meal plan ID: ${newMealPlan.id}`);
           }
         }
@@ -2951,7 +2952,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.post("/api/meal-plans/generate-optimized", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/generate-optimized", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -2973,7 +2974,7 @@ export function registerRoutes(app: Express): Server {
       const userDietaryData = await db
         .select()
         .from(userDietaryPreferences)
-        .where(eq(userDietaryPreferences.userId, req.user!.id))
+        .where(eq(userDietaryPreferences.userId, req.user.id))
         .limit(1);
 
       if (!userDietaryData.length) {
@@ -2985,7 +2986,7 @@ export function registerRoutes(app: Express): Server {
 
       // Get user profile to determine language preference
       const userProfile = await db.query.users.findFirst({
-        where: eq(users.id, req.user!.id)
+        where: eq(users.id, req.user.id)
       });
 
       const language = userProfile?.preferred_language || 'en';
@@ -3045,7 +3046,7 @@ export function registerRoutes(app: Express): Server {
       const [newMealPlan] = await db
         .insert(mealPlans)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           date: date,
           totalCalories: optimizedMealPlanResult.plan[0]?.totalDailyCalories || calorieTarget,
           status: 'active',
@@ -3065,7 +3066,7 @@ export function registerRoutes(app: Express): Server {
         const [newRecipe] = await db
           .insert(recipes)
           .values({
-            userId: req.user!.id,
+            userId: req.user.id,
             name: meal.name,
             ingredients: Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [],
             instructions: Array.isArray(meal.recipe?.instructions) ? meal.recipe.instructions : [],
@@ -3122,7 +3123,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get user nutrition preferences
-  app.get("/api/user-nutrition-preferences", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/user-nutrition-preferences", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3131,7 +3132,7 @@ export function registerRoutes(app: Express): Server {
       const userNutritionData = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .where(eq(userNutritionPreferences.userId, req.user.id))
         .limit(1);
 
       if (!userNutritionData.length) {
@@ -3152,7 +3153,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Enhanced meal plan generation endpoint
-  app.post("/api/meal-plans/generate-enhanced", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/generate-enhanced", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3164,13 +3165,13 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Preferences are required' });
       }
 
-      console.log(`Generating enhanced meal plan for user ${req.user!.id} with duration: ${duration}`);
+      console.log(`Generating enhanced meal plan for user ${req.user.id} with duration: ${duration}`);
 
       // Get user's preferred language
       const userProfile = await db
         .select()
         .from(users)
-        .where(eq(users.id, req.user!.id));
+        .where(eq(users.id, req.user.id));
 
       const language = userProfile[0]?.preferred_language || 'en';
       const isPolish = language === 'pl';
@@ -3179,7 +3180,7 @@ export function registerRoutes(app: Express): Server {
       await db
         .insert(userDietaryPreferences)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           allergies: preferences.allergies || [],
           dietaryType: preferences.dietaryType || 'omnivore',
           calorieTarget: preferences.calorieTarget || 2000,
@@ -3241,7 +3242,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // On-demand meal plan generation for specific date
-  app.post("/api/meal-plans/generate-for-date", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/generate-for-date", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3261,7 +3262,7 @@ export function registerRoutes(app: Express): Server {
         .from(mealPlans)
         .where(
           and(
-            eq(mealPlans.userId, req.user!.id),
+            eq(mealPlans.userId, req.user.id),
             eq(mealPlans.date, date)
           )
         )
@@ -3352,7 +3353,7 @@ export function registerRoutes(app: Express): Server {
       const userPrefs = await db
         .select()
         .from(userDietaryPreferences)
-        .where(eq(userDietaryPreferences.userId, req.user!.id));
+        .where(eq(userDietaryPreferences.userId, req.user.id));
       
       // Set defaults if no preferences exist
       const dietaryType = userPrefs[0]?.dietaryType || 'balanced';
@@ -3375,7 +3376,7 @@ export function registerRoutes(app: Express): Server {
       const userProfile = await db
         .select()
         .from(users)
-        .where(eq(users.id, req.user!.id));
+        .where(eq(users.id, req.user.id));
       
       // Get user's preferred language
       // Debug the structure to verify language preference path
@@ -3404,7 +3405,7 @@ export function registerRoutes(app: Express): Server {
         const userDietPrefs = await db
           .select()
           .from(userDietaryPreferences)
-          .where(eq(userDietaryPreferences.userId, req.user!.id))
+          .where(eq(userDietaryPreferences.userId, req.user.id))
           .limit(1);
           
         const actualPrefs = userDietPrefs[0] || {};
@@ -3456,7 +3457,7 @@ export function registerRoutes(app: Express): Server {
       const [newMealPlan] = await db
         .insert(mealPlans)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           date: date,
           totalCalories: totalCalories,
           status: 'active',
@@ -3470,7 +3471,7 @@ export function registerRoutes(app: Express): Server {
         const [newRecipe] = await db
           .insert(recipes)
           .values({
-    userId: req.user!.id,
+    userId: req.user.id,
     name: meal.name,
     description: `${meal.mealType} for ${date}`,
     ingredients: Array.isArray(meal.recipe?.ingredients) ? meal.recipe.ingredients : [],
@@ -3524,7 +3525,7 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Endpoint to get meal plan for a specific date
-  app.get('/api/meal-plans/:date', requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get('/api/meal-plans/:date', isAuthenticated, async (req, res) => {
     try {
       const { date } = req.params;
       
@@ -3534,7 +3535,7 @@ export function registerRoutes(app: Express): Server {
 
       const mealPlanWithRecipes = await db.query.mealPlans.findFirst({
         where: and(
-          eq(mealPlans.userId, req.user!.id),
+          eq(mealPlans.userId, req.user.id),
           eq(mealPlans.date, date)
         ),
         with: {
@@ -3581,7 +3582,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Generate grocery list from meal plan - now uses AI consolidation
-  app.post("/api/meal-plans/:planId/generate-grocery-list", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/:planId/generate-grocery-list", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3591,7 +3592,7 @@ export function registerRoutes(app: Express): Server {
       
       // Use AI consolidation service for proper deduplication
       const { generateWeeklyShoppingList } = await import('./services/shopping-list-generator');
-      const shoppingList = await generateWeeklyShoppingList([parseInt(planId)], req.user!.id);
+      const shoppingList = await generateWeeklyShoppingList([parseInt(planId)], req.user.id);
       
       console.log(`Generated shopping list for meal plan ${planId} with ${shoppingList.items.length} items`);
       
@@ -3606,19 +3607,19 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Get current user's shopping list (all items)
-  app.get("/api/shopping-list", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/shopping-list", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
       }
       
-      console.log(`Fetching shopping list for user: ${req.user!.id}`);
+      console.log(`Fetching shopping list for user: ${req.user.id}`);
       
       // Fetch all shopping list items for the user
       const items = await db
         .select()
         .from(shoppingListItems)
-        .where(eq(shoppingListItems.userId, req.user!.id))
+        .where(eq(shoppingListItems.userId, req.user.id))
         .orderBy(shoppingListItems.category, shoppingListItems.name);
       
       console.log(`Found ${items.length} shopping list items`);
@@ -3648,7 +3649,7 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Get shopping list for a specific date
-  app.get("/api/shopping-list/:date", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/shopping-list/:date", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3656,16 +3657,16 @@ export function registerRoutes(app: Express): Server {
       
       const { date } = req.params;
       const { type = 'day' } = req.query;
-      console.log(`Fetching shopping list for date: ${date}, user: ${req.user!.id}, type: ${type}`);
+      console.log(`Fetching shopping list for date: ${date}, user: ${req.user.id}, type: ${type}`);
       
       // Simply return the shopping list from database (already generated during meal plan creation)
       const items = await db
         .select()
         .from(shoppingListItems)
-        .where(eq(shoppingListItems.userId, req.user!.id))
+        .where(eq(shoppingListItems.userId, req.user.id))
         .orderBy(shoppingListItems.category, shoppingListItems.name);
       
-      console.log(`Found ${items.length} shopping list items for user ${req.user!.id}`);
+      console.log(`Found ${items.length} shopping list items for user ${req.user.id}`);
       
       // Group items by category for better organization
       const groupedItems: Record<string, typeof items> = {};
@@ -3692,7 +3693,7 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Legacy endpoint - kept for backward compatibility but simplified
-  app.get("/api/shopping-list/:date/old", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/shopping-list/:date/old", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3708,7 +3709,7 @@ export function registerRoutes(app: Express): Server {
           .from(mealPlans)
           .where(
             and(
-              eq(mealPlans.userId, req.user!.id),
+              eq(mealPlans.userId, req.user.id),
               eq(mealPlans.date, date)
             )
           )
@@ -3982,7 +3983,7 @@ export function registerRoutes(app: Express): Server {
   }
 
   // Get prices for a shopping list at a specific location
-  app.get("/api/shopping-list/:date/prices/:locationId", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/shopping-list/:date/prices/:locationId", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -3994,7 +3995,7 @@ export function registerRoutes(app: Express): Server {
       const items = await db
         .select()
         .from(shoppingListItems)
-        .where(eq(shoppingListItems.userId, req.user!.id));
+        .where(eq(shoppingListItems.userId, req.user.id));
       
       if (!items.length) {
         return res.json({ items: [], totalPrice: 0 });
@@ -4043,7 +4044,7 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Update shopping list item with price from a specific location
-  app.post("/api/shopping-list/items/:itemId/price", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/shopping-list/items/:itemId/price", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -4086,7 +4087,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add food log endpoint (updated with enhanced logging)
-  app.post("/api/food-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/food-logs", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to add food log');
@@ -4095,7 +4096,7 @@ export function registerRoutes(app: Express): Server {
 
       const { name, calories, protein, carbs, fat, image, date, components, isAnalyzing } = req.body;
       console.log('[Food Logs API] Processing food log request:', {
-        userId: req.user!.id,
+        userId: req.user.id,
         name,
         hasImage: !!image,
         hasComponents: Array.isArray(components),
@@ -4249,7 +4250,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       console.log('[Food Logs API] Inserting food log into database:', {
-        userId: req.user!.id,
+        userId: req.user.id,
         name: analyzedName, // Use the analyzed name here instead of original name
         componentsCount: processedComponents.length
       });
@@ -4258,7 +4259,7 @@ export function registerRoutes(app: Express): Server {
       const [mainLog] = await db
         .insert(foodLogs)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           name: analyzedName, // Use the analyzed name here instead of original name
           calories: totalCalories.toString(),
           protein: totalProtein.toString(),
@@ -4291,7 +4292,7 @@ export function registerRoutes(app: Express): Server {
         .from(foodLogs)
         .where(
           and(
-            eq(foodLogs.userId, req.user!.id),
+            eq(foodLogs.userId, req.user.id),
             sql`${foodLogs.date} >= ${startOfDay.toISOString()}`,
             sql`${foodLogs.date} < ${endOfDay.toISOString()}`
           )
@@ -4345,7 +4346,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // GET endpoint for food logs (updated with enhanced logging)
-  app.get("/api/food-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/food-logs", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to fetch food logs');
@@ -4362,7 +4363,7 @@ export function registerRoutes(app: Express): Server {
       const endOfDay = new Date(`${dateString}T23:59:59.999Z`);
 
       console.log('[Food Logs API] Fetching logs for date range:', {
-        userId: req.user!.id,
+        userId: req.user.id,
         dateRequested: dateString,
         start: startOfDay.toISOString(),
         end: endOfDay.toISOString()
@@ -4373,7 +4374,7 @@ export function registerRoutes(app: Express): Server {
         .from(foodLogs)
         .where(
           and(
-            eq(foodLogs.userId, req.user!.id),
+            eq(foodLogs.userId, req.user.id),
             sql`${foodLogs.date} >= ${startOfDay.getTime()}`,
             sql`${foodLogs.date} < ${endOfDay.getTime()}`
           )
@@ -4417,7 +4418,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // PUT endpoint for updating food logs
-  app.put("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.put("/api/food-logs/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to update food log');
@@ -4436,7 +4437,7 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(foodLogs.id, logId),
-            eq(foodLogs.userId, req.user!.id)
+            eq(foodLogs.userId, req.user.id)
           )
         )
         .limit(1);
@@ -4449,7 +4450,7 @@ export function registerRoutes(app: Express): Server {
       
       console.log('[Food Logs API] Updating food log:', {
         logId,
-        userId: req.user!.id,
+        userId: req.user.id,
         name,
         hasComponents: Array.isArray(components)
       });
@@ -4493,7 +4494,7 @@ export function registerRoutes(app: Express): Server {
         .from(foodLogs)
         .where(
           and(
-            eq(foodLogs.userId, req.user!.id),
+            eq(foodLogs.userId, req.user.id),
             sql`${foodLogs.date} >= ${startOfDay.toISOString()}`,
             sql`${foodLogs.date} < ${endOfDay.toISOString()}`
           )
@@ -4532,7 +4533,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add new shopping list item
-  app.post("/api/shopping-list-items", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/shopping-list-items", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -4551,7 +4552,7 @@ export function registerRoutes(app: Express): Server {
           name,
           quantity: quantity.toString(),
           isChecked: false,
-          userId: req.user!.id,
+          userId: req.user.id,
           category
         })
         .returning();
@@ -4569,7 +4570,7 @@ export function registerRoutes(app: Express): Server {
   
 
   // DELETE endpoint for removing a food log
-  app.delete("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.delete("/api/food-logs/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to delete food log');
@@ -4588,7 +4589,7 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(foodLogs.id, logId),
-            eq(foodLogs.userId, req.user!.id)
+            eq(foodLogs.userId, req.user.id)
           )
         )
         .limit(1);
@@ -4617,7 +4618,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Get a specific food log by ID (for viewing meals from any day)
-  app.get("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/food-logs/:id", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to fetch food log by ID');
@@ -4636,12 +4637,12 @@ export function registerRoutes(app: Express): Server {
         .where(
           and(
             eq(foodLogs.id, logId),
-            eq(foodLogs.userId, req.user!.id)
+            eq(foodLogs.userId, req.user.id)
           )
         );
 
       if (!foodLog) {
-        console.error('[Food Logs API] Food log not found or unauthorized:', { logId, userId: req.user!.id });
+        console.error('[Food Logs API] Food log not found or unauthorized:', { logId, userId: req.user.id });
         return res.status(404).json({ error: 'Food log not found' });
       }
 
@@ -4730,19 +4731,19 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Vision board endpoint for fetching stored vision board data
-  app.post("/api/vision-board", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/vision-board", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log('[Vision Board API] Fetching vision board for user:', req.user!.id);
+      console.log('[Vision Board API] Fetching vision board for user:', req.user.id);
 
       // Get user's nutrition preferences and profile
       const userProfile = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .where(eq(userNutritionPreferences.userId, req.user.id))
         .limit(1);
 
       if (!userProfile.length) {
@@ -4808,7 +4809,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         personalData
       };
 
-      console.log('[Vision Board API] Generated vision board data for user:', req.user!.id);
+      console.log('[Vision Board API] Generated vision board data for user:', req.user.id);
       
       res.json({
         success: true,
@@ -4825,7 +4826,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Add meal image upload endpoint
-  app.post("/api/food-logs/:id/image", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/food-logs/:id/image", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         console.error('[Food Logs API] Unauthorized attempt to upload meal image');
@@ -4844,12 +4845,12 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         .where(
           and(
             eq(foodLogs.id, logId),
-            eq(foodLogs.userId, req.user!.id)
+            eq(foodLogs.userId, req.user.id)
           )
         );
 
       if (!existingLog) {
-        console.error('[Food Logs API] Food log not found or unauthorized:', { logId, userId: req.user!.id });
+        console.error('[Food Logs API] Food log not found or unauthorized:', { logId, userId: req.user.id });
         return res.status(404).json({ error: 'Food log not found' });
       }
 
@@ -4891,7 +4892,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
             .where(
               and(
                 eq(foodLogs.id, logId),
-                eq(foodLogs.userId, req.user!.id)
+                eq(foodLogs.userId, req.user.id)
               )
             );
 
@@ -4919,7 +4920,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Add water logs endpoints
-  app.post("/api/water-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/water-logs", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -4942,7 +4943,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const [log] = await db
         .insert(foodLogs)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           name: "Water Intake",
           calories: "0",
           protein: "0",
@@ -4974,7 +4975,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
   // Add like/unlike recipe endpoint
-  app.post("/api/recipes/:id/toggle-like", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/recipes/:id/toggle-like", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -4999,7 +5000,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         .from(recipeLikes)
         .where(
           and(
-            eq(recipeLikes.userId, req.user!.id),
+            eq(recipeLikes.userId, req.user.id),
             eq(recipeLikes.recipeId, recipeId)
           )
         )
@@ -5020,7 +5021,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         await db
           .insert(recipeLikes)
           .values({
-            userId: req.user!.id,
+            userId: req.user.id,
             recipeId: recipeId,
           });
 
@@ -5037,7 +5038,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           isLiked: sql`EXISTS(
             SELECT 1 FROM ${recipeLikes} 
             WHERE ${recipeLikes.recipeId} = ${recipes.id} 
-            AND ${recipeLikes.userId} = ${req.user!.id}
+            AND ${recipeLikes.userId} = ${req.user.id}
           )`,
         })
         .from(recipes)
@@ -5055,7 +5056,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
   // Add profile image upload endpoint
-  app.post("/api/user/profile-image", handleUpload, requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/user/profile-image", handleUpload, async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -5070,7 +5071,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       await fs.mkdir(uploadsDir, { recursive: true });
 
       // Process and save the image
-      const filename = `profile-${req.user!.id}-${Date.now()}.jpg`;
+      const filename = `profile-${req.user.id}-${Date.now()}.jpg`;
       const filepath = path.join(uploadsDir, filename);
 
       await sharp(req.file.buffer)
@@ -5086,7 +5087,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       await db
         .update(users)
         .set({ profileImage: imageUrl, hasCompletedOnboarding: true })
-        .where(eq(users.id, req.user!.id));
+        .where(eq(users.id, req.user.id));
 
       res.json({ imageUrl });
     } catch (error) {
@@ -5099,7 +5100,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Add dietary preferences endpoint
-  app.post("/api/user/dietary-preferences", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/user/dietary-preferences", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -5153,7 +5154,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         const [prefs] = await db
           .insert(userNutritionPreferences)
           .values({
-            userId: req.user!.id,
+            userId: req.user.id,
             currentWeight: "70", // Default value
             goalWeight: "70",    // Default value
             weightGoal: "maintain",
@@ -5181,7 +5182,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
             fatGoal,
             updatedAt: new Date()
           })
-          .where(eq(userNutritionPreferences.userId, req.user!.id))
+          .where(eq(userNutritionPreferences.userId, req.user.id))
           .returning();
 
         nutritionPreferences = updatedPrefs;
@@ -5214,7 +5215,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           const [newDietPrefs] = await db
             .insert(userDietaryPreferences)
             .values({
-              userId: req.user!.id,
+              userId: req.user.id,
               dietaryType: dietPrefs.dietaryType,
               calorieTarget: dietPrefs.calorieTarget,
               mealsPerDay: dietPrefs.mealsPerDay,
@@ -5252,7 +5253,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
               cookingSkillLevel: dietPrefs.cookingSkillLevel,
               updatedAt: new Date()
             })
-            .where(eq(userDietaryPreferences.userId, req.user!.id))
+            .where(eq(userDietaryPreferences.userId, req.user.id))
             .returning();
           
           dietaryPreferences = updatedDietPrefs;
@@ -5270,7 +5271,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
             mealBudget: dietPrefs.budgetPreference,
             updatedAt: new Date()
           })
-          .where(eq(userNutritionPreferences.userId, req.user!.id))
+          .where(eq(userNutritionPreferences.userId, req.user.id))
           .returning();
         
         console.log("Also updated nutrition preferences for backwards compatibility");
@@ -5294,7 +5295,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Add complete recipe endpoint
-  app.post("/api/meal-plans/:mealPlanId/recipes/:recipeId/complete", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans/:mealPlanId/recipes/:recipeId/complete", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -5303,7 +5304,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const mealPlanId = parseInt(req.params.mealPlanId);
       const recipeId = parseInt(req.params.recipeId);
 
-      console.log('Completing meal:', { mealPlanId, recipeId, userId: req.user!.id });
+      console.log('Completing meal:', { mealPlanId, recipeId, userId: req.user.id });
 
       // First verify the meal plan belongs to the user
       const [mealPlan] = await db
@@ -5312,7 +5313,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         .where(
           and(
             eq(mealPlans.id, mealPlanId),
-            eq(mealPlans.userId, req.user!.id)
+            eq(mealPlans.userId, req.user.id)
           )
         );
 
@@ -5430,7 +5431,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       
       // Add to food logs with proper type conversion and structured components
       await db.insert(foodLogs).values({
-        userId: req.user!.id,
+        userId: req.user.id,
         date: normalizedDate,
         name: recipe.name,
         calories: Number(recipe.nutritionInfo?.calories || 0).toString(),
@@ -5456,7 +5457,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Add the profile route to the existing routes
-  app.get("/api/user/profile", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/user/profile", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: "Not authenticated" });
@@ -5466,7 +5467,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const preferences = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .where(eq(userNutritionPreferences.userId, req.user.id))
         .orderBy(desc(userNutritionPreferences.updatedAt))
         .limit(1);
 
@@ -5480,7 +5481,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         const weightLogEntries = await db
           .select()
           .from(weightLogs)
-          .where(eq(weightLogs.userId, req.user!.id))
+          .where(eq(weightLogs.userId, req.user.id))
           .orderBy(desc(weightLogs.loggedAt))
           .limit(1);
           
@@ -5514,7 +5515,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Update user profile
-  app.put("/api/user/profile", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.put("/api/user/profile", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: "Not authenticated" });
@@ -5558,7 +5559,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const preferences = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id));
+        .where(eq(userNutritionPreferences.userId, req.user.id));
 
       if (!preferences || preferences.length === 0) {
         return res.status(404).json({ error: "User profile not found" });
@@ -5613,7 +5614,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
           bodyType: bodyType !== undefined ? bodyType : preferences[0].bodyType,
           updatedAt: new Date(),
         })
-        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .where(eq(userNutritionPreferences.userId, req.user.id))
         .returning();
 
       res.json(updatedPreferences[0]);
@@ -5624,18 +5625,18 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Weight logs endpoints
-  app.get("/api/weight-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/weight-logs", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log('[Weight Logs API] Fetching weight logs for user:', req.user!.id);
+      console.log('[Weight Logs API] Fetching weight logs for user:', req.user.id);
       
       const logs = await db
         .select()
         .from(weightLogs)
-        .where(eq(weightLogs.userId, req.user!.id))
+        .where(eq(weightLogs.userId, req.user.id))
         .orderBy(desc(weightLogs.loggedAt));
       
       console.log('[Weight Logs API] Retrieved logs count:', logs.length);
@@ -5650,7 +5651,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
 
-  app.post("/api/weight-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/weight-logs", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -5659,7 +5660,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const { weight, note, notes } = req.body;
       // Support both field names for compatibility
       const noteContent = notes || note;
-      console.log('[Weight Logs API] Adding weight log:', { userId: req.user!.id, weight, notes: noteContent });
+      console.log('[Weight Logs API] Adding weight log:', { userId: req.user.id, weight, notes: noteContent });
       
       if (typeof weight !== 'number' || isNaN(weight)) {
         console.error('[Weight Logs API] Invalid weight value:', weight);
@@ -5678,7 +5679,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const [log] = await db
         .insert(weightLogs)
         .values({
-          userId: req.user!.id,
+          userId: req.user.id,
           weight: weight.toString(), // Convert to string for storage as decimal
           notes: noteContent || null,
           loggedAt: normalizedDate
@@ -5691,7 +5692,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const preferences = await db
         .select()
         .from(userNutritionPreferences)
-        .where(eq(userNutritionPreferences.userId, req.user!.id));
+        .where(eq(userNutritionPreferences.userId, req.user.id));
       
       if (preferences && preferences.length > 0) {
         console.log('[Weight Logs API] Updating user nutrition preferences with new weight');
@@ -5701,7 +5702,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
             currentWeight: weight.toString(),
             updatedAt: new Date()
           })
-          .where(eq(userNutritionPreferences.userId, req.user!.id));
+          .where(eq(userNutritionPreferences.userId, req.user.id));
       }
       
       // Return the log and updated preferences
@@ -5722,12 +5723,12 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Delete user account with full dependency cleanup
-  app.delete("/api/user/account", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.delete("/api/user/account", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const userId = req.user!.id;
+    const userId = req.user.id;
     console.log(`[Account Deletion] Initiating deletion for user ${userId}`);
 
     try {
@@ -5813,13 +5814,13 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   //Remove duplicate onboarding endpoint.
 
   // Get current user
-  app.get("/api/user", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
     const user = await db.query.users.findFirst({
-      where: eq(users.id, req.user!.id)
+      where: eq(users.id, req.user.id)
     });
 
     // Make sure both camelCase and snake_case versions are consistent
@@ -5836,7 +5837,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Update user's language preference
-  app.post("/api/user/language", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/user/language", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }
@@ -5851,9 +5852,9 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       // Use preferred_language (snake_case) to match database schema
       await db.update(users)
         .set({ preferred_language: language })
-        .where(eq(users.id, req.user!.id));
+        .where(eq(users.id, req.user.id));
       
-      console.log(`Updated user ${req.user!.id} language to: ${language}`);
+      console.log(`Updated user ${req.user.id} language to: ${language}`);
       res.json({ success: true, language });
     } catch (error) {
       console.error("Error updating language preference:", error);
@@ -5862,17 +5863,17 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   });
 
   // Vision board generation endpoint
-  app.post("/api/vision-board", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/vision-board", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log('[Vision Board API] Generating vision board for user:', req.user!.id);
+      console.log('[Vision Board API] Generating vision board for user:', req.user.id);
 
       // Get user profile data from database
       const userProfile = await db.query.userNutritionPreferences.findFirst({
-        where: eq(userNutritionPreferences.userId, req.user!.id)
+        where: eq(userNutritionPreferences.userId, req.user.id)
       });
 
       if (!userProfile) {
@@ -5884,7 +5885,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
       // Get user basic info
       const user = await db.query.users.findFirst({
-        where: eq(users.id, req.user!.id)
+        where: eq(users.id, req.user.id)
       });
 
       // Create formData from stored profile for compatibility with existing logic
@@ -6054,7 +6055,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
       // Create comprehensive vision board data
       const visionBoardData = {
-        userId: req.user!.id,
+        userId: req.user.id,
         macros,
         timeline,
         motivation,

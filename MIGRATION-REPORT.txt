@@ -1,0 +1,81 @@
+
+JWT MIGRATION ANALYSIS REPORT
+Generated: 2025-10-18T16:16:54.172Z
+==================================================================
+
+SUMMARY:
+- Total authentication checks: 62
+- Total user accesses: 132
+- Total route definitions: 66
+
+AUTHENTICATION CHECKS:
+1. Line 105: if (!req.isAuthenticated()) {
+2. Line 210: if (!req.isAuthenticated()) {
+3. Line 279: if (!req.isAuthenticated()) {
+4. Line 333: if (!req.isAuthenticated()) {
+5. Line 401: if (!req.isAuthenticated()) {
+6. Line 455: if (!req.isAuthenticated()) {
+7. Line 507: if (!req.isAuthenticated()) {
+8. Line 551: if (!req.isAuthenticated()) {
+9. Line 586: if (!req.isAuthenticated()) {
+10. Line 624: if (!req.isAuthenticated()) {
+11. Line 672: if (!req.isAuthenticated()) {
+12. Line 708: if (!req.isAuthenticated()) {
+13. Line 737: if (!req.isAuthenticated()) {
+14. Line 844: if (!req.isAuthenticated()) {
+15. Line 931: if (!req.isAuthenticated()) {
+16. Line 989: if (!req.isAuthenticated()) {
+17. Line 1034: if (!req.isAuthenticated()) {
+18. Line 1066: authStatus: req.isAuthenticated(),
+19. Line 1157: if (!req.isAuthenticated()) {
+20. Line 1202: if (!req.isAuthenticated()) {
+21. Line 1318: if (!req.isAuthenticated()) {
+22. Line 1384: if (!req.isAuthenticated()) {
+23. Line 1466: if (!req.isAuthenticated()) {
+24. Line 1497: if (!req.isAuthenticated()) {
+25. Line 1521: if (!req.isAuthenticated()) {
+26. Line 1643: if (!req.isAuthenticated()) {
+27. Line 1680: if (!req.isAuthenticated()) {
+28. Line 1752: if (!req.isAuthenticated()) {
+29. Line 2618: if (!req.isAuthenticated()) {
+30. Line 2763: if (!req.isAuthenticated()) {
+31. Line 2970: if (!req.isAuthenticated()) {
+32. Line 3141: if (!req.isAuthenticated()) {
+33. Line 3171: if (!req.isAuthenticated()) {
+34. Line 3260: if (!req.isAuthenticated()) {
+35. Line 3545: if (!req.isAuthenticated() || !req.user) {
+36. Line 3600: if (!req.isAuthenticated()) {
+37. Line 3625: if (!req.isAuthenticated()) {
+38. Line 3667: if (!req.isAuthenticated()) {
+39. Line 3711: if (!req.isAuthenticated()) {
+40. Line 4001: if (!req.isAuthenticated()) {
+41. Line 4062: if (!req.isAuthenticated()) {
+42. Line 4105: if (!req.isAuthenticated()) {
+43. Line 4364: if (!req.isAuthenticated()) {
+44. Line 4436: if (!req.isAuthenticated()) {
+45. Line 4551: if (!req.isAuthenticated()) {
+46. Line 4588: if (!req.isAuthenticated()) {
+47. Line 4636: if (!req.isAuthenticated()) {
+48. Line 4749: if (!req.isAuthenticated()) {
+49. Line 4844: if (!req.isAuthenticated()) {
+50. Line 4938: if (!req.isAuthenticated()) {
+51. Line 4993: if (!req.isAuthenticated()) {
+52. Line 5074: if (!req.isAuthenticated()) {
+53. Line 5118: if (!req.isAuthenticated()) {
+54. Line 5313: if (!req.isAuthenticated()) {
+55. Line 5475: if (!req.isAuthenticated()) {
+56. Line 5533: if (!req.isAuthenticated()) {
+57. Line 5643: if (!req.isAuthenticated()) {
+58. Line 5669: if (!req.isAuthenticated()) {
+59. Line 5740: if (!req.isAuthenticated()) {
+60. Line 5831: if (!req.isAuthenticated()) {
+61. Line 5854: if (!req.isAuthenticated()) {
+62. Line 5881: if (!req.isAuthenticated()) {
+
+ROUTES BY METHOD:
+POST: 34
+GET: 23
+PUT: 5
+DELETE: 4
+
+==================================================================
