@@ -264,15 +264,10 @@ export function registerRoutes(app: Express): Server {
     res.json(exampleUserData[userId as unknown as keyof typeof exampleUserData]);
   });
 
-  // Add logout endpoint
+  // Add logout endpoint (redirects to JWT logout)
   app.post("/api/logout", (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        console.error('Logout error:', err);
-        return res.status(500).json({ error: 'Failed to logout' });
-      }
-      res.json({ ok: true });
-    });
+    // Redirect to JWT logout endpoint
+    return res.redirect(307, '/api/auth/logout');
   });
 
   // Add food analysis endpoint
@@ -5631,10 +5626,14 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       await db.delete(users).where(eq(users.id, userId));
       console.log('[Account Deletion] Deleted user row');
 
-      // Logout after successful transaction
-      req.logout(err => {
-        if (err) console.error('[Account Deletion] Logout error:', err);
-      });
+      // Revoke all refresh tokens after successful deletion
+      try {
+        const { revokeAllUserTokens } = await import('./utils/jwt');
+        await revokeAllUserTokens(userId);
+        console.log('[Account Deletion] Revoked all refresh tokens');
+      } catch (err) {
+        console.error('[Account Deletion] Token revocation error:', err);
+      }
 
       res.json({ success: true, message: 'Account deleted successfully' });
     } catch (error) {
