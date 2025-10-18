@@ -12,6 +12,63 @@ const openai = new OpenAI({
 });
 
 /**
+ * Manual deduplication post-processing to catch AI failures
+ * Aggressively merges similar ingredient names
+ */
+function manualDeduplicate(items: Array<{name: string; quantity: number; unit: string}>): Array<{name: string; quantity: number; unit: string}> {
+  const normalized = new Map<string, {quantity: number; unit: string; originalName: string}>();
+  
+  for (const item of items) {
+    // Normalize the ingredient name by:
+    // 1. Lowercase
+    // 2. Remove descriptors (fresh, chopped, sliced, diced, minced, grated, crumbled, etc.)
+    // 3. Remove measurements from name (1/4 cup, 1/2, etc.)
+    // 4. Trim and normalize spacing
+    let normalizedName = item.name
+      .toLowerCase()
+      .replace(/\b(fresh|chopped|sliced|diced|minced|grated|crumbled|halved|peeled|trimmed|boneless|skinless|ripe|large|medium|small|extra virgin|cooked|raw|whole|ground|canned)\b/g, '')
+      .replace(/\d+\/\d+\s*(cup|tablespoon|teaspoon|tbsp|tsp|oz|pound|lb)/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Additional specific normalizations
+    normalizedName = normalizedName
+      .replace(/cucumbers?/i, 'cucumber')
+      .replace(/tomatoes?/i, 'tomato')
+      .replace(/avocados?/i, 'avocado')
+      .replace(/peppers?/i, 'pepper')
+      .replace(/bell peppers?/i, 'bell pepper')
+      .replace(/red bell peppers?/i, 'bell pepper')
+      .replace(/mixed bell peppers?/i, 'bell pepper')
+      .replace(/eggs?/i, 'egg')
+      .replace(/cloves?/i, 'clove')
+      .replace(/fillets?/i, 'fillet')
+      .replace(/breasts?/i, 'breast')
+      .replace(/florets?/i, 'floret');
+    
+    // If already exists, sum quantities
+    if (normalized.has(normalizedName)) {
+      const existing = normalized.get(normalizedName)!;
+      // Sum quantities (assuming same unit for now - AI should have already normalized units)
+      existing.quantity += item.quantity;
+    } else {
+      normalized.set(normalizedName, {
+        quantity: item.quantity,
+        unit: item.unit,
+        originalName: item.name // Keep first occurrence's name for display
+      });
+    }
+  }
+  
+  // Convert back to array
+  return Array.from(normalized.entries()).map(([name, data]) => ({
+    name: name,
+    quantity: data.quantity,
+    unit: data.unit
+  }));
+}
+
+/**
  * Generate a consolidated weekly shopping list using AI
  */
 export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: number) {
@@ -62,59 +119,68 @@ export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: 
   console.log(`Total ingredients to consolidate: ${allIngredients.length}`);
   
   // Ask AI to consolidate all ingredients into a shopping list
-  const prompt = `You are a smart grocery shopping assistant. Consolidate ingredients into a clean shopping list.
+  const prompt = `TASK: Consolidate duplicate ingredients into ONE entry each. Merge quantities.
 
-CRITICAL CONSOLIDATION RULES - EACH INGREDIENT MUST APPEAR EXACTLY ONCE:
+MANDATORY DEDUPLICATION - Read each input and identify base ingredient:
 
-1. CUCUMBER = cucumber, cucumber sliced, cucumber diced, cucumber slices (ALL → "cucumber")
-2. OLIVE OIL = olive oil, extra virgin olive oil, EVOO (ALL → "olive oil")
-3. CHERRY TOMATO = cherry tomatoes, cherry tomato halved, cherry tomatoes halved (ALL → "cherry tomato")
-4. FETA CHEESE = feta, feta cheese, feta cheese crumbled, crumbled feta (ALL → "feta cheese")
-5. BUTTER = butter, unsalted butter (ALL → "butter")
-6. AVOCADO = avocado, avocado sliced, avocado pitted, ripe avocado (ALL → "avocado")
-7. PARMESAN = parmesan, parmesan cheese, grated parmesan, parmesan grated (ALL → "parmesan cheese")
-8. SOY SAUCE = soy sauce, low sodium soy sauce (ALL → "soy sauce")
-9. GARLIC = garlic, garlic cloves, garlic minced, garlic clove (ALL → "garlic")
-10. LEMON JUICE = lemon juice, fresh lemon juice, juice of lemon (ALL → "lemon juice")
+"cucumber sliced" = cucumber
+"cucumber diced" = cucumber  
+"cucumber slices" = cucumber
+"cucumbers diced" = cucumber
+→ OUTPUT: ONE "cucumber" entry with total quantity
 
-CONVERSION RULES:
-- 1 cup = 240ml
-- 1 tablespoon = 15ml
-- 1 teaspoon = 5ml
-- 1 oz = 28g
+"olive oil" = olive oil
+"extra virgin olive oil" = olive oil
+→ OUTPUT: ONE "olive oil" entry with total quantity
+
+"feta cheese" = feta cheese
+"feta cheese crumbled" = feta cheese
+"crumbled feta" = feta cheese
+→ OUTPUT: ONE "feta cheese" entry with total quantity
+
+"bell pepper diced" = bell pepper
+"bell peppers diced" = bell pepper
+"red bell pepper diced" = bell pepper
+"pepper sliced" = bell pepper
+"mixed bell peppers" = bell pepper
+→ OUTPUT: ONE "bell pepper" entry with total quantity
+
+"boneless chicken breast" = chicken breast
+"boneless skinless chicken breast" = chicken breast
+"chicken breast" = chicken breast
+→ OUTPUT: ONE "chicken breast" entry with total quantity
+
+UNIT CONVERSIONS (sum all to same unit):
+- tbsp = tablespoon = 15ml
+- tsp = teaspoon = 5ml
+- cup = 240ml
 - 1/2 cup = 120ml
 - 1/4 cup = 60ml
-- 1 pound = 454g
+- oz = 28g
+- lb = pound = 454g
 
-STRIP ALL DESCRIPTORS:
-✗ "fresh spinach" → ✓ "spinach"
-✗ "boneless chicken breast" → ✓ "chicken breast"
-✗ "ripe banana" → ✓ "banana"
-✗ "chopped parsley" → ✓ "parsley"
-✗ "sliced cucumber" → ✓ "cucumber"
+STRIP PREPARATION WORDS:
+Remove: fresh, chopped, sliced, diced, minced, grated, crumbled, halved, peeled, trimmed, boneless, skinless, ripe, large, medium, small
 
-EXAMPLES:
-Input: ["1/2 cucumber sliced", "1/3 cucumber diced", "1/4 cup cucumber slices"]
-Output: {"name": "cucumber", "quantity": 1, "unit": "unit"}
+ALGORITHM:
+1. For each input ingredient, extract the BASE FOOD ITEM (ignore all descriptors)
+2. Group ALL inputs with same base item
+3. Sum quantities (convert units if needed)
+4. Output ONE entry per base item
 
-Input: ["2 tablespoons olive oil", "1/4 cup olive oil", "1 tbsp olive oil"]
-Output: {"name": "olive oil", "quantity": 105, "unit": "ml"}
+CRITICAL: If you output "cucumber" twice, you FAILED. Each base ingredient = ONE output line.
 
-Input: ["3 eggs", "6 large eggs", "2 eggs"]
-Output: {"name": "egg", "quantity": 11, "unit": "unit"}
-
-Here are ALL the ingredients (${allIngredients.length} total):
-
+Ingredients to consolidate (${allIngredients.length} total):
 ${allIngredients.map((ing, i) => `${i + 1}. ${ing}`).join('\n')}
 
-Return ONLY JSON - no text before or after:
+OUTPUT FORMAT (JSON only):
 {
   "shoppingList": [
-    {"name": "ingredient", "quantity": number, "unit": "g|ml|unit|kg|L"}
+    {"name": "base ingredient name", "quantity": total_number, "unit": "g|ml|unit"}
   ]
 }
 
-VERIFY: Each ingredient name appears ONLY ONCE in your output. If you see duplicates, you did it wrong.`;
+FINAL CHECK: Count output entries. Each "name" value must be unique. No duplicates allowed.`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -174,12 +240,16 @@ VERIFY: Each ingredient name appears ONLY ONCE in your output. If you see duplic
     
     console.log(`AI consolidated into ${consolidatedIngredients.length} unique items`);
     
+    // MANUAL DEDUPLICATION POST-PROCESSING (in case AI fails)
+    const deduplicated = manualDeduplicate(consolidatedIngredients);
+    console.log(`After manual deduplication: ${deduplicated.length} items (removed ${consolidatedIngredients.length - deduplicated.length} duplicates)`);
+    
     // Delete existing shopping list
     await db.delete(shoppingListItems).where(eq(shoppingListItems.userId, userId));
     
     // Insert consolidated items
     const shoppingListEntries = [];
-    for (const item of consolidatedIngredients) {
+    for (const item of deduplicated) {
       try {
         const [newItem] = await db
           .insert(shoppingListItems)
