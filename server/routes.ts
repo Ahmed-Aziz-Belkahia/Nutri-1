@@ -3594,7 +3594,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add new endpoint to generate grocery list from meal plan
+  // Generate grocery list from meal plan - now uses AI consolidation
   app.post("/api/meal-plans/:planId/generate-grocery-list", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
@@ -3602,95 +3602,14 @@ export function registerRoutes(app: Express): Server {
       }
 
       const { planId } = req.params;
-
-      // Get all recipes in the meal plan
-      const mealPlanRecipes = await db
-        .select({
-          recipe: recipes,
-          mealType: recipesInMealPlan.mealType,
-        })
-        .from(recipesInMealPlan)
-        .innerJoin(recipes, eq(recipes.id, recipesInMealPlan.recipeId))
-        .where(eq(recipesInMealPlan.mealPlanId, parseInt(planId)));
-
-      // Helper function to categorize ingredients
-      const categorizeIngredient = (ingredient: string) => {
-        const categories = {
-          produce: ['lettuce', 'tomato', 'carrot', 'onion', 'garlic', 'potato', 'spinach', 'cucumber'],
-          protein: ['chicken', 'beef', 'fish', 'salmon', 'tuna', 'eggs', 'tofu'],
-          dairy: ['milk', 'cheese', 'yogurt', 'butter', 'cream'],
-          grains: ['rice', 'pasta', 'bread', 'quinoa', 'oats'],
-          pantry: ['oil', 'vinegar', 'sauce', 'spice', 'salt', 'pepper'],
-        };
-
-        const lowerIngredient = ingredient.toLowerCase();
-        for (const [category, items] of Object.entries(categories)) {
-          if (items.some(item => lowerIngredient.includes(item))) {
-            return category;
-          }
-        }
-        return 'other';
-      };
-
-      // Aggregate ingredients from all recipes
-      const ingredientMap = new Map<string, { quantity: number; unit: string; category: string }>();
-      const servingSize = 1; // Default serving size of 1
       
-      for (const { recipe } of mealPlanRecipes) {
-        if (!recipe.ingredients) continue;
-
-        for (const ingredient of recipe.ingredients) {
-          // Parse ingredient string to extract quantity and unit (assuming format like "2 cups flour")
-          const match = ingredient.match(/^(\d*\.?\d*)\s*(\w+)?\s+(.+)$/);
-          const quantity = match ? parseFloat(match[1]) || 1 : 1;
-          const unit = match ? match[2] || 'unit' : 'unit';
-          const name = match ? match[3] : ingredient;
-
-          const existing = ingredientMap.get(name);
-          if (existing) {
-            existing.quantity += quantity * servingSize;
-          } else {
-            ingredientMap.set(name, {
-              quantity: quantity * servingSize,
-              unit,
-              category: categorizeIngredient(name),
-            });
-          }
-        }
-      }
-
-      // Get meal information
-      const mealInfoMap = new Map();
-      for (const { recipe, mealType } of mealPlanRecipes) {
-        // Get the recipe name and image
-        const recipeName = recipe.name || '';
-        const recipeImage = recipe.imageUrl || '';
-        
-        // Store ingredients with their meal info
-        if (recipe.ingredients) {
-          for (const ingredient of recipe.ingredients) {
-            const match = ingredient.match(/^(\d*\.?\d*)\s*(\w+)?\s+(.+)$/);
-            const name = match ? match[3] : ingredient;
-            mealInfoMap.set(name, { mealType, recipeName, recipeImage });
-          }
-        }
-      }
-
-      // Convert to shopping list items
-      const shoppingListResult = await Promise.all(
-        Array.from(ingredientMap.entries()).map(([ingredient, details]) => {
-          const mealInfo = mealInfoMap.get(ingredient) || { mealType: 'other', recipeName: '', recipeImage: '' };
-          return db.insert(shoppingListItems).values({
-            userId: req.user.id,
-            name: ingredient, 
-            quantity: details.quantity.toString(),
-            isChecked: false,
-            category: details.category
-          }).returning();
-        })
-      );
-
-      res.json(shoppingListResult.map(([item]) => item));
+      // Use AI consolidation service for proper deduplication
+      const { generateWeeklyShoppingList } = await import('./services/shopping-list-generator');
+      const shoppingList = await generateWeeklyShoppingList([parseInt(planId)], req.user.id);
+      
+      console.log(`Generated shopping list for meal plan ${planId} with ${shoppingList.items.length} items`);
+      
+      res.json(shoppingList.items);
     } catch (error) {
       console.error('Error generating grocery list:', error);
       res.status(500).json({
