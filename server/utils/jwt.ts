@@ -120,8 +120,8 @@ export async function storeRefreshToken(
     await db.insert(refreshTokens).values({
       userId,
       token,
-      expiresAt: Math.floor(expiresAt.getTime() / 1000), // Convert to Unix timestamp (seconds)
-      createdAt: Math.floor(Date.now() / 1000) // Convert to Unix timestamp (seconds)
+      expiresAt: Math.floor(expiresAt.getTime() / 1000) // Convert to Unix timestamp (seconds)
+      // createdAt is set by database default: strftime('%s', 'now')
     });
     console.log(`[JWT] Stored refresh token for user ${userId}`);
   } catch (error) {
