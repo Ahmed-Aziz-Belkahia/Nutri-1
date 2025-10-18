@@ -374,32 +374,30 @@ Guidelines:
   });
 
   const content = response.choices[0].message.content || '{"meals":[],"totalCalories":0}';
-  console.log("OpenAI raw response:", content.slice(0, 500) + '...');
   
-  // Save the full raw response to a log file for debugging
-  const logPath = './openai-response-log.json';
-  try {
-    fs.writeFileSync(logPath, content);
-    console.log(`Full OpenAI response saved to ${logPath}`);
-  } catch (e) {
-    console.warn('Failed to save OpenAI response to log file:', e);
+  // Only log OpenAI response in development or if there's an error
+  if (process.env.NODE_ENV === 'development') {
+    console.log("OpenAI response received:", content.slice(0, 200) + '...');
   }
   
+  // Save the full raw response to a log file for debugging (only on errors)
   const result = JSON.parse(content);
   
-  // Log the structure to debug
-  console.log("OpenAI meal plan structure:", {
-    mealsCount: result.meals?.length || 0,
-    firstMealSample: result.meals?.[0] ? {
-      name: result.meals[0].name,
-      mealType: result.meals[0].mealType,
-      recipeFull: result.meals[0].recipe,
-      hasIngredients: Array.isArray(result.meals[0].recipe?.ingredients) && result.meals[0].recipe.ingredients.length > 0,
-      hasInstructions: Array.isArray(result.meals[0].recipe?.instructions) && result.meals[0].recipe.instructions.length > 0,
-      ingredientsSample: Array.isArray(result.meals[0].recipe?.ingredients) ? result.meals[0].recipe.ingredients.slice(0, 2) : null,
-      instructionsSample: Array.isArray(result.meals[0].recipe?.instructions) ? result.meals[0].recipe.instructions.slice(0, 2) : null
-    } : null
-  });
+  // Only log structure if there's an issue
+  if (!result.meals || result.meals.length === 0) {
+    console.warn("OpenAI returned empty meal plan:", {
+      mealsCount: result.meals?.length || 0,
+      firstMealSample: result.meals?.[0] ? {
+        name: result.meals[0].name,
+        mealType: result.meals[0].mealType,
+        recipeFull: result.meals[0].recipe,
+        hasIngredients: Array.isArray(result.meals[0].recipe?.ingredients) && result.meals[0].recipe.ingredients.length > 0,
+        hasInstructions: Array.isArray(result.meals[0].recipe?.instructions) && result.meals[0].recipe.instructions.length > 0,
+        ingredientsSample: Array.isArray(result.meals[0].recipe?.ingredients) ? result.meals[0].recipe.ingredients.slice(0, 2) : null,
+        instructionsSample: Array.isArray(result.meals[0].recipe?.instructions) ? result.meals[0].recipe.instructions.slice(0, 2) : null
+      } : null
+    });
+  }
 
   // Ensure the response matches our expected format and ingredients/instructions are arrays
   return {

@@ -2002,7 +2002,10 @@ export function registerRoutes(app: Express): Server {
             false
           );
           
-          console.log(`Generating AI meal plan for day ${day + 1}/${durationDays}...`);
+          // Only log first and last day to reduce spam
+          if (day === 0 || day === durationDays - 1) {
+            console.log(`Generating AI meal plan for day ${day + 1}/${durationDays}...`);
+          }
           
           const dayPlan = await generateMealPlanWithRecipes({
             dietaryType: currentPrefs.dietaryType,

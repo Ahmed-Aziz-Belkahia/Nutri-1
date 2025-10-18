@@ -90,14 +90,25 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
+    
+    // Skip logging for noisy endpoints
+    if (path === '/api/meal-plans/progress' || 
+        path === '/api/auth/me' ||
+        path === '/api/user-nutrition-preferences' ||
+        path === '/api/recipes') {
+      return;
+    }
+    
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      
+      // Only log response body for errors or important endpoints
+      if (capturedJsonResponse && (res.statusCode >= 400 || duration > 1000)) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+      if (logLine.length > 120) {
+        logLine = logLine.slice(0, 119) + "…";
       }
 
       log(logLine);

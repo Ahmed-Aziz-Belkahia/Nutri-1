@@ -59,7 +59,10 @@ export function updateMealPlanProgress(
   };
   
   progressStore.set(userId, update);
-  console.log(`[Progress] User ${userId}: ${message}`);
+  // Only log progress updates on major steps (not every day)
+  if (currentDay === 1 || currentDay === totalDays || step === 'complete') {
+    console.log(`[Progress] User ${userId}: ${message}`);
+  }
 }
 
 /**
