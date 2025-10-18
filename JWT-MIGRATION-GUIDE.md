@@ -27,19 +27,24 @@ This guide documents the complete migration from Passport.js session-based authe
 - ✅ Removed old passport middleware from all route files
 - ✅ Fixed req.logout() calls (replaced with JWT token revocation)
 
-### Phase 4: Frontend Implementation (TODO 📝)
-- ⏳ Create `client/src/hooks/use-jwt-auth.tsx`
+### Phase 4: Frontend Implementation (IN PROGRESS �)
+- ✅ Updated use-auth.tsx to use JWT endpoints
+  - Changed /api/user → /api/auth/me
+  - Changed /api/login → /api/auth/login
+  - Changed /api/register → /api/auth/register
+  - Changed /api/logout → /api/auth/logout
+  - Added proper null/undefined handling for hasCompletedOnboarding
 - ⏳ Create `client/src/lib/axios-config.ts` with interceptors
-- ⏳ Replace all fetch() calls with axios instance
-- ⏳ Update AuthProvider to use JWT auth
+- ⏳ Replace remaining fetch() calls with axios instance
 - ⏳ Add automatic token refresh logic
 
-### Phase 5: Testing & Cleanup (PARTIALLY COMPLETE �)
+### Phase 5: Testing & Cleanup (IN PROGRESS 🔄)
 - ✅ Test register flow - WORKING
 - ✅ Test login flow - WORKING
 - ✅ Test logout flow - WORKING
 - ✅ Test protected routes - WORKING
 - ✅ Test account deletion - WORKING
+- ✅ Test onboarding detection - WORKING (after frontend JWT integration)
 - ⏳ Remove old passport/session code
 - ⏳ Update package.json to remove passport dependencies
 
