@@ -3736,6 +3736,48 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+  // Get current user's shopping list (all items)
+  app.get("/api/shopping-list", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      console.log(`Fetching shopping list for user: ${req.user.id}`);
+      
+      // Fetch all shopping list items for the user
+      const items = await db
+        .select()
+        .from(shoppingListItems)
+        .where(eq(shoppingListItems.userId, req.user.id))
+        .orderBy(shoppingListItems.category, shoppingListItems.name);
+      
+      console.log(`Found ${items.length} shopping list items`);
+      
+      // Group items by category for better organization
+      const groupedItems: Record<string, typeof items> = {};
+      for (const item of items) {
+        const category = item.category || 'Other';
+        if (!groupedItems[category]) {
+          groupedItems[category] = [];
+        }
+        groupedItems[category].push(item);
+      }
+      
+      res.json({
+        items,
+        groupedItems,
+        totalItems: items.length
+      });
+    } catch (error) {
+      console.error('Error fetching shopping list:', error);
+      res.status(500).json({
+        error: 'Failed to fetch shopping list',
+        message: error instanceof Error ? error.message : 'Unknown error occurred'
+      });
+    }
+  });
+  
   // Get shopping list for a specific date
   app.get("/api/shopping-list/:date", async (req, res) => {
     try {
