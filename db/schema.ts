@@ -423,9 +423,9 @@ export const refreshTokens = sqliteTable("refresh_tokens", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),
   token: text("token").notNull().unique(),
-  expiresAt: integer("expires_at", { mode: 'timestamp' }).notNull(),
+  expiresAt: integer("expires_at").notNull(), // Unix timestamp in seconds
   isRevoked: integer("is_revoked", { mode: 'boolean' }).default(false).notNull(),
-  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  createdAt: integer("created_at").notNull().default(sql`(strftime('%s', 'now'))`), // Unix timestamp in seconds
 });
 
 export const insertRefreshTokenSchema = createInsertSchema(refreshTokens);
@@ -440,7 +440,7 @@ export const apiUsageTracking = sqliteTable("api_usage_tracking", {
   endpoint: text("endpoint").notNull(), // e.g., "/api/meal-plans", "/api/analyze-body-fat"
   tokensUsed: integer("tokens_used").notNull().default(0), // OpenAI tokens consumed
   costUsd: real("cost_usd").notNull().default(0), // Estimated cost in USD
-  requestDate: integer("request_date", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
+  requestDate: integer("request_date").notNull().default(sql`(strftime('%s', 'now'))`), // Unix timestamp in seconds
   model: text("model"), // e.g., "gpt-4o-mini", "gpt-4o"
   status: text("status").notNull().default("success"), // success, error, rate_limited
   metadata: text("metadata", { mode: 'json' }).$type<{

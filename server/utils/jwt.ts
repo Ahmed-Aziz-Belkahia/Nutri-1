@@ -120,8 +120,8 @@ export async function storeRefreshToken(
     await db.insert(refreshTokens).values({
       userId,
       token,
-      expiresAt: Math.floor(expiresAt.getTime() / 1000) as any, // Convert to Unix timestamp (seconds)
-      createdAt: Math.floor(Date.now() / 1000) as any // Convert to Unix timestamp (seconds)
+      expiresAt: Math.floor(expiresAt.getTime() / 1000), // Convert to Unix timestamp (seconds)
+      createdAt: Math.floor(Date.now() / 1000) // Convert to Unix timestamp (seconds)
     });
     console.log(`[JWT] Stored refresh token for user ${userId}`);
   } catch (error) {
@@ -142,7 +142,7 @@ export async function verifyRefreshTokenInDB(token: string): Promise<boolean> {
       .where(
         and(
           eq(refreshTokens.token, token),
-          gt(refreshTokens.expiresAt, currentTime as any),
+          gt(refreshTokens.expiresAt, currentTime),
           eq(refreshTokens.isRevoked, false)
         )
       )
@@ -195,7 +195,7 @@ export async function cleanupExpiredTokens(): Promise<void> {
     const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix timestamp (seconds)
     const result = await db
       .delete(refreshTokens)
-      .where(lt(refreshTokens.expiresAt, currentTime as any));
+      .where(lt(refreshTokens.expiresAt, currentTime));
     
     console.log('[JWT] Cleaned up expired refresh tokens');
   } catch (error) {
