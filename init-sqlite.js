@@ -251,6 +251,48 @@ CREATE TABLE IF NOT EXISTS notifications (
     data TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- JWT Authentication Tables --
+
+-- Refresh tokens table (for JWT auth)
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    token TEXT NOT NULL UNIQUE,
+    expires_at INTEGER NOT NULL,
+    is_revoked INTEGER DEFAULT 0 NOT NULL,
+    created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- API usage tracking table (for token limitations)
+CREATE TABLE IF NOT EXISTS api_usage_tracking (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    endpoint TEXT NOT NULL,
+    tokens_used INTEGER DEFAULT 0 NOT NULL,
+    cost_usd REAL DEFAULT 0 NOT NULL,
+    request_date INTEGER NOT NULL,
+    model TEXT,
+    status TEXT DEFAULT 'success' NOT NULL,
+    metadata TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- User token limits table (premium tiers)
+CREATE TABLE IF NOT EXISTS user_token_limits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL UNIQUE,
+    tier TEXT DEFAULT 'free' NOT NULL,
+    daily_token_limit INTEGER DEFAULT 10000 NOT NULL,
+    monthly_token_limit INTEGER DEFAULT 200000 NOT NULL,
+    daily_used INTEGER DEFAULT 0 NOT NULL,
+    monthly_used INTEGER DEFAULT 0 NOT NULL,
+    last_reset_daily INTEGER NOT NULL,
+    last_reset_monthly INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 `;
 
 // Execute the SQL commands
@@ -261,7 +303,22 @@ try {
         sqlite.exec(statement);
     }
     
+    // Create indexes for JWT tables
+    sqlite.exec(`
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
+        CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);
+        
+        CREATE INDEX IF NOT EXISTS idx_api_usage_user_id ON api_usage_tracking(user_id);
+        CREATE INDEX IF NOT EXISTS idx_api_usage_request_date ON api_usage_tracking(request_date);
+        CREATE INDEX IF NOT EXISTS idx_api_usage_endpoint ON api_usage_tracking(endpoint);
+        
+        CREATE INDEX IF NOT EXISTS idx_user_token_limits_user_id ON user_token_limits(user_id);
+        CREATE INDEX IF NOT EXISTS idx_user_token_limits_tier ON user_token_limits(tier);
+    `);
+    
     console.log('✅ All tables created successfully!');
+    console.log('✅ JWT authentication tables added!');
     console.log('✅ Local SQLite database is ready!');
 } catch (error) {
     console.error('Error creating tables:', error);
