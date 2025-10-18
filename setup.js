@@ -89,19 +89,24 @@ CREATE TABLE IF NOT EXISTS food_logs (
 CREATE TABLE IF NOT EXISTS user_nutrition_preferences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    height REAL NOT NULL,
+    age INTEGER,
+    gender TEXT,
     current_weight REAL NOT NULL,
     goal_weight REAL NOT NULL,
-    age INTEGER NOT NULL,
-    gender TEXT NOT NULL,
+    height REAL NOT NULL,
     weight_goal TEXT NOT NULL,
     activity_level TEXT NOT NULL,
-    calorie_goal INTEGER NOT NULL,
-    protein_goal INTEGER NOT NULL,
-    carbs_goal INTEGER NOT NULL,
-    fat_goal INTEGER NOT NULL,
+    daily_calorie_goal INTEGER NOT NULL,
+    protein_goal_percentage INTEGER NOT NULL,
+    carbs_goal_percentage INTEGER NOT NULL,
+    fat_goal_percentage INTEGER NOT NULL,
+    body_fat_percentage REAL,
+    body_type TEXT,
+    dietary_restrictions TEXT,
+    allergies TEXT,
     meal_budget TEXT,
     experience_level TEXT,
+    updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -166,6 +171,7 @@ CREATE TABLE IF NOT EXISTS progress_photos (
     photo_url TEXT NOT NULL,
     caption TEXT,
     type TEXT NOT NULL,
+    photo_date TEXT NOT NULL DEFAULT (date('now')),
     created_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
