@@ -1,16 +1,20 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import multer from 'multer';
 import { recognizeFoodFromImage, analyzeNutrition, generateMealPlan, suggestRecipe } from '../services/openai';
 import { db } from '@db';
 import { userDietaryPreferences } from '@db/schema';
 import { eq, and } from 'drizzle-orm';
 import { mealPlans, recipes, recipesInMealPlan } from '@db/schema';
+import { requireAuth, type AuthRequest } from '../utils/jwt';
 
 const router = Router();
 const upload = multer();
 
+// Apply JWT authentication to all routes
+router.use(requireAuth);
+
 // Food recognition endpoint
-router.post('/recognize', upload.single('image'), async (req, res) => {
+router.post('/recognize', upload.single('image'), async (req: AuthRequest, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image provided' });
@@ -26,7 +30,7 @@ router.post('/recognize', upload.single('image'), async (req, res) => {
 });
 
 // Nutrition analysis endpoint
-router.post('/analyze-nutrition', async (req, res) => {
+router.post('/analyze-nutrition', async (req: AuthRequest, res: Response) => {
   try {
     const { foodItems } = req.body;
     if (!foodItems || !Array.isArray(foodItems)) {
@@ -42,12 +46,8 @@ router.post('/analyze-nutrition', async (req, res) => {
 });
 
 // Get today's meal plan endpoint
-router.get('/meal-plans/today', async (req, res) => {
+router.get('/meal-plans/today', async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
     const today = new Date().toISOString().split('T')[0];
     console.log('Fetching meal plan for date:', today);
 
@@ -57,7 +57,7 @@ router.get('/meal-plans/today', async (req, res) => {
       .from(mealPlans)
       .where(
         and(
-          eq(mealPlans.userId, req.user.id),
+          eq(mealPlans.userId, req.user!.id),
           eq(mealPlans.date, today)
         )
       );
@@ -123,15 +123,11 @@ router.get('/meal-plans/today', async (req, res) => {
 });
 
 // Meal plan generation endpoint
-router.post('/generate-meal-plan', async (req, res) => {
+router.post('/generate-meal-plan', async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
     // Get user's dietary preferences
     const preferences = await db.query.userDietaryPreferences.findFirst({
-      where: eq(userDietaryPreferences.userId, req.user.id)
+      where: eq(userDietaryPreferences.userId, req.user!.id)
     });
 
     if (!preferences) {
@@ -153,12 +149,8 @@ router.post('/generate-meal-plan', async (req, res) => {
 });
 
 // Recipe suggestion endpoint
-router.post('/suggest-recipe', async (req, res) => {
+router.post('/suggest-recipe', async (req: AuthRequest, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
-
     const { ingredients } = req.body;
     if (!ingredients || !Array.isArray(ingredients)) {
       return res.status(400).json({ error: 'Invalid ingredients provided' });

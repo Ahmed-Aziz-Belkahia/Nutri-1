@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Express, Request, Response } from "express";
 import { db } from "@db";
 import {
   mealPlans,
@@ -6,15 +6,13 @@ import {
   recipesInMealPlan
 } from "@db/schema";
 import { eq, desc, and } from "drizzle-orm";
+import { requireAuth, type AuthRequest } from "./utils/jwt";
 
 // Export function to register meal plan routes
 export function registerMealPlanRoutes(app: Express) {
   // Get today's meal plan - This endpoint must be defined before the :date route
-  app.get("/api/meal-plans/today", async (req, res) => {
+  app.get("/api/meal-plans/today", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       console.log('Fetching meal plan for today');
       console.log('User ID:', req.user.id);
@@ -88,11 +86,8 @@ export function registerMealPlanRoutes(app: Express) {
   });
 
   // Get meal plan generation progress - Must be before :date route
-  app.get("/api/meal-plans/progress", async (req, res) => {
+  app.get("/api/meal-plans/progress", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { getMealPlanProgress } = await import('./services/meal-plan-progress');
       const progress = getMealPlanProgress(req.user.id);
@@ -119,11 +114,8 @@ export function registerMealPlanRoutes(app: Express) {
   });
 
   // Get meal plan by specific date - This endpoint handles date-specific meal plan requests
-  app.get("/api/meal-plans/:date", async (req, res) => {
+  app.get("/api/meal-plans/:date", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const dateRequested = req.params.date;
       console.log('Fetching meal plan for date:', dateRequested);

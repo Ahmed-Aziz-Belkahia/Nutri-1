@@ -1,17 +1,17 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Response, NextFunction } from "express";
 import { db } from "@db";
 import { users, foodLogs, recipes, userNutritionPreferences, weightLogs, progressPhotos } from "@db/schema";
 import { eq, desc } from "drizzle-orm";
+import { requireAuth, type AuthRequest } from "../utils/jwt";
 
 const router = express.Router();
 
-// Middleware to check if the user is an admin
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
+// Apply JWT authentication to all routes
+router.use(requireAuth);
 
-  if (!req.user.isAdmin) {
+// Middleware to check if the user is an admin
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user!.isAdmin) {
     return res.status(403).json({ error: 'Admin access required' });
   }
 
@@ -22,7 +22,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 router.use(isAdmin);
 
 // Get all users
-router.get('/users', async (req: Request, res: Response) => {
+router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
     const allUsers = await db.select().from(users).orderBy(desc(users.id));
     res.json(allUsers);
