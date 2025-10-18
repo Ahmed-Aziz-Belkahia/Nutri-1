@@ -66,6 +66,13 @@ const getProgressSteps = (dayCount: number = 7): ProgressStep[] => {
       duration: 800
     },
     {
+      id: 'shopping',
+      title: 'Creating shopping list',
+      description: 'Generating weekly grocery list',
+      icon: <Utensils className="w-5 h-5" />,
+      duration: 1500
+    },
+    {
       id: 'saving',
       title: 'Saving plan',
       description: 'Storing everything',
@@ -103,7 +110,9 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
   } else if (backendStep === 'generating' && currentDay > 0) {
     currentStepIndex = 1 + currentDay; // 2 initial steps + current day
   } else if (backendStep === 'saving') {
-    currentStepIndex = progressSteps.length - 2; // saving step
+    currentStepIndex = progressSteps.length - 1; // saving step (last)
+  } else if (backendStep === 'shopping') {
+    currentStepIndex = progressSteps.length - 2; // shopping list step
   } else if (backendStep === 'optimizing') {
     currentStepIndex = progressSteps.length - 3; // optimizing step
   }
@@ -115,11 +124,13 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
   } else if (backendStep === 'calculating') {
     progressPercent = 10;
   } else if (backendStep === 'generating' && currentDay > 0) {
-    progressPercent = 10 + ((currentDay / totalDays) * 75); // 10% to 85%
+    progressPercent = 10 + ((currentDay / totalDays) * 70); // 10% to 80%
   } else if (backendStep === 'optimizing') {
-    progressPercent = 90;
+    progressPercent = 85;
+  } else if (backendStep === 'shopping') {
+    progressPercent = 92;
   } else if (backendStep === 'saving') {
-    progressPercent = 95;
+    progressPercent = 97;
   }
   
   // Mark steps as completed based on actual progress
@@ -143,13 +154,16 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
       }
     }
     
-    // If saving or optimizing, mark all days complete
-    if (backendStep === 'optimizing' || backendStep === 'saving' || backendStep === 'completed') {
+    // If saving, shopping, or optimizing, mark all days complete
+    if (backendStep === 'optimizing' || backendStep === 'shopping' || backendStep === 'saving' || backendStep === 'completed') {
       for (let i = 1; i <= totalDays; i++) {
         completed.push(`day${i}`);
       }
-      if (backendStep === 'saving' || backendStep === 'completed') {
+      if (backendStep === 'shopping' || backendStep === 'saving' || backendStep === 'completed') {
         completed.push('optimizing');
+      }
+      if (backendStep === 'saving' || backendStep === 'completed') {
+        completed.push('shopping');
       }
     }
     

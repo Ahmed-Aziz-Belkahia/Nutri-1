@@ -2440,6 +2440,16 @@ export function registerRoutes(app: Express): Server {
 
       // Generate shopping list for ALL meal plans in the week (after loop completes)
       try {
+        // Update progress to show shopping list generation
+        updateMealPlanProgress(
+          req.user!.id,
+          'shopping',
+          'Generating weekly shopping list',
+          durationDays,
+          durationDays,
+          false
+        );
+        
         console.log(`Generating weekly shopping list for ${generatedPlans.length} meal plans`);
         const { generateWeeklyShoppingList } = await import('./services/shopping-list-generator');
         const mealPlanIds = generatedPlans.map(p => p.id);
