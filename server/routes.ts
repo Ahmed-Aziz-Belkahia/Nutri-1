@@ -97,6 +97,18 @@ export function registerRoutes(app: Express): Server {
   // Register meal plan routes
   registerMealPlanRoutes(app);
 
+  // REDIRECT OLD AUTH ROUTES TO JWT ROUTES
+  // Intercept old /api/login and /api/register before auth.ts handles them
+  app.post("/api/login", async (req: Request, res: Response) => {
+    // Forward to JWT auth route
+    return res.redirect(307, '/api/auth/login');
+  });
+
+  app.post("/api/register", async (req: Request, res: Response) => {
+    // Forward to JWT auth route  
+    return res.redirect(307, '/api/auth/register');
+  });
+
   // Add onboarding completion endpoint
   app.post("/api/register/complete-onboarding", handleUpload, requireAuth, async (req: AuthRequest, res: Response) => {
     try {
