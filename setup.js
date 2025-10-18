@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS user_nutrition_preferences (
     body_type TEXT,
     dietary_restrictions TEXT,
     allergies TEXT,
+    health_goals TEXT,
     meal_budget TEXT,
     experience_level TEXT,
     updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
