@@ -189,6 +189,9 @@ CREATE TABLE IF NOT EXISTS user_dietary_preferences (
     excluded_ingredients TEXT,
     max_cooking_time INTEGER,
     budget_preference TEXT,
+    health_goals TEXT,
+    cuisine_preferences TEXT,
+    cooking_skill_level TEXT,
     updated_at INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
