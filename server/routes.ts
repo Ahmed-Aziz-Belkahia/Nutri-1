@@ -328,9 +328,6 @@ export function registerRoutes(app: Express): Server {
   // Add text-based food analysis endpoint
   app.post("/api/analyze-food-text", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { text } = req.body;
       if (!text || text.trim() === "") {
@@ -396,9 +393,6 @@ export function registerRoutes(app: Express): Server {
   // Add analyze-ingredients endpoint
   app.post("/api/analyze-ingredients", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { image } = req.body;
       if (!image) {
@@ -450,9 +444,6 @@ export function registerRoutes(app: Express): Server {
   // Get user's recipes
   app.get("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const type = req.query.type as string || 'created';
       
@@ -502,9 +493,6 @@ export function registerRoutes(app: Express): Server {
   // Create new recipe endpoint
   app.post("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { name, description, calories, protein, carbs, fat, ingredients, instructions, isPublic, imageUrl } = req.body;
 
@@ -546,9 +534,6 @@ export function registerRoutes(app: Express): Server {
   // Get favorite recipes
   app.get("/api/recipes/favorites", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       // Get recipes marked as favorite by the user
       const userRecipes = await db.select({
@@ -581,9 +566,6 @@ export function registerRoutes(app: Express): Server {
   // Get recent meals
   app.get("/api/food-logs/recent", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       // Get recent food logs
   const recentLogs = await db.select({
@@ -619,9 +601,6 @@ export function registerRoutes(app: Express): Server {
   // Get global top recipes sorted by likes
   app.get("/api/recipes/top", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       // Get public recipes sorted by likes with like status
       const topRecipes = await db
@@ -667,9 +646,6 @@ export function registerRoutes(app: Express): Server {
   // Add liked recipes endpoint
   app.get("/api/recipes/liked", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       // Get recipes liked by the user
       const likedRecipes = await db
@@ -703,9 +679,6 @@ export function registerRoutes(app: Express): Server {
   // Recipe generation endpoint - UPDATED
   app.post("/api/generate-recipe", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { ingredients } = req.body;
       if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
@@ -732,9 +705,6 @@ export function registerRoutes(app: Express): Server {
   // Update the recipe generation endpoint to include preferences
   app.post("/api/generate-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { ingredients, preferences, prompt, notes } = req.body;
       if (!ingredients || !Array.isArray(ingredients)) {
@@ -839,9 +809,6 @@ export function registerRoutes(app: Express): Server {
   // Create sample recipes
   app.post("/api/sample-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const sampleRecipes = [
         {
@@ -926,9 +893,6 @@ export function registerRoutes(app: Express): Server {
   // Add sample sandwich recipe
   app.post("/api/add-sandwich-recipe", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const sandwichRecipe = {
         name: "Swiss Cheese and Ham Open Sandwich",
@@ -984,9 +948,6 @@ export function registerRoutes(app: Express): Server {
   // Update the get progress photos endpoint
   app.get("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       console.log('Fetching progress photos for user:', req.user!.id);
 
@@ -1029,11 +990,6 @@ export function registerRoutes(app: Express): Server {
   // Update the progress photos POST endpoint - removed handleUpload middleware since we're handling base64 directly
   app.post("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.log('Authentication failed for progress photo upload');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
       // Check if user already uploaded a photo today
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
       const existingTodayPhoto = await db
@@ -1061,7 +1017,7 @@ export function registerRoutes(app: Express): Server {
         type: req.body.type,
         bodyKeys: Object.keys(req.body),
         bodyPhotoLength: req.body.photo ? req.body.photo.length : 0,
-        authStatus: req.isAuthenticated(),
+        authStatus: true, // JWT authenticated
         userId: req.user!.id
       });
 
@@ -1152,9 +1108,6 @@ export function registerRoutes(app: Express): Server {
   // Add the new PUT endpoint for updating photo type
   app.put("/api/progress-photos/type", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { photoUrl, type } = req.body;
 
@@ -1197,11 +1150,6 @@ export function registerRoutes(app: Express): Server {
   // Replace progress photo endpoint - for updating today's photo
   app.put("/api/progress-photos/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.log('Authentication failed for progress photo replacement');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
       const photoId = parseInt(req.params.id);
       if (isNaN(photoId)) {
         return res.status(400).json({ error: 'Invalid photo ID' });
@@ -1313,9 +1261,6 @@ export function registerRoutes(app: Express): Server {
   // Delete progress photo endpoint
   app.delete("/api/progress-photos", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { photoUrl } = req.body;
 
@@ -1379,9 +1324,6 @@ export function registerRoutes(app: Express): Server {
   // with proper citations from authoritative sources (WHO, CDC, ACE, NIH)
   app.post("/api/analyze-body", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { imageBase64, weight, height, gender, age } = req.body;
       
@@ -1461,9 +1403,6 @@ export function registerRoutes(app: Express): Server {
   // Get user's badges
   app.get("/api/user/badges", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const userBadgesData = await db
         .select({
@@ -1492,9 +1431,6 @@ export function registerRoutes(app: Express): Server {
   // Get user's notifications
   app.get("/api/notifications", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const userNotifications = await db
         .select()
@@ -1516,9 +1452,6 @@ export function registerRoutes(app: Express): Server {
   // Mark notification as read
   app.post("/api/notifications/:id/read", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const notificationId = parseInt(req.params.id);
 
@@ -1638,9 +1571,6 @@ export function registerRoutes(app: Express): Server {
   // DELETE recipe endpoint
   app.delete("/api/recipes/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const recipeId = parseInt(req.params.id);
       if (isNaN(recipeId)) {
@@ -1675,9 +1605,6 @@ export function registerRoutes(app: Express): Server {
 
   app.put("/api/recipes/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const recipeId = parseInt(req.params.id);
       if (isNaN(recipeId)) {
@@ -1747,9 +1674,6 @@ export function registerRoutes(app: Express): Server {
   // Create meal plan endpoint - UPDATED with AI-generated personalized meal plans
   app.post("/api/meal-plans", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       // Check if this is a request to replace an existing meal plan
       const { targetDate, replaceExisting } = req.body;
@@ -2613,9 +2537,6 @@ export function registerRoutes(app: Express): Server {
   // Get all meal plans endpoint
   app.get("/api/meal-plans/all", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       // Get all meal plans for the user, with a distinct date
       // First, we find the latest meal plan for each date to ensure we're only getting one per day
@@ -2758,9 +2679,6 @@ export function registerRoutes(app: Express): Server {
   // Generate a meal plan with budget-first approach (ingredients first, then meals)
   app.post("/api/meal-plans/generate-budget-first", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const {
         date,
@@ -2965,9 +2883,6 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/meal-plans/generate-optimized", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const {
         date,
@@ -3136,9 +3051,6 @@ export function registerRoutes(app: Express): Server {
   // Get user nutrition preferences
   app.get("/api/user-nutrition-preferences", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const userNutritionData = await db
         .select()
@@ -3166,9 +3078,6 @@ export function registerRoutes(app: Express): Server {
   // Enhanced meal plan generation endpoint
   app.post("/api/meal-plans/generate-enhanced", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { preferences, duration = 'week' } = req.body;
       
@@ -3255,9 +3164,6 @@ export function registerRoutes(app: Express): Server {
   // On-demand meal plan generation for specific date
   app.post("/api/meal-plans/generate-for-date", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { date, duration = 'day', useExistingPreferences = true } = req.body;
       
@@ -3540,10 +3446,6 @@ export function registerRoutes(app: Express): Server {
     try {
       const { date } = req.params;
       
-      if (!req.isAuthenticated() || !req.user) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
-
       const mealPlanWithRecipes = await db.query.mealPlans.findFirst({
         where: and(
           eq(mealPlans.userId, req.user!.id),
@@ -3595,9 +3497,6 @@ export function registerRoutes(app: Express): Server {
   // Generate grocery list from meal plan - now uses AI consolidation
   app.post("/api/meal-plans/:planId/generate-grocery-list", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { planId } = req.params;
       
@@ -3620,9 +3519,6 @@ export function registerRoutes(app: Express): Server {
   // Get current user's shopping list (all items)
   app.get("/api/shopping-list", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       console.log(`Fetching shopping list for user: ${req.user!.id}`);
       
@@ -3662,9 +3558,6 @@ export function registerRoutes(app: Express): Server {
   // Get shopping list for a specific date
   app.get("/api/shopping-list/:date", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { date } = req.params;
       const { type = 'day' } = req.query;
@@ -3706,9 +3599,6 @@ export function registerRoutes(app: Express): Server {
   // Legacy endpoint - kept for backward compatibility but simplified
   app.get("/api/shopping-list/:date/old", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { date } = req.params;
       const { type = 'day' } = req.query;
@@ -3996,9 +3886,6 @@ export function registerRoutes(app: Express): Server {
   // Get prices for a shopping list at a specific location
   app.get("/api/shopping-list/:date/prices/:locationId", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { date, locationId } = req.params;
       
@@ -4057,9 +3944,6 @@ export function registerRoutes(app: Express): Server {
   // Update shopping list item with price from a specific location
   app.post("/api/shopping-list/items/:itemId/price", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { itemId } = req.params;
       const { price, location } = req.body;
@@ -4100,10 +3984,6 @@ export function registerRoutes(app: Express): Server {
   // Add food log endpoint (updated with enhanced logging)
   app.post("/api/food-logs", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to add food log');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { name, calories, protein, carbs, fat, image, date, components, isAnalyzing } = req.body;
       console.log('[Food Logs API] Processing food log request:', {
@@ -4359,10 +4239,6 @@ export function registerRoutes(app: Express): Server {
   // GET endpoint for food logs (updated with enhanced logging)
   app.get("/api/food-logs", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to fetch food logs');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const requestedDate = req.query.date ? new Date(req.query.date as string) : new Date();
       
@@ -4431,10 +4307,6 @@ export function registerRoutes(app: Express): Server {
   // PUT endpoint for updating food logs
   app.put("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to update food log');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const logId = parseInt(req.params.id);
       if (isNaN(logId)) {
@@ -4546,9 +4418,6 @@ export function registerRoutes(app: Express): Server {
   // Add new shopping list item
   app.post("/api/shopping-list-items", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
       
       const { name, quantity, category = 'other' } = req.body;
       
@@ -4583,10 +4452,6 @@ export function registerRoutes(app: Express): Server {
   // DELETE endpoint for removing a food log
   app.delete("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to delete food log');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const logId = parseInt(req.params.id);
       if (isNaN(logId)) {
@@ -4631,10 +4496,6 @@ export function registerRoutes(app: Express): Server {
   // Get a specific food log by ID (for viewing meals from any day)
   app.get("/api/food-logs/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to fetch food log by ID');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const logId = parseInt(req.params.id);
       if (isNaN(logId)) {
@@ -4744,9 +4605,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Vision board endpoint for fetching stored vision board data
   app.post("/api/vision-board", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       console.log('[Vision Board API] Fetching vision board for user:', req.user!.id);
 
@@ -4839,10 +4697,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add meal image upload endpoint
   app.post("/api/food-logs/:id/image", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        console.error('[Food Logs API] Unauthorized attempt to upload meal image');
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const logId = parseInt(req.params.id);
       if (isNaN(logId)) {
@@ -4933,9 +4787,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add water logs endpoints
   app.post("/api/water-logs", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { amount } = req.body;
       if (typeof amount !== 'number') {
@@ -4988,9 +4839,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add like/unlike recipe endpoint
   app.post("/api/recipes/:id/toggle-like", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const recipeId = parseInt(req.params.id);
 
@@ -5069,9 +4917,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add profile image upload endpoint
   app.post("/api/user/profile-image", handleUpload, requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       if (!req.file) {
         return res.status(400).json({ error: 'No image file provided' });
@@ -5113,9 +4958,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add dietary preferences endpoint
   app.post("/api/user/dietary-preferences", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       console.log("Received dietary preferences request:", req.body);
 
@@ -5308,9 +5150,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add complete recipe endpoint
   app.post("/api/meal-plans/:mealPlanId/recipes/:recipeId/complete", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const mealPlanId = parseInt(req.params.mealPlanId);
       const recipeId = parseInt(req.params.recipeId);
@@ -5470,9 +5309,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Add the profile route to the existing routes
   app.get("/api/user/profile", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
 
       // Get nutrition preferences (latest entry first)
       const preferences = await db
@@ -5528,9 +5364,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Update user profile
   app.put("/api/user/profile", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
 
       const { 
         height, 
@@ -5638,9 +5471,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Weight logs endpoints
   app.get("/api/weight-logs", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       console.log('[Weight Logs API] Fetching weight logs for user:', req.user!.id);
       
@@ -5664,9 +5494,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
   app.post("/api/weight-logs", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       const { weight, note, notes } = req.body;
       // Support both field names for compatibility
@@ -5735,9 +5562,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
   // Delete user account with full dependency cleanup
   app.delete("/api/user/account", requireAuth, async (req: AuthRequest, res: Response) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
 
     const userId = req.user!.id;
     console.log(`[Account Deletion] Initiating deletion for user ${userId}`);
@@ -5826,10 +5650,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
   // Get current user
   app.get("/api/user", requireAuth, async (req: AuthRequest, res: Response) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
-
     const user = await db.query.users.findFirst({
       where: eq(users.id, req.user!.id)
     });
@@ -5849,9 +5669,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
   // Update user's language preference
   app.post("/api/user/language", requireAuth, async (req: AuthRequest, res: Response) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
 
     const { language } = req.body;
     
@@ -5876,9 +5693,6 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
   // Vision board generation endpoint
   app.post("/api/vision-board", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ error: 'Authentication required' });
-      }
 
       console.log('[Vision Board API] Generating vision board for user:', req.user!.id);
 
