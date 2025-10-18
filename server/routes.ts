@@ -5752,72 +5752,69 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     console.log(`[Account Deletion] Initiating deletion for user ${userId}`);
 
     try {
-      // better-sqlite3 transactions must be synchronous - cannot use async/await
-      db.transaction((tx) => {
-        // 1. Collect meal plan IDs (needed for junction & shopping items cleanup)
-        const mealPlanIds = tx
-          .select({ id: mealPlans.id })
-          .from(mealPlans)
-          .where(eq(mealPlans.userId, userId))
-          .all();
-        const mealPlanIdValues = mealPlanIds.map(mp => mp.id);
+      // Delete user data in proper order to respect foreign key constraints
+      
+      // 1. Collect meal plan IDs (needed for junction & shopping items cleanup)
+      const mealPlanIds = await db
+        .select({ id: mealPlans.id })
+        .from(mealPlans)
+        .where(eq(mealPlans.userId, userId));
+      const mealPlanIdValues = mealPlanIds.map(mp => mp.id);
 
-        // 1b. Collect recipe IDs owned by the user (needed for likes/comments cleanup and junctions)
-        const ownedRecipes = tx
-          .select({ id: recipes.id })
-          .from(recipes)
-          .where(eq(recipes.userId, userId))
-          .all();
-        const ownedRecipeIds = ownedRecipes.map(r => r.id);
+      // 1b. Collect recipe IDs owned by the user (needed for likes/comments cleanup and junctions)
+      const ownedRecipes = await db
+        .select({ id: recipes.id })
+        .from(recipes)
+        .where(eq(recipes.userId, userId));
+      const ownedRecipeIds = ownedRecipes.map(r => r.id);
 
-        // 2. Delete junction & dependent records NOT directly keyed by user first
-        if (mealPlanIdValues.length > 0) {
-          tx.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.mealPlanId, mealPlanIdValues)).run();
-          console.log(`[Account Deletion] Deleted recipesInMealPlan for meal plans: ${mealPlanIdValues.join(',')}`);
-        }
+      // 2. Delete junction & dependent records NOT directly keyed by user first
+      if (mealPlanIdValues.length > 0) {
+        await db.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.mealPlanId, mealPlanIdValues));
+        console.log(`[Account Deletion] Deleted recipesInMealPlan for meal plans: ${mealPlanIdValues.join(',')}`);
+      }
 
-        // Also delete any meal plan recipe entries that reference the user's recipes
-        if (ownedRecipeIds.length > 0) {
-          tx.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.recipeId, ownedRecipeIds)).run();
-        }
+      // Also delete any meal plan recipe entries that reference the user's recipes
+      if (ownedRecipeIds.length > 0) {
+        await db.delete(recipesInMealPlan).where(inArray(recipesInMealPlan.recipeId, ownedRecipeIds));
+      }
 
-        // 3. Delete records referencing recipes & user BEFORE deleting recipes
-        tx.delete(recipeLikes).where(eq(recipeLikes.userId, userId)).run();
-        tx.delete(recipeComments).where(eq(recipeComments.userId, userId)).run();
-        // Delete likes/comments pointing to the user's recipes (from other users)
-        if (ownedRecipeIds.length > 0) {
-          tx.delete(recipeLikes).where(inArray(recipeLikes.recipeId, ownedRecipeIds)).run();
-          tx.delete(recipeComments).where(inArray(recipeComments.recipeId, ownedRecipeIds)).run();
-        }
-        console.log('[Account Deletion] Deleted recipe likes & comments');
+      // 3. Delete records referencing recipes & user BEFORE deleting recipes
+      await db.delete(recipeLikes).where(eq(recipeLikes.userId, userId));
+      await db.delete(recipeComments).where(eq(recipeComments.userId, userId));
+      // Delete likes/comments pointing to the user's recipes (from other users)
+      if (ownedRecipeIds.length > 0) {
+        await db.delete(recipeLikes).where(inArray(recipeLikes.recipeId, ownedRecipeIds));
+        await db.delete(recipeComments).where(inArray(recipeComments.recipeId, ownedRecipeIds));
+      }
+      console.log('[Account Deletion] Deleted recipe likes & comments');
 
-        // 4. Delete shopping list items (may reference meal plans)
-        tx.delete(shoppingListItems).where(eq(shoppingListItems.userId, userId)).run();
-        console.log('[Account Deletion] Deleted shopping list items');
+      // 4. Delete shopping list items (may reference meal plans)
+      await db.delete(shoppingListItems).where(eq(shoppingListItems.userId, userId));
+      console.log('[Account Deletion] Deleted shopping list items');
 
-        // 5. Delete meal plans
-        tx.delete(mealPlans).where(eq(mealPlans.userId, userId)).run();
-        console.log('[Account Deletion] Deleted meal plans');
+      // 5. Delete meal plans
+      await db.delete(mealPlans).where(eq(mealPlans.userId, userId));
+      console.log('[Account Deletion] Deleted meal plans');
 
-        // 6. Delete other user-linked data
-        tx.delete(foodLogs).where(eq(foodLogs.userId, userId)).run();
-        tx.delete(weightLogs).where(eq(weightLogs.userId, userId)).run();
-        tx.delete(progressPhotos).where(eq(progressPhotos.userId, userId)).run();
-        tx.delete(userNutritionPreferences).where(eq(userNutritionPreferences.userId, userId)).run();
-        tx.delete(userDietaryPreferences).where(eq(userDietaryPreferences.userId, userId)).run();
-        tx.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId)).run();
-        console.log('[Account Deletion] Deleted logs, photos, nutrition & dietary prefs, reset tokens');
+      // 6. Delete other user-linked data
+      await db.delete(foodLogs).where(eq(foodLogs.userId, userId));
+      await db.delete(weightLogs).where(eq(weightLogs.userId, userId));
+      await db.delete(progressPhotos).where(eq(progressPhotos.userId, userId));
+      await db.delete(userNutritionPreferences).where(eq(userNutritionPreferences.userId, userId));
+      await db.delete(userDietaryPreferences).where(eq(userDietaryPreferences.userId, userId));
+      await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
+      console.log('[Account Deletion] Deleted logs, photos, nutrition & dietary prefs, reset tokens');
 
-        // 7. Delete user's own recipes (after likes/comments removed)
-        tx.delete(recipes).where(eq(recipes.userId, userId)).run();
-        console.log('[Account Deletion] Deleted user recipes');
+      // 7. Delete user's own recipes (after likes/comments removed)
+      await db.delete(recipes).where(eq(recipes.userId, userId));
+      console.log('[Account Deletion] Deleted user recipes');
 
-        // TODO (optional): notifications, badges, userBadges if schema adds user FK later
+      // TODO (optional): notifications, badges, userBadges if schema adds user FK later
 
-        // 8. Finally delete the user
-        tx.delete(users).where(eq(users.id, userId)).run();
-        console.log('[Account Deletion] Deleted user row');
-      })();
+      // 8. Finally delete the user
+      await db.delete(users).where(eq(users.id, userId));
+      console.log('[Account Deletion] Deleted user row');
 
       // Logout after successful transaction
       req.logout(err => {
