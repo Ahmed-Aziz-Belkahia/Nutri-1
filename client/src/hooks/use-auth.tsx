@@ -72,8 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["user"],
     queryFn: async () => {
       try {
-        const response = await axios.get("/api/user", { withCredentials: true });
-        console.log('User data received from API:', response.data);
+        // Use the new JWT auth endpoint
+        const response = await axios.get("/api/auth/me", { withCredentials: true });
+        console.log('User data received from JWT API:', response.data);
         
         // Transform snake_case to camelCase for frontend 
         const userData = response.data;
@@ -85,18 +86,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Store values in both snake_case and camelCase formats for compatibility
             preferredLanguage: userData.preferred_language || userData.preferredLanguage,
             preferred_language: userData.preferred_language || userData.preferredLanguage,
-            hasCompletedOnboarding: userData.has_completed_onboarding || userData.hasCompletedOnboarding,
-            has_completed_onboarding: userData.has_completed_onboarding || userData.hasCompletedOnboarding,
+            hasCompletedOnboarding: userData.has_completed_onboarding !== undefined ? userData.has_completed_onboarding : userData.hasCompletedOnboarding,
+            has_completed_onboarding: userData.has_completed_onboarding !== undefined ? userData.has_completed_onboarding : userData.hasCompletedOnboarding,
             profileImage: userData.profile_image || userData.profileImage,
             profile_image: userData.profile_image || userData.profileImage,
             isAdmin: userData.is_admin || userData.isAdmin,
             is_admin: userData.is_admin || userData.isAdmin,
             // Add other properties as needed
           };
+          console.log('Transformed user data:', transformedUser);
+          console.log('hasCompletedOnboarding value:', transformedUser.hasCompletedOnboarding);
           return transformedUser;
         }
         return userData;
       } catch (error) {
+        console.error('Failed to fetch user from JWT endpoint:', error);
         return null;
       }
     },
@@ -104,7 +108,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginMutation = useMutation<AuthResponse, Error, LoginData>({
     mutationFn: async (credentials) => {
-      const response = await axios.post("/api/login", credentials, {
+      // Use the new JWT auth endpoint (will be redirected via 307)
+      const response = await axios.post("/api/auth/login", credentials, {
         withCredentials: true,
       });
       return response.data;
@@ -128,7 +133,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const registerMutation = useMutation<AuthResponse, Error, RegisterData>({
     mutationFn: async (data) => {
-      const response = await axios.post("/api/register", data, {
+      // Use the new JWT auth endpoint (will be redirected via 307)
+      const response = await axios.post("/api/auth/register", data, {
         withCredentials: true,
       });
       return response.data;
@@ -152,7 +158,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      await axios.post("/api/logout", {}, { withCredentials: true });
+      // Use the new JWT auth endpoint (will be redirected via 307)
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
       queryClient.setQueryData(["user"], null);
       // Force invalidate the user query to ensure the auth state is updated correctly
       queryClient.invalidateQueries({ queryKey: ["user"] });
