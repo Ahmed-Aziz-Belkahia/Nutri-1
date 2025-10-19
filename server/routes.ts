@@ -1,6 +1,8 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { requireAuth, optionalAuth, type AuthRequest } from "./utils/jwt";
+import { checkTokenLimit } from "./middleware/check-token-limit";
+import { TokenLimitService } from "./services/token-limit.service";
 import { db } from "@db";
 import {
   users,
@@ -698,7 +700,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Update the recipe generation endpoint to include preferences
-  app.post("/api/generate-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/generate-recipes", requireAuth, checkTokenLimit('recipe-generation'), async (req: AuthRequest, res: Response) => {
     try {
 
       const { ingredients, preferences, prompt, notes } = req.body;
@@ -1302,7 +1304,7 @@ export function registerRoutes(app: Express): Server {
   // Body composition analysis endpoint
   // SAFETY NOTE: This endpoint provides health and medical recommendations 
   // with proper citations from authoritative sources (WHO, CDC, ACE, NIH)
-  app.post("/api/analyze-body", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/analyze-body", requireAuth, checkTokenLimit('body-analysis'), async (req: AuthRequest, res: Response) => {
     try {
 
       const { imageBase64, weight, height, gender, age } = req.body;
@@ -1652,7 +1654,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Create meal plan endpoint - UPDATED with AI-generated personalized meal plans
-  app.post("/api/meal-plans", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/meal-plans", requireAuth, checkTokenLimit('meal-plan-generation'), async (req: AuthRequest, res: Response) => {
     try {
       
       // Check if this is a request to replace an existing meal plan
@@ -3975,7 +3977,7 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add food log endpoint (updated with enhanced logging)
-  app.post("/api/food-logs", requireAuth, async (req: AuthRequest, res: Response) => {
+  app.post("/api/food-logs", requireAuth, checkTokenLimit('food-scan-analysis'), async (req: AuthRequest, res: Response) => {
     try {
 
       const { name, calories, protein, carbs, fat, image, date, components, isAnalyzing } = req.body;

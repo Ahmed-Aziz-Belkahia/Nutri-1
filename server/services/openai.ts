@@ -1,10 +1,46 @@
 import OpenAI from "openai";
 import fs from "fs";
+import { TokenLimitService } from "./token-limit.service";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || '' // Use empty string as fallback to avoid null errors
 });
+
+/**
+ * Helper to track OpenAI API usage after successful call
+ */
+async function trackOpenAIUsage(
+  userId: number,
+  endpoint: string,
+  response: OpenAI.Chat.Completions.ChatCompletion,
+  model: string
+): Promise<void> {
+  if (!response.usage) {
+    console.warn('[Token Tracking] No usage data in OpenAI response');
+    return;
+  }
+
+  const tokensUsed = response.usage.total_tokens;
+  // Estimate cost (gpt-4o pricing: $2.50 per 1M input tokens, $10 per 1M output tokens)
+  const inputCost = (response.usage.prompt_tokens / 1000000) * 2.50;
+  const outputCost = (response.usage.completion_tokens / 1000000) * 10.00;
+  const totalCost = inputCost + outputCost;
+
+  await TokenLimitService.trackTokenUsage(
+    userId,
+    endpoint,
+    tokensUsed,
+    model,
+    totalCost,
+    'success',
+    {
+      promptTokens: response.usage.prompt_tokens,
+      completionTokens: response.usage.completion_tokens,
+      totalTokens: tokensUsed
+    }
+  );
+}
 
 // Food recognition from image
 export async function recognizeFoodFromImage(base64Image: string): Promise<{

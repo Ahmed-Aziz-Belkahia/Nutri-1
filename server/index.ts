@@ -11,6 +11,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import jwtAuthRoutes from './routes/jwt-auth';
+import { initializeTokenLimitCronJobs } from './cron/token-limit-cron';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -157,6 +158,10 @@ async function initializeApp() {
     } catch (error) {
       console.error('Error creating uploads directory:', error);
     }
+
+    // Initialize cron jobs for token limits
+    initializeTokenLimitCronJobs();
+    log("✅ Token limit cron jobs initialized");
 
     // Create HTTP server and register routes
     const server = createServer(app);
