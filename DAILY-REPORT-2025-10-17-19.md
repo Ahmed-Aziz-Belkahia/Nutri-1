@@ -7,7 +7,7 @@
 • Complete auth system overhaul
 • 7 critical bugs fixed
 • 3 major features added
-• 14+ hours development time (across 3 days)
+• 6+ hours development time (across 3 days)
 
 **Major Features Implemented:**
 
