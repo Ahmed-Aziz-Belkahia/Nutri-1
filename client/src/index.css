@@ -1,6 +1,24 @@
+/**
+ * NUTRI AI - Main Stylesheet
+ * 
+ * Import order:
+ * 1. Design system foundation (must be first for @import rules)
+ * 2. Tailwind base (for reset)
+ * 3. Tailwind components & utilities
+ */
+
+/* Import design system foundation */
+@import './styles/design-tokens.css';
+@import './styles/base.css';
+@import './styles/components.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   LAYOUT OVERRIDES
+   ============================================ */
 
 /* Remove default margins and padding */
 html, body, #root {
@@ -40,4 +58,27 @@ body.camera-active {
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/* ============================================
+   RESPONSIVE MOBILE FIRST
+   ============================================ */
+
+/* Mobile: Default (up to 767px) */
+.container {
+  max-width: var(--max-width-mobile);
+}
+
+/* Tablet: 768px and up */
+@media (min-width: 768px) {
+  .container {
+    max-width: var(--max-width-tablet);
+  }
+}
+
+/* Desktop: 1024px and up */
+@media (min-width: 1024px) {
+  .container {
+    max-width: var(--max-width-desktop);
+  }
 }

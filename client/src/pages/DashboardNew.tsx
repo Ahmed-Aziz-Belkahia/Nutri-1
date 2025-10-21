@@ -1,196 +1,386 @@
-import { useTranslation } from "react-i18next";
-import { Card } from "@/components/ui/card";
-import { Bell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { format } from "date-fns";
+import Navbar from "@/components/Navbar";
 
-// Mock data - will be replaced with real API calls
-const mockMeals = [
-  { id: 1, name: "Big Mac meal", calories: 900, image: "/placeholder-food.jpg" },
-  { id: 2, name: "Beef Steak", calories: 1500, image: "/placeholder-food.jpg" },
+// Macro data for carousel
+const macroData = [
+  {
+    id: 'calories',
+    title: 'Eaten Calories',
+    current: 2000,
+    target: 3200,
+    unit: 'cal',
+    color: '#00a9a5',
+    percentage: 70
+  },
+  {
+    id: 'carbs',
+    title: 'Carbohydrates',
+    current: 180,
+    target: 250,
+    unit: 'g',
+    color: '#00a9a5',
+    percentage: 72
+  },
+  {
+    id: 'protein',
+    title: 'Protein',
+    current: 95,
+    target: 120,
+    unit: 'g',
+    color: '#00a9a5',
+    percentage: 79
+  },
+  {
+    id: 'fat',
+    title: 'Fat',
+    current: 45,
+    target: 70,
+    unit: 'g',
+    color: '#00a9a5',
+    percentage: 64
+  }
 ];
 
-const mockMealPlan = [
-  { id: 1, name: "Eggs", calories: 500, completed: false },
-  { id: 2, name: "Beef Steak", calories: 1500, completed: true },
-  { id: 3, name: "Fruit Salad", calories: 250, completed: false },
-];
+// Helper function to get week days starting from today
+function getWeekDays() {
+  const today = new Date();
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  return Array.from({ length: 7 }).map((_, idx) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - today.getDay() + idx); // Start from Sunday
+    
+    return {
+      date,
+      dayName: dayNames[idx],
+      dayNumber: date.getDate(),
+      isToday: date.toDateString() === today.toDateString(),
+      formattedDate: format(date, 'yyyy-MM-dd')
+    };
+  });
+}
 
 export default function DashboardNew() {
-  const { t } = useTranslation();
   const { user } = useAuth();
+  const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  const [weekDays, setWeekDays] = useState(getWeekDays());
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  // Mock stats - will be fetched from API
-  const caloriesConsumed = 2000;
-  const caloriesTarget = 3200;
-  const caloriesLeft = caloriesTarget - caloriesConsumed;
-  const percentage = Math.round((caloriesConsumed / caloriesTarget) * 100);
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  // Update week days when offset changes
+  useEffect(() => {
+    const today = new Date();
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    const newWeekDays = Array.from({ length: 7 }).map((_, idx) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - today.getDay() + idx + (weekOffset * 7));
+      
+      return {
+        date,
+        dayName: dayNames[idx],
+        dayNumber: date.getDate(),
+        isToday: date.toDateString() === today.toDateString(),
+        formattedDate: format(date, 'yyyy-MM-dd')
+      };
+    });
+    
+    setWeekDays(newWeekDays);
+  }, [weekOffset]);
+
+  // Auto-scroll carousel every 5 seconds
+  useEffect(() => {
+    if (isPaused) return;
+
+    const autoScrollInterval = setInterval(() => {
+      setCurrentMacroIndex((prev) => (prev === macroData.length - 1 ? 0 : prev + 1));
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(autoScrollInterval);
+  }, [isPaused]);
+
+  const handlePreviousWeek = () => {
+    setWeekOffset(prev => prev - 1);
+  };
+
+  const handleNextWeek = () => {
+    setWeekOffset(prev => prev + 1);
+  };
+
+  const handleDayClick = (formattedDate: string) => {
+    setSelectedDate(formattedDate);
+    // TODO: Fetch data for selected date
+    console.log('Selected date:', formattedDate);
+  };
+
+  const handlePreviousMacro = () => {
+    setIsPaused(true);
+    setCurrentMacroIndex((prev) => (prev === 0 ? macroData.length - 1 : prev - 1));
+  };
+
+  const handleNextMacro = () => {
+    setIsPaused(true);
+    setCurrentMacroIndex((prev) => (prev === macroData.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleDotClick = (index: number) => {
+    setIsPaused(true);
+    setCurrentMacroIndex(index);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe || isRightSwipe) {
+      setIsPaused(true);
+      if (isLeftSwipe) {
+        setCurrentMacroIndex((prev) => (prev === macroData.length - 1 ? 0 : prev + 1));
+      } else {
+        setCurrentMacroIndex((prev) => (prev === 0 ? macroData.length - 1 : prev - 1));
+      }
+    }
+  };
+
+  const currentMacro = macroData[currentMacroIndex];
+  const remaining = currentMacro.target - currentMacro.current;
+  const circumference = 2 * Math.PI * 38;
+  const strokeDasharray = `${(currentMacro.percentage / 100) * circumference} ${circumference}`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#d3f0ff] to-[#fefefe] pb-24">
-      {/* Header */}
-      <div className="flex items-center gap-2 px-5 pt-8 pb-6">
-        <div className="h-[50px] w-[50px] rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+    <div className="gradient-bg min-h-screen pb-32">
+      <header className="header">
+        <div className="profile-avatar">
           {user?.profileImage ? (
-            <img src={user.profileImage} alt={user.email} className="h-full w-full object-cover" />
+            <img 
+              src={user.profileImage} 
+              alt={user.email} 
+              className="profile-avatar-image" 
+            />
           ) : (
-            <div className="h-full w-full flex items-center justify-center bg-[#26a8ff] text-white text-xl font-bold">
-              {user?.email?.charAt(0).toUpperCase()}
+            <div className="profile-avatar-initial">
+              {user?.email?.charAt(0).toUpperCase() || "U"}
             </div>
           )}
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-[rgba(3,49,75,0.8)]">Welcome back</p>
-          <p className="text-base font-bold text-[#26a8ff] truncate">{user?.email?.split('@')[0] || "User"}</p>
+        <div className="profile-info">
+          <p className="profile-greeting">Welcome back</p>
+          <p className="profile-name">{user?.email?.split("@")[0] || "User"}</p>
         </div>
-        <button className="p-2">
-          <Bell className="h-6 w-6 text-gray-600" />
+        <button className="notification-button" aria-label="Notifications">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
         </button>
-      </div>
+      </header>
 
-      {/* Week Days Selector */}
-      <div className="mx-5 mb-6">
-        <div className="backdrop-blur-xl bg-white/60 rounded-[34px] shadow-lg p-1 flex items-center justify-between">
-          {[1, 2, 3, 4, 5, 6].map((day, index) => (
-            <div key={day} className="flex items-center">
-              {index > 0 && <div className="h-[18px] w-px bg-gray-300" />}
-              <button
-                className={`px-4 py-2 text-[15px] font-bold ${
-                  day === 4 ? "text-[#26a8ff]" : "text-gray-600"
-                }`}
-              >
-                {day}
-              </button>
-            </div>
-          ))}
-          <button className="bg-gray-200 rounded-full h-9 w-9 flex items-center justify-center text-gray-600">
-            →
+      <div className="day-selector">
+        <div className="day-selector-container">
+          <button 
+            className="day-arrow day-arrow-left" 
+            onClick={handlePreviousWeek}
+            aria-label="Previous week"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <div className="day-selector-scroll">
+            {weekDays.map((day, index) => (
+              <div key={day.formattedDate} className="flex items-center">
+                {index > 0 && <div className="day-divider" />}
+                <button 
+                  className={`day-button ${day.formattedDate === selectedDate ? 'active' : ''} ${day.isToday ? 'is-today' : ''}`}
+                  onClick={() => handleDayClick(day.formattedDate)}
+                  aria-label={`${day.dayName} ${day.dayNumber}`}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs font-medium" style={{ fontSize: '10px', marginBottom: '2px' }}>
+                      {day.dayName}
+                    </span>
+                    <span className="text-sm font-bold">
+                      {day.dayNumber}
+                    </span>
+                  </div>
+                </button>
+              </div>
+            ))}
+          </div>
+          
+          <button 
+            className="day-arrow day-arrow-right" 
+            onClick={handleNextWeek}
+            aria-label="Next week"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       </div>
 
-      {/* Calories Card */}
-      <div className="mx-5 mb-6">
-        <Card className="backdrop-blur-[15.7px] bg-white/60 border-0 shadow-[14px_24px_101px_0px_rgba(0,0,0,0.08)] p-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h2 className="text-[21px] font-medium text-[#1f1f1e] mb-2">Eaten Calories</h2>
-              <p className="text-base text-[#888888] mb-3">
-                <span className="text-[#26a8ff]">{caloriesConsumed} cal</span> of {caloriesTarget} cal
-              </p>
-              <div className="bg-[#eeeeee] rounded-full px-3 py-1.5 inline-block">
-                <p className="text-xs text-[#1f1f1e]">{caloriesLeft} cal left</p>
-              </div>
-            </div>
-            <div className="relative">
-              <svg className="h-[90px] w-[90px] -rotate-90">
-                <circle
-                  cx="45"
-                  cy="45"
-                  r="38"
-                  stroke="#e0e0e0"
-                  strokeWidth="8"
-                  fill="none"
-                />
-                <circle
-                  cx="45"
-                  cy="45"
-                  r="38"
-                  stroke="#26a8ff"
-                  strokeWidth="8"
-                  fill="none"
-                  strokeDasharray={`${percentage * 2.387} 238.7`}
-                  strokeLinecap="round"
-                />
+      <div className="container">
+        <div className="card section">
+          <div className="macro-carousel-wrapper">
+            <button 
+              className="macro-arrow macro-arrow-left" 
+              onClick={handlePreviousMacro}
+              aria-label="Previous macro"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[21px] font-semibold text-[#1f1f1e]">{percentage}%</span>
+            </button>
+
+            <div 
+              className="macro-carousel-scroll"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
+              <div 
+                className="macro-carousel-track"
+                style={{ 
+                  transform: `translateX(-${currentMacroIndex * 100}%)`,
+                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              >
+                {macroData.map((macro) => {
+                  const remaining = macro.target - macro.current;
+                  const circumference = 2 * Math.PI * 38;
+                  const strokeDasharray = `${(macro.percentage / 100) * circumference} ${circumference}`;
+                  
+                  return (
+                    <div key={macro.id} className="macro-slide">
+                      <div className="macro-slide-content">
+                        <div className="macro-info">
+                          <h2 className="macro-title" style={{ color: macro.color }}>
+                            {macro.title}
+                          </h2>
+                          <p className="macro-values">
+                            <span className="macro-current" style={{ color: macro.color }}>
+                              {macro.current} {macro.unit}
+                            </span>
+                            <span className="macro-target"> of {macro.target} {macro.unit}</span>
+                          </p>
+                          <div className="stats-badge">
+                            <span className="stats-badge-text">
+                              {remaining > 0 ? `${remaining} ${macro.unit} left` : 'Target reached!'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="progress-circle-container">
+                          <svg className="progress-circle-svg">
+                            <circle className="progress-circle-bg" cx="45" cy="45" r="38" />
+                            <circle 
+                              className="progress-circle-fg" 
+                              cx="45" 
+                              cy="45" 
+                              r="38" 
+                              strokeDasharray={strokeDasharray}
+                            />
+                          </svg>
+                          <div className="progress-circle-text">{macro.percentage}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
-          {/* Pagination dots */}
-          <div className="flex justify-center gap-2 mt-4">
-            <div className="h-2 w-2 rounded-full bg-black" />
-            <div className="h-2 w-2 rounded-full bg-black/30" />
-            <div className="h-2 w-2 rounded-full bg-black/30" />
-            <div className="h-2 w-2 rounded-full bg-black/30" />
-          </div>
-        </Card>
-      </div>
 
-      {/* Meals Carousel */}
-      <div className="mb-6 px-5">
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-          {mockMeals.map((meal) => (
-            <Card key={meal.id} className="backdrop-blur-[15px] bg-white/60 border-0 shadow-[14px_23px_97px_0px_rgba(0,0,0,0.08)] min-w-[216px] flex-shrink-0 overflow-hidden">
-              <div className="h-[204px] overflow-hidden rounded-t-[20px]">
-                <img 
-                  src={meal.image} 
-                  alt={meal.name}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23e0e0e0' width='200' height='200'/%3E%3C/svg%3E";
-                  }}
-                />
-              </div>
-              <div className="p-4">
-                <h3 className="text-xl font-medium text-[#1f1f1e] mb-1">{meal.name}</h3>
-                <p className="text-sm text-[#888888]">{meal.calories}kcal</p>
-              </div>
-            </Card>
-          ))}
+            <button 
+              className="macro-arrow macro-arrow-right" 
+              onClick={handleNextMacro}
+              aria-label="Next macro"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="pagination-dots">
+            {macroData.map((macro, index) => (
+              <button
+                key={macro.id}
+                className={`pagination-dot ${index === currentMacroIndex ? 'active' : ''}`}
+                onClick={() => handleDotClick(index)}
+                aria-label={`View ${macro.title}`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Meal Plan */}
-      <div className="mx-5 mb-6">
-        <Card className="backdrop-blur-[15px] bg-white/60 border-0 shadow-[14px_23px_97px_0px_rgba(0,0,0,0.08)] p-6">
-          <h2 className="text-xl font-medium text-[#26a8ff] mb-6">Meal Plan</h2>
-          <div className="space-y-6">
-            {mockMealPlan.map((item) => (
-              <div key={item.id} className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-medium text-[#1f1e1f]">{item.name}</h3>
-                  <p className="text-xs text-[#9e9e9e]">{item.calories}kcal</p>
+        <div className="section">
+          <div className="carousel scrollbar-hide">
+            {[
+              { id: 1, name: "Big Mac meal", calories: 900 },
+              { id: 2, name: "Beef Steak", calories: 1500 },
+            ].map((meal) => (
+              <div key={meal.id} className="meal-card">
+                <div className="h-[204px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-[20px] flex items-center justify-center">
+                  <svg className="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
                 </div>
-                <div className={`h-7 w-7 rounded-full border-2 flex items-center justify-center ${
-                  item.completed 
-                    ? "border-[#26a8ff] bg-[#26a8ff]" 
-                    : "border-gray-300"
-                }`}>
-                  {item.completed && (
-                    <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
+                <div className="meal-card-content">
+                  <h3 className="meal-card-title">{meal.name}</h3>
+                  <p className="meal-card-calories">{meal.calories}kcal</p>
                 </div>
               </div>
             ))}
           </div>
-        </Card>
-      </div>
+        </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 pb-6 px-6">
-        <div className="backdrop-blur-xl bg-white/90 rounded-full shadow-lg p-1 flex items-center justify-around max-w-md mx-auto">
-          <button className="flex-1 flex flex-col items-center gap-0.5 py-2 px-2 bg-gray-200 rounded-full">
-            <span className="text-[17px] text-[#0088ff]">🏠</span>
-            <span className="text-[10px] font-semibold text-[#0088ff]">Home</span>
-          </button>
-          <button className="flex-1 flex flex-col items-center gap-0.5 py-2 px-2">
-            <span className="text-[17px] text-gray-600">📖</span>
-            <span className="text-[10px] font-medium text-gray-600">Recipes</span>
-          </button>
-          <button className="flex-1 flex flex-col items-center gap-0.5 py-2 px-2">
-            <span className="text-[17px] text-gray-600">📚</span>
-            <span className="text-[10px] font-medium text-gray-600">Library</span>
-          </button>
-          <button className="flex-1 flex flex-col items-center gap-0.5 py-2 px-2">
-            <span className="text-[17px] text-gray-600">➕</span>
-            <span className="text-[10px] font-medium text-gray-600">ADD</span>
-          </button>
+        <div className="card section">
+          <h2 className="section-heading" style={{ marginBottom: '24px' }}>Meal Plan</h2>
+          <div>
+            {[
+              { id: 1, name: "Eggs", calories: 500, completed: false },
+              { id: 2, name: "Beef Steak", calories: 1500, completed: true },
+              { id: 3, name: "Fruit Salad", calories: 250, completed: false },
+            ].map((item, index) => (
+              <div key={item.id} className="meal-plan-item" style={{ marginTop: index > 0 ? '24px' : '0' }}>
+                <div className="meal-plan-info">
+                  <h3 className="meal-plan-name">{item.name}</h3>
+                  <p className="meal-plan-calories">{item.calories}kcal</p>
+                </div>
+                <button className={`meal-plan-checkbox ${item.completed ? 'checked' : ''}`} aria-label={`Mark ${item.name} as ${item.completed ? 'incomplete' : 'complete'}`}>
+                  {item.completed && (
+                    <svg className="meal-plan-checkbox-icon" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+
+      <Navbar />
     </div>
   );
 }

@@ -1,0 +1,262 @@
+/**
+ * NUTRI AI - Design System Tokens
+ * Generated from Figma design: Nutri-Ai-Ui
+ * 
+ * This file contains all design tokens (colors, spacing, typography, effects)
+ * that form the foundation of the Nutri AI design system.
+ */
+
+:root {
+  /* ============================================
+     COLOR SYSTEM
+     ============================================ */
+  
+  /* Primary Brand Colors */
+  --color-primary: #00a9a5;
+  --color-primary-rgb: 0, 169, 165;
+  --color-primary-light: #26c6c3;
+  --color-primary-dark: #008a87;
+  
+  /* Background Colors */
+  --color-bg-gradient-start: #d3f0ff;
+  --color-bg-gradient-end: #fefefe;
+  --color-bg-white: #ffffff;
+  --color-bg-card: rgba(255, 255, 255, 0.6);
+  --color-bg-glass: rgba(255, 255, 255, 0.6);
+  
+  /* Text Colors */
+  --color-text-primary: #1f1f1e;
+  --color-text-secondary: #888888;
+  --color-text-tertiary: #9e9e9e;
+  --color-text-muted: rgba(3, 49, 75, 0.8);
+  --color-text-heading: #1f1e1f;
+  
+  /* UI Element Colors */
+  --color-border: #e0e0e0;
+  --color-border-light: rgba(0, 0, 0, 0.1);
+  --color-divider: #d4d4d4;
+  
+  /* Semantic Colors */
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-error: #f44336;
+  --color-info: #2196f3;
+  
+  /* Neutral Grays */
+  --color-gray-50: #fafafa;
+  --color-gray-100: #f5f5f5;
+  --color-gray-200: #eeeeee;
+  --color-gray-300: #e0e0e0;
+  --color-gray-400: #bdbdbd;
+  --color-gray-500: #9e9e9e;
+  --color-gray-600: #757575;
+  --color-gray-700: #616161;
+  --color-gray-800: #424242;
+  --color-gray-900: #212121;
+
+  /* ============================================
+     GLASSMORPHISM EFFECTS
+     ============================================ */
+  
+  /* Glass Background Opacity */
+  --glass-bg-opacity: 0.6;
+  --glass-bg-strong: rgba(255, 255, 255, 0.9);
+  --glass-bg-medium: rgba(255, 255, 255, 0.6);
+  --glass-bg-light: rgba(255, 255, 255, 0.4);
+  
+  /* Blur Strengths */
+  --blur-light: 10px;
+  --blur-medium: 15.7px;
+  --blur-strong: 20px;
+  --blur-extra: 30px;
+
+  /* ============================================
+     SPACING SCALE
+     ============================================ */
+  
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  
+  /* Component-specific spacing */
+  --spacing-card-padding: 24px;
+  --spacing-section-margin: 24px;
+  --spacing-container-padding: 20px;
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 34px;
+  --radius-full: 9999px;
+  
+  /* Component-specific radius */
+  --radius-card: 20px;
+  --radius-button: 34px;
+  --radius-input: 12px;
+  --radius-pill: 9999px;
+
+  /* ============================================
+     SHADOWS
+     ============================================ */
+  
+  --shadow-sm: 0px 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0px 4px 8px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 14px 23px 97px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 14px 24px 101px rgba(0, 0, 0, 0.08);
+  
+  /* Component-specific shadows */
+  --shadow-card: 14px 23px 97px rgba(0, 0, 0, 0.08);
+  --shadow-button: 0px 4px 12px rgba(38, 168, 255, 0.2);
+  --shadow-nav: 0px -2px 20px rgba(0, 0, 0, 0.05);
+
+  /* ============================================
+     TYPOGRAPHY SCALE
+     ============================================ */
+  
+  /* Font Family */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+                       "Helvetica Neue", Arial, sans-serif;
+  --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+                          "Helvetica Neue", Arial, sans-serif;
+  
+  /* Font Sizes */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 21px;
+  --font-size-4xl: 24px;
+  --font-size-5xl: 28px;
+  --font-size-6xl: 32px;
+  --font-size-7xl: 41px;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.7;
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============================================
+     TRANSITIONS & ANIMATIONS
+     ============================================ */
+  
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Animation Durations */
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  
+  /* Easing Functions */
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ============================================
+     Z-INDEX LAYERS
+     ============================================ */
+  
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+
+  /* ============================================
+     COMPONENT-SPECIFIC VARIABLES
+     ============================================ */
+  
+  /* Cards */
+  --card-bg: var(--glass-bg-medium);
+  --card-backdrop-blur: var(--blur-medium);
+  --card-border: 0;
+  --card-shadow: var(--shadow-card);
+  --card-padding: var(--spacing-card-padding);
+  --card-radius: var(--radius-card);
+  
+  /* Buttons */
+  --button-padding-x: 24px;
+  --button-padding-y: 12px;
+  --button-radius: var(--radius-button);
+  --button-font-size: var(--font-size-md);
+  --button-font-weight: var(--font-weight-semibold);
+  
+  /* Navigation */
+  --nav-height: 60px;
+  --nav-bg: var(--glass-bg-strong);
+  --nav-backdrop-blur: var(--blur-strong);
+  --nav-shadow: var(--shadow-nav);
+  
+  /* Progress Circle */
+  --progress-size: 90px;
+  --progress-thickness: 8px;
+  --progress-bg: var(--color-gray-300);
+  --progress-fg: var(--color-primary);
+  
+  /* Image Heights */
+  --image-meal-card: 204px;
+  --image-recipe-card: 167px;
+  --image-profile: 50px;
+
+  /* ============================================
+     BREAKPOINTS
+     ============================================ */
+  
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ============================================
+     LAYOUT CONSTRAINTS
+     ============================================ */
+  
+  --max-width-mobile: 402px;
+  --max-width-tablet: 768px;
+  --max-width-desktop: 1280px;
+  --max-width-content: 1536px;
+  
+  /* Safe Areas (for mobile) */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+/* ============================================
+   DARK MODE OVERRIDES (Optional - for future)
+   ============================================ */
+
+/* Dark mode support can be added here in the future
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary: #26a8ff;
+  }
+}
+*/

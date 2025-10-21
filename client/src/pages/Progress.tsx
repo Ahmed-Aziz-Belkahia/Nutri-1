@@ -13,6 +13,7 @@ import HeightLogWidget from '@/components/HeightLogWidget';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import Navbar from '@/components/Navbar';
 import { 
   AlertDialog, 
   AlertDialogAction, 
@@ -534,7 +535,7 @@ export default function ProgressPage() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen relative overflow-hidden">
+      <div className="min-h-screen relative overflow-hidden pb-32">
         {/* Subtle emerald blobs background */}
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
@@ -1184,6 +1185,8 @@ export default function ProgressPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      <Navbar />
       </div>
     </PullToRefresh>
   );

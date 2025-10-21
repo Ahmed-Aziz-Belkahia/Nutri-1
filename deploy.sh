@@ -1,50 +1,46 @@
 #!/bin/bash
 
-# Simple deployment script for Nutri-AI
-# Database management is done manually with: node emergency-create-db.js
+echo "🚀 NutriApp VPS Deployment Script"
+echo "================================="
 
-set -e  # Exit on error
+# Update system packages
+echo "📦 Updating system packages..."
+sudo apt update && sudo apt upgrade -y
 
-echo "� Deploying Nutri-AI..."
-echo ""
+# Install Node.js if not installed
+if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+fi
 
-# Step 1: Install dependencies
+# Install PM2 for process management
+if ! command -v pm2 &> /dev/null; then
+    echo "📦 Installing PM2..."
+    sudo npm install -g pm2
+fi
+
+# Install dependencies
 echo "📦 Installing dependencies..."
 npm install
-echo "✅ Done"
-echo ""
 
-# Step 2: Build application  
+# Run setup
+echo "🔧 Running setup..."
+npm run setup
+
+# Build the application
 echo "🏗️  Building application..."
 npm run build
-echo "✅ Done"
-echo ""
 
-# Step 3: Set permissions (if database exists)
-if [ -f "local.db" ]; then
-    echo "� Setting database permissions..."
-    chmod 664 local.db 2>/dev/null || true
-    [ -f "local.db-wal" ] && chmod 664 local.db-wal 2>/dev/null || true
-    [ -f "local.db-shm" ] && chmod 664 local.db-shm 2>/dev/null || true
-    echo "✅ Done"
-    echo ""
-fi
+# Start with PM2
+echo "🚀 Starting application with PM2..."
+pm2 stop nutriapp 2>/dev/null || true
+pm2 delete nutriapp 2>/dev/null || true
+pm2 start dist/index.js --name "nutriapp"
+pm2 save
+pm2 startup
 
-# Step 4: Restart PM2
-echo "� Restarting PM2..."
-if pm2 list | grep -q "myapp"; then
-    pm2 restart myapp
-else
-    pm2 start ecosystem.config.js
-    pm2 save
-fi
-echo "✅ Done"
-echo ""
-
-echo "🎉 Deployment complete!"
-echo ""
-echo "📝 Useful commands:"
-echo "   • View logs: pm2 logs myapp"
-echo "   • Check status: pm2 status"
-echo "   • Recreate DB: node emergency-create-db.js"
-echo ""
+echo "✅ Deployment complete!"
+echo "🌐 Your NutriApp should be running on port 5000"
+echo "📊 Monitor with: pm2 status"
+echo "📝 View logs with: pm2 logs nutriapp"

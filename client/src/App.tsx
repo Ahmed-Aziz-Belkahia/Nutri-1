@@ -35,6 +35,7 @@ import TealButtonDemo from "./pages/TealButtonDemo";
 // Calendar page removed
 import { useEffect, useState, Suspense, lazy } from "react";
 import BottomNav from "./components/BottomNav";
+import Navbar from "./components/Navbar";
 import TransformationQuiz from "./pages/Onboarding/TransformationQuiz";
 import Goals from "./pages/settings/goals";
 import Profile from "./pages/Profile";
@@ -204,8 +205,12 @@ function App() {
     return <AppSkeleton />;
   }
 
-  // Show bottom nav only on main app pages when authenticated
-  const showBottomNav = user && ['/dashboard', '/enhanced-dashboard', '/progress', '/progress-new', '/recipes', '/settings', '/meals', '/profile', '/analytics'].includes(location);
+  // Show new navbar on main app pages when authenticated
+  // Check for both exact routes and routes with query parameters
+  const showNavbar = user && (
+    ['/dashboard', '/recipes', '/analytics', '/enhanced-add-food'].includes(location) ||
+    location.startsWith('/recipes?')
+  );
 
   // Use black background for camera-based pages only
   const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food';
@@ -478,8 +483,8 @@ function App() {
       </div>
     </div>
     
-    {/* Show bottom navigation for authenticated users on main pages - Outside main container */}
-    {showBottomNav && <BottomNav />}
+    {/* Show new navbar for authenticated users on main pages - Outside main container */}
+    {showNavbar && <Navbar />}
     </>
   );
 }
