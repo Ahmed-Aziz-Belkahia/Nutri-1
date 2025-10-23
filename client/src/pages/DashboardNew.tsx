@@ -2,55 +2,54 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
+import { useQuery } from "@tanstack/react-query";
 
-// Macro data for carousel
-const macroData = [
-  {
-    id: 'calories',
-    title: 'Eaten Calories',
-    current: 2000,
-    target: 3200,
-    unit: 'cal',
-    color: '#00a9a5',
-    percentage: 70
-  },
-  {
-    id: 'carbs',
-    title: 'Carbohydrates',
-    current: 180,
-    target: 250,
-    unit: 'g',
-    color: '#00a9a5',
-    percentage: 72
-  },
-  {
-    id: 'protein',
-    title: 'Protein',
-    current: 95,
-    target: 120,
-    unit: 'g',
-    color: '#00a9a5',
-    percentage: 79
-  },
-  {
-    id: 'fat',
-    title: 'Fat',
-    current: 45,
-    target: 70,
-    unit: 'g',
-    color: '#00a9a5',
-    percentage: 64
-  }
-];
+interface FoodLog {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  quantity: number;
+  unit: string;
+  imageUrl?: string;
+  loggedAt: string;
+}
 
-// Helper function to get week days starting from today
-function getWeekDays() {
+interface DailyTotals {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+}
+
+interface MealPlan {
+  id: number;
+  name: string;
+  targetCalories: number;
+  targetProtein: number;
+  targetCarbs: number;
+  targetFat: number;
+}
+
+interface GroceryItem {
+  id: number;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: string;
+  purchased: boolean;
+}
+
+// Helper function to get week days starting from Sunday
+function getWeekDays(weekOffset: number = 0) {
   const today = new Date();
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   return Array.from({ length: 7 }).map((_, idx) => {
     const date = new Date(today);
-    date.setDate(today.getDate() - today.getDay() + idx); // Start from Sunday
+    date.setDate(today.getDate() - today.getDay() + idx + (weekOffset * 7));
     
     return {
       date,
@@ -75,25 +74,116 @@ export default function DashboardNew() {
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
 
+  // Fetch food logs for selected date
+  const { data: foodLogs = [], isLoading: logsLoading } = useQuery<FoodLog[]>({
+    queryKey: ['food-logs', selectedDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/food-logs?date=${selectedDate}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch food logs');
+      const data = await response.json();
+      return data.logs || [];
+    }
+  });
+
+  // Fetch daily totals for selected date
+  const { data: dailyTotals = { calories: 0, protein: 0, carbs: 0, fat: 0 } } = useQuery<DailyTotals>({
+    queryKey: ['daily-totals', selectedDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/food-logs?date=${selectedDate}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch totals');
+      const data = await response.json();
+      return data.totals || { calories: 0, protein: 0, carbs: 0, fat: 0 };
+    }
+  });
+
+  // Fetch user's meal plan to get targets
+  const { data: mealPlan } = useQuery<MealPlan>({
+    queryKey: ['meal-plan', user?.id],
+    queryFn: async () => {
+      const response = await fetch('/api/meal-plans/active', {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        // Return default targets if no meal plan exists
+        return {
+          id: 0,
+          name: 'Default Plan',
+          targetCalories: 2500,
+          targetProtein: 150,
+          targetCarbs: 300,
+          targetFat: 80
+        };
+      }
+      return response.json();
+    }
+  });
+
+  // Fetch grocery list (shopping list)
+  const { data: groceryList = [], refetch: refetchGroceries } = useQuery<GroceryItem[]>({
+    queryKey: ['grocery-list'],
+    queryFn: async () => {
+      const response = await fetch('/api/shopping-list', {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        // Return mock data if API not available
+        return [
+          { id: 1, name: "Eggs", quantity: 12, unit: "pcs", category: "Dairy", purchased: false },
+          { id: 2, name: "Beef Steak", quantity: 500, unit: "g", category: "Meat", purchased: true },
+          { id: 3, name: "Mixed Fruits", quantity: 1, unit: "kg", category: "Fruits", purchased: false }
+        ];
+      }
+      return response.json();
+    }
+  });
+
+  // Calculate macro percentages based on targets
+  const macroData = [
+    {
+      id: 'calories',
+      title: 'Eaten Calories',
+      current: Math.round(dailyTotals.calories),
+      target: mealPlan?.targetCalories || 2500,
+      unit: 'cal',
+      color: '#00BFA6',
+      percentage: Math.min(100, Math.round((dailyTotals.calories / (mealPlan?.targetCalories || 2500)) * 100))
+    },
+    {
+      id: 'carbs',
+      title: 'Carbohydrates',
+      current: Math.round(dailyTotals.carbs),
+      target: mealPlan?.targetCarbs || 300,
+      unit: 'g',
+      color: '#00BFA6',
+      percentage: Math.min(100, Math.round((dailyTotals.carbs / (mealPlan?.targetCarbs || 300)) * 100))
+    },
+    {
+      id: 'protein',
+      title: 'Protein',
+      current: Math.round(dailyTotals.protein),
+      target: mealPlan?.targetProtein || 150,
+      unit: 'g',
+      color: '#00BFA6',
+      percentage: Math.min(100, Math.round((dailyTotals.protein / (mealPlan?.targetProtein || 150)) * 100))
+    },
+    {
+      id: 'fat',
+      title: 'Fat',
+      current: Math.round(dailyTotals.fat),
+      target: mealPlan?.targetFat || 80,
+      unit: 'g',
+      color: '#00BFA6',
+      percentage: Math.min(100, Math.round((dailyTotals.fat / (mealPlan?.targetFat || 80)) * 100))
+    }
+  ];
+
   // Update week days when offset changes
   useEffect(() => {
-    const today = new Date();
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    const newWeekDays = Array.from({ length: 7 }).map((_, idx) => {
-      const date = new Date(today);
-      date.setDate(today.getDate() - today.getDay() + idx + (weekOffset * 7));
-      
-      return {
-        date,
-        dayName: dayNames[idx],
-        dayNumber: date.getDate(),
-        isToday: date.toDateString() === today.toDateString(),
-        formattedDate: format(date, 'yyyy-MM-dd')
-      };
-    });
-    
-    setWeekDays(newWeekDays);
+    setWeekDays(getWeekDays(weekOffset));
   }, [weekOffset]);
 
   // Auto-scroll carousel every 5 seconds
@@ -102,10 +192,10 @@ export default function DashboardNew() {
 
     const autoScrollInterval = setInterval(() => {
       setCurrentMacroIndex((prev) => (prev === macroData.length - 1 ? 0 : prev + 1));
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
 
     return () => clearInterval(autoScrollInterval);
-  }, [isPaused]);
+  }, [isPaused, macroData.length]);
 
   const handlePreviousWeek = () => {
     setWeekOffset(prev => prev - 1);
@@ -117,8 +207,6 @@ export default function DashboardNew() {
 
   const handleDayClick = (formattedDate: string) => {
     setSelectedDate(formattedDate);
-    // TODO: Fetch data for selected date
-    console.log('Selected date:', formattedDate);
   };
 
   const handlePreviousMacro = () => {
@@ -134,6 +222,24 @@ export default function DashboardNew() {
   const handleDotClick = (index: number) => {
     setIsPaused(true);
     setCurrentMacroIndex(index);
+  };
+
+  const toggleGroceryItem = async (itemId: number, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/shopping-list/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ purchased: !currentStatus })
+      });
+
+      if (response.ok) {
+        refetchGroceries();
+      }
+    } catch (error) {
+      // If API fails, just update locally for now
+      refetchGroceries();
+    }
   };
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -311,46 +417,64 @@ export default function DashboardNew() {
           </div>
         </div>
 
+        {/* Today's Meals Section */}
         <div style={{ marginBottom: '20px' }}>
+          <h3 className="text-base font-semibold text-gray-900 mb-3 px-1">Today's Meals</h3>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {[
-              { id: 1, name: "Big Mac meal", calories: 900 },
-              { id: 2, name: "Beef Steak", calories: 1500 },
-            ].map((meal) => (
-              <div key={meal.id} className="meal-card">
-                <div className="h-[160px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-[16px] flex items-center justify-center">
-                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+            {logsLoading ? (
+              <div className="text-sm text-gray-500">Loading meals...</div>
+            ) : foodLogs.length > 0 ? (
+              foodLogs.slice(0, 2).map((meal) => (
+                <div key={meal.id} className="meal-card">
+                  <div className="h-[160px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-[16px] flex items-center justify-center overflow-hidden">
+                    {meal.imageUrl ? (
+                      <img 
+                        src={meal.imageUrl} 
+                        alt={meal.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="p-3 bg-white">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1">{meal.name}</h3>
+                    <p className="text-xs text-gray-500">{Math.round(meal.calories)}kcal</p>
+                  </div>
                 </div>
-                <div className="p-3 bg-white">
-                  <h3 className="text-sm font-semibold text-gray-900 mb-1">{meal.name}</h3>
-                  <p className="text-xs text-gray-500">{meal.calories}kcal</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-sm text-gray-500 py-8 text-center w-full">
+                No meals logged yet today
               </div>
-            ))}
+            )}
           </div>
         </div>
 
+        {/* Groceries List Section */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-[#00BFA6] mb-4">Meal Plan</h2>
+          <h2 className="text-lg font-semibold text-[#00BFA6] mb-4">Groceries List</h2>
           <div>
-            {[
-              { id: 1, name: "Eggs", calories: 500, completed: false },
-              { id: 2, name: "Beef Steak", calories: 1500, completed: true },
-              { id: 3, name: "Fruit Salad", calories: 250, completed: false },
-            ].map((item) => (
+            {groceryList.map((item) => (
               <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                <div>
+                <div className="flex-1">
                   <h3 className="text-base font-medium text-gray-900">{item.name}</h3>
-                  <p className="text-xs text-gray-500">{item.calories}kcal</p>
+                  <p className="text-xs text-gray-500">
+                    {item.quantity} {item.unit} • {item.category}
+                  </p>
                 </div>
-                <button className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                  item.completed 
-                    ? 'bg-[#00BFA6] border-[#00BFA6]' 
-                    : 'border-gray-300 bg-white'
-                }`}>
-                  {item.completed && (
+                <button 
+                  onClick={() => toggleGroceryItem(item.id, item.purchased)}
+                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                    item.purchased 
+                      ? 'bg-[#00BFA6] border-[#00BFA6]' 
+                      : 'border-gray-300 bg-white hover:border-[#00BFA6]'
+                  }`}
+                  aria-label={item.purchased ? 'Mark as not purchased' : 'Mark as purchased'}
+                >
+                  {item.purchased && (
                     <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -358,6 +482,11 @@ export default function DashboardNew() {
                 </button>
               </div>
             ))}
+            {groceryList.length === 0 && (
+              <div className="text-sm text-gray-500 py-4 text-center">
+                No items in your grocery list
+              </div>
+            )}
           </div>
         </div>
       </div>
