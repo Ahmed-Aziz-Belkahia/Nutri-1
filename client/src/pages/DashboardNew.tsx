@@ -126,18 +126,29 @@ export default function DashboardNew() {
   const { data: groceryList = [], refetch: refetchGroceries } = useQuery<GroceryItem[]>({
     queryKey: ['grocery-list'],
     queryFn: async () => {
-      const response = await fetch('/api/shopping-list', {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        // Return mock data if API not available
+      try {
+        const response = await fetch('/api/shopping-list', {
+          credentials: 'include'
+        });
+        if (!response.ok) {
+          // Return mock data if API not available
+          return [
+            { id: 1, name: "Eggs", quantity: 12, unit: "pcs", category: "Dairy", purchased: false },
+            { id: 2, name: "Beef Steak", quantity: 500, unit: "g", category: "Meat", purchased: true },
+            { id: 3, name: "Mixed Fruits", quantity: 1, unit: "kg", category: "Fruits", purchased: false }
+          ];
+        }
+        const data = await response.json();
+        // Ensure we return an array
+        return Array.isArray(data) ? data : (data.items || []);
+      } catch (error) {
+        // Return mock data on error
         return [
           { id: 1, name: "Eggs", quantity: 12, unit: "pcs", category: "Dairy", purchased: false },
           { id: 2, name: "Beef Steak", quantity: 500, unit: "g", category: "Meat", purchased: true },
           { id: 3, name: "Mixed Fruits", quantity: 1, unit: "kg", category: "Fruits", purchased: false }
         ];
       }
-      return response.json();
     }
   });
 
@@ -457,32 +468,33 @@ export default function DashboardNew() {
         <div className="card">
           <h2 className="text-lg font-semibold text-[#00BFA6] mb-4">Groceries List</h2>
           <div>
-            {groceryList.map((item) => (
-              <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                <div className="flex-1">
-                  <h3 className="text-base font-medium text-gray-900">{item.name}</h3>
-                  <p className="text-xs text-gray-500">
-                    {item.quantity} {item.unit} • {item.category}
-                  </p>
+            {Array.isArray(groceryList) && groceryList.length > 0 ? (
+              groceryList.map((item) => (
+                <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                  <div className="flex-1">
+                    <h3 className="text-base font-medium text-gray-900">{item.name}</h3>
+                    <p className="text-xs text-gray-500">
+                      {item.quantity} {item.unit} • {item.category}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => toggleGroceryItem(item.id, item.purchased)}
+                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      item.purchased 
+                        ? 'bg-[#00BFA6] border-[#00BFA6]' 
+                        : 'border-gray-300 bg-white hover:border-[#00BFA6]'
+                    }`}
+                    aria-label={item.purchased ? 'Mark as not purchased' : 'Mark as purchased'}
+                  >
+                    {item.purchased && (
+                      <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                <button 
-                  onClick={() => toggleGroceryItem(item.id, item.purchased)}
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                    item.purchased 
-                      ? 'bg-[#00BFA6] border-[#00BFA6]' 
-                      : 'border-gray-300 bg-white hover:border-[#00BFA6]'
-                  }`}
-                  aria-label={item.purchased ? 'Mark as not purchased' : 'Mark as purchased'}
-                >
-                  {item.purchased && (
-                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            ))}
-            {groceryList.length === 0 && (
+              ))
+            ) : (
               <div className="text-sm text-gray-500 py-4 text-center">
                 No items in your grocery list
               </div>
