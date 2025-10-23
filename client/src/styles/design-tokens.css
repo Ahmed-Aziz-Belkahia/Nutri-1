@@ -11,30 +11,30 @@
      COLOR SYSTEM
      ============================================ */
   
-  /* Primary Brand Colors */
-  --color-primary: #00a9a5;
-  --color-primary-rgb: 0, 169, 165;
-  --color-primary-light: #26c6c3;
-  --color-primary-dark: #008a87;
+  /* Primary Brand Colors - Updated to match Figma */
+  --color-primary: #00BFA6;
+  --color-primary-rgb: 0, 191, 166;
+  --color-primary-light: #4DDEBC;
+  --color-primary-dark: #00A693;
   
-  /* Background Colors */
-  --color-bg-gradient-start: #d3f0ff;
-  --color-bg-gradient-end: #fefefe;
+  /* Background Colors - Updated to match Figma */
+  --color-bg-gradient-start: #E8F5F2;
+  --color-bg-gradient-end: #FFFFFF;
   --color-bg-white: #ffffff;
-  --color-bg-card: rgba(255, 255, 255, 0.6);
-  --color-bg-glass: rgba(255, 255, 255, 0.6);
+  --color-bg-card: rgba(255, 255, 255, 0.95);
+  --color-bg-glass: rgba(255, 255, 255, 0.95);
   
-  /* Text Colors */
-  --color-text-primary: #1f1f1e;
-  --color-text-secondary: #888888;
-  --color-text-tertiary: #9e9e9e;
-  --color-text-muted: rgba(3, 49, 75, 0.8);
-  --color-text-heading: #1f1e1f;
+  /* Text Colors - Updated to match Figma */
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-muted: #6B7280;
+  --color-text-heading: #1A1A1A;
   
-  /* UI Element Colors */
-  --color-border: #e0e0e0;
-  --color-border-light: rgba(0, 0, 0, 0.1);
-  --color-divider: #d4d4d4;
+  /* UI Element Colors - Updated to match Figma */
+  --color-border: #E5E7EB;
+  --color-border-light: rgba(0, 0, 0, 0.06);
+  --color-divider: #E5E7EB;
   
   /* Semantic Colors */
   --color-success: #4caf50;
@@ -58,17 +58,17 @@
      GLASSMORPHISM EFFECTS
      ============================================ */
   
-  /* Glass Background Opacity */
-  --glass-bg-opacity: 0.6;
-  --glass-bg-strong: rgba(255, 255, 255, 0.9);
-  --glass-bg-medium: rgba(255, 255, 255, 0.6);
-  --glass-bg-light: rgba(255, 255, 255, 0.4);
+  /* Glass Background Opacity - Updated */
+  --glass-bg-opacity: 0.95;
+  --glass-bg-strong: rgba(255, 255, 255, 0.95);
+  --glass-bg-medium: rgba(255, 255, 255, 0.95);
+  --glass-bg-light: rgba(255, 255, 255, 0.8);
   
-  /* Blur Strengths */
-  --blur-light: 10px;
-  --blur-medium: 15.7px;
-  --blur-strong: 20px;
-  --blur-extra: 30px;
+  /* Blur Strengths - Updated for cleaner look */
+  --blur-light: 8px;
+  --blur-medium: 12px;
+  --blur-strong: 16px;
+  --blur-extra: 24px;
 
   /* ============================================
      SPACING SCALE
@@ -109,15 +109,15 @@
      SHADOWS
      ============================================ */
   
-  --shadow-sm: 0px 2px 4px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0px 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 14px 23px 97px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 14px 24px 101px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0px 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0px 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0px 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0px 8px 24px rgba(0, 0, 0, 0.1);
   
-  /* Component-specific shadows */
-  --shadow-card: 14px 23px 97px rgba(0, 0, 0, 0.08);
-  --shadow-button: 0px 4px 12px rgba(38, 168, 255, 0.2);
-  --shadow-nav: 0px -2px 20px rgba(0, 0, 0, 0.05);
+  /* Component-specific shadows - Updated */
+  --shadow-card: 0px 4px 20px rgba(0, 0, 0, 0.06);
+  --shadow-button: 0px 2px 8px rgba(0, 191, 166, 0.25);
+  --shadow-nav: 0px -4px 20px rgba(0, 0, 0, 0.08);
 
   /* ============================================
      TYPOGRAPHY SCALE
@@ -129,19 +129,19 @@
   --font-family-heading: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
                           "Helvetica Neue", Arial, sans-serif;
   
-  /* Font Sizes */
-  --font-size-xs: 10px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
+  /* Font Sizes - Updated to match Figma */
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
   --font-size-md: 15px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 20px;
-  --font-size-3xl: 21px;
-  --font-size-4xl: 24px;
-  --font-size-5xl: 28px;
-  --font-size-6xl: 32px;
-  --font-size-7xl: 41px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 32px;
+  --font-size-5xl: 36px;
+  --font-size-6xl: 40px;
+  --font-size-7xl: 48px;
   
   /* Line Heights */
   --line-height-tight: 1.2;

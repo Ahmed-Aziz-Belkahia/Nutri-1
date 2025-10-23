@@ -169,18 +169,19 @@ export default function DashboardNew() {
 
   return (
     <div className="gradient-bg min-h-screen pb-32">
+      <div className="max-w-md mx-auto px-5">
       <header className="header">
         <div className="profile-avatar">
           {user?.profileImage ? (
             <img 
               src={user.profileImage} 
               alt={user.email} 
-              className="profile-avatar-image" 
+              className="w-full h-full object-cover" 
             />
           ) : (
-            <div className="profile-avatar-initial">
-              {user?.email?.charAt(0).toUpperCase() || "U"}
-            </div>
+            <span>
+              {user?.email?.charAt(0).toUpperCase() || "A"}
+            </span>
           )}
         </div>
         <div className="profile-info">
@@ -188,7 +189,7 @@ export default function DashboardNew() {
           <p className="profile-name">{user?.email?.split("@")[0] || "User"}</p>
         </div>
         <button className="notification-button" aria-label="Notifications">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </button>
@@ -207,24 +208,20 @@ export default function DashboardNew() {
           </button>
           
           <div className="day-selector-scroll">
-            {weekDays.map((day, index) => (
-              <div key={day.formattedDate} className="flex items-center">
-                {index > 0 && <div className="day-divider" />}
-                <button 
-                  className={`day-button ${day.formattedDate === selectedDate ? 'active' : ''} ${day.isToday ? 'is-today' : ''}`}
-                  onClick={() => handleDayClick(day.formattedDate)}
-                  aria-label={`${day.dayName} ${day.dayNumber}`}
-                >
-                  <div className="flex flex-col items-center">
-                    <span className="text-xs font-medium" style={{ fontSize: '10px', marginBottom: '2px' }}>
-                      {day.dayName}
-                    </span>
-                    <span className="text-sm font-bold">
-                      {day.dayNumber}
-                    </span>
-                  </div>
-                </button>
-              </div>
+            {weekDays.map((day) => (
+              <button 
+                key={day.formattedDate}
+                className={`day-button ${day.formattedDate === selectedDate ? 'active' : ''} ${day.isToday ? 'is-today' : ''}`}
+                onClick={() => handleDayClick(day.formattedDate)}
+                aria-label={`${day.dayName} ${day.dayNumber}`}
+              >
+                <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                  {day.dayName}
+                </span>
+                <span style={{ fontSize: '15px', fontWeight: 600 }}>
+                  {day.dayNumber}
+                </span>
+              </button>
             ))}
           </div>
           
@@ -240,92 +237,73 @@ export default function DashboardNew() {
         </div>
       </div>
 
-      <div className="container">
-        <div className="card section">
-          <div className="macro-carousel-wrapper">
+      <div className="px-5">
+        <div className="card" style={{ marginBottom: '20px' }}>
+          <div className="flex items-center justify-between gap-2">
             <button 
-              className="macro-arrow macro-arrow-left" 
+              className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors" 
               onClick={handlePreviousMacro}
               aria-label="Previous macro"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
 
-            <div 
-              className="macro-carousel-scroll"
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            >
-              <div 
-                className="macro-carousel-track"
-                style={{ 
-                  transform: `translateX(-${currentMacroIndex * 100}%)`,
-                  transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-                }}
-              >
-                {macroData.map((macro) => {
-                  const remaining = macro.target - macro.current;
-                  const circumference = 2 * Math.PI * 38;
-                  const strokeDasharray = `${(macro.percentage / 100) * circumference} ${circumference}`;
-                  
-                  return (
-                    <div key={macro.id} className="macro-slide">
-                      <div className="macro-slide-content">
-                        <div className="macro-info">
-                          <h2 className="macro-title" style={{ color: macro.color }}>
-                            {macro.title}
-                          </h2>
-                          <p className="macro-values">
-                            <span className="macro-current" style={{ color: macro.color }}>
-                              {macro.current} {macro.unit}
-                            </span>
-                            <span className="macro-target"> of {macro.target} {macro.unit}</span>
-                          </p>
-                          <div className="stats-badge">
-                            <span className="stats-badge-text">
-                              {remaining > 0 ? `${remaining} ${macro.unit} left` : 'Target reached!'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="progress-circle-container">
-                          <svg className="progress-circle-svg">
-                            <circle className="progress-circle-bg" cx="45" cy="45" r="38" />
-                            <circle 
-                              className="progress-circle-fg" 
-                              cx="45" 
-                              cy="45" 
-                              r="38" 
-                              strokeDasharray={strokeDasharray}
-                            />
-                          </svg>
-                          <div className="progress-circle-text">{macro.percentage}%</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+            <div className="flex-1 flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  {currentMacro.title}
+                </h2>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-base font-semibold" style={{ color: currentMacro.color }}>
+                    {currentMacro.current} {currentMacro.unit}
+                  </span>
+                  <span className="text-sm text-gray-500">of {currentMacro.target} {currentMacro.unit}</span>
+                </div>
+                <div className="inline-flex items-center px-3 py-1 rounded-full mt-2" style={{ backgroundColor: 'rgba(0, 191, 166, 0.1)' }}>
+                  <span className="text-xs font-medium" style={{ color: currentMacro.color }}>
+                    {remaining > 0 ? `${remaining} ${currentMacro.unit} left` : 'Target reached!'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="progress-circle-container">
+                <svg className="progress-circle-svg">
+                  <circle className="progress-circle-bg" cx="40" cy="40" r="34" />
+                  <circle 
+                    className="progress-circle-fg" 
+                    cx="40" 
+                    cy="40" 
+                    r="34" 
+                    strokeDasharray={strokeDasharray}
+                    style={{ stroke: currentMacro.color }}
+                  />
+                </svg>
+                <div className="progress-circle-text">{currentMacro.percentage}%</div>
               </div>
             </div>
 
             <button 
-              className="macro-arrow macro-arrow-right" 
+              className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center hover:bg-gray-100 transition-colors" 
               onClick={handleNextMacro}
               aria-label="Next macro"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
 
-          <div className="pagination-dots">
+          <div className="flex justify-center gap-2 mt-4">
             {macroData.map((macro, index) => (
               <button
                 key={macro.id}
-                className={`pagination-dot ${index === currentMacroIndex ? 'active' : ''}`}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentMacroIndex 
+                    ? 'w-6 bg-[#00BFA6]' 
+                    : 'bg-gray-300'
+                }`}
                 onClick={() => handleDotClick(index)}
                 aria-label={`View ${macro.title}`}
               />
@@ -333,43 +311,47 @@ export default function DashboardNew() {
           </div>
         </div>
 
-        <div className="section">
-          <div className="carousel scrollbar-hide">
+        <div style={{ marginBottom: '20px' }}>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {[
               { id: 1, name: "Big Mac meal", calories: 900 },
               { id: 2, name: "Beef Steak", calories: 1500 },
             ].map((meal) => (
               <div key={meal.id} className="meal-card">
-                <div className="h-[204px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-[20px] flex items-center justify-center">
-                  <svg className="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="h-[160px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-[16px] flex items-center justify-center">
+                  <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <div className="meal-card-content">
-                  <h3 className="meal-card-title">{meal.name}</h3>
-                  <p className="meal-card-calories">{meal.calories}kcal</p>
+                <div className="p-3 bg-white">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-1">{meal.name}</h3>
+                  <p className="text-xs text-gray-500">{meal.calories}kcal</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="card section">
-          <h2 className="section-heading" style={{ marginBottom: '24px' }}>Meal Plan</h2>
+        <div className="card">
+          <h2 className="text-lg font-semibold text-[#00BFA6] mb-4">Meal Plan</h2>
           <div>
             {[
               { id: 1, name: "Eggs", calories: 500, completed: false },
               { id: 2, name: "Beef Steak", calories: 1500, completed: true },
               { id: 3, name: "Fruit Salad", calories: 250, completed: false },
-            ].map((item, index) => (
-              <div key={item.id} className="meal-plan-item" style={{ marginTop: index > 0 ? '24px' : '0' }}>
-                <div className="meal-plan-info">
-                  <h3 className="meal-plan-name">{item.name}</h3>
-                  <p className="meal-plan-calories">{item.calories}kcal</p>
+            ].map((item) => (
+              <div key={item.id} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                <div>
+                  <h3 className="text-base font-medium text-gray-900">{item.name}</h3>
+                  <p className="text-xs text-gray-500">{item.calories}kcal</p>
                 </div>
-                <button className={`meal-plan-checkbox ${item.completed ? 'checked' : ''}`} aria-label={`Mark ${item.name} as ${item.completed ? 'incomplete' : 'complete'}`}>
+                <button className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                  item.completed 
+                    ? 'bg-[#00BFA6] border-[#00BFA6]' 
+                    : 'border-gray-300 bg-white'
+                }`}>
                   {item.completed && (
-                    <svg className="meal-plan-checkbox-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -381,6 +363,7 @@ export default function DashboardNew() {
       </div>
 
       <Navbar />
+      </div>
     </div>
   );
 }
