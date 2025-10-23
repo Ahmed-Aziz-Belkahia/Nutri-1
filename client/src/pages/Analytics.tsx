@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser, type UserProfile as HookUserProfile } from "../hooks/use-user";
+import Navigation from "../components/Navigation";
 import HeightWeightInput from "@/components/HeightWeightInput";
 import { ExternalLink, BookOpen } from 'lucide-react';
 import { NUTRITION_SOURCES, CALCULATION_METHODS } from '@/lib/nutrition';
@@ -86,10 +87,10 @@ export default function Analytics() {
   const bodyFatPercentage = user?.profile?.bodyFatPercentage || calculateBodyFat(currentWeight, height);
 
   return (
-    <div className="flex flex-col min-h-screen gradient-bg">
-      <div className="flex-1 p-4 space-y-6 pb-24">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex-1 p-4 space-y-6">
         {/* Height Input Card */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">📏</span>
             <span className="text-lg">Height {height} cm</span>
@@ -108,7 +109,7 @@ export default function Analytics() {
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingHeight(false)}>
                   Cancel
                 </Button>
-                <Button className="flex-1 bg-[#00a9a5] hover:bg-[#008a87]" onClick={handleUpdateHeight}>
+                <Button className="flex-1" onClick={handleUpdateHeight}>
                   Save
                 </Button>
               </div>
@@ -116,7 +117,7 @@ export default function Analytics() {
           ) : (
             <Button 
               variant="outline" 
-              className="w-full border-2 hover:bg-white/50"
+              className="w-full border-2 hover:bg-gray-50"
               onClick={() => setIsUpdatingHeight(true)}
             >
               Update Height
@@ -125,7 +126,7 @@ export default function Analytics() {
         </Card>
 
         {/* Body Fat Percentage Card */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <h2 className="text-lg mb-4">Body Fat Percentage</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
@@ -133,15 +134,15 @@ export default function Analytics() {
                 <div className="text-2xl font-medium">{bodyFatPercentage}%</div>
                 <div className="text-sm text-gray-500">Estimated body fat</div>
                 <div className="inline-flex items-center gap-1 mt-1">
-                  <div className="w-2 h-2 rounded-full bg-[#00a9a5]"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
                   <span className="text-sm">Based on BMI calculation</span>
                 </div>
               </div>
             </div>
 
-            <div className="relative h-2 bg-gradient-to-r from-[#00a9a5] via-yellow-500 to-red-500 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-full overflow-hidden">
               <div 
-                className="absolute w-2 h-4 bg-[#00a9a5] -top-1 rounded-full"
+                className="absolute w-2 h-4 bg-black -top-1 rounded-full"
                 style={{ left: `${(bodyFatPercentage / 40) * 100}%` }}
               />
             </div>
@@ -157,7 +158,7 @@ export default function Analytics() {
         </Card>
 
         {/* Goal Weight Card */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-amber-500 text-xl">🏆</span>
             <span className="text-lg">Calorie Goal {user?.profile?.goals?.calories ?? 2000} kcal</span>
@@ -174,7 +175,7 @@ export default function Analytics() {
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingGoal(false)}>
                   Cancel
                 </Button>
-                <Button className="flex-1 bg-[#00a9a5] hover:bg-[#008a87]" onClick={handleUpdateGoalWeight}>
+                <Button className="flex-1" onClick={handleUpdateGoalWeight}>
                   Save
                 </Button>
               </div>
@@ -182,7 +183,7 @@ export default function Analytics() {
           ) : (
             <Button 
               variant="outline" 
-              className="w-full border-2 hover:bg-white/50"
+              className="w-full border-2 hover:bg-gray-50"
               onClick={() => setIsUpdatingGoal(true)}
             >
               Update
@@ -191,7 +192,7 @@ export default function Analytics() {
         </Card>
 
         {/* Current Weight */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">⚖️</span>
             <span className="text-lg">Current Weight {currentWeight} kg</span>
@@ -211,7 +212,7 @@ export default function Analytics() {
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingWeight(false)}>
                   Cancel
                 </Button>
-                <Button className="flex-1 bg-[#00a9a5] text-white hover:bg-[#008a87]" onClick={handleUpdateWeight}>
+                <Button className="flex-1 bg-black text-white hover:bg-black/90" onClick={handleUpdateWeight}>
                   Save
                 </Button>
               </div>
@@ -219,7 +220,7 @@ export default function Analytics() {
           ) : (
             <Button 
               variant="default" 
-              className="w-full bg-[#00a9a5] text-white hover:bg-[#008a87]"
+              className="w-full bg-black text-white hover:bg-black/90"
               onClick={() => setIsUpdatingWeight(true)}
             >
               Update your weight
@@ -228,7 +229,7 @@ export default function Analytics() {
         </Card>
 
         {/* BMI Section */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <h2 className="text-lg mb-4">Your BMI</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
@@ -236,7 +237,7 @@ export default function Analytics() {
                 <div className="text-2xl font-medium">{bmi}</div>
                 <div className="text-sm text-gray-500">Your BMI is</div>
                 <div className="inline-flex items-center gap-1 mt-1">
-                  <div className="w-2 h-2 rounded-full bg-[#00a9a5]"></div>
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span className="text-sm">Healthy</span>
                 </div>
               </div>
@@ -245,22 +246,22 @@ export default function Analytics() {
               </Button>
             </div>
 
-            <div className="relative h-2 bg-gradient-to-r from-[#00a9a5] via-yellow-500 to-red-500 rounded-full overflow-hidden">
+            <div className="relative h-2 bg-gradient-to-r from-[#0177FB] via-[#4CD964] to-[#FF3B30] rounded-full overflow-hidden">
               <div 
-                className="absolute w-2 h-4 bg-[#00a9a5] -top-1 rounded-full"
+                className="absolute w-2 h-4 bg-black -top-1 rounded-full"
                 style={{ left: `${(bmi / 40) * 100}%` }}
               />
             </div>
 
             <div className="flex justify-between text-xs text-gray-500">
               <span>Underweight</span>
-              <span className="text-[#00a9a5]">Healthy</span>
+              <span className="text-green-500">Healthy</span>
               <span>Overweight</span>
               <span className="text-right">Obese</span>
             </div>
             
             {/* BMI Source Information */}
-            <div className="mt-3 pt-3 border-t border-white/20">
+            <div className="mt-3 pt-3 border-t border-gray-100">
               <div className="text-xs text-gray-500 mb-1">
                 Formuła BMI: waga (kg) ÷ wzrost² (m²)
               </div>
@@ -268,7 +269,7 @@ export default function Analytics() {
                 href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-[#00a9a5] hover:text-[#008a87]"
+                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800"
               >
                 <span>Źródło: WHO</span>
                 <ExternalLink className="w-3 h-3" />
@@ -278,7 +279,7 @@ export default function Analytics() {
         </Card>
         
         {/* Medical Sources Section */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <Button
             variant="ghost"
             className="w-full flex items-center justify-between p-0"
@@ -300,7 +301,7 @@ export default function Analytics() {
                 <h4 className="font-medium mb-2 text-sm text-gray-700">Metody obliczeń:</h4>
                 <div className="space-y-2">
                   {CALCULATION_METHODS.map((method, index) => (
-                    <div key={index} className="p-3 bg-white/40 rounded-lg text-sm">
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg text-sm">
                       <div className="font-medium">{method.method}</div>
                       <div className="text-gray-600 text-xs mt-1 whitespace-pre-line">{method.formula}</div>
                       <div className="text-gray-500 text-xs mt-1">{method.source}</div>
@@ -319,22 +320,22 @@ export default function Analytics() {
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-3 bg-[#00a9a5]/10 rounded-lg hover:bg-[#00a9a5]/20 transition-colors"
+                      className="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="font-medium text-sm text-gray-900">{source.title}</div>
-                          <div className="text-xs text-gray-700 mt-1">{source.organization}</div>
-                          <div className="text-xs text-gray-600 mt-1">{source.description}</div>
+                          <div className="font-medium text-sm text-blue-900">{source.title}</div>
+                          <div className="text-xs text-blue-700 mt-1">{source.organization}</div>
+                          <div className="text-xs text-blue-600 mt-1">{source.description}</div>
                         </div>
-                        <ExternalLink className="w-3 h-3 text-[#00a9a5] mt-1 flex-shrink-0 ml-2" />
+                        <ExternalLink className="w-3 h-3 text-blue-600 mt-1 flex-shrink-0 ml-2" />
                       </div>
                     </a>
                   ))}
                 </div>
               </div>
               
-              <div className="text-xs text-gray-500 text-center pt-2 border-t border-white/20">
+              <div className="text-xs text-gray-500 text-center pt-2 border-t border-gray-200">
                 Ta aplikacja przedstawia informacje medyczne wyłącznie w celach edukacyjnych. 
                 Zawsze skonsultuj się z lekarzem przed podejmowaniem decyzji dotyczących zdrowia.
               </div>
@@ -342,7 +343,7 @@ export default function Analytics() {
           )}
         </Card>
         {/* Goal Progress */}
-        <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+        <Card className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg">Goal Progress</h2>
             <div className="flex items-center gap-1">
@@ -352,14 +353,14 @@ export default function Analytics() {
           </div>
 
           {/* Time Period Selector */}
-          <div className="flex gap-2 mb-6 bg-white/20 backdrop-blur-lg p-1 rounded-lg">
+          <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
             {["90 Days", "6 Months", "1 Year", "All time"].map((period) => (
               <Button
                 key={period}
                 variant={selectedPeriod === period ? "default" : "ghost"}
                 className={`flex-1 h-8 text-sm ${
                   selectedPeriod === period 
-                    ? "bg-[#00a9a5] text-white shadow-sm" 
+                    ? "bg-white shadow-sm text-black" 
                     : "text-gray-500 hover:text-gray-900 hover:bg-transparent"
                 }`}
                 onClick={() => setSelectedPeriod(period as "90 Days" | "6 Months" | "1 Year" | "All time")}
@@ -370,21 +371,21 @@ export default function Analytics() {
           </div>
 
           {/* Progress Graph */}
-          <div className="h-48 bg-white/30 rounded-lg" />
+          <div className="h-48 bg-gray-50 rounded-lg" />
         </Card>
         {/* Nutrition Section */}
         <section className="space-y-4">
           <h2 className="text-lg font-medium">Nutrition</h2>
 
           {/* Time Period Selector */}
-          <div className="flex gap-2 mb-4 bg-white/20 backdrop-blur-lg p-1 rounded-lg">
+          <div className="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg">
             {["This week", "Last week", "2 wks. ago", "3 wks. ago"].map((period) => (
               <Button
                 key={period}
                 variant="ghost"
                 className={`flex-1 h-8 text-sm ${
                   selectedNutritionPeriod === period
-                    ? "bg-[#00a9a5] text-white shadow-sm" 
+                    ? "bg-white shadow-sm text-black" 
                     : "text-gray-500 hover:text-gray-900 hover:bg-transparent"
                 }`}
                 onClick={() => setSelectedNutritionPeriod(period as "This week" | "Last week" | "2 wks. ago" | "3 wks. ago")}
@@ -394,7 +395,7 @@ export default function Analytics() {
             ))}
           </div>
 
-          <Card className="p-4 bg-white/25 backdrop-blur-lg border border-white/40">
+          <Card className="p-4">
             <div className="space-y-4">
               <div className="flex justify-between">
                 <div>
@@ -414,7 +415,7 @@ export default function Analytics() {
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
                       <div key={day} className="flex-1 flex flex-col items-center">
                         <div 
-                          className="w-full bg-[#00a9a5] rounded-sm transition-all duration-300" 
+                          className="w-full bg-black rounded-sm transition-all duration-300" 
                           style={{ 
                             height: i === 2 ? '60%' : '0%',
                             opacity: i === 2 ? 1 : 0.1
@@ -438,6 +439,7 @@ export default function Analytics() {
           </Card>
         </section>
       </div>
+      <Navigation />
     </div>
   );
 }
