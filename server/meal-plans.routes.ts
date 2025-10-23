@@ -13,11 +13,13 @@ export function registerMealPlanRoutes(app: Express) {
   // Get today's meal plan - This endpoint must be defined before the :date route
   app.get("/api/meal-plans/today", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      // Get today's date in YYYY-MM-DD format
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
+      // Get the date from query parameter or default to today
+      const dateParam = req.query.date as string | undefined;
+      const targetDate = dateParam || new Date().toISOString().split('T')[0];
       
-      // Get the meal plan for today
+      console.log(`Fetching meal plan for date: ${targetDate}`);
+      
+      // Get the meal plan for the target date
       const todayPlan = await db
         .select({
           id: mealPlans.id,
@@ -31,7 +33,7 @@ export function registerMealPlanRoutes(app: Express) {
         .where(
           and(
             eq(mealPlans.userId, req.user.id),
-            eq(mealPlans.date, todayStr)
+            eq(mealPlans.date, targetDate)
           )
         )
         .orderBy(desc(mealPlans.createdAt))

@@ -2442,6 +2442,9 @@ export function registerRoutes(app: Express): Server {
 
       // Generate shopping list for ALL meal plans in the week (after loop completes)
       try {
+        // Import progress tracking functions
+        const { updateMealPlanProgress } = await import('./services/meal-plan-progress');
+        
         // Update progress to show shopping list generation
         updateMealPlanProgress(
           req.user!.id,
@@ -3512,6 +3515,180 @@ export function registerRoutes(app: Express): Server {
   });
   
   // Get current user's shopping list (all items)
+  // Get shopping list for a specific meal plan
+  app.get("/api/meal-plans/:id/shopping-list", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const mealPlanId = parseInt(req.params.id);
+
+      console.log(`[SHOPPING LIST] Fetching shopping list for meal plan ${mealPlanId}, user ${userId}`);
+
+      // Verify the meal plan belongs to the user
+      const mealPlanCheck = await db
+        .select()
+        .from(mealPlans)
+        .where(
+          and(
+            eq(mealPlans.id, mealPlanId),
+            eq(mealPlans.userId, userId)
+          )
+        )
+        .limit(1);
+
+      console.log(`[SHOPPING LIST] Meal plan check result:`, mealPlanCheck.length > 0 ? 'Found' : 'Not found');
+
+      if (!mealPlanCheck.length) {
+        console.log(`[SHOPPING LIST] Meal plan not found for ID ${mealPlanId}`);
+        return res.status(404).json({ error: 'Meal plan not found' });
+      }
+
+      // Get shopping list items for this meal plan  
+      console.log(`[SHOPPING LIST] Querying shopping list items with meal_plan_id=${mealPlanId}, userId=${userId}`);
+      const shoppingList = await db
+        .select()
+        .from(shoppingListItems)
+        .where(
+          and(
+            eq(shoppingListItems.userId, userId),
+            eq(shoppingListItems.meal_plan_id, mealPlanId)
+          )
+        )
+        .orderBy(shoppingListItems.category, shoppingListItems.name);
+
+      console.log(`[SHOPPING LIST] Found ${shoppingList.length} existing shopping list items`);
+
+      // If no shopping list exists, generate it from the meal plan recipes
+      if (shoppingList.length === 0) {
+        console.log('[SHOPPING LIST] No shopping list found, generating from recipes...');
+        
+        // Get all recipes for this meal plan
+        const mealRecipes = await db
+          .select({
+            recipeId: recipesInMealPlan.recipeId,
+            ingredients: recipes.ingredients
+          })
+          .from(recipesInMealPlan)
+          .innerJoin(recipes, eq(recipes.id, recipesInMealPlan.recipeId))
+          .where(eq(recipesInMealPlan.mealPlanId, mealPlanId));
+
+        console.log(`[SHOPPING LIST] Found ${mealRecipes.length} recipes in meal plan`);
+        console.log(`[SHOPPING LIST] Recipe ingredients:`, mealRecipes.map(r => ({ 
+          recipeId: r.recipeId, 
+          ingredientsType: typeof r.ingredients,
+          ingredientsPreview: typeof r.ingredients === 'string' ? r.ingredients.substring(0, 100) : 'array'
+        })));
+
+        const ingredientMap = new Map<string, { quantity: number; unit: string; category: string }>();
+
+        // Helper function to categorize ingredients
+        const categorizeIngredient = (name: string): string => {
+          const lowerName = name.toLowerCase();
+          
+          if (/chicken|beef|pork|lamb|fish|salmon|tuna|shrimp|turkey|meat/i.test(lowerName)) {
+            return 'Meat & Seafood';
+          } else if (/milk|cheese|yogurt|butter|egg|cream|dairy/i.test(lowerName)) {
+            return 'Dairy & Eggs';
+          } else if (/bread|pasta|rice|flour|cereal|oats|grain|quinoa/i.test(lowerName)) {
+            return 'Grains & Bread';
+          } else if (/apple|banana|orange|berry|fruit|grape|melon|lemon|lime/i.test(lowerName)) {
+            return 'Fruits';
+          } else if (/lettuce|tomato|onion|carrot|potato|vegetable|broccoli|spinach|pepper|cucumber/i.test(lowerName)) {
+            return 'Vegetables';
+          } else if (/salt|pepper|spice|herb|garlic|ginger|basil|oregano|cumin|paprika/i.test(lowerName)) {
+            return 'Spices & Seasonings';
+          } else if (/oil|vinegar|sauce|mayo|ketchup|mustard|soy|olive/i.test(lowerName)) {
+            return 'Condiments & Oils';
+          } else {
+            return 'Other';
+          }
+        };
+
+        for (const recipeData of mealRecipes) {
+          let ingredients: any[] = [];
+          
+          // Parse ingredients based on the format
+          if (typeof recipeData.ingredients === 'string') {
+            try {
+              ingredients = JSON.parse(recipeData.ingredients);
+            } catch {
+              // If not JSON, split by comma
+              ingredients = recipeData.ingredients.split(',').map(i => ({ 
+                name: i.trim(), 
+                quantity: 1, 
+                unit: 'unit' 
+              }));
+            }
+          } else if (Array.isArray(recipeData.ingredients)) {
+            ingredients = recipeData.ingredients;
+          }
+
+          // Aggregate ingredients
+          for (const ingredient of ingredients) {
+            const name = (ingredient.name || ingredient.ingredient || ingredient).toString().trim();
+            if (!name) continue;
+            
+            const quantity = parseFloat(ingredient.quantity) || 1;
+            const unit = ingredient.unit || 'unit';
+            const category = ingredient.category || categorizeIngredient(name);
+
+            if (ingredientMap.has(name)) {
+              const existing = ingredientMap.get(name)!;
+              // If same unit, add quantities
+              if (existing.unit === unit) {
+                existing.quantity += quantity;
+              }
+            } else {
+              ingredientMap.set(name, { quantity, unit, category });
+            }
+          }
+        }
+
+        console.log(`[SHOPPING LIST] Processed ${ingredientMap.size} unique ingredients`);
+        console.log(`[SHOPPING LIST] Ingredient map:`, Array.from(ingredientMap.entries()).slice(0, 5));
+
+        // Create shopping list items
+        const newShoppingList = [];
+        for (const [name, details] of ingredientMap.entries()) {
+          console.log(`[SHOPPING LIST] Creating item: ${name}, quantity: ${details.quantity}, unit: ${details.unit}, category: ${details.category}`);
+          const [item] = await db
+            .insert(shoppingListItems)
+            .values({
+              name,
+              quantity: details.quantity.toString(),
+              unit: details.unit,
+              category: details.category,
+              isPurchased: false,
+              userId: userId,
+              meal_plan_id: mealPlanId
+            })
+            .returning();
+          newShoppingList.push(item);
+        }
+
+        console.log(`[SHOPPING LIST] Generated ${newShoppingList.length} shopping list items`);
+        console.log(`[SHOPPING LIST] Returning new shopping list:`, newShoppingList);
+        return res.json(newShoppingList);
+      }
+
+      // Transform existing shopping list to match frontend format
+      const transformedList = shoppingList.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unit: item.unit,
+        category: item.category,
+        isPurchased: item.isPurchased,
+        purchased: item.isPurchased // Also include for backwards compatibility
+      }));
+
+      console.log(`[SHOPPING LIST] Returning existing shopping list with ${transformedList.length} items`);
+      res.json(transformedList);
+    } catch (error) {
+      console.error('[SHOPPING LIST] Error fetching meal plan shopping list:', error);
+      res.status(500).json({ error: 'Failed to fetch shopping list' });
+    }
+  });
+
   app.get("/api/shopping-list", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
       
@@ -3588,6 +3765,94 @@ export function registerRoutes(app: Express): Server {
         error: 'Failed to fetch shopping list',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
       });
+    }
+  });
+
+  // Update shopping list item (toggle purchased, etc.)
+  app.patch("/api/shopping-list/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const itemId = parseInt(req.params.id);
+      const { purchased } = req.body;
+      
+      console.log(`Updating shopping list item ${itemId} for user ${req.user!.id}`);
+
+      // Update the item
+      const [updatedItem] = await db
+        .update(shoppingListItems)
+        .set({ 
+          isPurchased: purchased !== undefined ? purchased : undefined,
+          updated_at: new Date()
+        })
+        .where(
+          and(
+            eq(shoppingListItems.id, itemId),
+            eq(shoppingListItems.userId, req.user!.id)
+          )
+        )
+        .returning();
+
+      if (!updatedItem) {
+        return res.status(404).json({ error: 'Shopping list item not found' });
+      }
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error('Error updating shopping list item:', error);
+      res.status(500).json({ error: 'Failed to update shopping list item' });
+    }
+  });
+
+  // Delete shopping list item
+  app.delete("/api/shopping-list/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const itemId = parseInt(req.params.id);
+      
+      console.log(`Deleting shopping list item ${itemId} for user ${req.user!.id}`);
+
+      const [deletedItem] = await db
+        .delete(shoppingListItems)
+        .where(
+          and(
+            eq(shoppingListItems.id, itemId),
+            eq(shoppingListItems.userId, req.user!.id)
+          )
+        )
+        .returning();
+
+      if (!deletedItem) {
+        return res.status(404).json({ error: 'Shopping list item not found' });
+      }
+
+      res.json({ success: true, deletedItem });
+    } catch (error) {
+      console.error('Error deleting shopping list item:', error);
+      res.status(500).json({ error: 'Failed to delete shopping list item' });
+    }
+  });
+
+  // Add new shopping list item
+  app.post("/api/shopping-list", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const { name, quantity, unit, category } = req.body;
+      
+      console.log(`Adding new shopping list item for user ${req.user!.id}`);
+
+      const [newItem] = await db
+        .insert(shoppingListItems)
+        .values({
+          name,
+          quantity: (quantity || 1).toString(),
+          unit: unit || 'unit',
+          category: category || 'Other',
+          isPurchased: false,
+          userId: req.user!.id
+        })
+        .returning();
+
+      res.json(newItem);
+    } catch (error) {
+      console.error('Error adding shopping list item:', error);
+      res.status(500).json({ error: 'Failed to add shopping list item' });
     }
   });
   
