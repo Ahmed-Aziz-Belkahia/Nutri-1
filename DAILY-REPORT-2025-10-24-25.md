@@ -36,6 +36,13 @@
 • Added navigate function for proper routing
 
 **Camera View (Photo Tab):**
+• High-quality camera configuration:
+  - Uses main wide-angle camera sensor (highest megapixel count)
+  - Resolution: 1920x1080 ideal, 1080x720 minimum
+  - Zoom: 1.0x (no ultra-wide or telephoto switching)
+  - Continuous autofocus and exposure modes
+  - Exact back camera selection with facingMode: { exact: 'environment' }
+  - Optimized for best food photography quality
 • Multi-layered loading spinner with dual rings:
   - Outer static ring: border-4 border-[#26A8FF]/20
   - Inner spinning ring: border-t-[#26A8FF] with animate-spin

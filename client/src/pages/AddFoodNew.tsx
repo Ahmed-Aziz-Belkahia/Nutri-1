@@ -69,10 +69,16 @@ export default function AddFoodNew() {
   const [cameraLoading, setCameraLoading] = useState(true);
   const [webcamKey, setWebcamKey] = useState(0);
   const [cameraConstraints] = useState<any>({
-    facingMode: 'environment',
+    facingMode: { exact: 'environment' },
     aspectRatio: 9/16,
-    width: { ideal: 1080 },
-    height: { ideal: 1920 }
+    width: { ideal: 1920, min: 1080 },
+    height: { ideal: 1080, min: 720 },
+    // Request highest quality camera (main wide-angle sensor)
+    advanced: [
+      { zoom: 1.0 }, // No zoom, use main camera
+      { focusMode: 'continuous' },
+      { exposureMode: 'continuous' }
+    ]
   });
 
   // Forms
@@ -104,7 +110,11 @@ export default function AddFoodNew() {
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' }, 
+        video: { 
+          facingMode: { exact: 'environment' },
+          width: { ideal: 1920, min: 1080 },
+          height: { ideal: 1080, min: 720 }
+        }, 
         audio: false 
       });
       stream.getTracks().forEach(t => t.stop());
