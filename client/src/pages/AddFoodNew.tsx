@@ -702,11 +702,15 @@ export default function AddFoodNew() {
       paddingTop: 'env(safe-area-inset-top, 0)',
       paddingBottom: 'env(safe-area-inset-bottom, 0)'
     }}>
-      {/* Header */}
+      {/* Header - Transparent for photo tab, solid for others */}
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="absolute top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm"
+        className={`absolute top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          activeTab === "photo"
+            ? "bg-gradient-to-b from-black/40 via-black/20 to-transparent border-b-0"
+            : "bg-white/80 backdrop-blur-xl border-b border-gray-100/50 shadow-sm"
+        }`}
         style={{ paddingTop: 'max(16px, env(safe-area-inset-top, 16px))' }}
       >
         <div className="px-5 pb-4">
@@ -714,67 +718,81 @@ export default function AddFoodNew() {
           <div className="flex items-center mb-4">
             <motion.button
               onClick={() => navigate(-1)}
-              className="w-10 h-10 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
+                activeTab === "photo"
+                  ? "bg-black/30 hover:bg-black/40 backdrop-blur-md"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
               whileTap={{ scale: 0.92 }}
             >
-              <ArrowLeft className="w-5 h-5 text-gray-700" />
+              <ArrowLeft className={`w-5 h-5 ${activeTab === "photo" ? "text-white" : "text-gray-700"}`} />
             </motion.button>
           </div>
 
-          {/* Title & Tabs */}
-          <div className="space-y-4">
-            <div>
-              <h1 className="text-2xl font-extrabold text-gray-900">Add Food</h1>
-              <p className="text-sm text-gray-500 mt-1">Log your meals effortlessly</p>
+          {/* Title & Tabs - Hidden on photo tab */}
+          {activeTab !== "photo" && (
+            <div className="space-y-4">
+              <div>
+                <h1 className="text-2xl font-extrabold text-gray-900">Add Food</h1>
+                <p className="text-sm text-gray-500 mt-1">Log your meals effortlessly</p>
+              </div>
             </div>
+          )}
 
-            {/* Tab Selector */}
-            <div className="bg-gray-100/80 backdrop-blur-sm rounded-2xl p-1.5 flex gap-1.5">
-              <motion.button
-                onClick={() => setActiveTab("photo")}
-                className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                  activeTab === "photo"
-                    ? "bg-white text-gray-900 shadow-md"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-                whileTap={{ scale: 0.97 }}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <Camera className="w-4 h-4" />
-                  <span>Photo</span>
-                </div>
-              </motion.button>
+          {/* Tab Selector */}
+          <div className={`rounded-2xl p-1.5 flex gap-1.5 transition-all ${
+            activeTab === "photo"
+              ? "bg-white/20 backdrop-blur-xl border border-white/30 mt-4"
+              : "bg-gray-100/80 backdrop-blur-sm mt-4"
+          }`}>
+            <motion.button
+              onClick={() => setActiveTab("photo")}
+              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                activeTab === "photo"
+                  ? "bg-white text-gray-900 shadow-md"
+                  : "text-white/90"
+              }`}
+              whileTap={{ scale: 0.97 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Camera className="w-4 h-4" />
+                <span>Photo</span>
+              </div>
+            </motion.button>
 
-              <motion.button
-                onClick={() => setActiveTab("gallery")}
-                className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                  activeTab === "gallery"
-                    ? "bg-white text-gray-900 shadow-md"
+            <motion.button
+              onClick={() => setActiveTab("gallery")}
+              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                activeTab === "gallery"
+                  ? "bg-white text-gray-900 shadow-md"
+                  : activeTab === "photo"
+                    ? "text-white/90"
                     : "text-gray-500 hover:text-gray-700"
-                }`}
-                whileTap={{ scale: 0.97 }}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <ImageIcon className="w-4 h-4" />
-                  <span>Gallery</span>
-                </div>
-              </motion.button>
+              }`}
+              whileTap={{ scale: 0.97 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <ImageIcon className="w-4 h-4" />
+                <span>Gallery</span>
+              </div>
+            </motion.button>
 
-              <motion.button
-                onClick={() => setActiveTab("manual")}
-                className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
-                  activeTab === "manual"
-                    ? "bg-white text-gray-900 shadow-md"
+            <motion.button
+              onClick={() => setActiveTab("manual")}
+              className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                activeTab === "manual"
+                  ? "bg-white text-gray-900 shadow-md"
+                  : activeTab === "photo"
+                    ? "text-white/90"
                     : "text-gray-500 hover:text-gray-700"
-                }`}
-                whileTap={{ scale: 0.97 }}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <Edit3 className="w-4 h-4" />
-                  <span>Manual</span>
-                </div>
-              </motion.button>
-            </div>
+              }`}
+              whileTap={{ scale: 0.97 }}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Edit3 className="w-4 h-4" />
+                <span>Manual</span>
+              </div>
+            </motion.button>
           </div>
         </div>
       </motion.div>
