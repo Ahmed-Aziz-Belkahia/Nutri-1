@@ -18,11 +18,13 @@ import EnhancedDashboard from "./pages/EnhancedDashboard";
 import DetailedNutrition from "./pages/DetailedNutrition";
 import SimpleNutritionDetail from "./pages/SimpleNutritionDetail";
 import AddFood from "./pages/AddFood";
+import AddFoodNew from "./pages/AddFoodNew";
 import EnhancedAddFood from "./pages/EnhancedAddFood";
 import FoodDetail from "./pages/FoodDetail";
 import MealDetail from "./pages/MealDetail";
 import Recipes from "./pages/Recipes";
 import RecipeDetail from "./pages/RecipeDetail";
+import CookingMode from "./pages/CookingMode";
 import CreateRecipe from "./pages/CreateRecipe";
 import RecipeScanner from "./pages/RecipeScanner";
 import IngredientConfirmation from "./pages/IngredientConfirmation";
@@ -310,6 +312,11 @@ function App() {
             </Route>
             <Route path="/add-food">
               <ProtectedRoute>
+                <AddFoodNew />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/add-food-old">
+              <ProtectedRoute>
                 <AddFood />
               </ProtectedRoute>
             </Route>
@@ -336,6 +343,11 @@ function App() {
             <Route path="/recipes/:id">
               <ProtectedRoute>
                 <RecipeDetail />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/cooking/:id">
+              <ProtectedRoute>
+                <CookingMode />
               </ProtectedRoute>
             </Route>
             <Route path="/create-recipe">

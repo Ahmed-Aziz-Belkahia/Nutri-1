@@ -49,6 +49,7 @@ import EmbeddedShoppingList from "@/components/EmbeddedShoppingList";
 import MealPlanningWelcome from "@/components/MealPlanningWelcome";
 import PullToRefresh from "@/components/PullToRefresh";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import GroceryList from "@/components/dashboard/GroceryList";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -248,6 +249,39 @@ export default function Recipes() {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
+
+  // Fetch grocery list for the selected meal plan
+  const { data: groceryList = [], isLoading: groceriesLoading, refetch: refetchGroceries } = useQuery({
+    queryKey: ["/api/shopping-list", selectedPlan?.id],
+    queryFn: async () => {
+      // If we have a meal plan, fetch its shopping list
+      if (selectedPlan && selectedPlan.id) {
+        const response = await fetch(`/api/meal-plans/${selectedPlan.id}/shopping-list`, {
+          credentials: "include",
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Transform the response to match our GroceryItem interface
+          if (Array.isArray(data)) {
+            return data.map((item: any) => ({
+              id: item.id,
+              name: item.name || item.ingredient,
+              quantity: item.quantity || '',
+              unit: item.unit || '',
+              category: item.category || '',
+              isPurchased: item.purchased || false,
+              purchased: item.purchased || false
+            }));
+          }
+          return data;
+        }
+      }
+      return [];
+    },
+    enabled: activeTab === "meal-plan" && !!selectedPlan?.id,
+  });
   
   // Mutation to mark a meal as complete or incomplete
   const markMealStatusMutation = useMutation({
@@ -411,6 +445,25 @@ export default function Recipes() {
       isPublic: true
     }
   });
+
+  // Toggle grocery item handler
+  const toggleGroceryItem = async (itemId: number, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/shopping-list/${itemId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ purchased: !currentStatus })
+      });
+
+      if (response.ok) {
+        refetchGroceries();
+      }
+    } catch (error) {
+      // If API fails, just update locally for now
+      refetchGroceries();
+    }
+  };
 
   const createRecipeMutation = useMutation({
     mutationFn: async (data: CreateRecipeForm) => {
@@ -982,7 +1035,11 @@ export default function Recipes() {
                     </div>
                   </div>
                   <div className="p-4 bg-transparent">
-                    <EmbeddedShoppingList />
+                    <GroceryList 
+                      groceryList={groceryList}
+                      mealPlan={selectedPlan}
+                      onToggleItem={toggleGroceryItem}
+                    />
                   </div>
                 </Card>
               </motion.section>

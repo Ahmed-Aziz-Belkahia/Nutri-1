@@ -38,7 +38,7 @@ export default function Navbar() {
         
         <button 
           className="nav-item nav-item-add"
-          onClick={() => navigate('/enhanced-add-food')}
+          onClick={() => navigate('/add-food')}
           aria-label="Add Food"
         >
           <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

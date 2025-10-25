@@ -7,16 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Webcam from 'react-webcam';
-import { Camera, ArrowLeft, ImageIcon, AlignLeft, AlertTriangle, Pencil, X, Loader2 } from "lucide-react";
+import { Camera, AlertTriangle, X, Loader2, Sparkles } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText } from '@/lib/vision';
-import CameraUI from '@/components/CameraUI';
-import CaptureButton from '@/components/CaptureButton';
 
 // Form schema for manual food entry
 const formSchema = z.object({
