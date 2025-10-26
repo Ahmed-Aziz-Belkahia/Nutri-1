@@ -168,7 +168,12 @@ export default function AddFoodNew() {
         image: screenshot
       };
       
-      await addFood(foodData);
+      const response = await addFood(foodData);
+      
+      // Store the food log ID for navigation to detail page
+      if (response?.log?.id) {
+        localStorage.setItem('analyzedFoodId', response.log.id.toString());
+      }
 
       toast({
         title: "Success! 🎉",
@@ -227,7 +232,17 @@ export default function AddFoodNew() {
             image: base64data
           };
           
-          await addFood(foodData);
+          const response = await addFood(foodData);
+          
+          // Store the food log ID for navigation to detail page
+          if (response?.log?.id) {
+            localStorage.setItem('analyzedFoodId', response.log.id.toString());
+          }
+
+          toast({
+            title: "Success! 🎉",
+            description: `Added ${result.name} to your food log`,
+          });
 
           toast({
             title: "Success! 🎉",

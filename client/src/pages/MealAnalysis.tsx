@@ -53,9 +53,16 @@ export default function MealAnalysis() {
         // Clean up image from localStorage after completion
         localStorage.removeItem('analyzingMealImage');
         
-        // Redirect to dashboard after showing success
+        // Get the food log ID and redirect to food detail page
+        const foodId = localStorage.getItem('analyzedFoodId');
         setTimeout(() => {
-          setLocation('/dashboard');
+          if (foodId) {
+            localStorage.removeItem('analyzedFoodId'); // Clean up
+            setLocation(`/food/${foodId}`);
+          } else {
+            // Fallback to dashboard if no ID found
+            setLocation('/dashboard');
+          }
         }, 2000);
       }
     };
