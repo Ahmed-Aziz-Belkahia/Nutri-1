@@ -12,7 +12,7 @@ import * as z from "zod";
 import Webcam from 'react-webcam';
 import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3 } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
-import { analyzeFoodText } from '@/lib/vision';
+import { analyzeFoodText, analyzeFoodImage } from '@/lib/vision';
 
 // Form schemas
 const formSchema = z.object({
@@ -137,16 +137,43 @@ export default function AddFoodNew() {
         throw new Error("Failed to capture image");
       }
 
+      setIsAnalyzing(true);
+
       toast({
         title: "Photo Captured",
-        description: "Analyzing your meal...",
+        description: "Analyzing your meal with AI...",
       });
 
-      localStorage.setItem('pendingFoodImage', screenshot);
-      localStorage.setItem('pendingFoodName', 'Analyzing...');
+      // Analyze the image with AI
+      const result = await analyzeFoodImage(screenshot);
+      
+      if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
+        throw new Error('Invalid analysis result: Missing required data');
+      }
+      
+      // Add the analyzed food to the log
+      const foodData = {
+        name: result.name,
+        calories: typeof result.calories === 'number' ? result.calories : 0,
+        protein: typeof result.protein === 'number' ? result.protein : 0,
+        carbs: typeof result.carbs === 'number' ? result.carbs : 0,
+        fat: typeof result.fat === 'number' ? result.fat : 0,
+        components: Array.isArray(result.components) ? result.components : [],
+        image: screenshot
+      };
+      
+      await addFood(foodData);
+
+      toast({
+        title: "Success! 🎉",
+        description: `Added ${result.name} to your food log`,
+      });
+
+      setIsAnalyzing(false);
       setLocation("/dashboard");
     } catch (error) {
       console.error('Capture Error:', error);
+      setIsAnalyzing(false);
       handleAnalysisError(error);
     }
   };
@@ -162,16 +189,43 @@ export default function AddFoodNew() {
         try {
           const base64data = reader.result as string;
           
+          setIsAnalyzing(true);
+          
           toast({
             title: "Photo Uploaded",
-            description: "Analyzing your meal...",
+            description: "Analyzing your meal with AI...",
           });
 
-          localStorage.setItem('pendingFoodImage', base64data);
-          localStorage.setItem('pendingFoodName', 'Analyzing...');
+          // Analyze the image with AI
+          const result = await analyzeFoodImage(base64data);
+          
+          if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
+            throw new Error('Invalid analysis result: Missing required data');
+          }
+          
+          // Add the analyzed food to the log
+          const foodData = {
+            name: result.name,
+            calories: typeof result.calories === 'number' ? result.calories : 0,
+            protein: typeof result.protein === 'number' ? result.protein : 0,
+            carbs: typeof result.carbs === 'number' ? result.carbs : 0,
+            fat: typeof result.fat === 'number' ? result.fat : 0,
+            components: Array.isArray(result.components) ? result.components : [],
+            image: base64data
+          };
+          
+          await addFood(foodData);
+
+          toast({
+            title: "Success! 🎉",
+            description: `Added ${result.name} to your food log`,
+          });
+
+          setIsAnalyzing(false);
           setLocation("/dashboard");
         } catch (analysisError) {
           console.error('Upload Analysis Error:', analysisError);
+          setIsAnalyzing(false);
           handleAnalysisError(analysisError);
         }
       };
@@ -182,10 +236,12 @@ export default function AddFoodNew() {
         setErrorMessage("We couldn't read your image file.");
         setErrorSuggestion("The file might be corrupted. Try selecting a different image or take a new photo.");
         setErrorModalOpen(true);
+        setIsAnalyzing(false);
       };
       
       reader.readAsDataURL(file);
     } catch (error) {
+      setIsAnalyzing(false);
       handleAnalysisError(error);
     }
   };
@@ -384,34 +440,43 @@ export default function AddFoodNew() {
             style={{ paddingBottom: 'max(32px, calc(env(safe-area-inset-bottom) + 16px))' }}
           >
             {/* Hint Text */}
-            <p className="text-white/80 text-sm font-medium mb-4">Tap to capture your meal</p>
+            <p className="text-white/80 text-sm font-medium mb-4">
+              {isAnalyzing ? "Analyzing your meal..." : "Tap to capture your meal"}
+            </p>
             
             {/* Capture Button */}
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={handleCapture}
-              className="relative w-20 h-20 rounded-full flex items-center justify-center group"
+              disabled={isAnalyzing}
+              className="relative w-20 h-20 rounded-full flex items-center justify-center group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {/* Outer Ring */}
               <div className="absolute inset-0 rounded-full bg-white/20 backdrop-blur-sm" />
               
               {/* Pulsing Effect */}
-              <motion.div
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 0, 0.5],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="absolute inset-0 rounded-full bg-[#26A8FF]"
-              />
+              {!isAnalyzing && (
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 0, 0.5],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 rounded-full bg-[#26A8FF]"
+                />
+              )}
               
               {/* Inner Circle */}
               <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] flex items-center justify-center shadow-2xl group-active:scale-95 transition-transform">
-                <Camera className="w-8 h-8 text-white" />
+                {isAnalyzing ? (
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-8 h-8 text-white" />
+                )}
               </div>
             </motion.button>
 
@@ -419,7 +484,8 @@ export default function AddFoodNew() {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => fileInputRef.current?.click()}
-              className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-colors"
+              disabled={isAnalyzing}
+              className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ImageIcon className="w-4 h-4 text-white" />
               <span className="text-white text-sm font-medium">Choose from Gallery</span>
