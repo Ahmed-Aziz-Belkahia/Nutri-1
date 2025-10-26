@@ -20,6 +20,7 @@ import SimpleNutritionDetail from "./pages/SimpleNutritionDetail";
 import AddFood from "./pages/AddFood";
 import AddFoodNew from "./pages/AddFoodNew";
 import EnhancedAddFood from "./pages/EnhancedAddFood";
+import MealAnalysis from "./pages/MealAnalysis";
 import FoodDetail from "./pages/FoodDetail";
 import MealDetail from "./pages/MealDetail";
 import Recipes from "./pages/Recipes";
@@ -211,7 +212,7 @@ function App() {
   const showBottomNav = user && ['/dashboard-old', '/enhanced-dashboard', '/progress', '/progress-new', '/recipes', '/settings', '/meals', '/profile', '/analytics'].includes(location);
 
   // Use black background for camera-based pages only
-  const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food';
+  const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food' || location === '/meal-analysis';
   const appBackgroundClass = isFullScreenCameraPage 
     ? "app-container min-h-screen relative bg-black" 
     : "app-container min-h-screen relative bg-white";
@@ -313,6 +314,11 @@ function App() {
             <Route path="/add-food">
               <ProtectedRoute>
                 <AddFoodNew />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/meal-analysis">
+              <ProtectedRoute>
+                <MealAnalysis />
               </ProtectedRoute>
             </Route>
             <Route path="/add-food-old">

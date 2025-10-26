@@ -136,6 +136,13 @@ export default function AddFoodNew() {
         throw new Error("Failed to capture image");
       }
 
+      // Store image for analysis page
+      localStorage.setItem('analyzingMealImage', screenshot);
+      
+      // Navigate to analysis page
+      setLocation("/meal-analysis");
+      
+      // Start analysis in background
       setIsAnalyzing(true);
 
       toast({
@@ -169,10 +176,10 @@ export default function AddFoodNew() {
       });
 
       setIsAnalyzing(false);
-      setLocation("/dashboard");
     } catch (error) {
       console.error('Capture Error:', error);
       setIsAnalyzing(false);
+      localStorage.removeItem('analyzingMealImage');
       handleAnalysisError(error);
     }
   };
@@ -188,6 +195,13 @@ export default function AddFoodNew() {
         try {
           const base64data = reader.result as string;
           
+          // Store image for analysis page
+          localStorage.setItem('analyzingMealImage', base64data);
+          
+          // Navigate to analysis page
+          setLocation("/meal-analysis");
+          
+          // Start analysis in background
           setIsAnalyzing(true);
           
           toast({
@@ -221,10 +235,10 @@ export default function AddFoodNew() {
           });
 
           setIsAnalyzing(false);
-          setLocation("/dashboard");
         } catch (analysisError) {
           console.error('Upload Analysis Error:', analysisError);
           setIsAnalyzing(false);
+          localStorage.removeItem('analyzingMealImage');
           handleAnalysisError(analysisError);
         }
       };
@@ -241,6 +255,7 @@ export default function AddFoodNew() {
       reader.readAsDataURL(file);
     } catch (error) {
       setIsAnalyzing(false);
+      localStorage.removeItem('analyzingMealImage');
       handleAnalysisError(error);
     }
   };
