@@ -99,7 +99,7 @@ export async function analyzeFoodImage(base64Image: string): Promise<{
   console.log('Analyzing food image with Vision API...');
   
   try {
-    const response = await fetch('/api/analyze-food-image', {
+    const response = await fetch('/api/analyze-food', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

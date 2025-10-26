@@ -5,7 +5,6 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -915,41 +914,86 @@ export default function AddFoodNew() {
         </AnimatePresence>
       </div>
 
-      {/* Error Modal */}
-      <Dialog open={errorModalOpen} onOpenChange={setErrorModalOpen}>
-        <DialogContent className="sm:max-w-md rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center text-red-500">
-              <AlertTriangle className="mr-2 h-5 w-5" />
-              {errorTitle}
-            </DialogTitle>
-            <DialogDescription className="text-gray-800 text-base pt-2">
-              {errorMessage}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="bg-red-50 p-4 rounded-2xl text-sm text-red-800">
-            {errorSuggestion}
-          </div>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setErrorModalOpen(false);
-                setActiveTab('manual');
-              }}
-              className="w-full sm:w-auto rounded-xl"
-            >
-              Switch to Manual
-            </Button>
-            <Button 
+      {/* Error Modal - Redesigned to match dashboard theme */}
+      <AnimatePresence>
+        {errorModalOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setErrorModalOpen(false)}
-              className="w-full sm:w-auto bg-[#26A8FF] hover:bg-[#1A8FE6] rounded-xl"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-6"
+              style={{
+                paddingTop: 'max(24px, env(safe-area-inset-top, 24px))',
+                paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))'
+              }}
             >
-              Try Again
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+                {/* Header with gradient */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 px-6 py-5 border-b border-red-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <AlertTriangle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{errorTitle}</h3>
+                      <p className="text-sm text-gray-600 leading-relaxed">{errorMessage}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="p-6">
+                  {/* Suggestion Box */}
+                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-4 border border-blue-100 mb-6">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-[#26A8FF] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 mb-1">Suggestion</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{errorSuggestion}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3">
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setErrorModalOpen(false)}
+                      className="w-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-2xl h-12 font-semibold shadow-lg hover:shadow-xl transition-all"
+                    >
+                      Try Again
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => {
+                        setErrorModalOpen(false);
+                        setActiveTab('manual');
+                      }}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl h-12 font-semibold transition-all"
+                    >
+                      Switch to Manual Entry
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
