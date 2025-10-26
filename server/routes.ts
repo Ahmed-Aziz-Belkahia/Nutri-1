@@ -4245,14 +4245,20 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/food-logs", requireAuth, checkTokenLimit('food-scan-analysis'), async (req: AuthRequest, res: Response) => {
     try {
 
-      const { name, calories, protein, carbs, fat, image, date, components, isAnalyzing } = req.body;
+      const { 
+        name, calories, protein, carbs, fat, image, date, components, isAnalyzing,
+        // Recipe fields
+        description, ingredients, instructions, prepTime, cookTime, servings,
+        source, isRecipe, cuisineType, mealType, difficulty, tags
+      } = req.body;
       console.log('[Food Logs API] Processing food log request:', {
         userId: req.user!.id,
         name,
         hasImage: !!image,
         hasComponents: Array.isArray(components),
         isAnalyzing: isAnalyzing,
-        isPlaceholder: !!isAnalyzing
+        isPlaceholder: !!isAnalyzing,
+        hasRecipeData: !!(instructions && instructions.length > 0)
       });
 
       if (!name || calories === undefined) {
@@ -4406,7 +4412,7 @@ export function registerRoutes(app: Express): Server {
         componentsCount: processedComponents.length
       });
 
-      // Insert the food log with detailed components
+      // Insert the food log with detailed components and recipe fields
       const [mainLog] = await db
         .insert(foodLogs)
         .values({
@@ -4418,7 +4424,20 @@ export function registerRoutes(app: Express): Server {
           fat: totalFat.toString(),
           image: image || null,
           date: logDate,
-          components: processedComponents
+          components: processedComponents,
+          // Recipe fields (optional)
+          description: description || null,
+          ingredients: ingredients || null,
+          instructions: instructions || null,
+          prepTime: prepTime || null,
+          cookTime: cookTime || null,
+          servings: servings || 1,
+          source: source || 'scanned',
+          isRecipe: isRecipe || false,
+          cuisineType: cuisineType || null,
+          mealType: mealType || null,
+          difficulty: difficulty || null,
+          tags: tags || null,
         })
         .returning();
 

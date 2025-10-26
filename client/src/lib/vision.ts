@@ -1,30 +1,11 @@
 // Client-side API functions for food recognition via OpenAI Vision API
 
+import type { EnhancedFoodAnalysis } from '@/types/enhanced-food';
+
 /**
  * Analyze food from text using the backend API
  */
-export async function analyzeFoodText(text: string): Promise<{
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  confidence?: number;
-  components?: Array<{
-    name: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-    servingSize?: string;
-    quantity?: number;
-    details?: {
-      type?: string;
-      preparation?: string;
-      estimatedWeight?: string;
-    };
-  }>;
-}> {
+export async function analyzeFoodText(text: string): Promise<EnhancedFoodAnalysis> {
   console.log('Analyzing food text with OpenAI...', text);
   
   try {
@@ -73,29 +54,9 @@ export async function analyzeFoodText(text: string): Promise<{
 
 /**
  * Analyze food from image using the backend API
+ * Returns enhanced analysis with optional recipe data
  */
-export async function analyzeFoodImage(base64Image: string): Promise<{
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  confidence?: number;
-  components?: Array<{
-    name: string;
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-    servingSize?: string;
-    quantity?: number;
-    details?: {
-      type?: string;
-      preparation?: string;
-      estimatedWeight?: string;
-    };
-  }>;
-}> {
+export async function analyzeFoodImage(base64Image: string): Promise<EnhancedFoodAnalysis> {
   console.log('Analyzing food image with Vision API...');
   
   try {

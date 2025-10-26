@@ -51,7 +51,7 @@ export type InsertUser = z.infer<typeof registerSchema>;
 export type LoginUser = z.infer<typeof loginSchema>;
 export type SelectUser = typeof users.$inferSelect;
 
-// Food logs schema
+// Food logs schema - Enhanced with recipe fields for unified meal/recipe model
 export const foodLogs = sqliteTable("food_logs", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").notNull().references(() => users.id),
@@ -72,6 +72,27 @@ export const foodLogs = sqliteTable("food_logs", {
     quantity?: number;
     details?: any;
   }>>(),
+  
+  // Recipe-like fields (optional, for enhanced meal logs)
+  description: text("description"),
+  ingredients: text("ingredients", { mode: 'json' }).$type<Array<{
+    name: string;
+    quantity: number | string;
+    unit: string;
+    calories?: number;
+  }>>(),
+  instructions: text("instructions", { mode: 'json' }).$type<string[]>(),
+  prepTime: integer("prep_time"), // minutes
+  cookTime: integer("cook_time"), // minutes
+  servings: integer("servings").default(1),
+  imageUrl: text("image_url"), // Additional URL field (image is base64)
+  source: text("source").default('scanned'), // 'scanned', 'manual', 'ai-generated'
+  isRecipe: integer("is_recipe", { mode: 'boolean' }).default(false),
+  recipeId: integer("recipe_id").references(() => recipes.id), // Link if promoted to recipe
+  cuisineType: text("cuisine_type"), // 'Italian', 'Mexican', etc.
+  mealType: text("meal_type"), // 'breakfast', 'lunch', 'dinner', 'snack'
+  difficulty: text("difficulty"), // 'easy', 'medium', 'hard'
+  tags: text("tags", { mode: 'json' }).$type<string[]>(), // ['vegetarian', 'low-carb', etc.]
 });
 
 export const insertFoodLogSchema = createInsertSchema(foodLogs);

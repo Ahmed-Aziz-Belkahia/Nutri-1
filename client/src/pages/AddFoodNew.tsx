@@ -182,7 +182,7 @@ export default function AddFoodNew() {
         throw new Error('Invalid analysis result: Missing required data');
       }
       
-      // Add the analyzed food to the log with optimized image
+      // Build enhanced food data with recipe fields if available
       const foodData = {
         name: result.name,
         calories: typeof result.calories === 'number' ? result.calories : 0,
@@ -190,7 +190,21 @@ export default function AddFoodNew() {
         carbs: typeof result.carbs === 'number' ? result.carbs : 0,
         fat: typeof result.fat === 'number' ? result.fat : 0,
         components: Array.isArray(result.components) ? result.components : [],
-        image: optimizedImage
+        image: optimizedImage,
+        
+        // Recipe fields (if AI recognized a recipe)
+        description: result.description || undefined,
+        ingredients: result.ingredients || undefined,
+        instructions: result.instructions || undefined,
+        prepTime: result.prepTime || undefined,
+        cookTime: result.cookTime || undefined,
+        servings: result.servings || 1,
+        source: 'scanned' as const,
+        isRecipe: !!(result.instructions && result.instructions.length > 0),
+        cuisineType: result.cuisineType || undefined,
+        mealType: result.mealType || undefined,
+        difficulty: result.difficulty || undefined,
+        tags: result.tags || undefined,
       };
       
       const response = await addFood(foodData);
@@ -249,7 +263,7 @@ export default function AddFoodNew() {
             throw new Error('Invalid analysis result: Missing required data');
           }
           
-          // Add the analyzed food to the log with optimized image
+          // Build enhanced food data with recipe fields if available
           const foodData = {
             name: result.name,
             calories: typeof result.calories === 'number' ? result.calories : 0,
@@ -257,7 +271,21 @@ export default function AddFoodNew() {
             carbs: typeof result.carbs === 'number' ? result.carbs : 0,
             fat: typeof result.fat === 'number' ? result.fat : 0,
             components: Array.isArray(result.components) ? result.components : [],
-            image: optimizedImage
+            image: optimizedImage,
+            
+            // Recipe fields (if AI recognized a recipe)
+            description: result.description || undefined,
+            ingredients: result.ingredients || undefined,
+            instructions: result.instructions || undefined,
+            prepTime: result.prepTime || undefined,
+            cookTime: result.cookTime || undefined,
+            servings: result.servings || 1,
+            source: 'scanned' as const,
+            isRecipe: !!(result.instructions && result.instructions.length > 0),
+            cuisineType: result.cuisineType || undefined,
+            mealType: result.mealType || undefined,
+            difficulty: result.difficulty || undefined,
+            tags: result.tags || undefined,
           };
           
           const response = await addFood(foodData);

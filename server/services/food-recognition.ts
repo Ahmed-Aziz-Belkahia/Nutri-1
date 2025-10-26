@@ -1,6 +1,14 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
 
+// Define ingredient schema for recipe fields
+const IngredientItemSchema = z.object({
+  name: z.string(),
+  quantity: z.union([z.number(), z.string()]),
+  unit: z.string(),
+  calories: z.number().optional(),
+});
+
 // Define component schema with strict validation
 const FoodComponentSchema = z.object({
   name: z.string(),
@@ -27,6 +35,7 @@ const FoodComponentSchema = z.object({
   }).required(),
 }).strict();
 
+// Enhanced schema with recipe fields
 const FoodAnalysisSchema = z.object({
   name: z.string(),
   calories: z.number(),
@@ -36,6 +45,18 @@ const FoodAnalysisSchema = z.object({
   confidence: z.number(),
   servingSize: z.string().optional(),
   components: z.array(FoodComponentSchema).default([]),
+  
+  // Recipe fields (optional)
+  description: z.string().optional().nullable(),
+  ingredients: z.array(IngredientItemSchema).optional().nullable(),
+  instructions: z.array(z.string()).optional().nullable(),
+  prepTime: z.number().optional().nullable(),
+  cookTime: z.number().optional().nullable(),
+  servings: z.number().optional().nullable(),
+  cuisineType: z.string().optional().nullable(),
+  mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']).optional().nullable(),
+  difficulty: z.enum(['easy', 'medium', 'hard']).optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
 }).strict();
 
 export type FoodAnalysis = z.infer<typeof FoodAnalysisSchema>;
@@ -56,14 +77,14 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
       messages: [
         {
           role: "system",
-          content: "Jesteś precyzyjnym systemem analizy żywności, który ZAWSZE rozkłada produkty spożywcze na oddzielne składniki z szczegółowymi informacjami o przygotowaniu i prezentacji. Nigdy nie łącz różnych produktów. ZAWSZE dołączaj co najmniej jeden składnik w swojej analizie. Jeśli nie możesz zidentyfikować konkretnych składników żywności, dodaj ogólny składnik jak 'Niezidentyfikowany produkt spożywczy'. Odpowiadaj ze strukturalnymi danymi JSON w języku polskim."
+          content: "Jesteś precyzyjnym systemem analizy żywności, który ZAWSZE rozkłada produkty spożywcze na oddzielne składniki z szczegółowymi informacjami. Dodatkowo identyfikujesz rozpoznawalne przepisy i generujesz instrukcje gotowania. Odpowiadaj ze strukturalnymi danymi JSON w języku polskim."
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `Przeanalizuj to zdjęcie jedzenia i rozłóż je na poszczególne składniki. Zwróć analizę jako obiekt JSON z dokładnie tą strukturą:
+              text: `Przeanalizuj to zdjęcie jedzenia i zwróć szczegółową analizę jako obiekt JSON z dokładnie tą strukturą:
 {
   "name": "Ogólny opis posiłku po polsku",
   "calories": suma_kalorii_wszystkich_składników,
@@ -73,7 +94,7 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
   "confidence": liczba_między_0_a_1,
   "components": [
     {
-      "name": "Nazwa konkretnego składnika po polsku",
+      "name": "Nazwa konkretnego składnika",
       "calories": kalorie_składnika,
       "protein": gramy_białka,
       "carbs": gramy_węglowodanów,
@@ -85,24 +106,39 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
         "preparation": "Sposób przygotowania",
         "texture": "Opis tekstury",
         "color": "Opis koloru",
-        "estimatedWeight": "Waga w gramach",
-        "cookingMethod": "Technika gotowania",
-        "doneness": "Stopień ugotowania",
-        "temperature": "Stan temperatury",
-        "accompaniments": ["Lista", "dodatków"],
-        "sauce": "Opis sosu",
-        "seasonings": ["Użyte", "przyprawy"],
-        "garnishes": ["Użyte", "ozdoby"],
-        "presentation": "Opis prezentacji"
+        "estimatedWeight": "Waga w gramach"
       }
     }
-  ]
+  ],
+  "description": "Szczegółowy opis dania (opcjonalny)",
+  "ingredients": [
+    {
+      "name": "Składnik",
+      "quantity": liczba,
+      "unit": "jednostka miary",
+      "calories": kalorie_opcjonalne
+    }
+  ],
+  "instructions": [
+    "Krok 1 przygotowania",
+    "Krok 2 przygotowania"
+  ],
+  "prepTime": czas_przygotowania_w_minutach,
+  "cookTime": czas_gotowania_w_minutach,
+  "servings": liczba_porcji,
+  "cuisineType": "Typ kuchni (np. 'Polska', 'Włoska', 'Azjatycka')",
+  "mealType": "Typ posiłku ('breakfast', 'lunch', 'dinner', 'snack')",
+  "difficulty": "Poziom trudności ('easy', 'medium', 'hard')",
+  "tags": ["tag1", "tag2"]
 }
 
-Przykłady polskich nazw:
-- "Różnorodne owoce i warzywa w lodówce"
-- "Sałatka z kurczakiem i warzywami"
-- "Kotlet schabowy z ziemniakami"`
+WAŻNE:
+- Jeśli rozpoznajesz przepis (np. Pizza Margherita, Spaghetti Carbonara), wypełnij pola: ingredients, instructions, prepTime, cookTime, cuisineType, difficulty
+- Jeśli to proste jedzenie bez przepisu, zostaw te pola puste lub null
+- ingredients powinny być bazowane na components, ale w formie składników do gotowania
+- instructions to kroki gotowania (tylko dla rozpoznawalnych przepisów)
+- prepTime i cookTime w minutach
+- Zawsze dołącz co najmniej jeden element w components`
             },
             {
               type: "image_url",
