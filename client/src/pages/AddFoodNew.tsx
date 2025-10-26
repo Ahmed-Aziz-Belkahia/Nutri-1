@@ -13,6 +13,28 @@ import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText, analyzeFoodImage } from '@/lib/vision';
 
+// Utility function to convert image to WebP format for optimization
+const convertToWebP = async (base64Image: string, quality: number = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Failed to get canvas context'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0);
+      const webpData = canvas.toDataURL('image/webp', quality);
+      resolve(webpData);
+    };
+    img.onerror = () => reject(new Error('Failed to load image'));
+    img.src = base64Image;
+  });
+};
+
 // Form schemas
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -136,8 +158,11 @@ export default function AddFoodNew() {
         throw new Error("Failed to capture image");
       }
 
-      // Store image for analysis page
-      localStorage.setItem('analyzingMealImage', screenshot);
+      // Convert to WebP for optimization (80% quality, typically 50-70% smaller)
+      const optimizedImage = await convertToWebP(screenshot, 0.8);
+
+      // Store optimized image for analysis page
+      localStorage.setItem('analyzingMealImage', optimizedImage);
       
       // Navigate to analysis page
       setLocation("/meal-analysis");
@@ -150,14 +175,14 @@ export default function AddFoodNew() {
         description: "Analyzing your meal with AI...",
       });
 
-      // Analyze the image with AI
-      const result = await analyzeFoodImage(screenshot);
+      // Analyze the image with AI using optimized image
+      const result = await analyzeFoodImage(optimizedImage);
       
       if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
         throw new Error('Invalid analysis result: Missing required data');
       }
       
-      // Add the analyzed food to the log
+      // Add the analyzed food to the log with optimized image
       const foodData = {
         name: result.name,
         calories: typeof result.calories === 'number' ? result.calories : 0,
@@ -165,7 +190,7 @@ export default function AddFoodNew() {
         carbs: typeof result.carbs === 'number' ? result.carbs : 0,
         fat: typeof result.fat === 'number' ? result.fat : 0,
         components: Array.isArray(result.components) ? result.components : [],
-        image: screenshot
+        image: optimizedImage
       };
       
       const response = await addFood(foodData);
@@ -200,8 +225,11 @@ export default function AddFoodNew() {
         try {
           const base64data = reader.result as string;
           
-          // Store image for analysis page
-          localStorage.setItem('analyzingMealImage', base64data);
+          // Convert to WebP for optimization (80% quality)
+          const optimizedImage = await convertToWebP(base64data, 0.8);
+          
+          // Store optimized image for analysis page
+          localStorage.setItem('analyzingMealImage', optimizedImage);
           
           // Navigate to analysis page
           setLocation("/meal-analysis");
@@ -214,14 +242,14 @@ export default function AddFoodNew() {
             description: "Analyzing your meal with AI...",
           });
 
-          // Analyze the image with AI
-          const result = await analyzeFoodImage(base64data);
+          // Analyze the image with AI using optimized image
+          const result = await analyzeFoodImage(optimizedImage);
           
           if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
             throw new Error('Invalid analysis result: Missing required data');
           }
           
-          // Add the analyzed food to the log
+          // Add the analyzed food to the log with optimized image
           const foodData = {
             name: result.name,
             calories: typeof result.calories === 'number' ? result.calories : 0,
@@ -229,7 +257,7 @@ export default function AddFoodNew() {
             carbs: typeof result.carbs === 'number' ? result.carbs : 0,
             fat: typeof result.fat === 'number' ? result.fat : 0,
             components: Array.isArray(result.components) ? result.components : [],
-            image: base64data
+            image: optimizedImage
           };
           
           const response = await addFood(foodData);
@@ -238,11 +266,6 @@ export default function AddFoodNew() {
           if (response?.log?.id) {
             localStorage.setItem('analyzedFoodId', response.log.id.toString());
           }
-
-          toast({
-            title: "Success! 🎉",
-            description: `Added ${result.name} to your food log`,
-          });
 
           toast({
             title: "Success! 🎉",
