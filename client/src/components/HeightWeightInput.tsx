@@ -27,16 +27,16 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
   return (
     <div className="space-y-8">
       {/* Unit Toggle */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#0CC5BA]/5 to-purple-500/5 rounded-2xl backdrop-blur-sm">
-        <span className={`text-sm font-medium transition-colors ${isImperial ? 'text-[#0CC5BA]' : 'text-gray-500'}`}>
+      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+        <span className={`text-sm font-medium transition-colors ${isImperial ? 'text-[#26A8FF]' : 'text-gray-500'}`}>
           Imperial
         </span>
         <Switch
           checked={!isImperial}
           onCheckedChange={(checked) => setIsImperial(!checked)}
-          className="mx-2 data-[state=checked]:bg-[#0CC5BA] hover:data-[state=checked]:bg-[#0CC5BA]/90"
+          className="mx-2 data-[state=checked]:bg-[#26A8FF]"
         />
-        <span className={`text-sm font-medium transition-colors ${!isImperial ? 'text-[#0CC5BA]' : 'text-gray-500'}`}>
+        <span className={`text-sm font-medium transition-colors ${!isImperial ? 'text-[#26A8FF]' : 'text-gray-500'}`}>
           Metric
         </span>
       </div>
@@ -57,14 +57,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                      className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                       onClick={() => {
                         const newFt = Math.min(8, heightFt + 1);
                         setHeightFt(newFt);
                         onHeightChange({ ft: newFt, in: heightIn });
                       }}
                     >
-                      <ChevronUp className="h-5 w-5 text-[#0CC5BA]" />
+                      <ChevronUp className="h-5 w-5 text-[#26A8FF]" />
                     </Button>
                     <motion.div 
                       className="py-3 text-center"
@@ -72,7 +72,7 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                       animate={{ scale: [1.1, 1] }}
                       transition={{ duration: 0.2 }}
                     >
-                      <span className="text-3xl font-medium bg-gradient-to-r from-[#0CC5BA] to-purple-500 bg-clip-text text-transparent">
+                      <span className="text-3xl font-medium text-[#26A8FF]">
                         {heightFt}
                       </span>
                       <span className="text-sm text-gray-500 ml-2">ft</span>
@@ -80,14 +80,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                      className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                       onClick={() => {
                         const newFt = Math.max(4, heightFt - 1);
                         setHeightFt(newFt);
                         onHeightChange({ ft: newFt, in: heightIn });
                       }}
                     >
-                      <ChevronDown className="h-5 w-5 text-[#0CC5BA]" />
+                      <ChevronDown className="h-5 w-5 text-[#26A8FF]" />
                     </Button>
                   </div>
                 </motion.div>
@@ -103,14 +103,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                      className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                       onClick={() => {
                         const newIn = Math.min(11, heightIn + 1);
                         setHeightIn(newIn);
                         onHeightChange({ ft: heightFt, in: newIn });
                       }}
                     >
-                      <ChevronUp className="h-5 w-5 text-[#0CC5BA]" />
+                      <ChevronUp className="h-5 w-5 text-[#26A8FF]" />
                     </Button>
                     <motion.div 
                       className="py-3 text-center"
@@ -118,7 +118,7 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                       animate={{ scale: [1.1, 1] }}
                       transition={{ duration: 0.2 }}
                     >
-                      <span className="text-3xl font-medium bg-gradient-to-r from-[#0CC5BA] to-purple-500 bg-clip-text text-transparent">
+                      <span className="text-3xl font-medium text-[#26A8FF]">
                         {heightIn}
                       </span>
                       <span className="text-sm text-gray-500 ml-2">in</span>
@@ -126,14 +126,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                      className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                       onClick={() => {
                         const newIn = Math.max(0, heightIn - 1);
                         setHeightIn(newIn);
                         onHeightChange({ ft: heightFt, in: newIn });
                       }}
                     >
-                      <ChevronDown className="h-5 w-5 text-[#0CC5BA]" />
+                      <ChevronDown className="h-5 w-5 text-[#26A8FF]" />
                     </Button>
                   </div>
                 </motion.div>
@@ -150,14 +150,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                    className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                     onClick={() => {
                       const newCm = Math.min(220, heightCm + 1);
                       setHeightCm(newCm);
                       onHeightChange({ cm: newCm });
                     }}
                   >
-                    <ChevronUp className="h-5 w-5 text-[#0CC5BA]" />
+                    <ChevronUp className="h-5 w-5 text-[#26A8FF]" />
                   </Button>
                   <motion.div 
                     className="py-3 text-center"
@@ -165,7 +165,7 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                     animate={{ scale: [1.1, 1] }}
                     transition={{ duration: 0.2 }}
                   >
-                    <span className="text-3xl font-medium bg-gradient-to-r from-[#0CC5BA] to-purple-500 bg-clip-text text-transparent">
+                    <span className="text-3xl font-medium text-[#26A8FF]">
                       {heightCm}
                     </span>
                     <span className="text-sm text-gray-500 ml-2">cm</span>
@@ -173,14 +173,14 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    className="w-full h-10 hover:bg-[#0CC5BA]/5 active:bg-[#0CC5BA]/10"
+                    className="w-full h-10 hover:bg-[#26A8FF]/5 active:bg-[#26A8FF]/10"
                     onClick={() => {
                       const newCm = Math.max(100, heightCm - 1);
                       setHeightCm(newCm);
                       onHeightChange({ cm: newCm });
                     }}
                   >
-                    <ChevronDown className="h-5 w-5 text-[#0CC5BA]" />
+                    <ChevronDown className="h-5 w-5 text-[#26A8FF]" />
                   </Button>
                 </div>
               </motion.div>
@@ -206,7 +206,7 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
               transition={{ type: "spring", stiffness: 500, damping: 25 }}
             >
               <div className="text-center">
-                <span className="text-5xl font-medium tracking-tight bg-gradient-to-r from-[#0CC5BA] to-purple-500 bg-clip-text text-transparent">
+                <span className="text-5xl font-medium tracking-tight text-[#26A8FF]">
                   {weight}
                 </span>
                 <span className="text-xl text-gray-500 ml-2">{isImperial ? "lb" : "kg"}</span>
@@ -221,7 +221,7 @@ export default function HeightWeightInput({ onHeightChange, onWeightChange }: He
                 step={1}
                 onValueChange={([value]) => handleWeightChange(value)}
                 onValueCommit={() => setIsDragging(false)}
-                className="w-full [&>[role=slider]]:h-6 [&>[role=slider]]:w-6 [&>[role=slider]]:bg-[#0CC5BA] [&>[role=slider]]:hover:bg-[#0CC5BA]/90 [&>[role=slider]]:focus:ring-[#0CC5BA]/20 [&_[data-disabled]]:opacity-50"
+                className="w-full [&>[role=slider]]:h-6 [&>[role=slider]]:w-6 [&>[role=slider]]:bg-[#26A8FF] [&>[role=slider]]:hover:bg-[#1A8FE6] [&>[role=slider]]:focus:ring-[#26A8FF]/20 [&_[data-disabled]]:opacity-50"
                 onPointerDown={() => setIsDragging(true)}
                 onPointerUp={() => setIsDragging(false)}
               />

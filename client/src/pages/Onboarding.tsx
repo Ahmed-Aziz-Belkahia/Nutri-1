@@ -159,16 +159,11 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-[#0CC5BA]/20 via-purple-500/10 to-blue-500/20 p-2 flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-[#0CC5BA]/20 rounded-full filter blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full filter blur-3xl animate-pulse delay-1000" />
-      </div>
-
+    <div className="min-h-screen bg-gray-50 p-4 flex items-center justify-center overflow-hidden">
       <div className="w-full max-w-[500px] relative">
-        <Card className="backdrop-blur-xl bg-white/70 border-0 shadow-2xl shadow-[#0CC5BA]/10 rounded-[40px] overflow-hidden">
+        <Card className="bg-white border-0 shadow-sm rounded-2xl overflow-hidden">
           <motion.div
-            className="h-1 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-blue-500"
+            className="h-1 bg-[#26A8FF]"
             initial={{ width: 0 }}
             animate={{ width: `${(currentStep / steps.length) * 100}%` }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -180,7 +175,7 @@ export default function Onboarding() {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-sm font-medium text-[#0CC5BA]"
+                  className="text-sm font-medium text-[#26A8FF]"
                 >
                   Step {currentStep} of {steps.length}
                 </motion.div>
@@ -188,7 +183,7 @@ export default function Onboarding() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className="text-3xl font-bold bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-blue-500 bg-clip-text text-transparent"
+                  className="text-3xl font-bold text-gray-900"
                 >
                   {currentStepData.question}
                 </motion.h2>
@@ -207,7 +202,7 @@ export default function Onboarding() {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="w-16 h-16 rounded-3xl bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                className="w-16 h-16 rounded-2xl bg-[#26A8FF] flex items-center justify-center text-white font-bold text-xl shadow-sm"
               >
                 {currentStep}
               </motion.div>
@@ -230,16 +225,16 @@ export default function Onboarding() {
                           key={gender}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`w-full p-6 rounded-2xl border-2 transition-all duration-300 ${
+                          className={`w-full p-6 rounded-xl border-2 transition-all duration-300 ${
                             formData.gender === gender
-                              ? 'border-[#0CC5BA] bg-[#0CC5BA]/5'
-                              : 'border-transparent bg-white/50 hover:bg-white'
+                              ? 'border-[#26A8FF] bg-[#26A8FF]/5'
+                              : 'border-gray-200 bg-white hover:bg-gray-50'
                           }`}
                           onClick={() => setFormData({ ...formData, gender })}
                         >
                           <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                              formData.gender === gender ? 'bg-[#0CC5BA]/10' : 'bg-gray-50'
+                              formData.gender === gender ? 'bg-[#26A8FF]/10' : 'bg-gray-50'
                             }`}>
                               {gender === 'male' ? '👨' : gender === 'female' ? '👩' : '🧑'}
                             </div>
@@ -253,12 +248,12 @@ export default function Onboarding() {
                   )}
                   {currentStepData.type === "experience" && (
                     <div className="space-y-3">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`w-full p-4 justify-start rounded-xl border ${
-                          formData.experience === "no" ? "bg-gray-900 text-white hover:bg-gray-800 border-transparent" : "hover:bg-gray-50 border-gray-200"
-                        }`}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`w-full p-4 justify-start rounded-xl border-2 ${
+                            formData.experience === "no" ? "bg-[#26A8FF] text-white hover:bg-[#1A8FE6] border-[#26A8FF]" : "hover:bg-gray-50 border-gray-200 bg-white"
+                          }`}
                         onClick={() => setFormData({ ...formData, experience: "no" })}
                       >
                         <div className="flex items-center gap-4">
@@ -266,12 +261,12 @@ export default function Onboarding() {
                           <div className="text-base font-medium">No</div>
                         </div>
                       </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`w-full p-4 justify-start rounded-xl border ${
-                          formData.experience === "yes" ? "bg-gray-900 text-white hover:bg-gray-800 border-transparent" : "hover:bg-gray-50 border-gray-200"
-                        }`}
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className={`w-full p-4 justify-start rounded-xl border-2 ${
+                            formData.experience === "yes" ? "bg-[#26A8FF] text-white hover:bg-[#1A8FE6] border-[#26A8FF]" : "hover:bg-gray-50 border-gray-200 bg-white"
+                          }`}
                         onClick={() => setFormData({ ...formData, experience: "yes" })}
                       >
                         <div className="flex items-center gap-4">
@@ -400,10 +395,10 @@ export default function Onboarding() {
                           key={goal.value}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`w-full p-4 justify-start rounded-xl border ${
+                          className={`w-full p-4 justify-start rounded-xl border-2 ${
                             formData.weightGoal === goal.value
-                              ? "bg-gray-900 text-white hover:bg-gray-800 border-transparent"
-                              : "hover:bg-gray-50 border-gray-200"
+                              ? "bg-[#26A8FF] text-white hover:bg-[#1A8FE6] border-[#26A8FF]"
+                              : "hover:bg-gray-50 border-gray-200 bg-white"
                           }`}
                           onClick={() => setFormData({ ...formData, weightGoal: goal.value })}
                         >
@@ -452,8 +447,8 @@ export default function Onboarding() {
                           key={level.value}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className={`w-full p-4 justify-start rounded-xl border ${
-                            formData.activityLevel === level.value ? "bg-gray-900 text-white hover:bg-gray-800 border-transparent" : "hover:bg-gray-50 border-gray-200"
+                          className={`w-full p-4 justify-start rounded-xl border-2 ${
+                            formData.activityLevel === level.value ? "bg-[#26A8FF] text-white hover:bg-[#1A8FE6] border-[#26A8FF]" : "hover:bg-gray-50 border-gray-200 bg-white"
                           }`}
                           onClick={() => setFormData({ ...formData, activityLevel: level.value })}
                         >

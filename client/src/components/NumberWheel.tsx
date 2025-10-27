@@ -80,7 +80,7 @@ export function NumberWheel({ value, onChange, min, max, unit = "cm" }: NumberWh
             animate={{ scale: [0.98, 1], opacity: [0.9, 1] }}
             transition={{ duration: 0.3 }}
           >
-            <div className="text-4xl font-bold bg-gradient-to-r from-[#0CC5BA] via-[#3B82F6] to-[#8B5CF6] bg-clip-text text-transparent">
+            <div className="text-4xl font-bold text-[#26A8FF]">
               {displayedValue}{unit}
             </div>
             <div className="text-xs text-gray-500 mt-1">
@@ -140,7 +140,7 @@ export function NumberWheel({ value, onChange, min, max, unit = "cm" }: NumberWh
                   size="sm"
                   className={`px-3 py-1 h-8 ${
                     displayedValue === preset 
-                      ? 'bg-[#0CC5BA] hover:bg-[#0CC5BA]/90' 
+                      ? 'bg-[#26A8FF] hover:bg-[#1A8FE6]' 
                       : 'border-gray-200 text-gray-700'
                   }`}
                   onClick={() => {
@@ -161,7 +161,7 @@ export function NumberWheel({ value, onChange, min, max, unit = "cm" }: NumberWh
                   size="sm"
                   className={`px-3 py-1 h-8 ${
                     displayedValue === preset 
-                      ? 'bg-[#0CC5BA] hover:bg-[#0CC5BA]/90' 
+                      ? 'bg-[#26A8FF] hover:bg-[#1A8FE6]' 
                       : 'border-gray-200 text-gray-700'
                   }`}
                   onClick={() => {
