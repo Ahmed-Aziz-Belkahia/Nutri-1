@@ -28,9 +28,19 @@ export default function MealAnalysis() {
   const { addFood } = useFoodLog();
   const { toast } = useToast();
   const hasAnalyzed = useRef(false);
+  const analysisStarted = useRef(false);
 
   // Get image from route params or localStorage
   const imageData = params?.image ? decodeURIComponent(params.image) : localStorage.getItem('analyzingMealImage');
+
+  // Generate a hash from the image data to detect duplicates
+  const getImageHash = async (data: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data.substring(0, 1000)); // Use first 1KB for hash
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+  };
 
   useEffect(() => {
     console.log('[MealAnalysis] Component mounted');
@@ -43,14 +53,39 @@ export default function MealAnalysis() {
       return;
     }
 
-    // Prevent duplicate analysis (React StrictMode in dev runs effects twice)
-    if (hasAnalyzed.current) {
-      console.log('[MealAnalysis] Already analyzed, skipping');
-      return;
-    }
-    hasAnalyzed.current = true;
+    const checkAndAnalyze = async () => {
+      // Generate hash of the image
+      const imageHash = await getImageHash(imageData);
+      console.log('[MealAnalysis] Image hash:', imageHash);
+      
+      // Check if this exact image was analyzed before
+      const previousAnalysis = localStorage.getItem(`analysis_${imageHash}`);
+      if (previousAnalysis) {
+        const foodId = previousAnalysis;
+        console.log('[MealAnalysis] Found previous analysis for this image, redirecting to:', foodId);
+        localStorage.removeItem('analyzingMealImage');
+        setLocation(`/food/${foodId}`);
+        return;
+      }
 
-    let isMounted = true;
+      // Prevent duplicate analysis - use a flag that persists across strict mode remounts
+      if (analysisStarted.current) {
+        console.log('[MealAnalysis] Analysis already started, skipping');
+        return;
+      }
+      
+      // Check if we already have a result stored from this session
+      const storedResult = sessionStorage.getItem('lastAnalyzedFoodId');
+      if (storedResult && hasAnalyzed.current) {
+        console.log('[MealAnalysis] Found previous analysis result, redirecting to:', storedResult);
+        setLocation(`/food/${storedResult}`);
+        return;
+      }
+      
+      analysisStarted.current = true;
+      hasAnalyzed.current = true;
+
+      let isMounted = true;
 
     const performAnalysis = async () => {
       try {
@@ -116,16 +151,26 @@ export default function MealAnalysis() {
         setCurrentState('complete');
         localStorage.removeItem('analyzingMealImage');
         
+        // Store the food ID in sessionStorage so we can redirect on remount
+        const foodId = response?.log?.id;
+        if (foodId) {
+          sessionStorage.setItem('lastAnalyzedFoodId', foodId.toString());
+          // Store the image hash with the food ID for future duplicate detection
+          const imageHash = await getImageHash(imageData);
+          localStorage.setItem(`analysis_${imageHash}`, foodId.toString());
+          console.log('[MealAnalysis] Stored analysis result for hash:', imageHash);
+        }
+        
         // Wait a moment to show success, then redirect
         setTimeout(() => {
           if (!isMounted) return;
           
           // Response structure: { log: { id: number, ... }, totals: {...} }
-          const foodId = response?.log?.id;
           console.log('[MealAnalysis] Extracted foodId:', foodId);
           
           if (foodId) {
             console.log('[MealAnalysis] Redirecting to /food/' + foodId);
+            sessionStorage.removeItem('lastAnalyzedFoodId'); // Clean up after redirect
             setLocation(`/food/${foodId}`);
           } else {
             console.log('[MealAnalysis] No foodId found, redirecting to dashboard');
@@ -156,6 +201,9 @@ export default function MealAnalysis() {
     return () => {
       isMounted = false;
     };
+  };
+
+  checkAndAnalyze();
   }, [imageData, setLocation, addFood, toast]);
 
   if (!imageData) {
