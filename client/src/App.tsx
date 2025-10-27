@@ -8,7 +8,6 @@ import { ProgressSkeleton } from "@/components/ui/ProgressSkeleton";
 import { DashboardSkeleton } from "@/components/ui/DashboardSkeleton";
 import Footer from "./components/Footer";
 import AuthPage from "./pages/AuthPage";
-import Dashboard from "./pages/Dashboard";
 import DashboardNew from "./pages/DashboardNew";
 import LandingPage from "./pages/LandingPage";
 import Progress from "./pages/Progress";
@@ -254,7 +253,7 @@ function App() {
             </Route>
             <Route path="/dashboard-old">
               <ProtectedRoute>
-                <Dashboard />
+                <DashboardNew />
               </ProtectedRoute>
             </Route>
             <Route path="/progress">
