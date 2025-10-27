@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMealPlanProgress } from '@/hooks/use-meal-plan-progress';
 import { 
@@ -90,7 +90,9 @@ interface MealPlanGenerationProgressProps {
 
 export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGenerationProgressProps) {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const progressSteps = getProgressSteps(dayCount);
+  
+  // Memoize progressSteps to prevent recreation on every render
+  const progressSteps = useMemo(() => getProgressSteps(dayCount), [dayCount]);
   
   // Poll for real-time progress from backend
   const { data: progress } = useMealPlanProgress(true);
@@ -186,7 +188,8 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
     }
     
     setCompletedSteps(completed);
-  }, [currentDay, effectiveStep, totalDays, isActuallyInProgress, progressSteps]);
+  }, [currentDay, effectiveStep, totalDays, isActuallyInProgress, dayCount]);
+  // Note: progressSteps is memoized based on dayCount, so we only need dayCount in dependencies
 
   return (
     <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center p-3">
