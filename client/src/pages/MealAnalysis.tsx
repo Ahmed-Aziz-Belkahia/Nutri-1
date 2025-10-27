@@ -139,6 +139,7 @@ export default function MealAnalysis() {
           mealType: result.mealType || undefined,
           difficulty: result.difficulty || undefined,
           tags: result.tags || undefined,
+          isAnalyzing: true, // Tell backend we already analyzed this image
         };
         
         const response = await addFood(foodData);
