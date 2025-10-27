@@ -273,7 +273,7 @@ export default function MealPlanningQuiz() {
       
       // Wait for queries to refetch before navigating
       await new Promise(resolve => setTimeout(resolve, 500));
-      setLocation("/");
+      setLocation("/meal-plan/view");
     },
     onError: (error) => {
       setIsGeneratingMealPlan(false);

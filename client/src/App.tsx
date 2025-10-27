@@ -48,6 +48,8 @@ import AboutPage from "./pages/settings/AboutPage";
 import SecurityPage from "./pages/settings/SecurityPage";
 import SimpleMealPlanningQuiz from "./pages/SimpleMealPlanningQuiz";
 import MealPlanningQuiz from "./pages/MealPlanningQuiz";
+import MealPlanningQuizNew from "./pages/MealPlanningQuizNew";
+import MealPlanView from "./pages/MealPlanView";
 
 import MealPlan from "./pages/MealPlan";
 import ShoppingList from "./pages/ShoppingList";
@@ -400,6 +402,18 @@ function App() {
             <Route path="/meal-planning-quiz">
               <ProtectedRoute>
                 <MealPlanningQuiz />
+              </ProtectedRoute>
+            </Route>
+
+            <Route path="/meal-planning-quiz-new">
+              <ProtectedRoute>
+                <MealPlanningQuizNew />
+              </ProtectedRoute>
+            </Route>
+
+            <Route path="/meal-plan/view">
+              <ProtectedRoute>
+                <MealPlanView />
               </ProtectedRoute>
             </Route>
 
