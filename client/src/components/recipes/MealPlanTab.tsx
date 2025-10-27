@@ -20,6 +20,8 @@ interface GroceryItem {
   category?: string;
   isPurchased?: boolean;
   purchased?: boolean;
+  allIds?: number[]; // Track all IDs for merged items
+  mealPlanIds?: number[]; // Track which meal plans these items belong to
 }
 
 // Generate days for calendar (ensures current date can be centered with at least 7 days on each side)
@@ -182,6 +184,13 @@ export default function MealPlanTab() {
               const existingQty = parseFloat(existing.quantity?.toString() || '0');
               const newQty = parseFloat(item.quantity?.toString() || '0');
               existing.quantity = existingQty + newQty;
+              // Track all IDs and meal plan IDs
+              existing.allIds = existing.allIds || [existing.id];
+              existing.allIds.push(item.id);
+              existing.mealPlanIds = existing.mealPlanIds || [];
+              if (!existing.mealPlanIds.includes(plan.id)) {
+                existing.mealPlanIds.push(plan.id);
+              }
             } else {
               itemMap.set(key, {
                 id: item.id,
@@ -189,7 +198,9 @@ export default function MealPlanTab() {
                 quantity: item.quantity || 1,
                 unit: item.unit || 'unit',
                 category: item.category || 'Other',
-                isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false
+                isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false,
+                allIds: [item.id],
+                mealPlanIds: [plan.id]
               });
             }
           });
@@ -205,23 +216,49 @@ export default function MealPlanTab() {
   });
 
   // Handle toggling grocery item purchased status
-  const handleToggleItem = async (itemId: number, currentStatus: boolean) => {
-    if (!mealPlan?.id) return;
-    
+  const handleToggleItem = async (item: GroceryItem, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/meal-plans/${mealPlan.id}/shopping-list/${itemId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          isPurchased: !currentStatus
-        }),
-      });
+      const newStatus = !currentStatus;
       
-      if (!response.ok) {
-        throw new Error('Failed to update item');
+      // If this is a merged item from weekly list, update all instances across meal plans
+      if (item.allIds && item.allIds.length > 0 && item.mealPlanIds && item.mealPlanIds.length > 0) {
+        // Update all IDs across all meal plans
+        const updatePromises: Promise<Response>[] = [];
+        
+        for (const mealPlanId of item.mealPlanIds) {
+          for (const itemId of item.allIds) {
+            updatePromises.push(
+              fetch(`/api/meal-plans/${mealPlanId}/shopping-list/${itemId}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                  isPurchased: newStatus
+                }),
+              })
+            );
+          }
+        }
+        
+        await Promise.all(updatePromises);
+      } else if (mealPlan?.id) {
+        // Single item update (daily grocery list)
+        const response = await fetch(`/api/meal-plans/${mealPlan.id}/shopping-list/${item.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            isPurchased: newStatus
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to update item');
+        }
       }
       
       // Invalidate and refetch the grocery lists
@@ -294,7 +331,7 @@ export default function MealPlanTab() {
                     </p>
                   </div>
                   <button
-                    onClick={() => handleToggleItem(item.id, isPurchased)}
+                    onClick={() => handleToggleItem(item, isPurchased)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                       isPurchased
                         ? 'bg-[#26A8FF] border-[#26A8FF]'
