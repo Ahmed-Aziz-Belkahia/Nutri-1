@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ChefHat, Eye, Sparkles, Search } from 'lucide-react';
 
@@ -7,8 +7,7 @@ interface IngredientAnalysisProgressProps {
 }
 
 const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({ isVisible }) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  if (!isVisible) return null;
 
   const steps = [
     { icon: Eye, text: "Skanowanie obrazu", duration: 2, delay: 0 },
@@ -16,39 +15,6 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
     { icon: Sparkles, text: "Analiza jakości", duration: 2, delay: 5 },
     { icon: ChefHat, text: "Generowanie przepisów", duration: 3, delay: 7 }
   ];
-
-  useEffect(() => {
-    if (!isVisible) {
-      setCurrentStep(0);
-      setCompletedSteps(new Set());
-      return;
-    }
-
-    let stepIndex = 0;
-    const timers: NodeJS.Timeout[] = [];
-
-    const progressThroughSteps = () => {
-      if (stepIndex < steps.length) {
-        setCurrentStep(stepIndex);
-        
-        const timer = setTimeout(() => {
-          setCompletedSteps(prev => new Set(prev).add(stepIndex));
-          stepIndex++;
-          progressThroughSteps();
-        }, steps[stepIndex].duration * 1000);
-        
-        timers.push(timer);
-      }
-    };
-
-    progressThroughSteps();
-
-    return () => {
-      timers.forEach(clearTimeout);
-    };
-  }, [isVisible]);
-
-  if (!isVisible) return null;
 
   return (
     <motion.div
@@ -119,8 +85,8 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
       {/* Progress steps - styled to match screenshot */}
       <div className="space-y-4 w-full max-w-md">
         {steps.map((step, index) => {
-          const isActive = index === currentStep;
-          const isCompleted = completedSteps.has(index);
+          const isActive = true; // For continuous animation
+          const isCompleted = false; // Will be controlled by timing logic later
           
           return (
             <motion.div
