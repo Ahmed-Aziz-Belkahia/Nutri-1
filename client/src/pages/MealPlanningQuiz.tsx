@@ -168,6 +168,10 @@ export default function MealPlanningQuiz() {
 
   const handleNext = () => {
     if (isLastStep) {
+      // Prevent multiple submissions
+      if (saveMealPlanPreferences.isPending || isGeneratingMealPlan || isSubmittingRef.current) {
+        return;
+      }
       handleSubmit(onSubmit)();
     } else {
       setCurrentStep(currentStep + 1);
@@ -215,7 +219,15 @@ export default function MealPlanningQuiz() {
         });
 
         if (!mealPlanResponse.ok) {
-          throw new Error("Failed to create meal plan");
+          const errorData = await mealPlanResponse.json();
+          
+          // If generation is already in progress (409), just show progress screen
+          if (mealPlanResponse.status === 409) {
+            console.log('Meal plan generation already in progress, showing progress...');
+            return { preferences, mealPlan: { alreadyInProgress: true } };
+          }
+          
+          throw new Error(errorData.message || "Failed to create meal plan");
         }
 
         const mealPlan = await mealPlanResponse.json();
@@ -1073,13 +1085,13 @@ export default function MealPlanningQuiz() {
           >
             <Button
               onClick={handleNext}
-              disabled={!isCurrentStepValid()}
+              disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
               className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 text-white py-3 rounded-2xl text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLastStep ? (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Stwórz Mój Plan Żywieniowy
+                  {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Tworzę...' : 'Stwórz Mój Plan Żywieniowy'}
                 </>
               ) : (
                 <>
