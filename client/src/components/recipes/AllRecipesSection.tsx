@@ -154,6 +154,11 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
             className="appearance-none pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all cursor-pointer text-sm font-medium text-gray-700"
+            style={{
+              backgroundImage: 'none',
+              WebkitAppearance: 'none',
+              MozAppearance: 'none',
+            }}
           >
             <option value="newest">Newest First</option>
             <option value="name">Name (A-Z)</option>
