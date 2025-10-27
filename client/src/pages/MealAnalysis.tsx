@@ -33,13 +33,19 @@ export default function MealAnalysis() {
   const imageData = params?.image ? decodeURIComponent(params.image) : localStorage.getItem('analyzingMealImage');
 
   useEffect(() => {
+    console.log('[MealAnalysis] Component mounted');
+    console.log('[MealAnalysis] imageData exists:', !!imageData);
+    console.log('[MealAnalysis] imageData length:', imageData?.length);
+    
     if (!imageData) {
+      console.log('[MealAnalysis] No image data found, redirecting to /add-food');
       setLocation('/add-food');
       return;
     }
 
     // Prevent duplicate analysis (React StrictMode in dev runs effects twice)
     if (hasAnalyzed.current) {
+      console.log('[MealAnalysis] Already analyzed, skipping');
       return;
     }
     hasAnalyzed.current = true;
@@ -48,15 +54,20 @@ export default function MealAnalysis() {
 
     const performAnalysis = async () => {
       try {
+        console.log('[MealAnalysis] Starting analysis...');
+        
         // Step 1: Start detection
         setCurrentState('detecting');
+        console.log('[MealAnalysis] State: detecting');
         await new Promise(resolve => setTimeout(resolve, 1000)); // Min 1s for UX
         
         if (!isMounted) return;
         
         // Step 2: Analyzing (call API)
         setCurrentState('analyzing');
+        console.log('[MealAnalysis] State: analyzing, calling API...');
         const result = await analyzeFoodImage(imageData);
+        console.log('[MealAnalysis] API result:', result);
         
         if (!isMounted) return;
 
