@@ -128,6 +128,15 @@ export default function AddFoodNew() {
     }
   }, [activeTab]);
 
+  // Handle gallery tab - automatically trigger file input
+  useEffect(() => {
+    if (activeTab === "gallery") {
+      fileInputRef.current?.click();
+      // Return to photo tab after file selection attempt
+      setActiveTab("photo");
+    }
+  }, [activeTab]);
+
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -577,13 +586,6 @@ export default function AddFoodNew() {
 
   // Gallery view - redirects to file input
   const renderGalleryView = () => {
-    // Automatically trigger file input when gallery tab is selected
-    React.useEffect(() => {
-      fileInputRef.current?.click();
-      // Return to photo tab after selection
-      setActiveTab("photo");
-    }, []);
-
     return null;
   };
 
