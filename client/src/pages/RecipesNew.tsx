@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
+import MealPlanTab from "@/components/recipes/MealPlanTab";
 import MobileMenu from "@/components/dashboard/MobileMenu";
 import ProfileHeader from "@/components/dashboard/ProfileHeader";
 import { Book, Calendar } from "lucide-react";
@@ -147,23 +148,8 @@ export default function RecipesNew() {
             />
           </>
         ) : (
-          /* Meal Plan Tab - Keep existing content for now */
-          <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <div className="mb-4">
-              <Calendar className="w-16 h-16 mx-auto text-[#26A8FF] opacity-20" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Meal Planning</h3>
-            <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-              Plan your meals for the week ahead
-            </p>
-            <button 
-              className="inline-flex items-center px-6 py-3 rounded-full text-white font-medium transition-all hover:shadow-lg"
-              style={{ backgroundColor: '#26A8FF' }}
-              onClick={() => {/* TODO: Implement meal planning */}}
-            >
-              Create Meal Plan
-            </button>
-          </div>
+          /* Meal Plan Tab */
+          <MealPlanTab />
         )}
       </div>
 
