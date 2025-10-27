@@ -138,14 +138,14 @@ export default function MealPlanView() {
   };
 
   return (
-    <div className="gradient-bg min-h-screen pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-[#0CC5BA] via-[#6B46C1] to-[#9333EA] pb-32">
       <div className="max-w-md mx-auto px-5">
         {/* Back Button */}
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => setLocation("/")}
-          className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors py-4"
+          className="flex items-center space-x-2 text-white hover:text-white/90 transition-colors py-4"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Dashboard</span>
@@ -161,9 +161,9 @@ export default function MealPlanView() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-20 h-20 bg-gradient-to-r from-[#0CC5BA] to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#0CC5BA]/30"
+            className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl"
           >
-            <Check className="w-10 h-10 text-white" strokeWidth={3} />
+            <Check className="w-10 h-10 text-[#0CC5BA]" strokeWidth={3} />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0 }}
@@ -177,7 +177,7 @@ export default function MealPlanView() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-white/70 text-base"
+            className="text-white/90 text-base"
           >
             {format(firstDate, "MMM d")} - {format(lastDate, "MMM d, yyyy")}
           </motion.p>
