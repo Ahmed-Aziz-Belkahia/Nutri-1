@@ -80,8 +80,11 @@ export default function AddFoodNew() {
   const [errorTitle, setErrorTitle] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [errorSuggestion, setErrorSuggestion] = useState("");
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const { addFood } = useFoodLog();
 
@@ -125,15 +128,6 @@ export default function AddFoodNew() {
   useEffect(() => {
     if (activeTab === "photo") {
       requestCameraPermission();
-    }
-  }, [activeTab]);
-
-  // Handle gallery tab - automatically trigger file input
-  useEffect(() => {
-    if (activeTab === "gallery") {
-      fileInputRef.current?.click();
-      // Return to photo tab after file selection attempt
-      setActiveTab("photo");
     }
   }, [activeTab]);
 
@@ -244,93 +238,67 @@ export default function AddFoodNew() {
     
     try {
       const reader = new FileReader();
-      reader.onload = async () => {
-        try {
-          const base64data = reader.result as string;
-          
-          // Convert to WebP for optimization (80% quality)
-          const optimizedImage = await convertToWebP(base64data, 0.8);
-          
-          // Store optimized image for analysis page
-          localStorage.setItem('analyzingMealImage', optimizedImage);
-          
-          // Navigate to analysis page
-          setLocation("/meal-analysis");
-          
-          // Start analysis in background
-          setIsAnalyzing(true);
-          
-          toast({
-            title: "Photo Uploaded",
-            description: "Analyzing your meal with AI...",
-          });
-
-          // Analyze the image with AI using optimized image
-          const result = await analyzeFoodImage(optimizedImage);
-          
-          if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
-            throw new Error('Invalid analysis result: Missing required data');
-          }
-          
-          // Build enhanced food data with recipe fields if available
-          const foodData = {
-            name: result.name,
-            calories: typeof result.calories === 'number' ? result.calories : 0,
-            protein: typeof result.protein === 'number' ? result.protein : 0,
-            carbs: typeof result.carbs === 'number' ? result.carbs : 0,
-            fat: typeof result.fat === 'number' ? result.fat : 0,
-            components: Array.isArray(result.components) ? result.components : [],
-            image: optimizedImage,
-            
-            // Recipe fields (if AI recognized a recipe)
-            description: result.description || undefined,
-            ingredients: result.ingredients || undefined,
-            instructions: result.instructions || undefined,
-            prepTime: result.prepTime || undefined,
-            cookTime: result.cookTime || undefined,
-            servings: result.servings || 1,
-            source: 'scanned' as const,
-            isRecipe: !!(result.instructions && result.instructions.length > 0),
-            cuisineType: result.cuisineType || undefined,
-            mealType: result.mealType || undefined,
-            difficulty: result.difficulty || undefined,
-            tags: result.tags || undefined,
-          };
-          
-          const response = await addFood(foodData);
-          
-          // Store the food log ID for navigation to detail page
-          if (response?.log?.id) {
-            localStorage.setItem('analyzedFoodId', response.log.id.toString());
-          }
-
-          toast({
-            title: "Success! 🎉",
-            description: `Added ${result.name} to your food log`,
-          });
-
-          setIsAnalyzing(false);
-        } catch (analysisError) {
-          console.error('Upload Analysis Error:', analysisError);
-          setIsAnalyzing(false);
-          localStorage.removeItem('analyzingMealImage');
-          handleAnalysisError(analysisError);
-        }
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        
+        // Convert to WebP for optimization
+        const optimizedImage = await convertToWebP(base64, 0.8);
+        
+        // Store for analysis page
+        localStorage.setItem('analyzingMealImage', optimizedImage);
+        
+        // Navigate to analysis page
+        setLocation("/meal-analysis");
       };
-      
-      reader.onerror = (fileReadError) => {
-        console.error('File Read Error:', fileReadError);
-        setErrorTitle("File Reading Error");
-        setErrorMessage("We couldn't read your image file.");
-        setErrorSuggestion("The file might be corrupted. Try selecting a different image or take a new photo.");
-        setErrorModalOpen(true);
-        setIsAnalyzing(false);
-      };
-      
       reader.readAsDataURL(file);
     } catch (error) {
-      setIsAnalyzing(false);
-      localStorage.removeItem('analyzingMealImage');
+      console.error('File upload error:', error);
+      handleAnalysisError(error);
+    }
+  };
+
+  // Handle multiple gallery images selection
+  const handleGalleryImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    try {
+      const imagePromises = Array.from(files).map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
+      
+      const images = await Promise.all(imagePromises);
+      setGalleryImages(images);
+    } catch (error) {
+      console.error('Gallery images upload error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load gallery images",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle gallery image selection
+  const handleGalleryImageSelect = async (image: string) => {
+    setSelectedGalleryImage(image);
+    
+    try {
+      // Convert to WebP for optimization
+      const optimizedImage = await convertToWebP(image, 0.8);
+      
+      // Store for analysis page
+      localStorage.setItem('analyzingMealImage', optimizedImage);
+      
+      // Navigate to analysis page
+      setLocation("/meal-analysis");
+    } catch (error) {
+      console.error('Gallery selection error:', error);
       handleAnalysisError(error);
     }
   };
@@ -586,7 +554,102 @@ export default function AddFoodNew() {
 
   // Gallery view - redirects to file input
   const renderGalleryView = () => {
-    return null;
+    return (
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/30 to-white overflow-auto">
+        <div className="min-h-full flex flex-col" style={{ paddingTop: '120px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
+          <div className="flex-1 px-5">
+            <div className="max-w-4xl mx-auto">
+              {/* Header */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6"
+              >
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose from Gallery</h2>
+                <p className="text-gray-600">Select food images to analyze</p>
+              </motion.div>
+
+              {/* Gallery Grid */}
+              {galleryImages.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center py-20"
+                >
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#26A8FF]/10 to-[#1A8FE6]/10 flex items-center justify-center mb-6">
+                    <ImageIcon className="w-16 h-16 text-[#26A8FF]" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Images Loaded</h3>
+                  <p className="text-gray-500 text-center mb-8 max-w-md">
+                    Load images from your device to select and analyze food photos
+                  </p>
+                  <Button
+                    onClick={() => galleryInputRef.current?.click()}
+                    className="bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] hover:from-[#1A8FE6] hover:to-[#0D7FD6] text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-lg"
+                  >
+                    <ImageIcon className="w-5 h-5 mr-2" />
+                    Load Images
+                  </Button>
+                </motion.div>
+              ) : (
+                <>
+                  {/* Load More Button */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mb-6"
+                  >
+                    <Button
+                      onClick={() => galleryInputRef.current?.click()}
+                      variant="outline"
+                      className="w-full py-6 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#26A8FF] hover:bg-[#26A8FF]/5 transition-all"
+                    >
+                      <ImageIcon className="w-5 h-5 mr-2" />
+                      Load More Images
+                    </Button>
+                  </motion.div>
+
+                  {/* Image Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
+                    {galleryImages.map((image, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleGalleryImageSelect(image)}
+                        className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl transition-all group"
+                      >
+                        <img
+                          src={image}
+                          alt={`Gallery ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
+                          <span className="text-white font-semibold text-sm">Select</span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Hidden Gallery Input - Multiple Selection */}
+        <input
+          type="file"
+          ref={galleryInputRef}
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleGalleryImagesUpload}
+        />
+      </div>
+    );
   };
 
   // Manual entry view - Clean and organized
