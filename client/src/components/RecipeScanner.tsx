@@ -71,11 +71,6 @@ const RecipeScanner: FC<RecipeScannerProps> = ({ onClose = () => {} }) => {
           console.log('Navigating to ingredient confirmation with data:', analysisData);
           console.log('Encoded URL data:', encodedData);
           
-          // Wait for minimum progress animation duration (10 seconds total: 2+3+2+3)
-          // This ensures all 4 steps are visible to the user
-          const minProgressDuration = 10000;
-          await new Promise(resolve => setTimeout(resolve, minProgressDuration));
-          
           // Use router navigation for smooth transition
           const resultUrl = `/confirm-ingredients?data=${encodedData}`;
           console.log('Navigating to URL:', resultUrl);
@@ -142,11 +137,6 @@ const RecipeScanner: FC<RecipeScannerProps> = ({ onClose = () => {} }) => {
             const encodedData = encodeURIComponent(JSON.stringify(analysisData));
             console.log('Navigating to ingredient confirmation with file data:', analysisData);
             console.log('Encoded file URL data:', encodedData);
-            
-            // Wait for minimum progress animation duration (10 seconds total: 2+3+2+3)
-            // This ensures all 4 steps are visible to the user
-            const minProgressDuration = 10000;
-            await new Promise(resolve => setTimeout(resolve, minProgressDuration));
             
             // Use router navigation for smooth transition
             const resultUrl = `/confirm-ingredients?data=${encodedData}`;
