@@ -346,6 +346,11 @@ function App() {
                 <Recipes />
               </ProtectedRoute>
             </Route>
+            <Route path="/recipes/food-log/:id">
+              <ProtectedRoute>
+                <RecipeDetail />
+              </ProtectedRoute>
+            </Route>
             <Route path="/recipes/:id">
               <ProtectedRoute>
                 <RecipeDetail />

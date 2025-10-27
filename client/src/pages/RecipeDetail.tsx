@@ -39,7 +39,8 @@ interface Recipe {
 
 export default function RecipeDetail() {
   const { id } = useParams();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const isFoodLog = location.includes('/food-log/');
   const recipeId = id;
   const [activeTab, setActiveTab] = useState<'ingredients' | 'instructions' | 'nutrition'>('ingredients');
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
@@ -48,9 +49,12 @@ export default function RecipeDetail() {
 
   // Fetch recipe details
   const { data: recipe, isLoading } = useQuery<Recipe>({
-    queryKey: ['recipe', recipeId],
+    queryKey: ['recipe', recipeId, isFoodLog],
     queryFn: async () => {
-      const response = await fetch(`/api/recipes/${recipeId}`, {
+      const endpoint = isFoodLog 
+        ? `/api/recipes/food-log/${recipeId}`
+        : `/api/recipes/${recipeId}`;
+      const response = await fetch(endpoint, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch recipe');

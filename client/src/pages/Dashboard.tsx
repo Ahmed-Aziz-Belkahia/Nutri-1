@@ -679,7 +679,7 @@ export default function Dashboard() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        onClick={() => setLocation(`/meal/${log.id}`)}
+                        onClick={() => setLocation(log.isRecipe ? `/recipes/food-log/${log.id}` : `/meal/${log.id}`)}
                         className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/30 cursor-pointer hover:bg-white/50 transition-all duration-200"
                       >
                         <div className="flex items-center gap-3">

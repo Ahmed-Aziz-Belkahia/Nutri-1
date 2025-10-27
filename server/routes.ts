@@ -1512,6 +1512,61 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add endpoint for fetching scanned recipe from food_logs
+  app.get("/api/recipes/food-log/:id", async (req, res) => {
+    try {
+      const logId = parseInt(req.params.id);
+      if (isNaN(logId)) {
+        return res.status(400).json({ error: 'Invalid food log ID' });
+      }
+
+      const foodLog = await db
+        .select()
+        .from(foodLogs)
+        .where(and(eq(foodLogs.id, logId), eq(foodLogs.isRecipe, true)))
+        .limit(1);
+
+      if (!foodLog || foodLog.length === 0) {
+        return res.status(404).json({ error: 'Recipe not found in food logs' });
+      }
+
+      const log = foodLog[0];
+
+      // Transform food log to recipe format
+      const recipeData = {
+        id: log.id,
+        name: log.name,
+        description: log.description || '',
+        imageUrl: log.image || '',
+        prepTime: log.prepTime || null,
+        cookTime: log.cookTime || null,
+        servings: log.servings || 1,
+        difficulty: log.difficulty || null,
+        ingredients: log.ingredients || [],
+        instructions: log.instructions || [],
+        nutritionInfo: {
+          calories: log.calories,
+          protein: log.protein,
+          carbs: log.carbs,
+          fat: log.fat
+        },
+        tags: log.tags || [],
+        cuisineType: log.cuisineType || null,
+        mealType: log.mealType || null,
+        source: 'scanned',
+        isSaved: false
+      };
+
+      res.json(recipeData);
+    } catch (error) {
+      console.error('Error fetching food log recipe:', error);
+      res.status(500).json({
+        error: 'Failed to fetch recipe',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Add the GET single recipe endpoint after the existing recipe routes
   app.get("/api/recipes/:id", async (req, res) => {
     try {
