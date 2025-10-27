@@ -5,6 +5,8 @@ import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 
 interface FoodDetailViewProps {
   food?: {
@@ -16,6 +18,7 @@ interface FoodDetailViewProps {
     fat: number;
     image?: string;
     isComposite?: boolean;
+    date?: string;
     components?: Array<{
       name: string;
       calories: number;
@@ -43,7 +46,9 @@ export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps)
   const { toast } = useToast();
   const { t } = useTranslation();
   const [, navigate] = useLocation();
+  const queryClient = useQueryClient();
   const [quantity, setQuantity] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
 
   if (isLoading || !food) {
     return (
@@ -54,6 +59,65 @@ export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps)
       </div>
     );
   }
+
+  const handleSave = async () => {
+    if (!food.id) {
+      navigate('/dashboard');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // Prepare updated data
+      const updatedData: any = {
+        name: food.name,
+        calories: food.isComposite ? food.calories : Number(food.calories) * quantity,
+        protein: food.isComposite ? food.protein : Number(food.protein) * quantity,
+        carbs: food.isComposite ? food.carbs : Number(food.carbs) * quantity,
+        fat: food.isComposite ? food.fat : Number(food.fat) * quantity,
+      };
+
+      // Include components if it's a composite meal
+      if (food.isComposite && food.components) {
+        updatedData.components = food.components;
+      }
+
+      // Update the food log with the new quantity
+      const response = await fetch(`/api/food-logs/${food.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update food log');
+      }
+
+      // Invalidate queries to refresh data
+      const dateString = food.date ? format(new Date(food.date), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
+      await queryClient.invalidateQueries({ queryKey: ['/api/food-logs', dateString] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/food-logs'] });
+
+      toast({
+        title: t('meal.updated', 'Zaktualizowano posiłek'),
+        description: t('meal.updatedDescription', 'Ilość została zaktualizowana w Twoim dzienniku.'),
+      });
+
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error updating food log:', error);
+      toast({
+        title: t('error.title', 'Błąd'),
+        description: t('error.updateFailed', 'Nie udało się zaktualizować posiłku.'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-[#F8F9FA] overflow-y-auto">
@@ -239,16 +303,18 @@ export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps)
       {/* Bottom Button */}
       <div className="fixed bottom-0 left-0 right-0 p-3 bg-[#F8F9FA]">
         <Button
-          className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-2xl"
-          onClick={() => {
-            toast({
-              title: t('meal.viewing', 'Przeglądasz posiłek'),
-              description: t('meal.alreadySaved', 'Ten posiłek jest już zapisany w Twoim dzienniku.')
-            });
-            navigate('/dashboard');
-          }}
+          className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-2xl disabled:opacity-50"
+          onClick={handleSave}
+          disabled={isSaving}
         >
-          {t('common.back', 'Wróć do pulpitu')}
+          {isSaving ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+              <span>{t('common.saving', 'Zapisywanie...')}</span>
+            </div>
+          ) : (
+            t('meal.save', 'Zapisz')
+          )}
         </Button>
       </div>
     </div>
