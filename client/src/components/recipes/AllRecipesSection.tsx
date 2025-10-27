@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Search, SlidersHorizontal, X, Check } from 'lucide-react';
 import RecipeCard from './RecipeCard';
 import { useLocation } from 'wouter';
 
@@ -31,6 +31,33 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowFilters(false);
+      }
+    };
+
+    if (showFilters) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showFilters]);
+
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: 'newest', label: 'Newest First' },
+    { value: 'name', label: 'Name (A-Z)' },
+    { value: 'calories-low', label: 'Calories (Low to High)' },
+    { value: 'calories-high', label: 'Calories (High to Low)' },
+    { value: 'time-low', label: 'Quick Meals First' },
+    { value: 'time-high', label: 'Longest Time First' },
+  ];
 
   // Filter recipes by search query
   const filteredRecipes = recipes.filter(recipe => 
@@ -148,26 +175,38 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
           )}
         </div>
 
-        {/* Sort Dropdown */}
-        <div className="relative">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="appearance-none pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all cursor-pointer text-sm font-medium text-gray-700"
-            style={{
-              backgroundImage: 'none',
-              WebkitAppearance: 'none',
-              MozAppearance: 'none',
-            }}
+        {/* Sort Dropdown Button */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all text-sm font-medium text-gray-700"
           >
-            <option value="newest">Newest First</option>
-            <option value="name">Name (A-Z)</option>
-            <option value="calories-low">Calories (Low to High)</option>
-            <option value="calories-high">Calories (High to Low)</option>
-            <option value="time-low">Quick Meals First</option>
-            <option value="time-high">Longest Time First</option>
-          </select>
-          <SlidersHorizontal className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#26A8FF] pointer-events-none" />
+            <SlidersHorizontal className="w-5 h-5 text-[#26A8FF]" />
+            <span>Sort</span>
+          </button>
+
+          {/* Dropdown Menu */}
+          {showFilters && (
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+              {sortOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    setSortBy(option.value);
+                    setShowFilters(false);
+                  }}
+                  className="w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 transition-colors flex items-center justify-between"
+                >
+                  <span className={sortBy === option.value ? 'font-medium text-[#26A8FF]' : 'text-gray-700'}>
+                    {option.label}
+                  </span>
+                  {sortBy === option.value && (
+                    <Check className="w-4 h-4 text-[#26A8FF]" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
