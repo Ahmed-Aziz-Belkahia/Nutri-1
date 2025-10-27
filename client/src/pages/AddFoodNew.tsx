@@ -167,66 +167,10 @@ export default function AddFoodNew() {
       // Store optimized image for analysis page
       localStorage.setItem('analyzingMealImage', optimizedImage);
       
-      // Navigate to analysis page
+      // Navigate to analysis page - let MealAnalysis handle the API call
       setLocation("/meal-analysis");
-      
-      // Start analysis in background
-      setIsAnalyzing(true);
-
-      toast({
-        title: "Photo Captured",
-        description: "Analyzing your meal with AI...",
-      });
-
-      // Analyze the image with AI using optimized image
-      const result = await analyzeFoodImage(optimizedImage);
-      
-      if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
-        throw new Error('Invalid analysis result: Missing required data');
-      }
-      
-      // Build enhanced food data with recipe fields if available
-      const foodData = {
-        name: result.name,
-        calories: typeof result.calories === 'number' ? result.calories : 0,
-        protein: typeof result.protein === 'number' ? result.protein : 0,
-        carbs: typeof result.carbs === 'number' ? result.carbs : 0,
-        fat: typeof result.fat === 'number' ? result.fat : 0,
-        components: Array.isArray(result.components) ? result.components : [],
-        image: optimizedImage,
-        
-        // Recipe fields (if AI recognized a recipe)
-        description: result.description || undefined,
-        ingredients: result.ingredients || undefined,
-        instructions: result.instructions || undefined,
-        prepTime: result.prepTime || undefined,
-        cookTime: result.cookTime || undefined,
-        servings: result.servings || 1,
-        source: 'scanned' as const,
-        isRecipe: !!(result.instructions && result.instructions.length > 0),
-        cuisineType: result.cuisineType || undefined,
-        mealType: result.mealType || undefined,
-        difficulty: result.difficulty || undefined,
-        tags: result.tags || undefined,
-      };
-      
-      const response = await addFood(foodData);
-      
-      // Store the food log ID for navigation to detail page
-      if (response?.log?.id) {
-        localStorage.setItem('analyzedFoodId', response.log.id.toString());
-      }
-
-      toast({
-        title: "Success! 🎉",
-        description: `Added ${result.name} to your food log`,
-      });
-
-      setIsAnalyzing(false);
     } catch (error) {
       console.error('Capture Error:', error);
-      setIsAnalyzing(false);
-      localStorage.removeItem('analyzingMealImage');
       handleAnalysisError(error);
     }
   };

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useRoute } from 'wouter';
 import { Sparkles, Check, Loader2, ChefHat, Scale, Flame, Beef } from 'lucide-react';
+import { analyzeFoodImage } from '@/lib/vision';
+import { useFoodLog } from '@/hooks/use-food-log';
+import { useToast } from '@/hooks/use-toast';
 
 interface AnalysisStep {
   id: string;
@@ -23,6 +26,8 @@ export default function MealAnalysis() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const { addFood } = useFoodLog();
+  const { toast } = useToast();
 
   // Get image from route params or localStorage
   const imageData = params?.image ? decodeURIComponent(params.image) : localStorage.getItem('analyzingMealImage');
@@ -33,35 +38,89 @@ export default function MealAnalysis() {
       return;
     }
 
-    // Check if analysis is already complete (fast completion)
-    const checkAnalysisCompletion = setInterval(() => {
-      const foodId = localStorage.getItem('analyzedFoodId');
-      if (foodId && !analysisComplete) {
-        // Analysis completed, speed up remaining steps
-        setCurrentStep(analysisSteps.length);
-        setCompletedSteps(new Set(analysisSteps.map((_, i) => i)));
-        setAnalysisComplete(true);
-        clearInterval(checkAnalysisCompletion);
-        
-        // Clean up and redirect
-        localStorage.removeItem('analyzingMealImage');
-        setTimeout(() => {
-          localStorage.removeItem('analyzedFoodId');
-          setLocation(`/food/${foodId}`);
-        }, 1500);
-      }
-    }, 500);
-
-    // Simulate analysis progress with visual steps
+    let isMounted = true;
     let stepIndex = 0;
     const intervals: NodeJS.Timeout[] = [];
 
+    // Start the actual API analysis
+    const performAnalysis = async () => {
+      try {
+        // Analyze the image with AI
+        const result = await analyzeFoodImage(imageData);
+        
+        if (!isMounted) return;
+
+        if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
+          throw new Error('Invalid analysis result: Missing required data');
+        }
+        
+        // Build enhanced food data with recipe fields if available
+        const foodData = {
+          name: result.name,
+          calories: typeof result.calories === 'number' ? result.calories : 0,
+          protein: typeof result.protein === 'number' ? result.protein : 0,
+          carbs: typeof result.carbs === 'number' ? result.carbs : 0,
+          fat: typeof result.fat === 'number' ? result.fat : 0,
+          components: Array.isArray(result.components) ? result.components : [],
+          image: imageData,
+          
+          // Recipe fields (if AI recognized a recipe)
+          description: result.description || undefined,
+          ingredients: result.ingredients || undefined,
+          instructions: result.instructions || undefined,
+          prepTime: result.prepTime || undefined,
+          cookTime: result.cookTime || undefined,
+          servings: result.servings || 1,
+          source: 'scanned' as const,
+          isRecipe: !!(result.instructions && result.instructions.length > 0),
+          cuisineType: result.cuisineType || undefined,
+          mealType: result.mealType || undefined,
+          difficulty: result.difficulty || undefined,
+          tags: result.tags || undefined,
+        };
+        
+        const response = await addFood(foodData);
+        
+        if (!isMounted) return;
+
+        // Complete all steps instantly
+        setCurrentStep(analysisSteps.length);
+        setCompletedSteps(new Set(analysisSteps.map((_, i) => i)));
+        setAnalysisComplete(true);
+        
+        // Clean up and redirect
+        localStorage.removeItem('analyzingMealImage');
+        
+        setTimeout(() => {
+          if (!isMounted) return;
+          
+          if (response?.log?.id) {
+            setLocation(`/food/${response.log.id}`);
+          } else {
+            setLocation('/dashboard');
+          }
+        }, 1500);
+      } catch (error) {
+        console.error('Analysis Error:', error);
+        if (!isMounted) return;
+        
+        localStorage.removeItem('analyzingMealImage');
+        toast({
+          title: "Analysis Error",
+          description: "Failed to analyze your meal. Please try again.",
+          variant: "destructive",
+        });
+        setLocation('/add-food');
+      }
+    };
+
+    // Visual progress animation
     const progressThroughSteps = () => {
       if (stepIndex < analysisSteps.length && !analysisComplete) {
         setCurrentStep(stepIndex);
         
         const timer = setTimeout(() => {
-          if (!analysisComplete) {
+          if (!analysisComplete && isMounted) {
             setCompletedSteps(prev => new Set(prev).add(stepIndex));
             stepIndex++;
             progressThroughSteps();
@@ -69,33 +128,18 @@ export default function MealAnalysis() {
         }, analysisSteps[stepIndex].duration);
         
         intervals.push(timer);
-      } else if (stepIndex >= analysisSteps.length && !analysisComplete) {
-        // All visual steps complete, but still waiting for actual analysis
-        // This is a fallback in case analysis takes longer than expected
-        const checkCompletion = setInterval(() => {
-          const foodId = localStorage.getItem('analyzedFoodId');
-          if (foodId) {
-            setAnalysisComplete(true);
-            clearInterval(checkCompletion);
-            localStorage.removeItem('analyzingMealImage');
-            
-            setTimeout(() => {
-              localStorage.removeItem('analyzedFoodId');
-              setLocation(`/food/${foodId}`);
-            }, 1500);
-          }
-        }, 500);
-        intervals.push(checkCompletion as any);
       }
     };
 
+    // Start both analysis and visual progress
+    performAnalysis();
     progressThroughSteps();
 
     return () => {
-      clearInterval(checkAnalysisCompletion);
+      isMounted = false;
       intervals.forEach(clearTimeout);
     };
-  }, [imageData, setLocation, analysisComplete]);
+  }, [imageData, setLocation, addFood, toast, analysisComplete]);
 
   if (!imageData) {
     return null;
