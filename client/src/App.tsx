@@ -8,6 +8,7 @@ import { ProgressSkeleton } from "@/components/ui/ProgressSkeleton";
 import { DashboardSkeleton } from "@/components/ui/DashboardSkeleton";
 import Footer from "./components/Footer";
 import AuthPage from "./pages/AuthPage";
+import Dashboard from "./pages/Dashboard";
 import DashboardNew from "./pages/DashboardNew";
 import LandingPage from "./pages/LandingPage";
 import Progress from "./pages/Progress";
@@ -23,6 +24,7 @@ import MealAnalysis from "./pages/MealAnalysis";
 import FoodDetail from "./pages/FoodDetail";
 import MealDetail from "./pages/MealDetail";
 import Recipes from "./pages/Recipes";
+import RecipesNew from "./pages/RecipesNew";
 import RecipeDetail from "./pages/RecipeDetail";
 import CookingMode from "./pages/CookingMode";
 import CreateRecipe from "./pages/CreateRecipe";
@@ -250,6 +252,11 @@ function App() {
                 <DashboardNew />
               </ProtectedRoute>
             </Route>
+            <Route path="/dashboard-old">
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            </Route>
             <Route path="/progress">
               <ProtectedRoute>
                 <UnifiedProgress />
@@ -337,7 +344,7 @@ function App() {
             </Route>
             <Route path="/recipes">
               <ProtectedRoute>
-                <Recipes />
+                <RecipesNew />
               </ProtectedRoute>
             </Route>
             <Route path="/recipes/food-log/:id">
