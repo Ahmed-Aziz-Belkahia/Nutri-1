@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -119,6 +119,7 @@ export default function MealPlanningQuiz() {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [isGeneratingMealPlan, setIsGeneratingMealPlan] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   // Fetch user nutrition preferences
   const { data: userPreferences } = useQuery({
@@ -183,6 +184,14 @@ export default function MealPlanningQuiz() {
 
   const saveMealPlanPreferences = useMutation({
     mutationFn: async (data: MealPlanPreferencesForm) => {
+      // Prevent double submission
+      if (isSubmittingRef.current) {
+        console.log('[Meal Plan Quiz] Already submitting, ignoring duplicate request');
+        throw new Error('Already submitting');
+      }
+      
+      isSubmittingRef.current = true;
+      
       try {
         const preferencesResponse = await fetch("/api/user/dietary-preferences", {
           method: "POST",
@@ -214,11 +223,13 @@ export default function MealPlanningQuiz() {
       } catch (error) {
         console.error("Meal plan creation error:", error);
         setIsGeneratingMealPlan(false);
+        isSubmittingRef.current = false;
         throw error;
       }
     },
     onSuccess: async () => {
       setIsGeneratingMealPlan(false);
+      isSubmittingRef.current = false;
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
@@ -235,7 +246,14 @@ export default function MealPlanningQuiz() {
     },
     onError: (error) => {
       setIsGeneratingMealPlan(false);
+      isSubmittingRef.current = false;
       const errorMessage = error instanceof Error ? error.message : "Failed to save preferences";
+      
+      // Don't show error toast for duplicate submission
+      if (errorMessage === 'Already submitting') {
+        return;
+      }
+      
       toast({
         variant: "destructive",
         title: "Error",
