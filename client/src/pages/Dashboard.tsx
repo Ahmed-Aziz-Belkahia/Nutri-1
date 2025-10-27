@@ -670,7 +670,7 @@ export default function Dashboard() {
                   )}
 
                   {/* Regular meals */}
-                  {foodLogs?.slice(0, 3).map((log: any, index: number) => {
+                  {foodLogs?.map((log: any, index: number) => {
                     const totalCalories = calculateTotal(log.name, log.calories);
                     
                     return (
@@ -678,7 +678,7 @@ export default function Dashboard() {
                         key={log.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
+                        transition={{ delay: Math.min(index * 0.1, 0.5) }}
                         onClick={() => setLocation(log.isRecipe ? `/recipes/food-log/${log.id}` : `/meal/${log.id}`)}
                         className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/30 cursor-pointer hover:bg-white/50 transition-all duration-200"
                       >
@@ -712,16 +712,6 @@ export default function Dashboard() {
                       </motion.div>
                     );
                   })}
-
-                  {foodLogs && foodLogs.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Link href="/food-logs">
-                        <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                          View all {foodLogs.length} meals
-                        </button>
-                      </Link>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center py-8">
