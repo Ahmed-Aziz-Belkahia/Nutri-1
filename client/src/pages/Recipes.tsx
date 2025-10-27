@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
   Loader2, 
@@ -9,30 +8,25 @@ import {
 import { useLocation } from "wouter";
 import { useUser } from "../hooks/use-user";
 import { format } from "date-fns";
-import Navbar from "@/components/Navbar";
-import PullToRefresh from "@/components/PullToRefresh";
+import BaseLayout from "@/components/layouts/BaseLayout";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { 
-  Plus, Camera, ChevronRight, Loader2, 
+  Plus, Camera, ChevronRight, 
   Search, User, Settings, LogOut, Trash2,
-  Utensils, Filter, LayoutGrid, Heart, Clock, Flame,
+  Filter, LayoutGrid, Heart, Flame,
   CalendarDays, Coffee, Pizza, ShoppingCart, ShoppingBag, Sparkles
 } from "lucide-react";
-import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useUser } from "../hooks/use-user";
 import { useTranslation } from "react-i18next";
-import { format, parseISO, addDays, differenceInDays } from "date-fns";
+import { parseISO, addDays, differenceInDays } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { MealCard } from "@/components/MealCard";
 import { EnhancedRecipeCard } from "@/components/EnhancedRecipeCard";
 import { Recipe } from "@/types/recipe";
-import Navbar from "@/components/Navbar"; 
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -59,8 +53,6 @@ import { z } from "zod";
 import ImprovedShoppingList from "@/pages/ImprovedShoppingList";
 import EmbeddedShoppingList from "@/components/EmbeddedShoppingList";
 import MealPlanningWelcome from "@/components/MealPlanningWelcome";
-import PullToRefresh from "@/components/PullToRefresh";
-import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import GroceryList from "@/components/dashboard/GroceryList";
 
 const containerVariants = {
@@ -636,42 +628,13 @@ export default function Recipes() {
   }
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div className="gradient-bg min-h-screen pb-32">
-      <div className="max-w-md mx-auto relative z-10 pt-6 px-4">
-        {/* Minimal header to match Dashboard */}
-        <motion.header
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="mb-6"
-        >
-          <div className="flex items-center justify-between">
-            <div className="profile-avatar">
-              {user?.profileImage ? (
-                <img 
-                  src={user.profileImage} 
-                  alt={user.email} 
-                  className="profile-avatar-image" 
-                />
-              ) : (
-                <div className="profile-avatar-initial">
-                  {userInitial}
-                </div>
-              )}
-            </div>
-            <div className="profile-info">
-              <p className="profile-greeting">{t('recipes.welcomeBack', 'Welcome back')}</p>
-              <p className="profile-name">{username}</p>
-            </div>
-          </div>
-        </motion.header>
-
-        <motion.main
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="pb-24"
-        >
+    <BaseLayout onRefresh={handleRefresh}>
+      <motion.main
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="pb-24"
+      >
           {/* Redesigned Scan Ingredients Card */}
           {/* Tab navigation */}
           <Tabs
@@ -684,11 +647,11 @@ export default function Recipes() {
             }}
             className="w-full mb-8"
           >
-            <TabsList className="grid w-full grid-cols-2 mb-4 bg-transparent rounded-2xl p-1">
-              <TabsTrigger value="recipes" className="text-base font-medium py-2.5 px-4 rounded-xl text-gray-600 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
+            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/10 backdrop-blur-sm rounded-2xl p-1">
+              <TabsTrigger value="recipes" className="text-base font-medium py-2.5 px-4 rounded-xl text-white/70 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
                 {t('navigation.recipes', 'Recipes')}
               </TabsTrigger>
-              <TabsTrigger value="meal-plan" className="text-base font-medium py-2.5 px-4 rounded-xl text-gray-600 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
+              <TabsTrigger value="meal-plan" className="text-base font-medium py-2.5 px-4 rounded-xl text-white/70 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
                 {t('navigation.mealPlan', 'Meal Plan')}
               </TabsTrigger>
             </TabsList>
@@ -700,21 +663,21 @@ export default function Recipes() {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="card mb-6"
+                className="mb-6"
               >
                 <div className="text-center mb-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Camera className="w-8 h-8 text-primary" />
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Camera className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-2">{t('recipes.aIPoweredCreator')}</h2>
-                  <p className="text-sm text-gray-600 mb-6">
+                  <h2 className="text-xl font-bold text-white mb-2">{t('recipes.aIPoweredCreator')}</h2>
+                  <p className="text-sm text-white/80 mb-6">
                     {t('recipes.takePhoto')}
                   </p>
                   
                   <div className="flex justify-center">
                     <Button
                       onClick={() => navigate('/scan-recipe')}
-                      className="py-6 px-10 bg-primary text-white rounded-2xl font-semibold text-base hover:shadow-lg transition-all duration-300 flex items-center justify-center"
+                      className="py-6 px-10 bg-white text-primary rounded-2xl font-semibold text-base hover:shadow-lg transition-all duration-300 flex items-center justify-center hover:bg-white/90"
                     >
                       <Camera className="w-5 h-5 mr-3" />
                       {t('recipes.scanIngredients')}
@@ -732,16 +695,16 @@ export default function Recipes() {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="bg-primary/10 p-2 rounded-full">
-                      <Utensils className="h-5 w-5 text-primary" />
+                    <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
+                      <Utensils className="h-5 w-5 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 ml-2">
+                    <h2 className="text-xl font-bold text-white ml-2">
                       {t('recipes.yourRecipes')}
                     </h2>
                   </div>
                   <Button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-primary text-white rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all"
+                    className="bg-white text-primary rounded-lg px-4 py-2 flex items-center gap-2 hover:shadow-lg transition-all hover:bg-white/90"
                   >
                     <Plus className="h-4 w-4" />
                     {t('recipes.createRecipe', 'Create Recipe')}
@@ -752,16 +715,16 @@ export default function Recipes() {
                 {isLoadingCreated ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {[1, 2, 3, 4].map((i) => (
-                      <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                      <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden">
                         <div className="animate-pulse">
-                          <div className="h-40 bg-gray-200 w-full" />
+                          <div className="h-40 bg-white/20 w-full" />
                           <div className="p-4 space-y-2">
-                            <div className="h-5 bg-gray-200 rounded w-3/4" />
-                            <div className="h-4 bg-gray-200 rounded w-1/2" />
+                            <div className="h-5 bg-white/20 rounded w-3/4" />
+                            <div className="h-4 bg-white/20 rounded w-1/2" />
                             <div className="flex gap-2 pt-1">
-                              <div className="h-6 w-6 rounded-full bg-gray-200" />
-                              <div className="h-6 w-6 rounded-full bg-gray-200" />
-                              <div className="h-6 w-6 rounded-full bg-gray-200" />
+                              <div className="h-6 w-6 rounded-full bg-white/20" />
+                              <div className="h-6 w-6 rounded-full bg-white/20" />
+                              <div className="h-6 w-6 rounded-full bg-white/20" />
                             </div>
                           </div>
                         </div>
@@ -783,21 +746,21 @@ export default function Recipes() {
                     ))}
                     
                     {getFilteredRecipes(createdRecipes).length === 0 && (
-                      <div className="col-span-1 sm:col-span-2 text-center py-8 text-gray-500">
+                      <div className="col-span-1 sm:col-span-2 text-center py-8 text-white/80">
                         <p>No matching recipes found. Try adjusting your filters or create a new recipe!</p>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="text-center py-10">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Plus className="h-6 w-6 text-gray-400" />
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Plus className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{t('recipes.noRecipesYet')}</h3>
-                    <p className="text-gray-500 mb-6">{t('recipes.startCulinaryJourney')}</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{t('recipes.noRecipesYet')}</h3>
+                    <p className="text-white/80 mb-6">{t('recipes.startCulinaryJourney')}</p>
                     <Button
                       onClick={() => setShowCreateModal(true)}
-                      className="bg-primary text-white rounded-lg px-6 py-3 flex items-center gap-2 hover:shadow-lg transition-all mx-auto"
+                      className="bg-white text-primary rounded-lg px-6 py-3 flex items-center gap-2 hover:shadow-lg transition-all mx-auto hover:bg-white/90"
                     >
                       <Plus className="h-5 w-5" />
                       {t('recipes.createRecipe', 'Create Recipe')}
@@ -815,10 +778,10 @@ export default function Recipes() {
                   className="mb-8"
                 >
                   <div className="flex items-center space-x-2 mb-4">
-                    <div className="bg-primary/10 p-2 rounded-full">
-                      <Heart className="h-5 w-5 text-primary" />
+                    <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
+                      <Heart className="h-5 w-5 text-white" />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-white">
                       {t('recipes.savedFavorites')}
                     </h2>
                   </div>
@@ -833,7 +796,7 @@ export default function Recipes() {
                     ))}
                     
                     {getFilteredRecipes(savedRecipes).length === 0 && (
-                      <div className="col-span-1 sm:col-span-2 text-center py-8 text-gray-500">
+                      <div className="col-span-1 sm:col-span-2 text-center py-8 text-white/80">
                         <p>No matching saved recipes found with your current filters.</p>
                       </div>
                     )}
@@ -1022,27 +985,27 @@ export default function Recipes() {
                 className="mb-8"
               >
                 <div className="flex items-center mb-4">
-                  <div className="bg-primary/10 p-2 rounded-full">
-                    <ShoppingBag className="h-5 w-5 text-primary" />
+                  <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
+                    <ShoppingBag className="h-5 w-5 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 ml-2">
+                  <h2 className="text-xl font-bold text-white ml-2">
                     {t('navigation.shoppingList', 'Shopping List')}
                   </h2>
                 </div>
                 
-                <Card className="overflow-hidden rounded-3xl border-none shadow-lg transition-all duration-300 group card">
+                <Card className="overflow-hidden rounded-3xl border-none shadow-lg transition-all duration-300 group bg-white/10 backdrop-blur-sm">
                   <div className="relative p-5 bg-transparent border-b border-white/10">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-xl font-bold leading-tight text-gray-900 group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-bold leading-tight text-white group-hover:text-white/80 transition-colors">
                           {t('shoppingList.weeklyTitle', 'Weekly Shopping List')}
                         </h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-white/80 mt-1">
                           {t('shoppingList.description', 'Your meal plan shopping items')}
                         </p>
                       </div>
-                      <div className="h-12 w-12 flex items-center justify-center bg-primary rounded-full shadow-lg">
-                        <ShoppingBag className="h-6 w-6 text-white" />
+                      <div className="h-12 w-12 flex items-center justify-center bg-white rounded-full shadow-lg">
+                        <ShoppingBag className="h-6 w-6 text-primary" />
                       </div>
                     </div>
                   </div>
@@ -1070,9 +1033,8 @@ export default function Recipes() {
 
 
           </Tabs>
-        </motion.main>
-      </div>
-      
+      </motion.main>
+        
       <Dialog open={showCreateModal} onOpenChange={(open) => setShowCreateModal(open)}>
         <DialogContent className="max-w-[420px] rounded-xl">
           <DialogHeader>
@@ -1207,9 +1169,6 @@ export default function Recipes() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      <Navbar />
-      </div>
-    </PullToRefresh>
+    </BaseLayout>
   );
 }

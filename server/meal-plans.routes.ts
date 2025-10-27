@@ -85,7 +85,11 @@ export function registerMealPlanRoutes(app: Express) {
   app.get("/api/meal-plans/progress", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
 
-      const { getMealPlanProgress } = await import('./services/meal-plan-progress');
+      const { getMealPlanProgress, cleanupStaleProgress } = await import('./services/meal-plan-progress');
+      
+      // Cleanup stale progress before checking current progress
+      cleanupStaleProgress();
+      
       const progress = getMealPlanProgress(req.user.id);
 
       if (!progress) {

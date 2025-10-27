@@ -20,8 +20,8 @@ interface GroceryItem {
   category?: string;
   isPurchased?: boolean;
   purchased?: boolean;
-  allIds?: number[]; // Track all IDs for merged items
-  mealPlanIds?: number[]; // Track which meal plans these items belong to
+  itemsWithPlans?: Array<{ itemId: number; mealPlanId: number }>; // Track itemId-mealPlanId pairs
+  purchasedCount?: number; // Track how many instances are purchased
 }
 
 // Generate days for calendar (ensures current date can be centered with at least 7 days on each side)
@@ -177,31 +177,36 @@ export default function MealPlanTab() {
           items.forEach((item: any) => {
             const name = item.name || item.ingredient || 'Unknown';
             const key = name.toLowerCase();
+            const itemPurchased = item.isPurchased ?? item.is_purchased ?? item.purchased ?? false;
             
             if (itemMap.has(key)) {
               const existing = itemMap.get(key)!;
-              // Add quantities if they're numbers
+              // Add quantities
               const existingQty = parseFloat(existing.quantity?.toString() || '0');
               const newQty = parseFloat(item.quantity?.toString() || '0');
               existing.quantity = existingQty + newQty;
-              // Track all IDs and meal plan IDs
-              existing.allIds = existing.allIds || [existing.id];
-              existing.allIds.push(item.id);
-              existing.mealPlanIds = existing.mealPlanIds || [];
-              if (!existing.mealPlanIds.includes(plan.id)) {
-                existing.mealPlanIds.push(plan.id);
-              }
+              
+              // Track all instances
+              existing.itemsWithPlans!.push({ itemId: item.id, mealPlanId: plan.id });
+              
+              // Count purchased instances
+              if (!existing.purchasedCount) existing.purchasedCount = existing.isPurchased ? 1 : 0;
+              if (itemPurchased) existing.purchasedCount++;
+              
+              // Item shows as purchased if ALL instances are purchased
+              existing.isPurchased = existing.purchasedCount === existing.itemsWithPlans!.length;
             } else {
-              itemMap.set(key, {
+              const newItem: GroceryItem = {
                 id: item.id,
                 name,
                 quantity: item.quantity || 1,
                 unit: item.unit || 'unit',
                 category: item.category || 'Other',
-                isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false,
-                allIds: [item.id],
-                mealPlanIds: [plan.id]
-              });
+                isPurchased: itemPurchased,
+                itemsWithPlans: [{ itemId: item.id, mealPlanId: plan.id }],
+                purchasedCount: itemPurchased ? 1 : 0
+              };
+              itemMap.set(key, newItem);
             }
           });
         } catch (error) {
@@ -217,57 +222,68 @@ export default function MealPlanTab() {
 
   // Handle toggling grocery item purchased status
   const handleToggleItem = async (item: GroceryItem, currentStatus: boolean) => {
+    const newStatus = !currentStatus;
+
+    // Optimistically update the UI immediately
+    queryClient.setQueryData(['weekly-grocery-list', selectedDate], (oldData: any) => {
+      if (!oldData) return oldData;
+      return oldData.map((i: GroceryItem) => 
+        i.name === item.name ? { ...i, isPurchased: newStatus } : i
+      );
+    });
+
     try {
-      const newStatus = !currentStatus;
-      
-      // If this is a merged item from weekly list, update all instances across meal plans
-      if (item.allIds && item.allIds.length > 0 && item.mealPlanIds && item.mealPlanIds.length > 0) {
-        // Update all IDs across all meal plans
-        const updatePromises: Promise<Response>[] = [];
-        
-        for (const mealPlanId of item.mealPlanIds) {
-          for (const itemId of item.allIds) {
-            updatePromises.push(
-              fetch(`/api/meal-plans/${mealPlanId}/shopping-list/${itemId}`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                  isPurchased: newStatus
-                }),
-              })
-            );
+      // If this is a merged item, update all instances
+      if (item.itemsWithPlans && item.itemsWithPlans.length > 0) {
+        const updatePromises = item.itemsWithPlans.map(async ({ itemId, mealPlanId }) => {
+          const response = await fetch(`/api/meal-plans/${mealPlanId}/shopping-list/${itemId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ isPurchased: newStatus }),
+          });
+          
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`Failed to update item ${itemId}: ${response.status} ${text}`);
           }
-        }
-        
+          
+          return response.json();
+        });
+
         await Promise.all(updatePromises);
+        
       } else if (mealPlan?.id) {
-        // Single item update (daily grocery list)
+        // Single item fallback
         const response = await fetch(`/api/meal-plans/${mealPlan.id}/shopping-list/${item.id}`, {
           method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({
-            isPurchased: newStatus
-          }),
+          body: JSON.stringify({ isPurchased: newStatus }),
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to update item');
         }
       }
+
+      // Refetch to ensure we have the latest data
+      await queryClient.invalidateQueries({ queryKey: ['weekly-grocery-list', selectedDate] });
+      await queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
       
-      // Invalidate and refetch the grocery lists
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['grocery-list', selectedDate, mealPlan?.id] }),
-        queryClient.invalidateQueries({ queryKey: ['weekly-grocery-list', selectedDate] })
-      ]);
     } catch (error) {
-      console.error('Error toggling grocery item:', error);
+      console.error('[Weekly Grocery] Error updating item:', error);
+      
+      // Revert optimistic update on error
+      queryClient.setQueryData(['weekly-grocery-list', selectedDate], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((i: GroceryItem) => 
+          i.name === item.name ? { ...i, isPurchased: currentStatus } : i
+        );
+      });
+      
+      // Show error to user
+      alert('Failed to update item. Please try again.');
     }
   };
 

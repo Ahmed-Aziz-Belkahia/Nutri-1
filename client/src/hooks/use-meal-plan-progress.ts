@@ -20,7 +20,12 @@ export function useMealPlanProgress(enabled: boolean = false) {
       return res.json();
     },
     // Poll every 500ms while generation is in progress
-    refetchInterval: enabled ? 500 : false,
+    // Stop polling if inProgress is false
+    refetchInterval: (data) => {
+      if (!enabled) return false;
+      if (data?.inProgress === false) return false;
+      return 500;
+    },
     refetchOnMount: "always", // Always refetch when component mounts
     refetchOnWindowFocus: true, // Refetch when window/tab regains focus
     staleTime: 0, // Always consider data stale

@@ -1,14 +1,12 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
-import Navbar from "@/components/Navbar";
 import { useQuery } from "@tanstack/react-query";
+import BaseLayout from "@/components/layouts/BaseLayout";
 import CalendarSelector from "@/components/dashboard/CalendarSelector";
 import MacroCard from "@/components/dashboard/MacroCard";
 import MealsSection from "@/components/dashboard/MealsSection";
 import GroceryList from "@/components/dashboard/GroceryList";
-import ProfileHeader from "@/components/dashboard/ProfileHeader";
-import MobileMenu from "@/components/dashboard/MobileMenu";
 import MealPlanSection from "@/components/dashboard/MealPlanSection";
 
 interface FoodLog {
@@ -114,8 +112,6 @@ export default function DashboardNew() {
   const [allDays] = useState(getLast3MonthsPlus7Days());
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMenuClosing, setIsMenuClosing] = useState(false);
 
   // Fetch food logs for selected date
   const { data: foodLogs = [], isLoading: logsLoading } = useQuery<FoodLog[]>({
@@ -379,14 +375,6 @@ export default function DashboardNew() {
     setCurrentMacroIndex(index);
   };
 
-  const handleCloseMenu = () => {
-    setIsMenuClosing(true);
-    setTimeout(() => {
-      setIsMenuOpen(false);
-      setIsMenuClosing(false);
-    }, 300); // Increased to match animation duration
-  };
-
   const toggleGroceryItem = async (itemId: number, currentStatus: boolean) => {
     try {
       const response = await fetch(`/api/shopping-list/${itemId}`, {
@@ -406,42 +394,30 @@ export default function DashboardNew() {
   };
 
   return (
-    <div className="gradient-bg min-h-screen pb-24">
-      <div className="max-w-md mx-auto">
-        <div className="px-5">
-          <ProfileHeader user={user} onMenuClick={() => setIsMenuOpen(!isMenuOpen)} />
-        </div>
+    <BaseLayout>
+      <CalendarSelector 
+        allDays={allDays}
+        selectedDate={selectedDate}
+        onDateSelect={handleDayClick}
+      />
 
-        <MobileMenu isOpen={isMenuOpen} isClosing={isMenuClosing} onClose={handleCloseMenu} />
+      <MacroCard 
+        dailyTotals={dailyTotals}
+        currentCardIndex={currentMacroIndex}
+        onPrevious={handlePreviousMacro}
+        onNext={handleNextMacro}
+        onDotClick={handleDotClick}
+        mealPlan={mealPlan}
+      />
 
-        <CalendarSelector 
-          allDays={allDays}
-          selectedDate={selectedDate}
-          onDateSelect={handleDayClick}
-        />
+      <MealsSection 
+        foodLogs={foodLogs}
+        isLoading={logsLoading}
+      />
 
-        <div className="px-5">
-          <MacroCard 
-            dailyTotals={dailyTotals}
-            currentCardIndex={currentMacroIndex}
-            onPrevious={handlePreviousMacro}
-            onNext={handleNextMacro}
-            onDotClick={handleDotClick}
-            mealPlan={mealPlan}
-          />
-
-          <MealsSection 
-            foodLogs={foodLogs}
-            isLoading={logsLoading}
-          />
-
-          <MealPlanSection 
-            mealPlan={mealPlan}
-          />
-        </div>
-
-        <Navbar />
-      </div>
-    </div>
+      <MealPlanSection 
+        mealPlan={mealPlan}
+      />
+    </BaseLayout>
   );
 }

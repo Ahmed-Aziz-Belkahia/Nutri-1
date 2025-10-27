@@ -2085,6 +2085,9 @@ export function registerRoutes(app: Express): Server {
         const { generateMealPlanWithRecipes } = await import('./services/openai');
         const { updateMealPlanProgress, clearMealPlanProgress } = await import('./services/meal-plan-progress');
         
+        // Clear any existing progress before starting new generation
+        clearMealPlanProgress(req.user!.id);
+        
         // Step 1: Initialize progress tracking
         updateMealPlanProgress(
           req.user!.id,
@@ -2599,12 +2602,26 @@ export function registerRoutes(app: Express): Server {
         console.error(`Error generating weekly shopping list:`, shoppingListError);
       }
 
+      // Clear progress after successful completion
+      const { clearMealPlanProgress } = await import('./services/meal-plan-progress');
+      clearMealPlanProgress(req.user!.id);
+      console.log(`Meal plan generation completed successfully for user ${req.user!.id}`);
+
       res.json({
         weekStart: startDate.toISOString().split('T')[0],
         plans: generatedPlans
       });
     } catch (error) {
       console.error('[Meal Plan API] Error creating meal plan:', error);
+      
+      // Clear progress on error as well
+      try {
+        const { clearMealPlanProgress } = await import('./services/meal-plan-progress');
+        clearMealPlanProgress(req.user!.id);
+      } catch (clearError) {
+        console.error('Error clearing progress after failure:', clearError);
+      }
+      
       res.status(500).json({
         error: 'Failed to create meal plan',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -3900,6 +3917,63 @@ export function registerRoutes(app: Express): Server {
         error: 'Failed to fetch shopping list',
         message: error instanceof Error ? error.message : 'Unknown error occurred'
       });
+    }
+  });
+
+  // Update shopping list item via meal plan route (supports isPurchased field)
+  app.patch("/api/meal-plans/:mealPlanId/shopping-list/:itemId", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const itemId = parseInt(req.params.itemId);
+      const mealPlanId = parseInt(req.params.mealPlanId);
+      const { isPurchased, purchased } = req.body;
+      
+      const purchasedValue = isPurchased !== undefined ? isPurchased : purchased;
+      
+      console.log(`[SHOPPING LIST] PATCH request for item ${itemId} in meal plan ${mealPlanId}: isPurchased=${purchasedValue}`);
+
+      // Verify the meal plan belongs to the user
+      const mealPlanCheck = await db
+        .select()
+        .from(mealPlans)
+        .where(
+          and(
+            eq(mealPlans.id, mealPlanId),
+            eq(mealPlans.userId, req.user!.id)
+          )
+        )
+        .limit(1);
+
+      if (!mealPlanCheck.length) {
+        console.log(`[SHOPPING LIST] Meal plan ${mealPlanId} not found or doesn't belong to user`);
+        return res.status(404).json({ error: 'Meal plan not found' });
+      }
+
+      // Update the item
+      const [updatedItem] = await db
+        .update(shoppingListItems)
+        .set({ 
+          isPurchased: purchasedValue,
+          updated_at: new Date()
+        })
+        .where(
+          and(
+            eq(shoppingListItems.id, itemId),
+            eq(shoppingListItems.userId, req.user!.id),
+            eq(shoppingListItems.meal_plan_id, mealPlanId)
+          )
+        )
+        .returning();
+
+      if (!updatedItem) {
+        console.log(`[SHOPPING LIST] Item ${itemId} not found in meal plan ${mealPlanId}`);
+        return res.status(404).json({ error: 'Shopping list item not found' });
+      }
+
+      console.log(`[SHOPPING LIST] Successfully updated item ${itemId}: isPurchased=${updatedItem.isPurchased}`);
+      res.json(updatedItem);
+    } catch (error) {
+      console.error('[SHOPPING LIST] Error updating shopping list item:', error);
+      res.status(500).json({ error: 'Failed to update shopping list item' });
     }
   });
 

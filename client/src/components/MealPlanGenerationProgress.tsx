@@ -95,80 +95,98 @@ export default function MealPlanGenerationProgress({ dayCount = 7 }: MealPlanGen
   // Poll for real-time progress from backend
   const { data: progress } = useMealPlanProgress(true);
   
+  // Check if generation is actually in progress
+  const isActuallyInProgress = progress?.inProgress !== false;
+  
   // Calculate current step and progress based on real backend data
   const currentDay = progress?.currentDay || 0;
   const totalDays = progress?.totalDays || dayCount;
   const currentMessage = progress?.message || 'Starting meal plan generation';
   const backendStep = progress?.step || 'analyzing';
   
+  // If backend reports not in progress, show completion state
+  const effectiveStep = !isActuallyInProgress ? 'completed' : backendStep;
+  
   // Determine which step we're on based on backend step and currentDay
   let currentStepIndex = 0;
-  if (backendStep === 'analyzing') {
+  if (effectiveStep === 'analyzing') {
     currentStepIndex = 0;
-  } else if (backendStep === 'calculating') {
+  } else if (effectiveStep === 'calculating') {
     currentStepIndex = 1;
-  } else if (backendStep === 'generating' && currentDay > 0) {
+  } else if (effectiveStep === 'generating' && currentDay > 0) {
     currentStepIndex = 1 + currentDay; // 2 initial steps + current day
-  } else if (backendStep === 'saving') {
+  } else if (effectiveStep === 'saving' || effectiveStep === 'completed') {
     currentStepIndex = progressSteps.length - 1; // saving step (last)
-  } else if (backendStep === 'shopping') {
+  } else if (effectiveStep === 'shopping') {
     currentStepIndex = progressSteps.length - 2; // shopping list step
-  } else if (backendStep === 'optimizing') {
+  } else if (effectiveStep === 'optimizing') {
     currentStepIndex = progressSteps.length - 3; // optimizing step
   }
   
   // Calculate accurate progress percentage based on actual day progress
   let progressPercent = 5;
-  if (backendStep === 'analyzing') {
+  if (effectiveStep === 'analyzing') {
     progressPercent = 5;
-  } else if (backendStep === 'calculating') {
+  } else if (effectiveStep === 'calculating') {
     progressPercent = 10;
-  } else if (backendStep === 'generating' && currentDay > 0) {
+  } else if (effectiveStep === 'generating' && currentDay > 0) {
     progressPercent = 10 + ((currentDay / totalDays) * 70); // 10% to 80%
-  } else if (backendStep === 'optimizing') {
+  } else if (effectiveStep === 'optimizing') {
     progressPercent = 85;
-  } else if (backendStep === 'shopping') {
+  } else if (effectiveStep === 'shopping') {
     progressPercent = 92;
-  } else if (backendStep === 'saving') {
+  } else if (effectiveStep === 'saving') {
     progressPercent = 97;
+  } else if (effectiveStep === 'completed' || !isActuallyInProgress) {
+    progressPercent = 100;
   }
   
   // Mark steps as completed based on actual progress
   useEffect(() => {
     const completed: string[] = [];
     
+    // If not in progress, mark everything as complete
+    if (!isActuallyInProgress) {
+      progressSteps.forEach(step => completed.push(step.id));
+      setCompletedSteps(completed);
+      return;
+    }
+    
     // Mark analyzing as complete if we're past it
-    if (backendStep !== 'analyzing') {
+    if (effectiveStep !== 'analyzing') {
       completed.push('analyzing');
     }
     
     // Mark calculating as complete if we're past it
-    if (backendStep !== 'analyzing' && backendStep !== 'calculating') {
+    if (effectiveStep !== 'analyzing' && effectiveStep !== 'calculating') {
       completed.push('calculating');
     }
     
     // Mark completed days
-    if (backendStep === 'generating' && currentDay > 0) {
+    if (effectiveStep === 'generating' && currentDay > 0) {
       for (let i = 1; i < currentDay; i++) {
         completed.push(`day${i}`);
       }
     }
     
     // If saving, shopping, or optimizing, mark all days complete
-    if (backendStep === 'optimizing' || backendStep === 'shopping' || backendStep === 'saving' || backendStep === 'completed') {
+    if (effectiveStep === 'optimizing' || effectiveStep === 'shopping' || effectiveStep === 'saving' || effectiveStep === 'completed') {
       for (let i = 1; i <= totalDays; i++) {
         completed.push(`day${i}`);
       }
-      if (backendStep === 'shopping' || backendStep === 'saving' || backendStep === 'completed') {
+      if (effectiveStep === 'shopping' || effectiveStep === 'saving' || effectiveStep === 'completed') {
         completed.push('optimizing');
       }
-      if (backendStep === 'saving' || backendStep === 'completed') {
+      if (effectiveStep === 'saving' || effectiveStep === 'completed') {
         completed.push('shopping');
+      }
+      if (effectiveStep === 'completed') {
+        completed.push('saving');
       }
     }
     
     setCompletedSteps(completed);
-  }, [currentDay, backendStep, totalDays]);
+  }, [currentDay, effectiveStep, totalDays, isActuallyInProgress, progressSteps]);
 
   return (
     <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center p-3">

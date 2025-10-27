@@ -77,4 +77,25 @@ export function getMealPlanProgress(userId: number): ProgressUpdate | null {
  */
 export function clearMealPlanProgress(userId: number) {
   progressStore.delete(userId);
+  console.log(`[Progress] User ${userId}: Progress cleared`);
+}
+
+/**
+ * Auto-cleanup stale progress data (older than 5 minutes)
+ * Should be called periodically or on each request
+ */
+export function cleanupStaleProgress() {
+  const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+  let cleanedCount = 0;
+  
+  progressStore.forEach((progress, userId) => {
+    if (progress.timestamp < fiveMinutesAgo) {
+      progressStore.delete(userId);
+      cleanedCount++;
+    }
+  });
+  
+  if (cleanedCount > 0) {
+    console.log(`[Progress] Cleaned up ${cleanedCount} stale progress entries`);
+  }
 }

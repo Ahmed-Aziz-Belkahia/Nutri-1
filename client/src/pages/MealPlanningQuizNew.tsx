@@ -203,7 +203,8 @@ export default function MealPlanningQuiz() {
         });
 
         if (!mealPlanResponse.ok) {
-          throw new Error("Failed to create meal plan");
+          const errorData = await mealPlanResponse.json();
+          throw new Error(errorData.message || "Failed to create meal plan");
         }
 
         const mealPlan = await mealPlanResponse.json();
