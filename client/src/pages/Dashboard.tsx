@@ -202,6 +202,15 @@ export default function Dashboard() {
   }, [location]);
   const { foodLogs, isLoadingLogs, logFood, addFood } = useFoodLog(selectedDate);
   const { user } = useUser();
+  
+  // Debug log for foodLogs
+  useEffect(() => {
+    console.log('[Dashboard] foodLogs updated:', {
+      count: foodLogs?.length,
+      logs: foodLogs
+    });
+  }, [foodLogs]);
+  
   // XP functionality removed
   const awardXP = async () => {}; // Empty function as placeholder
 
