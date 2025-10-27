@@ -32,8 +32,8 @@ const FoodComponentSchema = z.object({
     seasonings: z.array(z.string()).optional(),
     garnishes: z.array(z.string()).optional(),
     presentation: z.string().optional()
-  }).partial().required(),
-}).strict();
+  }).passthrough(),
+});
 
 // Enhanced schema with recipe fields
 const FoodAnalysisSchema = z.object({
