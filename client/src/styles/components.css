@@ -167,8 +167,12 @@
    ============================================ */
 
 .day-selector {
-  padding: 0;
+  padding: 0 20px;
   margin-bottom: 20px;
+}
+
+.day-selector.no-padding {
+  padding: 0;
 }
 
 .day-selector-container {

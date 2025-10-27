@@ -13,9 +13,10 @@ interface CalendarSelectorProps {
   allDays: Day[];
   selectedDate: string;
   onDateSelect: (date: string) => void;
+  noPadding?: boolean;
 }
 
-export default function CalendarSelector({ allDays, selectedDate, onDateSelect }: CalendarSelectorProps) {
+export default function CalendarSelector({ allDays, selectedDate, onDateSelect, noPadding = false }: CalendarSelectorProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const selectedButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -36,7 +37,7 @@ export default function CalendarSelector({ allDays, selectedDate, onDateSelect }
   }, [selectedDate]);
 
   return (
-    <div className="day-selector">
+    <div className={`day-selector ${noPadding ? 'no-padding' : ''}`}>
       <div className="day-selector-container">
         <div className="day-selector-scroll" ref={scrollContainerRef}>
           {allDays.map((day) => {

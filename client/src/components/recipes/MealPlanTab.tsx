@@ -237,6 +237,7 @@ export default function MealPlanTab() {
         allDays={allDays}
         selectedDate={selectedDate}
         onDateSelect={setSelectedDate}
+        noPadding={true}
       />
 
       {/* Meal Plan Section */}
