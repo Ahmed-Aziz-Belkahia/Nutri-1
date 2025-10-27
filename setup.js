@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS users (
     is_admin INTEGER DEFAULT 0
 );
 
--- Food logs table
+-- Food logs table (with recipe fields)
 CREATE TABLE IF NOT EXISTS food_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -82,7 +82,22 @@ CREATE TABLE IF NOT EXISTS food_logs (
     date INTEGER DEFAULT (strftime('%s', 'now')) NOT NULL,
     image TEXT,
     components TEXT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    description TEXT,
+    ingredients TEXT,
+    instructions TEXT,
+    prep_time INTEGER,
+    cook_time INTEGER,
+    servings INTEGER DEFAULT 1,
+    image_url TEXT,
+    source TEXT DEFAULT 'scanned',
+    is_recipe INTEGER DEFAULT 0,
+    recipe_id INTEGER,
+    cuisine_type TEXT,
+    meal_type TEXT,
+    difficulty TEXT,
+    tags TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
 );
 
 -- User nutrition preferences table
