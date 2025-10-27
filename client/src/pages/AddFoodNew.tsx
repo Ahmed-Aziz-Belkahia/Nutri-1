@@ -131,27 +131,9 @@ export default function AddFoodNew() {
   // Handle gallery tab - automatically trigger file input
   useEffect(() => {
     if (activeTab === "gallery") {
-      // Small delay to allow tab transition, then trigger file picker
-      const timer = setTimeout(() => {
-        fileInputRef.current?.click();
-      }, 100);
-      
-      // Set up a listener to detect when file picker closes without selection
-      const checkIfCancelled = () => {
-        // After a brief delay, check if we're still on gallery tab and no file was selected
-        setTimeout(() => {
-          if (activeTab === "gallery") {
-            setActiveTab("photo");
-          }
-        }, 500);
-      };
-      
-      window.addEventListener('focus', checkIfCancelled, { once: true });
-      
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener('focus', checkIfCancelled);
-      };
+      fileInputRef.current?.click();
+      // Return to photo tab after file selection attempt
+      setActiveTab("photo");
     }
   }, [activeTab]);
 
@@ -258,13 +240,7 @@ export default function AddFoodNew() {
   // Handle file upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) {
-      // No file selected, return to photo tab
-      if (activeTab === "gallery") {
-        setActiveTab("photo");
-      }
-      return;
-    }
+    if (!file) return;
     
     try {
       const reader = new FileReader();
@@ -603,10 +579,6 @@ export default function AddFoodNew() {
           capture="environment"
           className="hidden"
           onChange={handleFileUpload}
-          onClick={(e) => {
-            // Reset the input value so the same file can be selected again
-            e.currentTarget.value = '';
-          }}
         />
       </>
     );
