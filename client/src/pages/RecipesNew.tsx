@@ -44,19 +44,18 @@ export default function RecipesNew() {
   const { data: todaysRecipes = [], isLoading: todaysLoading } = useQuery<FoodLog[]>({
     queryKey: ['recipes', 'today'],
     queryFn: async () => {
-      const response = await fetch('/api/food-logs/recent', {
+      const response = await fetch('/api/food-logs/scanned?limit=10', {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch today\'s recipes');
       const data = await response.json();
       
-      // Filter for items with images (scanned meals) from last 24 hours
-      const now = new Date();
-      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      // Filter for items from last 24 hours
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
       
-      return data.filter((log: FoodLog) => 
-        (log.image || log.imageUrl) && 
-        new Date(log.id) > yesterday // Assuming ID is timestamp-based
+      return data.filter((log: FoodLog & { date: number }) => 
+        new Date(log.date) > yesterday
       );
     }
   });
@@ -65,18 +64,13 @@ export default function RecipesNew() {
   const { data: allRecipes = [], isLoading: allLoading } = useQuery<FoodLog[]>({
     queryKey: ['recipes', 'all'],
     queryFn: async () => {
-      const response = await fetch('/api/food-logs/recent', {
+      const response = await fetch('/api/food-logs/scanned?limit=100', {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch all recipes');
-      const data = await response.json();
-      
-      // Filter for items with images and recipe data
-      return data.filter((log: FoodLog) => 
-        (log.image || log.imageUrl) && 
-        (log.instructions || log.prepTime || log.cookTime)
-      );
-    }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
   return (

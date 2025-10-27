@@ -642,6 +642,39 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Get all scanned meals (food logs with images) for recipes page
+  app.get("/api/food-logs/scanned", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+
+      // Get all food logs with images (scanned meals)
+      const scannedLogs = await db
+        .select()
+        .from(foodLogs)
+        .where(
+          and(
+            eq(foodLogs.userId, req.user!.id),
+            sql`${foodLogs.image} IS NOT NULL AND ${foodLogs.image} != ''`
+          )
+        )
+        .orderBy(desc(foodLogs.date))
+        .limit(limit);
+
+      console.log('[Food Logs API] Retrieved scanned logs:', {
+        count: scannedLogs.length,
+        userId: req.user!.id
+      });
+
+      res.json(scannedLogs);
+    } catch (error) {
+      console.error('Error fetching scanned meals:', error);
+      res.status(500).json({
+        error: 'Failed to fetch scanned meals',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Get global top recipes sorted by likes
   app.get("/api/recipes/top", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
