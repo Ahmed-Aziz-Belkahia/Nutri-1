@@ -167,11 +167,22 @@ export default function MealPlanningQuiz() {
   const progress = ((currentStep + 1) / questions.length) * 100;
 
   const handleNext = () => {
+    console.log('[Meal Plan Quiz] handleNext called', {
+      isLastStep,
+      isPending: saveMealPlanPreferences.isPending,
+      isGeneratingMealPlan,
+      isSubmittingRef: isSubmittingRef.current,
+      currentStep,
+      questionsLength: questions.length
+    });
+    
     if (isLastStep) {
       // Prevent multiple submissions
       if (saveMealPlanPreferences.isPending || isGeneratingMealPlan || isSubmittingRef.current) {
+        console.log('[Meal Plan Quiz] Submission blocked - already in progress');
         return;
       }
+      console.log('[Meal Plan Quiz] Calling handleSubmit(onSubmit)');
       handleSubmit(onSubmit)();
     } else {
       setCurrentStep(currentStep + 1);
@@ -188,6 +199,8 @@ export default function MealPlanningQuiz() {
 
   const saveMealPlanPreferences = useMutation({
     mutationFn: async (data: MealPlanPreferencesForm) => {
+      console.log('[Meal Plan Quiz] mutationFn called with data:', data);
+      
       // Prevent double submission
       if (isSubmittingRef.current) {
         console.log('[Meal Plan Quiz] Already submitting, ignoring duplicate request');
@@ -195,8 +208,10 @@ export default function MealPlanningQuiz() {
       }
       
       isSubmittingRef.current = true;
+      console.log('[Meal Plan Quiz] isSubmittingRef set to true');
       
       try {
+        console.log('[Meal Plan Quiz] Saving dietary preferences...');
         const preferencesResponse = await fetch("/api/user/dietary-preferences", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -209,8 +224,10 @@ export default function MealPlanningQuiz() {
         }
 
         const preferences = await preferencesResponse.json();
+        console.log('[Meal Plan Quiz] Preferences saved successfully');
         setIsGeneratingMealPlan(true);
 
+        console.log('[Meal Plan Quiz] Requesting meal plan generation...');
         const mealPlanResponse = await fetch("/api/meal-plans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -220,6 +237,7 @@ export default function MealPlanningQuiz() {
 
         if (!mealPlanResponse.ok) {
           const errorData = await mealPlanResponse.json();
+          console.log('[Meal Plan Quiz] Meal plan request failed:', errorData);
           
           // If generation is already in progress (409), just show progress screen
           if (mealPlanResponse.status === 409) {
@@ -231,9 +249,10 @@ export default function MealPlanningQuiz() {
         }
 
         const mealPlan = await mealPlanResponse.json();
+        console.log('[Meal Plan Quiz] Meal plan created successfully');
         return { preferences, mealPlan };
       } catch (error) {
-        console.error("Meal plan creation error:", error);
+        console.error("[Meal Plan Quiz] Meal plan creation error:", error);
         setIsGeneratingMealPlan(false);
         isSubmittingRef.current = false;
         throw error;
@@ -275,6 +294,7 @@ export default function MealPlanningQuiz() {
   });
 
   const onSubmit = async (data: MealPlanPreferencesForm) => {
+    console.log('[Meal Plan Quiz] onSubmit called with data:', data);
     await saveMealPlanPreferences.mutateAsync(data);
   };
 
@@ -282,23 +302,37 @@ export default function MealPlanningQuiz() {
     const questionId = currentQuestion.id;
     const formValues = watch();
     
+    let isValid = true;
     switch (questionId) {
       case "dietaryType":
-        return !!formValues.dietaryType;
+        isValid = !!formValues.dietaryType;
+        break;
       case "healthGoals":
-        return !!formValues.healthGoals && (
+        isValid = !!formValues.healthGoals && (
           (typeof formValues.healthGoals === 'string' && formValues.healthGoals.trim().length > 0) ||
           (Array.isArray(formValues.healthGoals) && formValues.healthGoals.length > 0)
         );
+        break;
       case "calorieTarget":
-        return !!formValues.calorieTarget && formValues.calorieTarget > 0;
+        isValid = !!formValues.calorieTarget && formValues.calorieTarget > 0;
+        break;
       case "cuisinePreferences":
-        return !!formValues.cuisinePreferences && typeof formValues.cuisinePreferences === 'string' && formValues.cuisinePreferences.trim().length > 0;
+        isValid = !!formValues.cuisinePreferences && typeof formValues.cuisinePreferences === 'string' && formValues.cuisinePreferences.trim().length > 0;
+        break;
       case "allergies":
-        return true; // Optional field
+        isValid = true; // Optional field
+        break;
       default:
-        return true;
+        isValid = true;
     }
+    
+    console.log('[Meal Plan Quiz] isCurrentStepValid', {
+      questionId,
+      isValid,
+      formValue: formValues[questionId as keyof typeof formValues]
+    });
+    
+    return isValid;
   };
 
   const renderQuestionContent = () => {
