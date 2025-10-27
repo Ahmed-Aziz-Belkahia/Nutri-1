@@ -181,8 +181,8 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all text-sm font-medium text-gray-700"
           >
-            <SlidersHorizontal className="w-5 h-5 text-[#26A8FF]" />
             <span>Sort</span>
+            <SlidersHorizontal className="w-5 h-5 text-[#26A8FF]" />
           </button>
 
           {/* Dropdown Menu */}
