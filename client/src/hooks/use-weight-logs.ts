@@ -21,6 +21,9 @@ export function useWeightLogs() {
 
   const { data: weightLogs = [], isLoading } = useQuery<WeightLog[]>({
     queryKey: ["/api/weight-logs"],
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
+    staleTime: 0, // Always consider data stale
   });
 
   const addWeightLog = useMutation({

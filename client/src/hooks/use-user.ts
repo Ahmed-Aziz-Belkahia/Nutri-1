@@ -83,7 +83,9 @@ export function useUser() {
       }
     },
     retry: false,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 0, // Always consider data stale
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
   });
 
   const loginMutation = useMutation({

@@ -21,6 +21,9 @@ export function useMealPlanProgress(enabled: boolean = false) {
     },
     // Poll every 500ms while generation is in progress
     refetchInterval: enabled ? 500 : false,
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
+    staleTime: 0, // Always consider data stale
     enabled
   });
 }

@@ -183,11 +183,11 @@ export default function Recipes() {
       if (!response.ok) throw new Error("Failed to fetch created recipes");
       return response.json();
     },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 0, // Always consider data stale
     retry: 1, // Limit retries to reduce unnecessary requests
-    refetchOnWindowFocus: false, // Disable refetching when window regains focus
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
     enabled: activeTab === "recipes", // Only fetch when on recipes tab
-    refetchOnMount: true, // Always fetch when component mounts to ensure fresh data
+    refetchOnMount: "always", // Always fetch when component mounts
     placeholderData: [], // Use empty array as placeholder to avoid undefined errors
   });
 
@@ -198,11 +198,11 @@ export default function Recipes() {
       if (!response.ok) throw new Error("Failed to fetch saved recipes");
       return response.json();
     },
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 0, // Always consider data stale
     retry: 1, // Limit retries to reduce unnecessary requests
-    refetchOnWindowFocus: false, // Disable refetching when window regains focus
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
     enabled: activeTab === "recipes", // Only fetch when on recipes tab
-    refetchOnMount: true, // Always fetch when component mounts to ensure fresh data
+    refetchOnMount: "always", // Always fetch when component mounts
     placeholderData: [], // Use empty array as placeholder to avoid undefined errors
   });
   
@@ -222,10 +222,10 @@ export default function Recipes() {
       return response.json();
     },
     retry: false,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 0, // Always consider data stale
     enabled: activeTab === "meal-plan",
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
   });
   
   // Fetch all meal plans for the calendar view
@@ -244,10 +244,10 @@ export default function Recipes() {
       return response.json();
     },
     retry: false,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 0, // Always consider data stale
     enabled: activeTab === "meal-plan",
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
   });
 
   // Fetch grocery list for the selected meal plan

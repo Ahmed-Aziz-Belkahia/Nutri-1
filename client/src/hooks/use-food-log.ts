@@ -82,9 +82,9 @@ export function useFoodLog(selectedDate: Date = new Date()) {
       return data;
     },
     enabled: !!user,
-    refetchOnMount: true, // Refetch to ensure we have latest data
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
-    staleTime: 10000, // Consider data fresh for 10 seconds (reduced from 60s)
+    refetchOnMount: "always", // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
+    staleTime: 0, // Always consider data stale - fetch on every mount
     gcTime: 5 * 60 * 1000 // Cache for 5 minutes
   });
 
