@@ -469,14 +469,61 @@ export function registerRoutes(app: Express): Server {
         .orderBy(desc(recipes.createdAt))
         .limit(50); // Add limit to prevent too many records
       
-      // Add isLiked property in JavaScript
-      const userRecipesWithLikes = userRecipes.map(recipe => ({
+      // ALSO fetch from food_logs where is_recipe = 1 (scanned recipes)
+      const scannedRecipes = await db
+        .select()
+        .from(foodLogs)
+        .where(
+          and(
+            eq(foodLogs.userId, req.user!.id),
+            eq(foodLogs.isRecipe, true)
+          )
+        )
+        .orderBy(desc(foodLogs.date))
+        .limit(50);
+      
+      // Transform scanned recipes to match recipe format
+      const transformedScannedRecipes = scannedRecipes.map(log => ({
+        id: log.id,
+        userId: log.userId,
+        name: log.name,
+        description: log.description || '',
+        ingredients: log.ingredients || [],
+        instructions: log.instructions || [],
+        nutritionInfo: {
+          calories: log.calories,
+          protein: log.protein,
+          carbs: log.carbs,
+          fat: log.fat
+        },
+        prepTime: log.prepTime || null,
+        cookTime: log.cookTime || null,
+        servings: log.servings || 1,
+        cuisineType: log.cuisineType || null,
+        mealType: log.mealType || null,
+        difficulty: log.difficulty || null,
+        tags: log.tags || [],
+        imageUrl: log.image || '',
+        isPublic: false,
+        source: 'scanned' as const,
+        likesCount: 0,
+        commentsCount: 0,
+        createdAt: new Date(log.date * 1000), // Convert Unix timestamp to Date
+        updatedAt: new Date(log.date * 1000),
+        isLiked: false // Scanned recipes don't have likes
+      }));
+      
+      // Combine both sources
+      const allRecipes = [...userRecipes.map(recipe => ({
         ...recipe,
         isLiked: likedIds.has(recipe.id)
-      }));
+      })), ...transformedScannedRecipes];
+      
+      // Sort by creation date (newest first)
+      allRecipes.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-      console.log(`Found ${userRecipesWithLikes.length} ${type} recipes`);
-      res.json(userRecipesWithLikes);
+      console.log(`Found ${userRecipes.length} ${type} recipes + ${scannedRecipes.length} scanned recipes`);
+      res.json(allRecipes);
     } catch (error) {
       console.error('Error fetching recipes:', error);
       res.status(500).json({
