@@ -33,46 +33,69 @@ export default function MealAnalysis() {
       return;
     }
 
-    // Simulate analysis progress
+    // Check if analysis is already complete (fast completion)
+    const checkAnalysisCompletion = setInterval(() => {
+      const foodId = localStorage.getItem('analyzedFoodId');
+      if (foodId && !analysisComplete) {
+        // Analysis completed, speed up remaining steps
+        setCurrentStep(analysisSteps.length);
+        setCompletedSteps(new Set(analysisSteps.map((_, i) => i)));
+        setAnalysisComplete(true);
+        clearInterval(checkAnalysisCompletion);
+        
+        // Clean up and redirect
+        localStorage.removeItem('analyzingMealImage');
+        setTimeout(() => {
+          localStorage.removeItem('analyzedFoodId');
+          setLocation(`/food/${foodId}`);
+        }, 1500);
+      }
+    }, 500);
+
+    // Simulate analysis progress with visual steps
     let stepIndex = 0;
     const intervals: NodeJS.Timeout[] = [];
 
     const progressThroughSteps = () => {
-      if (stepIndex < analysisSteps.length) {
+      if (stepIndex < analysisSteps.length && !analysisComplete) {
         setCurrentStep(stepIndex);
         
         const timer = setTimeout(() => {
-          setCompletedSteps(prev => new Set(prev).add(stepIndex));
-          stepIndex++;
-          progressThroughSteps();
+          if (!analysisComplete) {
+            setCompletedSteps(prev => new Set(prev).add(stepIndex));
+            stepIndex++;
+            progressThroughSteps();
+          }
         }, analysisSteps[stepIndex].duration);
         
         intervals.push(timer);
-      } else {
-        setAnalysisComplete(true);
-        // Clean up image from localStorage after completion
-        localStorage.removeItem('analyzingMealImage');
-        
-        // Get the food log ID and redirect to food detail page
-        const foodId = localStorage.getItem('analyzedFoodId');
-        setTimeout(() => {
+      } else if (stepIndex >= analysisSteps.length && !analysisComplete) {
+        // All visual steps complete, but still waiting for actual analysis
+        // This is a fallback in case analysis takes longer than expected
+        const checkCompletion = setInterval(() => {
+          const foodId = localStorage.getItem('analyzedFoodId');
           if (foodId) {
-            localStorage.removeItem('analyzedFoodId'); // Clean up
-            setLocation(`/food/${foodId}`);
-          } else {
-            // Fallback to dashboard if no ID found
-            setLocation('/dashboard');
+            setAnalysisComplete(true);
+            clearInterval(checkCompletion);
+            localStorage.removeItem('analyzingMealImage');
+            
+            setTimeout(() => {
+              localStorage.removeItem('analyzedFoodId');
+              setLocation(`/food/${foodId}`);
+            }, 1500);
           }
-        }, 2000);
+        }, 500);
+        intervals.push(checkCompletion as any);
       }
     };
 
     progressThroughSteps();
 
     return () => {
+      clearInterval(checkAnalysisCompletion);
       intervals.forEach(clearTimeout);
     };
-  }, [imageData, setLocation]);
+  }, [imageData, setLocation, analysisComplete]);
 
   if (!imageData) {
     return null;
