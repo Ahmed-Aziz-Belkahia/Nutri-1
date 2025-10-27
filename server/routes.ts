@@ -1791,6 +1791,20 @@ export function registerRoutes(app: Express): Server {
   // Create meal plan endpoint - UPDATED with AI-generated personalized meal plans
   app.post("/api/meal-plans", requireAuth, checkTokenLimit('meal-plan-generation'), async (req: AuthRequest, res: Response) => {
     try {
+      const userId = req.user!.id;
+      
+      // Import progress functions to check for existing generation
+      const { getMealPlanProgress } = await import('./services/meal-plan-progress');
+      
+      // Check if generation is already in progress for this user
+      const existingProgress = getMealPlanProgress(userId);
+      if (existingProgress && !existingProgress.completed) {
+        console.log(`[Meal Plan API] User ${userId}: Generation already in progress, rejecting duplicate request`);
+        return res.status(409).json({
+          error: 'Meal plan generation already in progress',
+          message: 'Please wait for the current generation to complete'
+        });
+      }
       
       // Check if this is a request to replace an existing meal plan
       const { targetDate, replaceExisting } = req.body;

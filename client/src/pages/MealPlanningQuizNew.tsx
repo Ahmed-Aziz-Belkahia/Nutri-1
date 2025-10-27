@@ -159,6 +159,10 @@ export default function MealPlanningQuiz() {
 
   const handleNext = () => {
     if (isLastStep) {
+      // Prevent multiple submissions
+      if (saveMealPlanPreferences.isPending || isGeneratingMealPlan) {
+        return;
+      }
       // Submit form
       handleSubmit(onSubmit)();
     } else {
@@ -204,6 +208,13 @@ export default function MealPlanningQuiz() {
 
         if (!mealPlanResponse.ok) {
           const errorData = await mealPlanResponse.json();
+          
+          // If generation is already in progress (409), just show progress screen
+          if (mealPlanResponse.status === 409) {
+            console.log('Meal plan generation already in progress, showing progress...');
+            return { preferences, mealPlan: { alreadyInProgress: true } };
+          }
+          
           throw new Error(errorData.message || "Failed to create meal plan");
         }
 
@@ -690,13 +701,13 @@ export default function MealPlanningQuiz() {
                 </Button>
                 <Button
                   onClick={handleNext}
-                  disabled={!isCurrentStepValid()}
-                  className="h-14 px-6 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-blue-500 text-white hover:opacity-90 rounded-xl"
+                  disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
+                  className="h-14 px-6 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-blue-500 text-white hover:opacity-90 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLastStep ? (
                     <>
                       <Flame className="w-5 h-5 mr-2" />
-                      Create Plan
+                      {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Creating...' : 'Create Plan'}
                     </>
                   ) : (
                     <>
