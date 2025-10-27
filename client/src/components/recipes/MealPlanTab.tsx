@@ -22,14 +22,14 @@ interface GroceryItem {
   purchased?: boolean;
 }
 
-// Generate days for calendar (last 90 days + next 7 days)
-function getLast3MonthsPlus7Days(): Day[] {
+// Generate days for calendar (ensures current date can be centered with at least 7 days on each side)
+function getDaysWithBuffer(): Day[] {
   const today = new Date();
   const days: Day[] = [];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
-  // Generate days for the last 90 days
-  for (let i = 89; i >= 0; i--) {
+  // Generate days: 90 days before today
+  for (let i = 90; i >= 1; i--) {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
     
@@ -37,13 +37,22 @@ function getLast3MonthsPlus7Days(): Day[] {
       date,
       dayName: dayNames[date.getDay()],
       dayNumber: date.getDate(),
-      isToday: date.toDateString() === today.toDateString(),
+      isToday: false,
       formattedDate: format(date, 'yyyy-MM-dd')
     });
   }
   
-  // Add next 7 days after today
-  for (let i = 1; i <= 7; i++) {
+  // Add today
+  days.push({
+    date: new Date(today),
+    dayName: dayNames[today.getDay()],
+    dayNumber: today.getDate(),
+    isToday: true,
+    formattedDate: format(today, 'yyyy-MM-dd')
+  });
+  
+  // Add next 90 days after today (ensures we have plenty of buffer)
+  for (let i = 1; i <= 90; i++) {
     const date = new Date(today);
     date.setDate(today.getDate() + i);
     
@@ -61,7 +70,7 @@ function getLast3MonthsPlus7Days(): Day[] {
 
 export default function MealPlanTab() {
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
-  const [allDays] = useState(getLast3MonthsPlus7Days());
+  const [allDays] = useState(getDaysWithBuffer());
 
   // Fetch all meal plans
   const { data: allMealPlans, isLoading: plansLoading } = useQuery({
@@ -224,14 +233,11 @@ export default function MealPlanTab() {
   return (
     <div className="space-y-6 pb-20">
       {/* Calendar Section */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Date</h2>
-        <CalendarSelector
-          allDays={allDays}
-          selectedDate={selectedDate}
-          onDateSelect={setSelectedDate}
-        />
-      </div>
+      <CalendarSelector
+        allDays={allDays}
+        selectedDate={selectedDate}
+        onDateSelect={setSelectedDate}
+      />
 
       {/* Meal Plan Section */}
       <MealPlanSection mealPlan={mealPlan} />
