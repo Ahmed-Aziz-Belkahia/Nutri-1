@@ -26,6 +26,7 @@ interface MealsSectionProps {
 
 export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: MealsSectionProps) {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside (desktop only)
@@ -122,7 +123,8 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
     );
   }
 
-  const mealsToShow = scannedMeals.slice(0, 3);
+  const mealsToShow = showAll ? scannedMeals : scannedMeals.slice(0, 3);
+  const hasMore = scannedMeals.length > 3;
 
   return (
     <>
@@ -241,6 +243,19 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
           </div>
         ))}
       </div>
+
+      {/* View All / Show Less button */}
+      {hasMore && (
+        <div className="text-center mt-4">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="text-sm font-medium text-[#26A8FF] hover:text-[#1a8fe0] transition-colors"
+          >
+            {showAll ? 'Show Less' : `View All (${scannedMeals.length})`}
+          </button>
+        </div>
+      )}
+
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
