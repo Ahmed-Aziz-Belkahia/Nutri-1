@@ -106,8 +106,8 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
       {/* Progress steps - styled to match screenshot */}
       <div className="space-y-4 w-full max-w-md">
         {steps.map((step, index) => {
-          const isActive = index === currentStep - 1; // Currently processing step
-          const isCompleted = index < currentStep - 1; // Completed steps
+          const isActive = index === currentStep && currentStep < steps.length; // Currently processing step
+          const isCompleted = index < currentStep; // Completed steps
           
           return (
             <motion.div
