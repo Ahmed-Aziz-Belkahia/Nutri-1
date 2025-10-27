@@ -125,9 +125,5 @@ Closing summary
 • Work completed across these two days represents a large functional and stabilization push—UI improvements, backend fixes, new endpoints, deployment/migration tooling, and important bug fixes that reduce duplicate behavior and harden the production flow.
 • Total tracked time: 23 hours (6h on 2025-10-26, 17h on 2025-10-27).
 
-If you want, I can also:
-• Produce a condensed changelog (only user-facing features and breaking changes) for a release note.
-• Open a PR with the new report file and link it to the commits.
-• Run a quick smoke test script to validate a generated meal plan end-to-end.
 
 -- End of report

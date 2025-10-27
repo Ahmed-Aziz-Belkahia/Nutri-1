@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import CalendarSelector from '@/components/dashboard/CalendarSelector';
 import MealPlanSection from '@/components/dashboard/MealPlanSection';
@@ -71,6 +71,7 @@ function getDaysWithBuffer(): Day[] {
 export default function MealPlanTab() {
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getDaysWithBuffer());
+  const queryClient = useQueryClient();
 
   // Fetch all meal plans
   const { data: allMealPlans, isLoading: plansLoading } = useQuery({
@@ -223,8 +224,11 @@ export default function MealPlanTab() {
         throw new Error('Failed to update item');
       }
       
-      // Refetch both grocery lists
-      // Note: React Query will handle the refetch automatically with invalidation
+      // Invalidate and refetch the grocery lists
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['grocery-list', selectedDate, mealPlan?.id] }),
+        queryClient.invalidateQueries({ queryKey: ['weekly-grocery-list', selectedDate] })
+      ]);
     } catch (error) {
       console.error('Error toggling grocery item:', error);
     }
