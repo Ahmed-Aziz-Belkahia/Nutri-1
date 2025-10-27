@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Share2, MoreVertical } from "lucide-react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
@@ -42,6 +42,7 @@ interface FoodDetailViewProps {
 export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const [, navigate] = useLocation();
   const [quantity, setQuantity] = useState(1);
 
   if (isLoading || !food) {
@@ -58,11 +59,12 @@ export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps)
     <div className="fixed inset-0 bg-[#F8F9FA] overflow-y-auto">
       {/* Top Bar */}
       <div className="flex items-center justify-between p-3 fixed top-0 left-0 right-0 z-10 bg-[#F8F9FA]">
-        <Link href="/dashboard">
-          <button className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-        </Link>
+        <button 
+          onClick={() => navigate('/dashboard')}
+          className="w-9 h-9 rounded-full bg-white flex items-center justify-center"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
         <div className="flex gap-2">
           <button className="w-9 h-9 rounded-full bg-white flex items-center justify-center">
             <Share2 className="w-5 h-5" />
@@ -240,12 +242,13 @@ export default function FoodDetailView({ food, isLoading }: FoodDetailViewProps)
           className="w-full h-12 bg-black text-white hover:bg-black/90 rounded-2xl"
           onClick={() => {
             toast({
-              title: t('meal.added', 'Dodano do diety'),
-              description: t('meal.addedDescription', 'Posiłek został dodany do Twojego planu diety.')
+              title: t('meal.viewing', 'Przeglądasz posiłek'),
+              description: t('meal.alreadySaved', 'Ten posiłek jest już zapisany w Twoim dzienniku.')
             });
+            navigate('/dashboard');
           }}
         >
-          {t('meal.save', 'Zapisz')}
+          {t('common.back', 'Wróć do pulpitu')}
         </Button>
       </div>
     </div>
