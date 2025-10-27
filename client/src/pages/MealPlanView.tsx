@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, startOfWeek } from "date-fns";
-import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
 import { 
   ChevronDown, 
@@ -12,9 +11,10 @@ import {
   ShoppingBag, 
   Check, 
   Clock,
-  Utensils
+  Utensils,
+  ArrowLeft,
+  Sparkles
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
 
 interface Meal {
   id: number;
@@ -51,55 +51,61 @@ export default function MealPlanView() {
   const [, setLocation] = useLocation();
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
+  const queryClient = useQueryClient();
 
-  // Fetch all meal plans
-  const { data: mealPlansData, isLoading } = useQuery<MealPlansResponse>({
+  // Invalidate and refetch meal plans when component mounts to ensure fresh data
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] });
+  }, [queryClient]);
+
+  // Fetch all meal plans with aggressive refetching
+  const { data: mealPlansData, isLoading, isError, refetch } = useQuery<MealPlansResponse>({
     queryKey: ["/api/meal-plans/all"],
     queryFn: async () => {
       const res = await fetch("/api/meal-plans/all", {
         credentials: "include",
+        cache: "no-store", // Prevent caching
       });
       if (!res.ok) throw new Error("Failed to fetch meal plans");
       return res.json();
     },
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0, // Always consider data stale
   });
 
   if (isLoading) {
     return (
-      <BaseLayout showHeader={false}>
-        <div className="flex items-center justify-center min-h-screen">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-          >
-            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-white text-lg">Loading your meal plan...</p>
-          </motion.div>
-        </div>
-      </BaseLayout>
+      <div className="gradient-bg min-h-screen flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center px-5"
+        >
+          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white text-lg">Loading your meal plan...</p>
+        </motion.div>
+      </div>
     );
   }
 
-  if (!mealPlansData?.plans || mealPlansData.plans.length === 0) {
+  if (isError || !mealPlansData?.plans || mealPlansData.plans.length === 0) {
     return (
-      <BaseLayout showHeader={false}>
-        <div className="flex items-center justify-center min-h-screen px-5">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+      <div className="gradient-bg min-h-screen flex items-center justify-center px-5">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <p className="text-white text-lg mb-6">No meal plan found</p>
+          <Button
+            onClick={() => setLocation("/meal-planning-quiz-new")}
+            className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border border-white/20"
           >
-            <p className="text-white text-lg mb-6">No meal plan found</p>
-            <Button
-              onClick={() => setLocation("/meal-planning-quiz-new")}
-              className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90"
-            >
-              Create a Meal Plan
-            </Button>
-          </motion.div>
-        </div>
-      </BaseLayout>
+            Create a Meal Plan
+          </Button>
+        </motion.div>
+      </div>
     );
   }
 
@@ -132,99 +138,116 @@ export default function MealPlanView() {
   };
 
   return (
-    <BaseLayout showHeader={false} className="pb-32">
-      {/* Success Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center py-8"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="w-20 h-20 bg-gradient-to-r from-[#0CC5BA] to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4"
+    <div className="gradient-bg min-h-screen pb-32">
+      <div className="max-w-md mx-auto px-5">
+        {/* Back Button */}
+        <motion.button
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          onClick={() => setLocation("/")}
+          className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors py-4"
         >
-          <Check className="w-10 h-10 text-white" />
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-3xl font-bold text-white mb-2"
-        >
-          Your Meal Plan is Ready!
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-white/80 text-lg"
-        >
-          {format(firstDate, "MMM d")} - {format(lastDate, "MMM d, yyyy")}
-        </motion.p>
-      </motion.div>
+          <ArrowLeft className="w-5 h-5" />
+          <span>Back to Dashboard</span>
+        </motion.button>
 
-      {/* Week Summary Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 p-6 mb-6">
+        {/* Success Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-6"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="w-20 h-20 bg-gradient-to-r from-[#0CC5BA] to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl shadow-[#0CC5BA]/30"
+          >
+            <Check className="w-10 h-10 text-white" strokeWidth={3} />
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl font-bold text-white mb-2"
+          >
+            Your Meal Plan is Ready!
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-white/70 text-base"
+          >
+            {format(firstDate, "MMM d")} - {format(lastDate, "MMM d, yyyy")}
+          </motion.p>
+        </motion.div>
+
+        {/* Week Summary Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 mb-6 shadow-lg"
+        >
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <Flame className="w-6 h-6 text-orange-400 mx-auto mb-2" />
-              <p className="text-white/60 text-sm">Avg Daily Calories</p>
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-lg">
+                <Flame className="w-6 h-6 text-white" />
+              </div>
+              <p className="text-white/60 text-xs font-medium mb-1">Avg Daily</p>
               <p className="text-white text-2xl font-bold">{avgDailyCalories}</p>
+              <p className="text-white/50 text-xs">calories</p>
             </div>
             <div className="text-center">
-              <Utensils className="w-6 h-6 text-[#0CC5BA] mx-auto mb-2" />
-              <p className="text-white/60 text-sm">Total Meals</p>
+              <div className="w-12 h-12 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-lg">
+                <Utensils className="w-6 h-6 text-white" />
+              </div>
+              <p className="text-white/60 text-xs font-medium mb-1">Total Meals</p>
               <p className="text-white text-2xl font-bold">
                 {weekPlans.reduce((sum, day) => sum + (day.meals?.length || 0), 0)}
               </p>
+              <p className="text-white/50 text-xs">this week</p>
             </div>
           </div>
-        </Card>
-      </motion.div>
+        </motion.div>
 
-      {/* Daily Meal Plans */}
-      <div className="space-y-4 mb-6">
-        {weekPlans.map((day, dayIndex) => {
-          const dayDate = new Date(day.date);
-          const isExpanded = expandedDay === day.date;
-          const dayMeals = day.meals || [];
+        {/* Daily Meal Plans */}
+        <div className="space-y-4 mb-6">
+          {weekPlans.map((day, dayIndex) => {
+            const dayDate = new Date(day.date);
+            const isExpanded = expandedDay === day.date;
+            const dayMeals = day.meals || [];
 
-          return (
-            <motion.div
-              key={day.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 + dayIndex * 0.1 }}
-            >
-              <Card className="bg-white/10 backdrop-blur-md border-white/20 overflow-hidden">
+            return (
+              <motion.div
+                key={day.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 + dayIndex * 0.1 }}
+                className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-lg"
+              >
                 {/* Day Header */}
                 <button
                   onClick={() => setExpandedDay(isExpanded ? null : day.date)}
-                  className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                  className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="text-center">
-                      <p className="text-white/60 text-xs uppercase tracking-wider">
+                    <div className="text-center bg-white/10 rounded-xl px-3 py-2 min-w-[3.5rem]">
+                      <p className="text-white/60 text-[10px] uppercase font-bold tracking-wider">
                         {format(dayDate, "EEE")}
                       </p>
-                      <p className="text-white text-2xl font-bold">
+                      <p className="text-white text-2xl font-bold leading-none">
                         {format(dayDate, "d")}
                       </p>
                     </div>
                     <div className="text-left">
-                      <p className="text-white font-semibold text-lg">
+                      <p className="text-white font-bold text-base">
                         {format(dayDate, "MMMM d")}
                       </p>
-                      <div className="flex items-center space-x-2 text-white/60 text-sm">
-                        <Flame className="w-4 h-4" />
-                        <span>{day.totalCalories} cal</span>
+                      <div className="flex items-center space-x-2 text-white/60 text-sm mt-1">
+                        <Flame className="w-3.5 h-3.5" />
+                        <span className="font-medium">{day.totalCalories} cal</span>
                         <span>•</span>
                         <span>{dayMeals.length} meals</span>
                       </div>
@@ -234,7 +257,7 @@ export default function MealPlanView() {
                     animate={{ rotate: isExpanded ? 180 : 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <ChevronDown className="w-6 h-6 text-white/60" />
+                    <ChevronDown className="w-5 h-5 text-white/60" />
                   </motion.div>
                 </button>
 
@@ -254,46 +277,46 @@ export default function MealPlanView() {
                           const nutrition = meal.recipe?.nutritionInfo;
 
                           return (
-                            <Card
+                            <div
                               key={meal.id}
-                              className="bg-white/5 backdrop-blur-sm border-white/10 overflow-hidden"
+                              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden"
                             >
                               {/* Meal Header */}
                               <button
                                 onClick={() =>
                                   setExpandedMeal(isMealExpanded ? null : meal.id)
                                 }
-                                className="w-full p-4 flex items-center space-x-4 hover:bg-white/5 transition-colors"
+                                className="w-full p-4 flex items-center space-x-3 hover:bg-white/5 transition-colors"
                               >
                                 {/* Meal Image */}
                                 {meal.imageUrl && (
                                   <img
                                     src={meal.imageUrl}
                                     alt={meal.name}
-                                    className="w-16 h-16 rounded-lg object-cover"
+                                    className="w-14 h-14 rounded-lg object-cover shadow-md"
                                   />
                                 )}
                                 
                                 {/* Meal Info */}
                                 <div className="flex-1 text-left">
                                   <div className="flex items-center space-x-2 mb-1">
-                                    <span className="text-lg">
+                                    <span className="text-base">
                                       {getMealTypeIcon(meal.mealType)}
                                     </span>
-                                    <span className="text-white/60 text-xs uppercase tracking-wider">
+                                    <span className="text-white/50 text-[10px] uppercase font-bold tracking-wider">
                                       {getMealTypeLabel(meal.mealType)}
                                     </span>
                                   </div>
-                                  <p className="text-white font-semibold">
+                                  <p className="text-white font-semibold text-sm leading-tight">
                                     {meal.name}
                                   </p>
                                   {nutrition && (
-                                    <div className="flex items-center space-x-3 mt-1 text-xs text-white/60">
+                                    <div className="flex items-center space-x-2 mt-1.5 text-[11px] text-white/60 font-medium">
                                       <span>{nutrition.calories} cal</span>
                                       <span>•</span>
-                                      <span>P: {nutrition.protein}g</span>
-                                      <span>C: {nutrition.carbs}g</span>
-                                      <span>F: {nutrition.fat}g</span>
+                                      <span>P {nutrition.protein}g</span>
+                                      <span>C {nutrition.carbs}g</span>
+                                      <span>F {nutrition.fat}g</span>
                                     </div>
                                   )}
                                 </div>
@@ -302,7 +325,7 @@ export default function MealPlanView() {
                                   animate={{ rotate: isMealExpanded ? 180 : 0 }}
                                   transition={{ duration: 0.3 }}
                                 >
-                                  <ChevronDown className="w-5 h-5 text-white/60" />
+                                  <ChevronDown className="w-4 h-4 text-white/60" />
                                 </motion.div>
                               </button>
 
@@ -318,8 +341,8 @@ export default function MealPlanView() {
                                   >
                                     {/* Prep Time */}
                                     {meal.recipe?.prepTime && (
-                                      <div className="flex items-center space-x-2 text-white/60 text-sm">
-                                        <Clock className="w-4 h-4" />
+                                      <div className="flex items-center space-x-2 text-white/60 text-xs font-medium">
+                                        <Clock className="w-3.5 h-3.5" />
                                         <span>{meal.recipe.prepTime} min prep time</span>
                                       </div>
                                     )}
@@ -327,16 +350,16 @@ export default function MealPlanView() {
                                     {/* Ingredients */}
                                     {meal.recipe?.ingredients && meal.recipe.ingredients.length > 0 && (
                                       <div>
-                                        <h4 className="text-white font-semibold mb-2 text-sm">
+                                        <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-2">
                                           Ingredients
                                         </h4>
-                                        <ul className="space-y-1">
+                                        <ul className="space-y-1.5">
                                           {meal.recipe.ingredients.map((ingredient, idx) => (
                                             <li
                                               key={idx}
-                                              className="text-white/70 text-sm flex items-start space-x-2"
+                                              className="text-white/70 text-xs flex items-start space-x-2"
                                             >
-                                              <span className="text-[#0CC5BA] mt-1">•</span>
+                                              <span className="text-[#0CC5BA] mt-0.5 font-bold">•</span>
                                               <span>
                                                 {typeof ingredient === "string"
                                                   ? ingredient
@@ -351,16 +374,16 @@ export default function MealPlanView() {
                                     {/* Instructions */}
                                     {meal.recipe?.instructions && meal.recipe.instructions.length > 0 && (
                                       <div>
-                                        <h4 className="text-white font-semibold mb-2 text-sm">
+                                        <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-2">
                                           Instructions
                                         </h4>
                                         <ol className="space-y-2">
                                           {meal.recipe.instructions.map((step, idx) => (
                                             <li
                                               key={idx}
-                                              className="text-white/70 text-sm flex space-x-2"
+                                              className="text-white/70 text-xs flex space-x-2"
                                             >
-                                              <span className="text-[#0CC5BA] font-semibold min-w-[1.5rem]">
+                                              <span className="text-[#0CC5BA] font-bold min-w-[1.25rem]">
                                                 {idx + 1}.
                                               </span>
                                               <span>{step}</span>
@@ -372,41 +395,41 @@ export default function MealPlanView() {
                                   </motion.div>
                                 )}
                               </AnimatePresence>
-                            </Card>
+                            </div>
                           );
                         })}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
+              </motion.div>
+            );
+          })}
+        </div>
 
-      {/* Action Buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="fixed bottom-20 left-0 right-0 px-5 max-w-md mx-auto space-y-3"
-      >
-        <Button
-          onClick={() => setLocation("/groceries")}
-          className="w-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border border-white/20 py-6 text-base font-medium"
+        {/* Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+          className="space-y-3 pb-8"
         >
-          <ShoppingBag className="w-5 h-5 mr-2" />
-          View Shopping List
-        </Button>
-        <Button
-          onClick={() => setLocation("/")}
-          className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 text-white py-6 text-base font-medium"
-        >
-          <Check className="w-5 h-5 mr-2" />
-          Start My Week
-        </Button>
-      </motion.div>
-    </BaseLayout>
+          <Button
+            onClick={() => setLocation("/groceries")}
+            className="w-full bg-white/20 backdrop-blur-md hover:bg-white/30 text-white border border-white/20 py-6 text-base font-semibold rounded-2xl shadow-lg"
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            View Shopping List
+          </Button>
+          <Button
+            onClick={() => setLocation("/")}
+            className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 text-white py-6 text-base font-semibold rounded-2xl shadow-xl shadow-[#0CC5BA]/30"
+          >
+            <Sparkles className="w-5 h-5 mr-2" />
+            Start My Week
+          </Button>
+        </motion.div>
+      </div>
+    </div>
   );
 }

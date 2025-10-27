@@ -234,12 +234,12 @@ export default function MealPlanningQuiz() {
       ]);
       
       toast({
-        title: t("mealPlanningQuiz:success.title", "Success"),
-        description: t("mealPlanningQuiz:success.description", "Your preferences have been saved and meal plan has been generated!"),
+        title: t("mealPlanningQuiz:success.title", "Success!"),
+        description: t("mealPlanningQuiz:success.description", "Your meal plan has been created!"),
       });
       
-      // Wait for queries to refetch before navigating
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait longer for queries to refetch and data to be available before navigating
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setLocation("/meal-plan/view");
     },
     onError: (error) => {
