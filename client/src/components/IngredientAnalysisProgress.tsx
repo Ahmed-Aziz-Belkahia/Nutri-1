@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChefHat, Eye, Sparkles, Search } from 'lucide-react';
 
@@ -7,6 +7,27 @@ interface IngredientAnalysisProgressProps {
 }
 
 const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({ isVisible }) => {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setCurrentStep(0);
+      return;
+    }
+
+    // Simulate progress through steps
+    const timers = [
+      setTimeout(() => setCurrentStep(1), 2000),  // Step 1 completes after 2s
+      setTimeout(() => setCurrentStep(2), 5000),  // Step 2 completes after 5s (2+3)
+      setTimeout(() => setCurrentStep(3), 7000),  // Step 3 completes after 7s (5+2)
+      setTimeout(() => setCurrentStep(4), 10000), // Step 4 completes after 10s (7+3)
+    ];
+
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, [isVisible]);
+
   if (!isVisible) return null;
 
   const steps = [
@@ -85,8 +106,8 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
       {/* Progress steps - styled to match screenshot */}
       <div className="space-y-4 w-full max-w-md">
         {steps.map((step, index) => {
-          const isActive = true; // For continuous animation
-          const isCompleted = false; // Will be controlled by timing logic later
+          const isActive = index === currentStep - 1; // Currently processing step
+          const isCompleted = index < currentStep - 1; // Completed steps
           
           return (
             <motion.div
@@ -104,10 +125,13 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
                 } : {}}
                 transition={{
                   duration: 2,
-                  repeat: Infinity,
-                  delay: step.delay
+                  repeat: isActive ? Infinity : 0
                 }}
-                className="w-14 h-14 rounded-full bg-[#4FD1C7] flex items-center justify-center shadow-md"
+                className={`w-14 h-14 rounded-full flex items-center justify-center shadow-md ${
+                  isCompleted ? 'bg-green-500' : 
+                  isActive ? 'bg-[#4FD1C7]' : 
+                  'bg-gray-300'
+                }`}
               >
                 <motion.div
                   animate={isActive ? {
@@ -115,8 +139,7 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
                   } : {}}
                   transition={{
                     duration: 3,
-                    repeat: Infinity,
-                    delay: step.delay,
+                    repeat: isActive ? Infinity : 0,
                     ease: "linear"
                   }}
                 >
@@ -132,10 +155,13 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
                   } : {}}
                   transition={{
                     duration: 1.5,
-                    repeat: Infinity,
-                    delay: step.delay
+                    repeat: isActive ? Infinity : 0
                   }}
-                  className="text-gray-700 font-semibold text-lg"
+                  className={`font-semibold text-lg ${
+                    isCompleted ? 'text-green-600' :
+                    isActive ? 'text-gray-700' :
+                    'text-gray-400'
+                  }`}
                 >
                   {step.text}
                 </motion.p>
@@ -145,14 +171,20 @@ const IngredientAnalysisProgress: React.FC<IngredientAnalysisProgressProps> = ({
               <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
+                  animate={{ 
+                    width: isCompleted ? "100%" : 
+                           isActive ? "100%" : 
+                           "0%" 
+                  }}
                   transition={{
-                    duration: step.duration,
-                    repeat: Infinity,
-                    delay: step.delay,
+                    duration: isActive ? step.duration : 0.5,
                     ease: "easeOut"
                   }}
-                  className="h-full bg-gradient-to-r from-[#4FD1C7] to-[#7FDBDA] rounded-full"
+                  className={`h-full rounded-full ${
+                    isCompleted ? 'bg-green-500' :
+                    isActive ? 'bg-gradient-to-r from-[#4FD1C7] to-[#7FDBDA]' :
+                    'bg-gray-300'
+                  }`}
                 />
               </div>
             </motion.div>
