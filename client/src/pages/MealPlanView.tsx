@@ -130,43 +130,11 @@ export default function MealPlanView() {
 
   return (
     <BaseLayout>
-      {/* Success Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-6"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg"
-        >
-          <Check className="w-8 h-8 text-[#0CC5BA]" strokeWidth={3} />
-        </motion.div>
-        <motion.h1
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-2xl font-bold text-white mb-1"
-        >
-          Meal Plan Ready!
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="text-white/70 text-sm"
-        >
-          {format(firstDate, "MMM d")} - {format(lastDate, "MMM d, yyyy")}
-        </motion.p>
-      </motion.div>
-
       {/* Week Summary Card - Dashboard Style */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.2 }}
         className="bg-white/90 backdrop-blur-sm rounded-3xl p-5 mb-5 shadow-lg"
       >
         <div className="grid grid-cols-2 gap-4">
