@@ -39,6 +39,7 @@ export default function MealAnalysis() {
     }
 
     let isMounted = true;
+    let analysisCompleted = false;
     let stepIndex = 0;
     const intervals: NodeJS.Timeout[] = [];
 
@@ -83,6 +84,9 @@ export default function MealAnalysis() {
         
         if (!isMounted) return;
 
+        // Mark analysis as completed to stop visual timer
+        analysisCompleted = true;
+        
         // Complete all steps instantly
         setCurrentStep(analysisSteps.length);
         setCompletedSteps(new Set(analysisSteps.map((_, i) => i)));
@@ -116,11 +120,11 @@ export default function MealAnalysis() {
 
     // Visual progress animation
     const progressThroughSteps = () => {
-      if (stepIndex < analysisSteps.length && !analysisComplete) {
+      if (stepIndex < analysisSteps.length && !analysisCompleted) {
         setCurrentStep(stepIndex);
         
         const timer = setTimeout(() => {
-          if (!analysisComplete && isMounted) {
+          if (!analysisCompleted && isMounted) {
             setCompletedSteps(prev => new Set(prev).add(stepIndex));
             stepIndex++;
             progressThroughSteps();
