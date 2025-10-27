@@ -220,7 +220,7 @@ CREATE TABLE IF NOT EXISTS shopping_list_items (
   recipe_image TEXT
 );
 
--- Food logs table
+-- Food logs table (with recipe fields)
 CREATE TABLE IF NOT EXISTS food_logs (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   user_id INTEGER NOT NULL REFERENCES users(id),
@@ -231,7 +231,21 @@ CREATE TABLE IF NOT EXISTS food_logs (
   fat REAL NOT NULL,
   date INTEGER NOT NULL DEFAULT (strftime('%s', 'now') * 1000),
   image TEXT,
-  components TEXT
+  components TEXT,
+  description TEXT,
+  ingredients TEXT,
+  instructions TEXT,
+  prep_time INTEGER,
+  cook_time INTEGER,
+  servings INTEGER DEFAULT 1,
+  image_url TEXT,
+  source TEXT DEFAULT 'scanned',
+  is_recipe INTEGER DEFAULT 0,
+  recipe_id INTEGER REFERENCES recipes(id),
+  cuisine_type TEXT,
+  meal_type TEXT,
+  difficulty TEXT,
+  tags TEXT
 );
 
 -- Password reset tokens table
@@ -316,7 +330,8 @@ const criticalColumns = {
   'progress_photos': ['caption'],
   'meal_plans': ['total_calories'],
   'weight_logs': ['logged_at'],
-  'recipes_in_meal_plan': ['order']
+  'recipes_in_meal_plan': ['order'],
+  'food_logs': ['description', 'ingredients', 'instructions', 'prep_time', 'cook_time', 'servings', 'source', 'is_recipe']
 };
 
 let allValid = true;

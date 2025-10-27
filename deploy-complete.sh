@@ -28,8 +28,10 @@ if [ -f "local.db" ]; then
     CALORIE_CHECK=$(sqlite3 local.db "PRAGMA table_info(user_nutrition_preferences);" 2>/dev/null | grep -c "daily_calorie_goal|INTEGER" || echo "0")
     USER_ID_CHECK=$(sqlite3 local.db "PRAGMA table_info(recipes);" 2>/dev/null | grep -c "user_id|INTEGER" || echo "0")
     CAPTION_CHECK=$(sqlite3 local.db "PRAGMA table_info(progress_photos);" 2>/dev/null | grep -c "caption|TEXT" || echo "0")
+    # NEW: Check for recipe fields in food_logs
+    RECIPE_FIELDS_CHECK=$(sqlite3 local.db "PRAGMA table_info(food_logs);" 2>/dev/null | grep -cE "description|ingredients|instructions|prep_time|cook_time" || echo "0")
     
-    if [ "$ORDER_CHECK" -eq "0" ] || [ "$CALORIE_CHECK" -eq "0" ] || [ "$USER_ID_CHECK" -eq "0" ] || [ "$CAPTION_CHECK" -eq "0" ]; then
+    if [ "$ORDER_CHECK" -eq 0 ] || [ "$CALORIE_CHECK" -eq 0 ] || [ "$USER_ID_CHECK" -eq 0 ] || [ "$CAPTION_CHECK" -eq 0 ] || [ "$RECIPE_FIELDS_CHECK" -lt 5 ]; then
         echo "⚠️  Database schema doesn't match Drizzle TypeScript definitions"
         echo "🗑️  Regenerating database from Drizzle schema..."
         rm -f local.db local.db-wal local.db-shm
