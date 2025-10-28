@@ -231,31 +231,53 @@ export default function MealPlanningQuiz() {
       setIsGeneratingMealPlan(false);
       
       console.log('[Meal Plan Quiz New] Invalidating queries...');
-      // Invalidate and wait for refetch to complete
+      // Invalidate queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
       ]);
       console.log('[Meal Plan Quiz New] Queries invalidated');
       
-      // Wait a bit for backend to finish writing to database
-      console.log('[Meal Plan Quiz New] Waiting 2 seconds for backend to complete...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Poll for meal plans to be ready (max 30 seconds)
+      console.log('[Meal Plan Quiz New] Polling for meal plans...');
+      let attempts = 0;
+      const maxAttempts = 15; // 15 attempts x 2 seconds = 30 seconds max
+      let plansReady = false;
       
-      // Refetch the all meal plans query to ensure data is loaded before navigation
-      console.log('[Meal Plan Quiz New] Refetching meal plans...');
-      const refetchResult = await queryClient.refetchQueries({ 
+      while (attempts < maxAttempts && !plansReady) {
+        attempts++;
+        console.log(`[Meal Plan Quiz New] Poll attempt ${attempts}/${maxAttempts}`);
+        
+        // Wait 2 seconds between attempts
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Try fetching meal plans
+        try {
+          const response = await fetch('/api/meal-plans/all', { credentials: 'include' });
+          if (response.ok) {
+            const data = await response.json();
+            console.log(`[Meal Plan Quiz New] Poll ${attempts}: Got ${data.plans?.length || 0} plans`);
+            
+            if (data.plans && data.plans.length > 0) {
+              plansReady = true;
+              console.log('[Meal Plan Quiz New] Meal plans are ready!');
+              break;
+            }
+          }
+        } catch (error) {
+          console.error(`[Meal Plan Quiz New] Poll ${attempts} failed:`, error);
+        }
+      }
+      
+      if (!plansReady) {
+        console.warn('[Meal Plan Quiz New] Timed out waiting for meal plans, navigating anyway...');
+      }
+      
+      // Final refetch to populate cache
+      console.log('[Meal Plan Quiz New] Final refetch...');
+      await queryClient.refetchQueries({ 
         queryKey: ["/api/meal-plans/all"],
         type: 'active'
-      });
-      console.log('[Meal Plan Quiz New] Refetch complete', { refetchResult });
-      
-      // Check if data is actually available
-      const cachedData = queryClient.getQueryData(["/api/meal-plans/all"]);
-      console.log('[Meal Plan Quiz New] Cached data after refetch:', { 
-        dataExists: !!cachedData, 
-        dataLength: Array.isArray(cachedData) ? cachedData.length : 'not array',
-        data: cachedData 
       });
       
       toast({
@@ -264,7 +286,6 @@ export default function MealPlanningQuiz() {
       });
       
       console.log('[Meal Plan Quiz New] Navigating to meal-plan/view...');
-      // Navigate immediately after data is loaded
       setLocation("/meal-plan/view");
     },
     onError: (error) => {
