@@ -56,12 +56,21 @@ export default function MealPlanView() {
 
   // Invalidate meal plans when component mounts to ensure fresh data
   useEffect(() => {
+    console.log('[MealPlanView] Component mounted, invalidating queries');
     const invalidator = createInvalidator(queryClient);
     invalidator.mealPlans();
   }, [queryClient]);
 
   // Fetch all meal plans using custom hook with aggressive refetching
   const { data: mealPlansData, isLoading, isError, refetch } = useAllMealPlans();
+  
+  console.log('[MealPlanView] Render state:', { 
+    isLoading, 
+    isError, 
+    hasData: !!mealPlansData,
+    dataLength: mealPlansData?.length,
+    mealPlansData 
+  });
 
   if (isLoading) {
     return (

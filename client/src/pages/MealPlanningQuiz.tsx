@@ -258,20 +258,37 @@ export default function MealPlanningQuiz() {
         throw error;
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (data) => {
+      console.log('[Meal Plan Quiz] onSuccess triggered', { data });
       setIsGeneratingMealPlan(false);
       isSubmittingRef.current = false;
       
+      console.log('[Meal Plan Quiz] Invalidating queries...');
       // Invalidate and wait for refetch to complete
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
       ]);
+      console.log('[Meal Plan Quiz] Queries invalidated');
+      
+      // Wait a bit for backend to finish writing to database
+      console.log('[Meal Plan Quiz] Waiting 2 seconds for backend to complete...');
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Refetch the all meal plans query to ensure data is loaded before navigation
-      await queryClient.refetchQueries({ 
+      console.log('[Meal Plan Quiz] Refetching meal plans...');
+      const refetchResult = await queryClient.refetchQueries({ 
         queryKey: ["/api/meal-plans/all"],
         type: 'active'
+      });
+      console.log('[Meal Plan Quiz] Refetch complete', { refetchResult });
+      
+      // Check if data is actually available
+      const cachedData = queryClient.getQueryData(["/api/meal-plans/all"]);
+      console.log('[Meal Plan Quiz] Cached data after refetch:', { 
+        dataExists: !!cachedData, 
+        dataLength: Array.isArray(cachedData) ? cachedData.length : 'not array',
+        data: cachedData 
       });
       
       toast({
@@ -279,6 +296,7 @@ export default function MealPlanningQuiz() {
         description: "Your meal plan has been created!",
       });
       
+      console.log('[Meal Plan Quiz] Navigating to meal-plan/view...');
       // Navigate immediately after data is loaded
       setLocation("/meal-plan/view");
     },

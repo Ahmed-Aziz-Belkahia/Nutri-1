@@ -48,13 +48,21 @@ export function useAllMealPlans(filters?: MealPlanFilters): UseQueryResult<MealP
       if (filters?.startDate) params.append('startDate', filters.startDate);
       if (filters?.endDate) params.append('endDate', filters.endDate);
       
+      console.log('[useAllMealPlans] Fetching from /api/meal-plans/all');
       const response = await fetch(`/api/meal-plans/all`, {
         credentials: 'include'
       });
+      console.log('[useAllMealPlans] Response status:', response.status);
+      
       if (!response.ok) throw new Error('Failed to fetch meal plans');
       const data = await response.json();
+      console.log('[useAllMealPlans] Raw response data:', data);
+      
       // API returns { weekStart, plans }, but we just need the plans array
-      return data.plans || [];
+      const plans = data.plans || [];
+      console.log('[useAllMealPlans] Extracted plans:', { count: plans.length, plans });
+      
+      return plans;
     },
     ...queryPresets.moderate,
   });
