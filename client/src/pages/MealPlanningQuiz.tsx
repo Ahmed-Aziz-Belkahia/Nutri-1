@@ -261,18 +261,25 @@ export default function MealPlanningQuiz() {
     onSuccess: async () => {
       setIsGeneratingMealPlan(false);
       isSubmittingRef.current = false;
+      
+      // Invalidate and wait for refetch to complete
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
       ]);
+      
+      // Refetch the all meal plans query to ensure data is loaded before navigation
+      await queryClient.refetchQueries({ 
+        queryKey: ["/api/meal-plans/all"],
+        type: 'active'
+      });
       
       toast({
         title: "Success!",
         description: "Your meal plan has been created!",
       });
       
-      // Wait longer for queries to refetch and data to be available before navigating
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Navigate immediately after data is loaded
       setLocation("/meal-plan/view");
     },
     onError: (error) => {
