@@ -1,8 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import CalendarSelector from '@/components/dashboard/CalendarSelector';
 import MealPlanSection from '@/components/dashboard/MealPlanSection';
+import { useAllMealPlans } from '@/hooks/queries/useMealPlans';
+import { useShoppingListByPlanId, useWeeklyShoppingList } from '@/hooks/queries/useShoppingList';
+import { createInvalidator } from '@/lib/queryUtils';
 
 interface Day {
   date: Date;
@@ -87,162 +90,54 @@ export default function MealPlanTab() {
     }
   }, []);
 
-  // Fetch all meal plans
-  const { data: allMealPlans, isLoading: plansLoading } = useQuery({
-    queryKey: ['all-meal-plans'],
-    queryFn: async () => {
-      const response = await fetch('/api/meal-plans/all', {
-        credentials: 'include'
-      });
-      if (!response.ok) return null;
-      return response.json();
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // Fetch all meal plans using custom hook
+  const { data: allMealPlans, isLoading: plansLoading } = useAllMealPlans();
 
   // Get the meal plan for the selected date
   const mealPlan = useMemo(() => {
-    if (!allMealPlans?.plans || !selectedDate) return null;
-    const plan = allMealPlans.plans.find((p: any) => p.date === selectedDate);
+    if (!allMealPlans || !selectedDate) return null;
+    const plan = allMealPlans.find((p: any) => p.date === selectedDate);
     return plan || null;
   }, [allMealPlans, selectedDate]);
 
-  // Fetch grocery list for the selected date's meal plan
-  const { data: groceryList = [], isLoading: groceryLoading } = useQuery<GroceryItem[]>({
-    queryKey: ['grocery-list', selectedDate, mealPlan?.id],
-    queryFn: async () => {
-      if (!mealPlan?.id) return [];
-      
-      const response = await fetch(`/api/meal-plans/${mealPlan.id}/shopping-list`, {
-        credentials: 'include'
-      });
-      
-      if (!response.ok) return [];
-      const data = await response.json();
-      
-      // Transform the response to match our GroceryItem interface
-      if (Array.isArray(data)) {
-        return data.map((item: any) => ({
-          id: item.id,
-          name: item.name || item.ingredient || 'Unknown',
-          quantity: item.quantity || 1,
-          unit: item.unit || 'unit',
-          category: item.category || 'Other',
-          isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false
-        }));
-      } else if (data.items && Array.isArray(data.items)) {
-        return data.items.map((item: any) => ({
-          id: item.id,
-          name: item.name || item.ingredient || 'Unknown',
-          quantity: item.quantity || 1,
-          unit: item.unit || 'unit',
-          category: item.category || 'Other',
-          isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false
-        }));
-      }
-      return [];
-    },
-    enabled: !!mealPlan?.id,
-  });
+  // Fetch grocery list for the selected date's meal plan using custom hook
+  const { data: groceryListData, isLoading: groceryLoading } = useShoppingListByPlanId(mealPlan?.id);
+  
+  // Transform shopping list data to match GroceryItem interface
+  const groceryList: GroceryItem[] = useMemo(() => {
+    if (!groceryListData?.items) return [];
+    
+    return groceryListData.items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category || 'Other',
+      isPurchased: item.isChecked || false
+    }));
+  }, [groceryListData]);
 
-  // Get weekly grocery list (all items from the current week)
-  const { data: weeklyGroceryList = [], isLoading: weeklyGroceryLoading } = useQuery<GroceryItem[]>({
-    queryKey: ['weekly-grocery-list', selectedDate],
-    queryFn: async () => {
-      // Get the start of the week (Sunday) for the selected date
-      const date = new Date(selectedDate);
-      const dayOfWeek = date.getDay();
-      const startOfWeek = new Date(date);
-      startOfWeek.setDate(date.getDate() - dayOfWeek);
-      const startDate = format(startOfWeek, 'yyyy-MM-dd');
-      
-      // Get the end of the week (Saturday)
-      const endOfWeek = new Date(startOfWeek);
-      endOfWeek.setDate(startOfWeek.getDate() + 6);
-      const endDate = format(endOfWeek, 'yyyy-MM-dd');
-      
-      // Fetch all meal plans for the week
-      if (!allMealPlans?.plans) return [];
-      
-      const weekPlans = allMealPlans.plans.filter((p: any) => 
-        p.date >= startDate && p.date <= endDate
-      );
-      
-      // Collect all grocery items from the week's meal plans
-      const allItems: GroceryItem[] = [];
-      const itemMap = new Map<string, GroceryItem>();
-      
-      for (const plan of weekPlans) {
-        if (!plan.id) continue;
-        
-        try {
-          const response = await fetch(`/api/meal-plans/${plan.id}/shopping-list`, {
-            credentials: 'include'
-          });
-          
-          if (!response.ok) continue;
-          const data = await response.json();
-          
-          const items = Array.isArray(data) ? data : (data.items || []);
-          
-          // Merge items with same name
-          items.forEach((item: any) => {
-            const name = item.name || item.ingredient || 'Unknown';
-            const key = name.toLowerCase();
-            const itemPurchased = item.isPurchased ?? item.is_purchased ?? item.purchased ?? false;
-            
-            if (itemMap.has(key)) {
-              const existing = itemMap.get(key)!;
-              // Add quantities
-              const existingQty = parseFloat(existing.quantity?.toString() || '0');
-              const newQty = parseFloat(item.quantity?.toString() || '0');
-              existing.quantity = existingQty + newQty;
-              
-              // Track all instances
-              existing.itemsWithPlans!.push({ itemId: item.id, mealPlanId: plan.id });
-              
-              // Count purchased instances
-              if (!existing.purchasedCount) existing.purchasedCount = existing.isPurchased ? 1 : 0;
-              if (itemPurchased) existing.purchasedCount++;
-              
-              // Item shows as purchased if ALL instances are purchased
-              existing.isPurchased = existing.purchasedCount === existing.itemsWithPlans!.length;
-            } else {
-              const newItem: GroceryItem = {
-                id: item.id,
-                name,
-                quantity: item.quantity || 1,
-                unit: item.unit || 'unit',
-                category: item.category || 'Other',
-                isPurchased: itemPurchased,
-                itemsWithPlans: [{ itemId: item.id, mealPlanId: plan.id }],
-                purchasedCount: itemPurchased ? 1 : 0
-              };
-              itemMap.set(key, newItem);
-            }
-          });
-        } catch (error) {
-          console.error(`Failed to fetch shopping list for plan ${plan.id}:`, error);
-        }
-      }
-      
-      return Array.from(itemMap.values());
-    },
-    enabled: !!allMealPlans?.plans,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // Get weekly grocery list using custom hook
+  const { data: weeklyGroceryListData, isLoading: weeklyGroceryLoading } = useWeeklyShoppingList(selectedDate);
+  
+  // Transform weekly shopping list
+  const weeklyGroceryList: GroceryItem[] = useMemo(() => {
+    if (!weeklyGroceryListData?.items) return [];
+    
+    return weeklyGroceryListData.items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category || 'Other',
+      isPurchased: item.isChecked || false
+    }));
+  }, [weeklyGroceryListData]);
 
   // Handle toggling grocery item purchased status
   const handleToggleItem = async (item: GroceryItem, currentStatus: boolean) => {
     const newStatus = !currentStatus;
-
-    // Optimistically update the UI immediately
-    queryClient.setQueryData(['weekly-grocery-list', selectedDate], (oldData: any) => {
-      if (!oldData) return oldData;
-      return oldData.map((i: GroceryItem) => 
-        i.name === item.name ? { ...i, isPurchased: newStatus } : i
-      );
-    });
+    const invalidator = createInvalidator(queryClient);
 
     try {
       // If this is a merged item, update all instances
@@ -279,22 +174,11 @@ export default function MealPlanTab() {
         }
       }
 
-      // Refetch to ensure we have the latest data
-      await queryClient.invalidateQueries({ queryKey: ['weekly-grocery-list', selectedDate] });
-      await queryClient.invalidateQueries({ queryKey: ['grocery-list'] });
+      // Use centralized invalidation
+      await invalidator.shoppingList(selectedDate, mealPlan?.id);
       
     } catch (error) {
       console.error('[Weekly Grocery] Error updating item:', error);
-      
-      // Revert optimistic update on error
-      queryClient.setQueryData(['weekly-grocery-list', selectedDate], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.map((i: GroceryItem) => 
-          i.name === item.name ? { ...i, isPurchased: currentStatus } : i
-        );
-      });
-      
-      // Show error to user
       alert('Failed to update item. Please try again.');
     }
   };
@@ -310,7 +194,7 @@ export default function MealPlanTab() {
       />
 
       {/* Meal Plan Section */}
-      <MealPlanSection mealPlan={mealPlan} />
+      <MealPlanSection mealPlan={mealPlan as any} />
 
       {/* Weekly Grocery List Section */}
       <div id="grocery-list" className="bg-white rounded-2xl shadow-sm p-6">

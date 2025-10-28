@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
 import { 
   X, ChevronLeft, ChevronRight, Pause, Play, 
   Check, Timer as TimerIcon, Volume2, VolumeX, 
@@ -8,6 +7,7 @@ import {
   Clock, Flame, Users, List, Settings
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useRecipeById } from '@/hooks/queries/useRecipes';
 
 interface Timer {
   id: string;
@@ -59,60 +59,48 @@ export default function CookingMode() {
   const timerUpdateRef = useRef<NodeJS.Timeout>();
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Fetch recipe
-  const { data: recipe, isLoading } = useQuery<Recipe>({
-    queryKey: ['recipe', id, isFoodLog],
-    queryFn: async () => {
-      const endpoint = isFoodLog 
-        ? `/api/recipes/food-log/${id}`
-        : `/api/recipes/${id}`;
-      const response = await fetch(endpoint, {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch recipe');
-      return response.json();
-    },
-    enabled: !!id
-  });
+  // Fetch recipe using custom hook
+  const { data: recipe, isLoading } = useRecipeById(Number(id), isFoodLog);
+  const recipeData = recipe as any;
 
   // Parse instructions
   const instructions: string[] = (() => {
-    if (!recipe?.instructions) return [];
+    if (!recipeData?.instructions) return [];
     
-    if (typeof recipe.instructions === 'string') {
+    if (typeof recipeData.instructions === 'string') {
       try {
-        const parsed = JSON.parse(recipe.instructions);
-        return Array.isArray(parsed) ? parsed : [recipe.instructions];
+        const parsed = JSON.parse(recipeData.instructions);
+        return Array.isArray(parsed) ? parsed : [recipeData.instructions];
       } catch {
-        return recipe.instructions.split('\n').filter(i => i.trim()).map(i => i.trim().replace(/^\d+\.\s*/, ''));
+        return recipeData.instructions.split('\n').filter((i: any) => i.trim()).map((i: any) => i.trim().replace(/^\d+\.\s*/, ''));
       }
     }
-    return Array.isArray(recipe.instructions) ? recipe.instructions : [];
+    return Array.isArray(recipeData.instructions) ? recipeData.instructions : [];
   })();
 
   // Parse ingredients
   const ingredients: any[] = (() => {
-    if (!recipe?.ingredients) return [];
+    if (!recipeData?.ingredients) return [];
     
-    if (typeof recipe.ingredients === 'string') {
+    if (typeof recipeData.ingredients === 'string') {
       try {
-        return JSON.parse(recipe.ingredients);
+        return JSON.parse(recipeData.ingredients);
       } catch {
-        return recipe.ingredients.split(',').map(i => ({
+        return recipeData.ingredients.split(',').map((i: any) => ({
           name: i.trim(),
           quantity: '',
           unit: ''
         }));
       }
     }
-    return recipe.ingredients;
+    return recipeData.ingredients;
   })();
 
   // Initialize session
   useEffect(() => {
-    if (recipe && !session) {
+    if (recipeData && !session) {
       setSession({
-        recipeId: recipe.id,
+        recipeId: recipeData.id,
         currentStep: 0,
         totalSteps: instructions.length,
         startTime: new Date(),
@@ -504,18 +492,18 @@ export default function CookingMode() {
             You've successfully completed:
           </p>
           
-          {recipe.imageUrl && (
+          {recipeData.imageUrl && (
             <div className="mb-4 animate-[fadeIn_0.6s_ease-out_0.5s_both]">
               <img 
-                src={recipe.imageUrl} 
-                alt={recipe.name}
+                src={recipeData.imageUrl} 
+                alt={recipeData.name}
                 className="w-full h-48 object-cover rounded-2xl shadow-lg"
               />
             </div>
           )}
           
           <h2 className="text-xl font-bold text-gray-800 mb-6 animate-[fadeIn_0.6s_ease-out_0.6s_both]">
-            {recipe.name}
+            {recipeData.name}
           </h2>
           
           <div className="grid grid-cols-3 gap-4 mb-8 animate-[fadeIn_0.6s_ease-out_0.7s_both]">
@@ -527,12 +515,12 @@ export default function CookingMode() {
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 transform hover:scale-105 transition-transform">
               <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
               <p className="text-xs text-gray-500">Calories</p>
-              <p className="text-lg font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
+              <p className="text-lg font-bold text-gray-900">{recipeData.nutritionInfo?.calories || 0}</p>
             </div>
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 transform hover:scale-105 transition-transform">
               <Users className="w-6 h-6 text-green-500 mx-auto mb-2" />
               <p className="text-xs text-gray-500">Servings</p>
-              <p className="text-lg font-bold text-gray-900">{recipe.servings || 1}</p>
+              <p className="text-lg font-bold text-gray-900">{recipeData.servings || 1}</p>
             </div>
           </div>
           
@@ -540,7 +528,7 @@ export default function CookingMode() {
             <button
               onClick={() => {
                 setSession({
-                  recipeId: recipe.id,
+                  recipeId: recipeData.id,
                   currentStep: 0,
                   totalSteps: instructions.length,
                   startTime: new Date(),
@@ -626,7 +614,7 @@ export default function CookingMode() {
               <X className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="font-bold text-lg truncate max-w-xs">{recipe.name}</h1>
+              <h1 className="font-bold text-lg truncate max-w-xs">{recipeData.name}</h1>
               <p className="text-sm text-gray-400">
                 Step {session.currentStep + 1} of {session.totalSteps}
               </p>

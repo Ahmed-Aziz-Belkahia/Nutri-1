@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import {
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { useRecipeById } from "@/hooks/queries/useRecipes";
 
 export default function SimpleCookingMode() {
   const [_, params] = useRoute('/cooking/:recipeId');
@@ -33,18 +33,9 @@ export default function SimpleCookingMode() {
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  // Fetch recipe data
-  const { data: recipe, isLoading, isError } = useQuery({
-    queryKey: ["/api/recipes", recipeId],
-    queryFn: async () => {
-      if (!recipeId) {
-        throw new Error('No recipe ID provided');
-      }
-      const response = await fetch(`/api/recipes/${recipeId}`);
-      if (!response.ok) throw new Error('Failed to fetch recipe');
-      return response.json();
-    },
-  });
+  // Fetch recipe data using custom hook with realtime refetching
+  const { data: recipeData, isLoading, isError } = useRecipeById(Number(recipeId), false);
+  const recipe = recipeData as any; // Cast to support additional properties
 
   // Parse instructions
   const instructionSteps = React.useMemo<string[]>(() => {

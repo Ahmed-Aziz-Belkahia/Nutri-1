@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import { useRecipeById } from '@/hooks/queries/useRecipes';
 
 interface Ingredient {
   name: string;
@@ -47,21 +47,9 @@ export default function RecipeDetail() {
   const [currentInstructionStep, setCurrentInstructionStep] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
 
-  // Fetch recipe details
-  const { data: recipe, isLoading } = useQuery<Recipe>({
-    queryKey: ['recipe', recipeId, isFoodLog],
-    queryFn: async () => {
-      const endpoint = isFoodLog 
-        ? `/api/recipes/food-log/${recipeId}`
-        : `/api/recipes/${recipeId}`;
-      const response = await fetch(endpoint, {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch recipe');
-      return response.json();
-    },
-    enabled: !!recipeId
-  });
+  // Fetch recipe details using custom hook
+  const { data: recipeData, isLoading } = useRecipeById(Number(recipeId), isFoodLog);
+  const recipe = recipeData as any; // Cast to support additional properties
 
   // Parse ingredients
   const ingredients: Ingredient[] = (() => {
@@ -71,7 +59,7 @@ export default function RecipeDetail() {
       try {
         return JSON.parse(recipe.ingredients);
       } catch {
-        return recipe.ingredients.split(',').map(i => ({
+        return recipe.ingredients.split(',').map((i: string) => ({
           name: i.trim(),
           quantity: '',
           unit: ''
@@ -90,7 +78,7 @@ export default function RecipeDetail() {
         const parsed = JSON.parse(recipe.instructions);
         return Array.isArray(parsed) ? parsed : [recipe.instructions];
       } catch {
-        return recipe.instructions.split('\n').filter(i => i.trim()).map(i => i.trim().replace(/^\d+\.\s*/, ''));
+        return recipe.instructions.split('\n').filter((i: string) => i.trim()).map((i: string) => i.trim().replace(/^\d+\.\s*/, ''));
       }
     }
     return Array.isArray(recipe.instructions) ? recipe.instructions : [];

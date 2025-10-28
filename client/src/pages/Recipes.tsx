@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
   Loader2, 
@@ -55,6 +55,9 @@ import ImprovedShoppingList from "@/pages/ImprovedShoppingList";
 import EmbeddedShoppingList from "@/components/EmbeddedShoppingList";
 import MealPlanningWelcome from "@/components/MealPlanningWelcome";
 import GroceryList from "@/components/dashboard/GroceryList";
+import { useCreatedRecipes, useSavedRecipes } from "@/hooks/queries/useRecipes";
+import { useTodaysMealPlan, useAllMealPlans } from "@/hooks/queries/useMealPlans";
+import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -188,112 +191,16 @@ export default function Recipes() {
   
   // Level functionality removed
 
-  const { data: createdRecipes, isLoading: isLoadingCreated } = useQuery({
-    queryKey: ["/api/recipes", "created"],
-    queryFn: async () => {
-      const response = await fetch("/api/recipes?type=created");
-      if (!response.ok) throw new Error("Failed to fetch created recipes");
-      return response.json();
-    },
-    staleTime: 0, // Always consider data stale
-    retry: 1, // Limit retries to reduce unnecessary requests
-    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
-    enabled: activeTab === "recipes", // Only fetch when on recipes tab
-    refetchOnMount: "always", // Always fetch when component mounts
-    placeholderData: [], // Use empty array as placeholder to avoid undefined errors
-  });
-
-  const { data: savedRecipes, isLoading: isLoadingSaved } = useQuery({
-    queryKey: ["/api/recipes", "saved"],
-    queryFn: async () => {
-      const response = await fetch("/api/recipes?type=saved");
-      if (!response.ok) throw new Error("Failed to fetch saved recipes");
-      return response.json();
-    },
-    staleTime: 0, // Always consider data stale
-    retry: 1, // Limit retries to reduce unnecessary requests
-    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
-    enabled: activeTab === "recipes", // Only fetch when on recipes tab
-    refetchOnMount: "always", // Always fetch when component mounts
-    placeholderData: [], // Use empty array as placeholder to avoid undefined errors
-  });
+  // Use custom hooks for recipes (cast to match local types)
+  const { data: createdRecipes, isLoading: isLoadingCreated } = useCreatedRecipes();
+  const { data: savedRecipes, isLoading: isLoadingSaved } = useSavedRecipes();
   
-  // Fetch today's meal plan
-  const { data: todayMealPlanData, isLoading: isTodayLoading, error: todayError } = useQuery<{ hasPlan: boolean; plan?: MealPlan }>({
-    queryKey: ["/api/meal-plans/today"],
-    queryFn: async () => {
-      const response = await fetch("/api/meal-plans/today", {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required');
-        }
-        throw new Error('Failed to fetch meal plan');
-      }
-      return response.json();
-    },
-    retry: false,
-    staleTime: 0, // Always consider data stale
-    enabled: activeTab === "meal-plan",
-    refetchOnMount: "always", // Always refetch when component mounts
-    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
-  });
-  
-  // Fetch all meal plans for the calendar view
-  const { data: allMealPlansData, isLoading: isAllPlansLoading, error: allPlansError, refetch: allMealPlansRefetch } = useQuery<MealPlanResponse>({
-    queryKey: ["/api/meal-plans/all"],
-    queryFn: async () => {
-      const response = await fetch("/api/meal-plans/all", {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required');
-        }
-        throw new Error('Failed to fetch all meal plans');
-      }
-      return response.json();
-    },
-    retry: false,
-    staleTime: 0, // Always consider data stale
-    enabled: activeTab === "meal-plan",
-    refetchOnMount: "always", // Always refetch when component mounts
-    refetchOnWindowFocus: true, // Refetch when window/tab regains focus
-  });
+  // Use custom hooks for meal plans (cast to match local types)
+  const { data: todayMealPlanData, isLoading: isTodayLoading, error: todayError } = useTodaysMealPlan();
+  const { data: allMealPlansData, isLoading: isAllPlansLoading, error: allPlansError, refetch: allMealPlansRefetch } = useAllMealPlans();
 
-  // Fetch grocery list for the selected meal plan
-  const { data: groceryList = [], isLoading: groceriesLoading, refetch: refetchGroceries } = useQuery({
-    queryKey: ["/api/shopping-list", selectedPlan?.id],
-    queryFn: async () => {
-      // If we have a meal plan, fetch its shopping list
-      if (selectedPlan && selectedPlan.id) {
-        const response = await fetch(`/api/meal-plans/${selectedPlan.id}/shopping-list`, {
-          credentials: "include",
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Transform the response to match our GroceryItem interface
-          if (Array.isArray(data)) {
-            return data.map((item: any) => ({
-              id: item.id,
-              name: item.name || item.ingredient,
-              quantity: item.quantity || '',
-              unit: item.unit || '',
-              category: item.category || '',
-              isPurchased: item.purchased || false,
-              purchased: item.purchased || false
-            }));
-          }
-          return data;
-        }
-      }
-      return [];
-    },
-    enabled: activeTab === "meal-plan" && !!selectedPlan?.id,
-  });
+  // Use custom hook for grocery list (cast to match local types)
+  const { data: groceryList = [], isLoading: groceriesLoading, refetch: refetchGroceries } = useShoppingListByPlanId(selectedPlan?.id);
   
   // Mutation to mark a meal as complete or incomplete
   const markMealStatusMutation = useMutation({
@@ -390,10 +297,10 @@ export default function Recipes() {
     setSelectedDate(date);
     
     // Find the plan for the selected date
-    if (allMealPlansData?.plans) {
+    if (allMealPlansData) {
       const selectedDateStr = format(date, 'yyyy-MM-dd');
-      const plan = allMealPlansData.plans.find(plan => plan.date === selectedDateStr);
-      setSelectedPlan(plan || null);
+      const plan = allMealPlansData.find((plan: any) => plan.date === selectedDateStr);
+      setSelectedPlan((plan || null) as any);
       
       // If no plan exists for this date, show toast with option to generate
       if (!plan) {
@@ -417,12 +324,12 @@ export default function Recipes() {
   
   // Set selected plan when all plans data loads
   useEffect(() => {
-    if (allMealPlansData?.plans && allMealPlansData.plans.length > 0) {
+    if (allMealPlansData && (allMealPlansData as any).length > 0) {
       // If today's date is selected, try to find today's meal plan
       const selectedDateStr = format(selectedDate, 'yyyy-MM-dd');
-      const plan = allMealPlansData.plans.find(plan => plan.date === selectedDateStr);
+      const plan = (allMealPlansData as any).find((plan: any) => plan.date === selectedDateStr);
       
-      setSelectedPlan(plan || null);
+      setSelectedPlan((plan || null) as any);
     }
   }, [allMealPlansData, selectedDate]);
 
@@ -636,7 +543,7 @@ export default function Recipes() {
   }
 
   return (
-    <BaseLayout onRefresh={handleRefresh}>
+    <BaseLayout onRefresh={handleRefresh} showHeader={false}>
       <motion.main
         variants={containerVariants}
         initial="hidden"
@@ -684,31 +591,54 @@ export default function Recipes() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Scan ingredients card */}
+              {/* Scan ingredients card - ENHANCED */}
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6"
+                className="mb-8"
               >
-                <div className="text-center mb-4">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Camera className="w-8 h-8 text-white" />
-                  </div>
-                  <h2 className="text-xl font-bold text-white mb-2">{t('recipes.aIPoweredCreator')}</h2>
-                  <p className="text-sm text-white/80 mb-6">
-                    {t('recipes.takePhoto')}
-                  </p>
+                <Card className="bg-gradient-to-br from-cyan-500 to-blue-600 border-none shadow-xl overflow-hidden relative">
+                  {/* Decorative elements */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
                   
-                  <div className="flex justify-center">
+                  <div className="relative p-6 text-center">
+                    <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <Camera className="w-10 h-10 text-white" />
+                    </div>
+                    
+                    <h2 className="text-2xl font-bold text-white mb-3">
+                      {t('recipes.aIPoweredCreator', 'AI-Powered Recipe Creator')}
+                    </h2>
+                    
+                    <p className="text-white/90 mb-6 max-w-md mx-auto leading-relaxed">
+                      {t('recipes.takePhoto', 'Take a photo of your ingredients and let AI create personalized recipes for you instantly!')}
+                    </p>
+                    
                     <Button
                       onClick={() => navigate('/scan-recipe')}
-                      className="py-6 px-10 bg-white text-primary rounded-2xl font-semibold text-base hover:shadow-lg transition-all duration-300 flex items-center justify-center hover:bg-white/90"
+                      className="py-6 px-12 bg-white text-cyan-600 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-white/95"
                     >
-                      <Camera className="w-5 h-5 mr-3" />
-                      {t('recipes.scanIngredients')}
+                      <Camera className="w-6 h-6 mr-3" />
+                      {t('recipes.scanIngredients', 'Scan Ingredients')}
                     </Button>
+                    
+                    <div className="flex items-center justify-center gap-6 mt-6 text-white/80 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        <span>AI Powered</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        <span>Instant Results</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ChefHat className="w-4 h-4" />
+                        <span>Custom Recipes</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </motion.div>
               
               {/* Created Recipes Section - COMPLETELY REDESIGNED */}
@@ -758,7 +688,7 @@ export default function Recipes() {
                   </div>
                 ) : createdRecipes && createdRecipes.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {getFilteredRecipes(createdRecipes).map((recipe) => (
+                    {getFilteredRecipes(createdRecipes as any).map((recipe: any) => (
                       <EnhancedRecipeCard
                         key={recipe.id}
                         recipe={recipe}
@@ -770,7 +700,7 @@ export default function Recipes() {
                       />
                     ))}
                     
-                    {getFilteredRecipes(createdRecipes).length === 0 && (
+                    {getFilteredRecipes(createdRecipes as any).length === 0 && (
                       <div className="col-span-1 sm:col-span-2 text-center py-8 text-white/80">
                         <p>No matching recipes found. Try adjusting your filters or create a new recipe!</p>
                       </div>
@@ -812,7 +742,7 @@ export default function Recipes() {
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {getFilteredRecipes(savedRecipes).map((recipe) => (
+                    {getFilteredRecipes(savedRecipes as any).map((recipe: any) => (
                       <EnhancedRecipeCard
                         key={recipe.id}
                         recipe={recipe}
@@ -820,7 +750,7 @@ export default function Recipes() {
                       />
                     ))}
                     
-                    {getFilteredRecipes(savedRecipes).length === 0 && (
+                    {getFilteredRecipes(savedRecipes as any).length === 0 && (
                       <div className="col-span-1 sm:col-span-2 text-center py-8 text-white/80">
                         <p>No matching saved recipes found with your current filters.</p>
                       </div>
@@ -861,7 +791,7 @@ export default function Recipes() {
                           date.getDate() === selectedDate.getDate() && 
                           date.getMonth() === selectedDate.getMonth();
                         const dateStr = format(date, 'yyyy-MM-dd');
-                        const hasPlan = allMealPlansData?.plans?.some(p => p.date === dateStr);
+                        const hasPlan = allMealPlansData?.some((p: any) => p.date === dateStr);
                         const isToday = new Date().toDateString() === date.toDateString();
                         return (
                           <button
@@ -1044,7 +974,7 @@ export default function Recipes() {
                   </div>
                   <div className="p-4 bg-transparent">
                     <GroceryList 
-                      groceryList={groceryList}
+                      groceryList={groceryList as any}
                       mealPlan={selectedPlan}
                       onToggleItem={toggleGroceryItem}
                     />

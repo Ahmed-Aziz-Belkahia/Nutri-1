@@ -1,63 +1,17 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
-import { useQuery } from "@tanstack/react-query";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import CalendarSelector from "@/components/dashboard/CalendarSelector";
 import MacroCard from "@/components/dashboard/MacroCard";
 import MealsSection from "@/components/dashboard/MealsSection";
 import GroceryList from "@/components/dashboard/GroceryList";
 import MealPlanSection from "@/components/dashboard/MealPlanSection";
-
-interface FoodLog {
-  id: number;
-  name: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  quantity: number;
-  unit: string;
-  imageUrl?: string;
-  loggedAt: string;
-}
-
-interface DailyTotals {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
-interface MealPlan {
-  id: number;
-  name?: string;
-  targetCalories?: number;
-  targetProtein?: number;
-  targetCarbs?: number;
-  targetFat?: number;
-  date?: string;
-  totalCalories?: number;
-  status?: string;
-  meals?: Array<{
-    id: number;
-    name: string;
-    mealType: string;
-    order: number;
-    servingSize: number;
-    isFrozen: boolean;
-    isCompleted: boolean;
-    nutritionInfo?: {
-      calories: number;
-      protein: number;
-      carbs: number;
-      fat: number;
-    };
-    instructions?: string | string[];
-    ingredients?: string | string[];
-    imageUrl?: string;
-  }>;
-}
+import { useFoodLogsByDate, useDailyTotals } from "@/hooks/queries/useFoodLogs";
+import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
+import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
+import { useQueryClient } from "@tanstack/react-query";
+import { createInvalidator } from "@/lib/queryUtils";
 
 interface GroceryItem {
   id: number;
@@ -108,166 +62,50 @@ function getLast3MonthsPlus7Days() {
 
 export default function DashboardNew() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getLast3MonthsPlus7Days());
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Fetch food logs for selected date
-  const { data: foodLogs = [], isLoading: logsLoading } = useQuery<FoodLog[]>({
-    queryKey: ['food-logs', selectedDate],
-    queryFn: async () => {
-      const response = await fetch(`/api/food-logs?date=${selectedDate}`, {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch food logs');
-      const data = await response.json();
-      return data.logs || [];
-    }
-  });
+  // Fetch food logs for selected date using custom hook
+  const { data: foodLogsData, isLoading: logsLoading } = useFoodLogsByDate(selectedDate);
+  const foodLogs = foodLogsData?.logs || [];
 
-  // Fetch daily totals for selected date
-  const { data: dailyTotals = { calories: 0, protein: 0, carbs: 0, fat: 0 } } = useQuery<DailyTotals>({
-    queryKey: ['daily-totals', selectedDate],
-    queryFn: async () => {
-      const response = await fetch(`/api/food-logs?date=${selectedDate}`, {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch totals');
-      const data = await response.json();
-      return data.totals || { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    }
-  });
+  // Fetch daily totals for selected date using custom hook
+  const { data: dailyTotals = { calories: 0, protein: 0, carbs: 0, fat: 0 } } = useDailyTotals(selectedDate);
 
-  // Fetch all meal plans to match the calendar approach used in Recipes page
-  const { data: allMealPlans } = useQuery({
-    queryKey: ['all-meal-plans'],
-    queryFn: async () => {
-      console.log('[ALL MEAL PLANS] Fetching all meal plans');
-      const response = await fetch('/api/meal-plans/all', {
-        credentials: 'include'
-      });
-      if (!response.ok) {
-        console.log('[ALL MEAL PLANS] Failed to fetch');
-        return null;
-      }
-      const data = await response.json();
-      console.log('[ALL MEAL PLANS] Received data:', data);
-      return data;
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+  // Fetch all meal plans using custom hook
+  const { data: allMealPlans } = useAllMealPlans();
 
   // Get the meal plan for the selected date from all plans
   const mealPlan = useMemo(() => {
-    if (!allMealPlans?.plans || !selectedDate) {
+    if (!allMealPlans || !selectedDate) {
       console.log('[MEAL PLAN] No plans available or no date selected');
       return null;
     }
-    const plan = allMealPlans.plans.find((p: any) => p.date === selectedDate);
+    // allMealPlans is already an array of MealPlan objects
+    const plan = allMealPlans.find((p: any) => p.date === selectedDate);
     console.log('[MEAL PLAN] Found plan for', selectedDate, ':', plan);
     return plan || null;
   }, [allMealPlans, selectedDate]);
 
-  // Fetch daily totals for selected date
-  const { data: groceryList = [], refetch: refetchGroceries } = useQuery<GroceryItem[]>({
-    queryKey: ['grocery-list', selectedDate, mealPlan?.id],
-    queryFn: async () => {
-      console.log('[GROCERY LIST] Starting fetch for date:', selectedDate);
-      console.log('[GROCERY LIST] mealPlan:', mealPlan);
-      console.log('[GROCERY LIST] mealPlan?.id:', mealPlan?.id);
-      
-      try {
-        // If we have a meal plan, fetch its shopping list
-        if (mealPlan && mealPlan.id) {
-          console.log('[GROCERY LIST] Fetching for meal plan ID:', mealPlan.id);
-          const url = `/api/meal-plans/${mealPlan.id}/shopping-list`;
-          console.log('[GROCERY LIST] URL:', url);
-          
-          const response = await fetch(url, {
-            credentials: 'include'
-          });
-          
-          console.log('[GROCERY LIST] Response status:', response.status);
-          console.log('[GROCERY LIST] Response ok:', response.ok);
-          
-          if (response.ok) {
-            const data = await response.json();
-            console.log('[GROCERY LIST] Raw data received:', data);
-            
-            // Transform the response to match our GroceryItem interface
-            if (Array.isArray(data)) {
-              console.log('[GROCERY LIST] Data is array, length:', data.length);
-              const mapped = data.map((item: any) => {
-                console.log('[GROCERY LIST] Mapping item:', item);
-                return {
-                  id: item.id,
-                  name: item.name || item.ingredient || 'Unknown',
-                  quantity: item.quantity || 1,
-                  unit: item.unit || 'unit',
-                  category: item.category || 'Other',
-                  isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false
-                };
-              });
-              console.log('[GROCERY LIST] Final mapped items:', mapped);
-              return mapped;
-            } else if (data.items && Array.isArray(data.items)) {
-              console.log('[GROCERY LIST] Data has items property, length:', data.items.length);
-              const mapped = data.items.map((item: any) => ({
-                id: item.id,
-                name: item.name || item.ingredient || 'Unknown',
-                quantity: item.quantity || 1,
-                unit: item.unit || 'unit',  
-                category: item.category || 'Other',
-                isPurchased: item.isPurchased ?? item.is_purchased ?? item.purchased ?? false
-              }));
-              console.log('[GROCERY LIST] Final mapped items from data.items:', mapped);
-              return mapped;
-            } else {
-              console.log('[GROCERY LIST] Unexpected data format:', data);
-              return [];
-            }
-          } else {
-            const errorText = await response.text();
-            console.error('[GROCERY LIST] Failed to fetch meal plan shopping list:', response.status, errorText);
-          }
-        } else {
-          console.log('[GROCERY LIST] No meal plan available yet');
-        }
-        
-        // Fallback to general shopping list
-        console.log('[GROCERY LIST] Trying fallback to general shopping list');
-        const response = await fetch('/api/shopping-list', {
-          credentials: 'include'
-        });
-        console.log('[GROCERY LIST] General list response status:', response.status);
-        
-        if (!response.ok) {
-          console.log('[GROCERY LIST] General list failed, returning empty array');
-          return [];
-        }
-        
-        const data = await response.json();
-        console.log('[GROCERY LIST] General list data:', data);
-        
-        // Ensure we return an array
-        if (Array.isArray(data)) {
-          console.log('[GROCERY LIST] Returning general list array, length:', data.length);
-          return data;
-        } else if (data.items && Array.isArray(data.items)) {
-          console.log('[GROCERY LIST] Returning general list items array, length:', data.items.length);
-          return data.items;
-        }
-        
-        console.log('[GROCERY LIST] No valid data format in general list, returning empty array');
-        return [];
-      } catch (error) {
-        console.error('[GROCERY LIST] Error in queryFn:', error);
-        return [];
-      }
-    },
-    enabled: true // Always enabled now
-  });
+  // Fetch shopping list for the meal plan using custom hook
+  const { data: groceryListData, refetch: refetchGroceries } = useShoppingListByPlanId(mealPlan?.id);
+  
+  // Transform shopping list data to match GroceryItem interface
+  const groceryList: GroceryItem[] = useMemo(() => {
+    if (!groceryListData?.items) return [];
+    
+    return groceryListData.items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      unit: item.unit,
+      category: item.category || 'Other',
+      isPurchased: item.isChecked || false
+    }));
+  }, [groceryListData]);
 
   // Calculate macro percentages based on targets
   const macroData = [
@@ -275,37 +113,37 @@ export default function DashboardNew() {
       id: 'calories',
       title: 'Eaten Calories',
       current: Math.round(dailyTotals.calories),
-      target: mealPlan?.targetCalories || 2500,
+      target: (mealPlan as any)?.targetCalories || 2500,
       unit: 'cal',
       color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.calories / (mealPlan?.targetCalories || 2500)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.calories / ((mealPlan as any)?.targetCalories || 2500)) * 100))
     },
     {
       id: 'carbs',
       title: 'Carbohydrates',
       current: Math.round(dailyTotals.carbs),
-      target: mealPlan?.targetCarbs || 300,
+      target: (mealPlan as any)?.targetCarbs || 300,
       unit: 'g',
       color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.carbs / (mealPlan?.targetCarbs || 300)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.carbs / ((mealPlan as any)?.targetCarbs || 300)) * 100))
     },
     {
       id: 'protein',
       title: 'Protein',
       current: Math.round(dailyTotals.protein),
-      target: mealPlan?.targetProtein || 150,
+      target: (mealPlan as any)?.targetProtein || 150,
       unit: 'g',
       color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.protein / (mealPlan?.targetProtein || 150)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.protein / ((mealPlan as any)?.targetProtein || 150)) * 100))
     },
     {
       id: 'fat',
       title: 'Fat',
       current: Math.round(dailyTotals.fat),
-      target: mealPlan?.targetFat || 80,
+      target: (mealPlan as any)?.targetFat || 80,
       unit: 'g',
       color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.fat / (mealPlan?.targetFat || 80)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.fat / ((mealPlan as any)?.targetFat || 80)) * 100))
     }
   ];
 
@@ -385,10 +223,12 @@ export default function DashboardNew() {
       });
 
       if (response.ok) {
-        refetchGroceries();
+        // Invalidate shopping list queries using centralized invalidation
+        const invalidator = createInvalidator(queryClient);
+        await invalidator.shoppingList(selectedDate, mealPlan?.id);
       }
     } catch (error) {
-      // If API fails, just update locally for now
+      // If API fails, refetch to sync state
       refetchGroceries();
     }
   };
@@ -416,7 +256,7 @@ export default function DashboardNew() {
       />
 
       <MealPlanSection 
-        mealPlan={mealPlan}
+        mealPlan={mealPlan as any}
       />
     </BaseLayout>
   );

@@ -20,9 +20,9 @@ import AddFood from "./pages/AddFood";
 import AddFoodNew from "./pages/AddFoodNew";
 import EnhancedAddFood from "./pages/EnhancedAddFood";
 import MealAnalysis from "./pages/MealAnalysis";
+import IngredientsAnalysis from "./pages/IngredientsAnalysis";
 import FoodDetail from "./pages/FoodDetail";
 import MealDetail from "./pages/MealDetail";
-import Recipes from "./pages/Recipes";
 import RecipesNew from "./pages/RecipesNew";
 import RecipeDetail from "./pages/RecipeDetail";
 import CookingMode from "./pages/CookingMode";
@@ -211,10 +211,10 @@ function App() {
 
   // Show bottom nav only on main app pages when authenticated
   // Exclude /dashboard as it has its own navbar
-  const showBottomNav = user && ['/dashboard-old', '/enhanced-dashboard', '/progress', '/progress-new', '/recipes', '/settings', '/meals', '/profile', '/analytics'].includes(location);
+  const showBottomNav = user && ['/dashboard-old', '/enhanced-dashboard', '/progress', '/progress-new', '/settings', '/meals', '/profile', '/analytics'].includes(location);
 
   // Use black background for camera-based pages only
-  const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food' || location === '/meal-analysis';
+  const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food' || location === '/meal-analysis' || location === '/ingredients-analysis';
   const appBackgroundClass = isFullScreenCameraPage 
     ? "app-container min-h-screen relative bg-black" 
     : "app-container min-h-screen relative bg-white";
@@ -321,6 +321,11 @@ function App() {
             <Route path="/meal-analysis">
               <ProtectedRoute>
                 <MealAnalysis />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/ingredients-analysis">
+              <ProtectedRoute>
+                <IngredientsAnalysis />
               </ProtectedRoute>
             </Route>
             <Route path="/add-food-old">

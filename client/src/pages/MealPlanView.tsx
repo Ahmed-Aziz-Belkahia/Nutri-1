@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays } from "date-fns";
@@ -14,6 +14,8 @@ import {
   Sparkles,
   ChefHat
 } from "lucide-react";
+import { useAllMealPlans, useCompleteMeal } from "@/hooks/queries/useMealPlans";
+import { createInvalidator } from "@/lib/queryUtils";
 
 interface Meal {
   id: number;
@@ -52,26 +54,14 @@ export default function MealPlanView() {
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
-  // Invalidate and refetch meal plans when component mounts to ensure fresh data
+  // Invalidate meal plans when component mounts to ensure fresh data
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] });
+    const invalidator = createInvalidator(queryClient);
+    invalidator.mealPlans();
   }, [queryClient]);
 
-  // Fetch all meal plans with aggressive refetching
-  const { data: mealPlansData, isLoading, isError, refetch } = useQuery<MealPlansResponse>({
-    queryKey: ["/api/meal-plans/all"],
-    queryFn: async () => {
-      const res = await fetch("/api/meal-plans/all", {
-        credentials: "include",
-        cache: "no-store", // Prevent caching
-      });
-      if (!res.ok) throw new Error("Failed to fetch meal plans");
-      return res.json();
-    },
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0, // Always consider data stale
-  });
+  // Fetch all meal plans using custom hook with aggressive refetching
+  const { data: mealPlansData, isLoading, isError, refetch } = useAllMealPlans();
 
   if (isLoading) {
     return (
@@ -88,7 +78,7 @@ export default function MealPlanView() {
     );
   }
 
-  if (isError || !mealPlansData?.plans || mealPlansData.plans.length === 0) {
+  if (isError || !mealPlansData || mealPlansData.length === 0) {
     return (
       <div className="gradient-bg min-h-screen flex items-center justify-center px-5">
         <motion.div
@@ -108,14 +98,14 @@ export default function MealPlanView() {
     );
   }
 
-  // Get the week's plans (latest 7 days)
-  const weekPlans = mealPlansData.plans.slice(-7);
+  // Get the week's plans (latest 7 days) - mealPlansData is already an array
+  const weekPlans = mealPlansData.slice(-7);
   const firstDate = weekPlans[0]?.date ? new Date(weekPlans[0].date) : new Date();
   const lastDate = weekPlans[weekPlans.length - 1]?.date 
     ? new Date(weekPlans[weekPlans.length - 1].date) 
     : addDays(firstDate, 6);
 
-  const totalWeekCalories = weekPlans.reduce((sum, day) => sum + (day.totalCalories || 0), 0);
+  const totalWeekCalories = weekPlans.reduce((sum: number, day: any) => sum + (day.totalCalories || 0), 0);
   const avgDailyCalories = Math.round(totalWeekCalories / weekPlans.length);
 
   const getMealTypeLabel = (mealType: string) => {
@@ -152,7 +142,7 @@ export default function MealPlanView() {
             </div>
             <p className="text-gray-500 text-xs font-medium mb-1">Total Meals</p>
             <p className="text-gray-900 text-xl font-bold">
-              {weekPlans.reduce((sum, day) => sum + (day.meals?.length || 0), 0)}
+              {weekPlans.reduce((sum: number, day: any) => sum + (day.meals?.length || 0), 0)}
             </p>
             <p className="text-gray-400 text-xs">this week</p>
           </div>
@@ -161,7 +151,7 @@ export default function MealPlanView() {
 
       {/* Daily Meal Plans - Dashboard Card Style */}
       <div className="space-y-3 mb-6">
-        {weekPlans.map((day, dayIndex) => {
+        {weekPlans.map((day: any, dayIndex: number) => {
           const dayDate = new Date(day.date);
           const isExpanded = expandedDay === day.date;
           const dayMeals = day.meals || [];
@@ -219,7 +209,7 @@ export default function MealPlanView() {
                     className="border-t border-gray-100"
                   >
                     <div className="p-4 space-y-3">
-                      {dayMeals.map((meal) => {
+                      {dayMeals.map((meal: any) => {
                         const isMealExpanded = expandedMeal === meal.id;
                         const nutrition = meal.recipe?.nutritionInfo;
 
@@ -296,7 +286,7 @@ export default function MealPlanView() {
                                         Ingredients
                                       </h4>
                                       <ul className="space-y-1.5">
-                                        {meal.recipe.ingredients.map((ingredient, idx) => (
+                                        {meal.recipe.ingredients.map((ingredient: any, idx: number) => (
                                           <li
                                             key={idx}
                                             className="text-gray-600 text-xs flex items-start space-x-2"
@@ -320,7 +310,7 @@ export default function MealPlanView() {
                                         Instructions
                                       </h4>
                                       <ol className="space-y-2">
-                                        {meal.recipe.instructions.map((step, idx) => (
+                                        {meal.recipe.instructions.map((step: any, idx: number) => (
                                           <li
                                             key={idx}
                                             className="text-gray-600 text-xs flex space-x-2"

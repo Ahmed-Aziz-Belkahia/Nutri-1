@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, addDays, isToday } from "date-fns";
 import { 
   ArrowLeft, 
@@ -19,6 +19,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GroceryList } from "@/components/GroceryList";
 import { useToast } from "@/hooks/use-toast";
+import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
+import { useShoppingListByDate } from "@/hooks/queries/useShoppingList";
 
 interface ShoppingItem {
   id: number;
@@ -166,48 +168,29 @@ export default function EnhancedShoppingList() {
   );
   const selectedDateString = format(selectedDate, 'yyyy-MM-dd');
   
-  // Fetch meal plans for the selected date
-  const { data: mealPlansData } = useQuery({
-    queryKey: ["/api/meal-plans/all"],
-    queryFn: async () => {
-      const response = await fetch(`/api/meal-plans/all`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch meal plans');
-      }
-      return response.json();
-    }
-  });
+  // Fetch meal plans using custom hook
+  const { data: mealPlansData } = useAllMealPlans();
   
   // Check if there's a meal plan for the selected date
-  const hasMealPlanForDate = mealPlansData?.plans?.some(
+  const hasMealPlanForDate = (mealPlansData as any)?.some(
     (plan: any) => plan.date === selectedDateString
   ) || false;
   
   // Get meal plan ID for the selected date
-  const mealPlanId = mealPlansData?.plans?.find(
+  const mealPlanId = (mealPlansData as any)?.find(
     (plan: any) => plan.date === selectedDateString
   )?.id;
 
-  // Fetch shopping list for the selected date
+  // Fetch shopping list using custom hook
   const { 
     data: shoppingListData, 
     isLoading, 
     error,
     refetch: refetchShoppingList
-  } = useQuery<ShoppingListResponse>({
-    queryKey: ["/api/shopping-list", selectedDateString],
-    queryFn: async () => {
-      const response = await fetch(`/api/shopping-list/${selectedDateString}`);
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required. Please log in to view your shopping list.');
-        }
-        throw new Error('Failed to fetch shopping list');
-      }
-      return response.json();
-    },
-    retry: false
-  });
+  } = useShoppingListByDate(selectedDateString);
+  
+  // Cast to match local interface
+  const shoppingList = shoppingListData as any;
   
   // Mutation to generate shopping list for a meal plan
   const generateShoppingListMutation = useMutation({
@@ -394,7 +377,7 @@ export default function EnhancedShoppingList() {
                 </Button>
               </div>
             </Card>
-          ) : !shoppingListData || !shoppingListData.items || shoppingListData.items.length === 0 ? (
+          ) : !shoppingList || !shoppingList.items || shoppingList.items.length === 0 ? (
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
@@ -449,8 +432,8 @@ export default function EnhancedShoppingList() {
                 <div className="space-y-6">
                   {Object.entries(
                     groupBy === 'meal' 
-                      ? getGroupedByMeal(shoppingListData.items) 
-                      : getGroupedByCategory(shoppingListData.items)
+                      ? getGroupedByMeal(shoppingList.items) 
+                      : getGroupedByCategory(shoppingList.items)
                   ).map(([group, items]) => (
                     <div key={group} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
                       <div className={`p-3 border-b border-gray-100 bg-gradient-to-r ${
@@ -528,8 +511,8 @@ export default function EnhancedShoppingList() {
                 <div className="space-y-6">
                   {Object.entries(
                     groupBy === 'meal' 
-                      ? getGroupedByMeal(getFilteredItems(shoppingListData.items, "pending")) 
-                      : getGroupedByCategory(getFilteredItems(shoppingListData.items, "pending"))
+                      ? getGroupedByMeal(getFilteredItems(shoppingList.items, "pending")) 
+                      : getGroupedByCategory(getFilteredItems(shoppingList.items, "pending"))
                   ).map(([group, items]) => (
                     items.length > 0 && (
                       <div key={group} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
@@ -597,8 +580,8 @@ export default function EnhancedShoppingList() {
                 <div className="space-y-6">
                   {Object.entries(
                     groupBy === 'meal' 
-                      ? getGroupedByMeal(getFilteredItems(shoppingListData.items, "purchased")) 
-                      : getGroupedByCategory(getFilteredItems(shoppingListData.items, "purchased"))
+                      ? getGroupedByMeal(getFilteredItems(shoppingList.items, "purchased")) 
+                      : getGroupedByCategory(getFilteredItems(shoppingList.items, "purchased"))
                   ).map(([group, items]) => (
                     items.length > 0 && (
                       <div key={group} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">

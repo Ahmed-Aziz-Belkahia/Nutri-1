@@ -43,6 +43,8 @@ import {
 } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
+import { useShoppingListByDate } from "@/hooks/queries/useShoppingList";
 
 interface ShoppingItem {
   id: number;
@@ -344,48 +346,29 @@ export default function ImprovedShoppingList() {
   } | null>(null);
   const [showRecipeModal, setShowRecipeModal] = useState(false);
   
-  // Fetch meal plans for the selected date
-  const { data: mealPlansData } = useQuery({
-    queryKey: ["/api/meal-plans/all"],
-    queryFn: async () => {
-      const response = await fetch(`/api/meal-plans/all`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch meal plans');
-      }
-      return response.json();
-    }
-  });
+  // Fetch meal plans using custom hook
+  const { data: mealPlansData } = useAllMealPlans();
   
   // Check if there's a meal plan for the selected date
-  const hasMealPlanForDate = mealPlansData?.plans?.some(
+  const hasMealPlanForDate = (mealPlansData as any)?.some(
     (plan: any) => plan.date === selectedDateString
   ) || false;
   
   // Get meal plan ID for the selected date
-  const mealPlanId = mealPlansData?.plans?.find(
+  const mealPlanId = (mealPlansData as any)?.find(
     (plan: any) => plan.date === selectedDateString
   )?.id;
 
-  // Fetch shopping list for the selected date
+  // Fetch shopping list using custom hook
   const { 
     data: shoppingListData, 
     isLoading, 
     error,
     refetch: refetchShoppingList
-  } = useQuery<ShoppingListResponse>({
-    queryKey: ["/api/shopping-list", selectedDateString],
-    queryFn: async () => {
-      const response = await fetch(`/api/shopping-list/${selectedDateString}`);
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication required. Please log in to view your shopping list.');
-        }
-        throw new Error('Failed to fetch shopping list');
-      }
-      return response.json();
-    },
-    retry: false
-  });
+  } = useShoppingListByDate(selectedDateString);
+  
+  // Cast to match local interface
+  const shoppingList = shoppingListData as any;
   
   // Mutation to generate shopping list for a meal plan
   const generateShoppingListMutation = useMutation({
@@ -531,16 +514,16 @@ export default function ImprovedShoppingList() {
   // Function to generate a new image for an ingredient
   const generateNewImage = (item: ShoppingItem) => {
     // Update the local state with a timestamp to force a new image
-    if (!shoppingListData) return;
+    if (!shoppingList) return;
     
     const timestamp = Date.now();
-    const updatedItems = shoppingListData.items.map(i => 
+    const updatedItems = shoppingList.items.map((i: any) => 
       i.id === item.id ? { ...i, customImage: `refresh_${timestamp}` } : i
     );
     
     // Update in the query cache
     queryClient.setQueryData(["/api/shopping-list", selectedDateString], {
-      ...shoppingListData,
+      ...shoppingList,
       items: updatedItems
     });
     
@@ -552,10 +535,10 @@ export default function ImprovedShoppingList() {
   
   // Show recipe details
   const showRecipeDetails = (mealType: string) => {
-    if (!shoppingListData) return;
+    if (!shoppingList) return;
 
-    const itemsForMeal = shoppingListData.items.filter(
-      item => item.mealType === mealType
+    const itemsForMeal = shoppingList.items.filter(
+      (item: any) => item.mealType === mealType
     );
     
     if (itemsForMeal.length === 0) return;
@@ -642,12 +625,12 @@ export default function ImprovedShoppingList() {
       }
       return response.json();
     },
-    enabled: !!selectedLocation && !!shoppingListData?.items.length,
+    enabled: !!selectedLocation && !!shoppingList?.items.length,
     staleTime: 60000 // Cache for 1 minute
   });
   
   // Combine the shopping list with prices if available
-  const displayedShoppingList = selectedLocation && pricedShoppingList ? pricedShoppingList : shoppingListData;
+  const displayedShoppingList = selectedLocation && pricedShoppingList ? pricedShoppingList : shoppingList;
 
   // Get selection status for an item
   const isSelected = (itemId: number) => selectedItems.includes(itemId);
@@ -745,7 +728,7 @@ export default function ImprovedShoppingList() {
                 </Button>
               </div>
             </Card>
-          ) : !shoppingListData || !shoppingListData.items || shoppingListData.items.length === 0 ? (
+          ) : !shoppingList || !shoppingList.items || shoppingList.items.length === 0 ? (
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
@@ -801,15 +784,15 @@ export default function ImprovedShoppingList() {
                     <h3 className="text-base font-medium text-gray-800">Pricing:</h3>
                     
                     <div className="flex items-center gap-2">
-                      {selectedLocation && locationsData?.locations.find(loc => loc.id === selectedLocation) && (
+                      {selectedLocation && locationsData?.locations.find((loc: any) => loc.id === selectedLocation) && (
                         <div className="flex items-center bg-blue-50 px-2 py-1 rounded-full border border-blue-100">
                           <img 
-                            src={locationsData?.locations.find(loc => loc.id === selectedLocation)?.logo} 
-                            alt={locationsData?.locations.find(loc => loc.id === selectedLocation)?.name} 
+                            src={locationsData?.locations.find((loc: any) => loc.id === selectedLocation)?.logo} 
+                            alt={locationsData?.locations.find((loc: any) => loc.id === selectedLocation)?.name} 
                             className="h-5 w-5 object-contain mr-1"
                           />
                           <span className="text-sm text-blue-700 font-medium">
-                            {locationsData?.locations.find(loc => loc.id === selectedLocation)?.name}
+                            {locationsData?.locations.find((loc: any) => loc.id === selectedLocation)?.name}
                           </span>
                           <Button 
                             variant="ghost" 
@@ -824,7 +807,7 @@ export default function ImprovedShoppingList() {
                       
                       <span className="text-sm font-semibold bg-green-50 text-green-700 px-2 py-1 rounded-full border border-green-100">
                         Total: {displayedShoppingList?.totalPrice ? displayedShoppingList.totalPrice.toFixed(2) : 
-                          displayedShoppingList?.items.reduce((sum, item) => sum + (item.price || getPolishPrice(item.ingredient)), 0).toFixed(2)} zł
+                          displayedShoppingList?.items.reduce((sum: number, item: any) => sum + (item.price || getPolishPrice(item.ingredient)), 0).toFixed(2)} zł
                       </span>
                     </div>
                   </div>
@@ -840,7 +823,7 @@ export default function ImprovedShoppingList() {
                   
                   {locationsData?.locations ? (
                     <div className="grid grid-cols-1 gap-2 mt-4">
-                      {locationsData.locations.map(loc => (
+                      {locationsData.locations.map((loc: any) => (
                         <Button
                           key={loc.id}
                           variant="outline"
@@ -1280,7 +1263,7 @@ export default function ImprovedShoppingList() {
                   )}
                   {detailItem.location && (
                     <span className="ml-1 text-xs bg-white text-green-800 rounded-full px-2 py-0.5">
-                      {locationsData?.locations.find(loc => loc.id === detailItem.location)?.name || detailItem.location}
+                      {locationsData?.locations.find((loc: any) => loc.id === detailItem.location)?.name || detailItem.location}
                     </span>
                   )}
                 </div>
@@ -1428,7 +1411,7 @@ export default function ImprovedShoppingList() {
             <div className="mt-2 max-h-48 overflow-auto">
               <div className="grid grid-cols-4 gap-2">
                 {displayedShoppingList && selectedItems.map(id => {
-                  const item = displayedShoppingList.items.find(i => i.id === id);
+                  const item = displayedShoppingList.items.find((i: any) => i.id === id);
                   if (!item) return null;
                   
                   return (

@@ -9,7 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface Recipe {
+  id?: number;
   name: string;
+  description?: string;
+  mealType?: string;
   ingredients: string[];
   instructions: string[];
   difficulty: string;
@@ -47,6 +50,7 @@ export default function RecipeResults() {
   const [error, setError] = useState<string | null>(null);
   const [selectedRecipes, setSelectedRecipes] = useState<Set<number>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
+  const [savedRecipeIds, setSavedRecipeIds] = useState<number[]>([]); // Track already saved recipes
   const { toast } = useToast();
 
   const generateRecipesFromIngredients = async (ingredientsData: any) => {
@@ -143,16 +147,173 @@ export default function RecipeResults() {
     }
   };
 
+  // Function to fetch recipes from database by IDs
+  const fetchRecipesFromDatabase = async (recipeIds: number[]) => {
+    try {
+      setIsLoading(true);
+      console.log('[RecipeResults] Fetching recipes from database:', recipeIds);
+      
+      // Fetch each recipe from the food logs endpoint
+      const recipePromises = recipeIds.map(id => 
+        fetch(`/api/food-logs/${id}`, {
+          credentials: 'include'
+        }).then(res => res.ok ? res.json() : null)
+      );
+      
+      const recipes = await Promise.all(recipePromises);
+      const validRecipes = recipes.filter(r => r !== null);
+      
+      console.log('[RecipeResults] Fetched recipes:', validRecipes);
+      
+      if (validRecipes.length === 0) {
+        throw new Error('No recipes found');
+      }
+      
+      // Transform to expected format
+      const transformedRecipes = validRecipes.map((recipe: any) => ({
+        id: recipe.id,
+        name: recipe.name,
+        ingredients: recipe.ingredients || [],
+        instructions: recipe.instructions || [],
+        difficulty: recipe.difficulty || 'Medium',
+        prepTime: recipe.prepTime || recipe.prep_time || 15,
+        cookingTime: recipe.cookTime || recipe.cook_time || 15,
+        flavor: recipe.flavor || 'Mixed',
+        cuisine: recipe.cuisine || recipe.cuisineType || 'International',
+        nutritionalInfo: {
+          calories: recipe.calories || 0,
+          protein: recipe.protein || 0,
+          carbs: recipe.carbs || 0,
+          fat: recipe.fat || 0
+        }
+      }));
+      
+      setAnalysisData({
+        ingredients: [], // We don't have ingredients info when loading from DB
+        recipes: {
+          recipeSuggestions: transformedRecipes
+        }
+      });
+      setSavedRecipeIds(recipeIds);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('[RecipeResults] Failed to fetch recipes from database:', error);
+      setError('Failed to load recipes');
+      setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load recipes. Please try again."
+      });
+    }
+  };
+
   useEffect(() => {
-    // Use window.location.search to get URL parameters more reliably
+    console.log('[RecipeResults] useEffect triggered');
+    
+    // First check URL for recipe IDs (new approach - fetch from DB)
     const searchParams = new URLSearchParams(window.location.search);
-    const data = searchParams.get('data');
+    const idsParam = searchParams.get('ids');
+    
+    if (idsParam) {
+      console.log('[RecipeResults] Found recipe IDs in URL:', idsParam);
+      const recipeIds = idsParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      
+      if (recipeIds.length > 0) {
+        fetchRecipesFromDatabase(recipeIds);
+        return;
+      }
+    }
+    
+    console.log('[RecipeResults] Checking localStorage for recipeResultsData');
+    
+    // Fallback: check localStorage for data (old approach for compatibility)
+    const localData = localStorage.getItem('recipeResultsData');
+    console.log('[RecipeResults] localStorage data exists:', !!localData);
+    console.log('[RecipeResults] localStorage data length:', localData?.length);
+    
+    if (localData) {
+      console.log('[RecipeResults] Found data in localStorage');
+      try {
+        const parsedData = JSON.parse(localData);
+        console.log('[RecipeResults] Parsed data:', parsedData);
+        console.log('[RecipeResults] Recipes array:', parsedData.recipes?.recipeSuggestions);
+        
+        if (!parsedData || !parsedData.ingredients) {
+          throw new Error('Invalid data format - no ingredients found');
+        }
+
+        // If we have ingredients but no recipes, generate them
+        if (!parsedData.recipes?.recipeSuggestions || parsedData.recipes.recipeSuggestions.length === 0) {
+          console.log('[RecipeResults] No recipes found in data, generating from ingredients...');
+          localStorage.removeItem('recipeResultsData'); // Clean up before generating
+          generateRecipesFromIngredients(parsedData);
+          return;
+        }
+
+        const transformedRecipes = parsedData.recipes.recipeSuggestions.map((recipe: any) => {
+          // Handle both nested nutritionInfo and top-level nutrition fields
+          const nutritionalInfo = recipe.nutritionInfo || recipe.nutritional_information || recipe.nutritionalInformation || {};
+          console.log('Processing existing recipe:', recipe.name, 'Full recipe:', recipe);
+          console.log('Raw nutrition data:', nutritionalInfo);
+          
+          const parseNutritionValue = (value: string | number | undefined) => {
+            if (!value) return 0;
+            if (typeof value === 'number') return value;
+            const strValue = String(value).replace(/[^\d]/g, '');
+            const parsed = parseInt(strValue) || 0;
+            return parsed;
+          };
+
+          const transformedRecipe = {
+            id: recipe.id, // Include ID for saved recipes
+            name: recipe.name || recipe.title || 'Untitled Recipe',
+            ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : [],
+            instructions: Array.isArray(recipe.instructions) ? recipe.instructions : [],
+            difficulty: recipe.difficultyLevel || recipe.difficulty || 'Medium',
+            prepTime: parseInt(String(recipe.prepTime || recipe.prep_time || recipe.cookingTime || '15').split(' ')[0]),
+            cookingTime: parseInt(String(recipe.cookTime || recipe.cook_time || recipe.cookingTime || '15').split(' ')[0]),
+            flavor: recipe.flavor || 'Mixed',
+            cuisine: recipe.cuisine || recipe.cuisineType || 'International',
+            nutritionalInfo: {
+              // Check both nested nutritionalInfo and top-level fields (from saved recipes)
+              calories: parseNutritionValue(nutritionalInfo.calories || recipe.calories),
+              protein: parseNutritionValue(nutritionalInfo.protein || recipe.protein),
+              carbs: parseNutritionValue(nutritionalInfo.carbohydrates || nutritionalInfo.carbs || recipe.carbs),
+              fat: parseNutritionValue(nutritionalInfo.fat || recipe.fat)
+            }
+          };
+          
+          console.log('Final transformed nutrition values:', transformedRecipe.nutritionalInfo);
+          return transformedRecipe;
+        });
+
+        setAnalysisData({
+          ingredients: parsedData.ingredients,
+          image: parsedData.image,
+          recipes: {
+            recipeSuggestions: transformedRecipes
+          }
+        });
+        setSavedRecipeIds(parsedData.savedRecipeIds || []); // Track which recipes are already saved
+        localStorage.removeItem('recipeResultsData'); // Clean up after successful processing
+        setIsLoading(false);
+        return;
+      } catch (error) {
+        console.error('[Recipe Results] Failed to parse localStorage data:', error);
+        localStorage.removeItem('recipeResultsData'); // Clean up on error
+        // Fall through to old URL parameter check (for backward compatibility)
+      }
+    }
+    
+    // Old fallback: Check for 'data' parameter (legacy approach - not recommended)
+    const dataParam = searchParams.get('data');
     
     console.log('Full window location:', window.location.href);
     console.log('Search params:', window.location.search);
-    console.log('Data param from URL:', data);
+    console.log('Data param from URL:', dataParam);
 
-    if (!data) {
+    if (!dataParam) {
       setIsLoading(false);
       setError('No recipe data found');
       console.error('No data parameter found in URL. Full location:', location);
@@ -165,7 +326,7 @@ export default function RecipeResults() {
     }
 
     try {
-      const decodedData = decodeURIComponent(data);
+      const decodedData = decodeURIComponent(dataParam);
       const parsedData = JSON.parse(decodedData);
 
       if (!parsedData || !parsedData.ingredients) {
@@ -180,7 +341,7 @@ export default function RecipeResults() {
       }
 
       const transformedRecipes = parsedData.recipes.recipeSuggestions.map((recipe: any) => {
-        // The API returns nutritionInfo, not nutritional_information
+        // Handle both nested nutritionInfo and top-level nutrition fields
         const nutritionalInfo = recipe.nutritionInfo || recipe.nutritional_information || recipe.nutritionalInformation || {};
         console.log('Processing existing recipe:', recipe.name, 'Full recipe:', recipe);
         console.log('Raw nutrition data:', nutritionalInfo);
@@ -194,19 +355,21 @@ export default function RecipeResults() {
         };
 
         const transformedRecipe = {
+          id: recipe.id, // Include ID for saved recipes
           name: recipe.name || recipe.title || 'Untitled Recipe',
           ingredients: Array.isArray(recipe.ingredients) ? recipe.ingredients : [],
           instructions: Array.isArray(recipe.instructions) ? recipe.instructions : [],
           difficulty: recipe.difficultyLevel || recipe.difficulty || 'Medium',
-          prepTime: parseInt(String(recipe.prepTime || recipe.cookingTime || '15').split(' ')[0]),
-          cookingTime: parseInt(String(recipe.cookTime || recipe.cookingTime || '15').split(' ')[0]),
+          prepTime: parseInt(String(recipe.prepTime || recipe.prep_time || recipe.cookingTime || '15').split(' ')[0]),
+          cookingTime: parseInt(String(recipe.cookTime || recipe.cook_time || recipe.cookingTime || '15').split(' ')[0]),
           flavor: recipe.flavor || 'Mixed',
           cuisine: recipe.cuisine || recipe.cuisineType || 'International',
           nutritionalInfo: {
-            calories: parseNutritionValue(nutritionalInfo.calories),
-            protein: parseNutritionValue(nutritionalInfo.protein),
-            carbs: parseNutritionValue(nutritionalInfo.carbohydrates || nutritionalInfo.carbs),
-            fat: parseNutritionValue(nutritionalInfo.fat)
+            // Check both nested nutritionalInfo and top-level fields (from saved recipes)
+            calories: parseNutritionValue(nutritionalInfo.calories || recipe.calories),
+            protein: parseNutritionValue(nutritionalInfo.protein || recipe.protein),
+            carbs: parseNutritionValue(nutritionalInfo.carbohydrates || nutritionalInfo.carbs || recipe.carbs),
+            fat: parseNutritionValue(nutritionalInfo.fat || recipe.fat)
           }
         };
         
@@ -248,17 +411,30 @@ export default function RecipeResults() {
     setIsSaving(true);
 
     try {
-      const selectedRecipesArray = Array.from(selectedRecipes).map(index => {
-        const recipe = analysisData.recipes.recipeSuggestions[index];
+      const recipesToSave = Array.from(selectedRecipes)
+        .map(index => analysisData.recipes.recipeSuggestions[index])
+        .filter(recipe => recipe.id ? !savedRecipeIds.includes(recipe.id) : true); // Skip already saved
+
+      if (recipesToSave.length === 0) {
+        toast({
+          title: "Already Saved",
+          description: "All selected recipes are already in your collection!",
+        });
+        setIsSaving(false);
+        return;
+      }
+
+      const selectedRecipesArray = recipesToSave.map(recipe => {
         return {
           name: recipe.name,
-          description: `AI-generated recipe based on ingredients scan`,
+          description: recipe.description || `AI-generated recipe based on ingredients scan`,
           servings: 4,
           prepTime: recipe.prepTime || 15,
           cookTime: recipe.cookingTime || 15,
           totalTime: (recipe.prepTime || 15) + (recipe.cookingTime || 15),
           difficulty: recipe.difficulty || 'Medium',
           cuisine: recipe.cuisine || 'International',
+          mealType: recipe.mealType || determineMealType(recipe.name),
           calories: recipe.nutritionalInfo.calories || 0,
           protein: recipe.nutritionalInfo.protein || 0,
           carbs: recipe.nutritionalInfo.carbs || 0,
@@ -268,12 +444,15 @@ export default function RecipeResults() {
           notes: `Generated from ingredient scan. Cuisine: ${recipe.cuisine || 'International'}, Flavor profile: ${recipe.flavor || 'Mixed'}`,
           tags: [recipe.cuisine || 'International', recipe.flavor || 'Mixed', 'AI Generated'],
           isPublic: true,
+          isRecipe: true,
+          source: 'ingredient_scan',
           imageUrl: analysisData.image || ''
         };
       });
 
+      const newSavedIds = [];
       for (const recipe of selectedRecipesArray) {
-        const response = await fetch("/api/recipes", {
+        const response = await fetch("/api/food-logs", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -287,11 +466,18 @@ export default function RecipeResults() {
           const errorData = await response.json();
           throw new Error(errorData.message || 'Failed to save recipe');
         }
+        
+        const result = await response.json();
+        if (result.log?.id) {
+          newSavedIds.push(result.log.id);
+        }
       }
+
+      setSavedRecipeIds([...savedRecipeIds, ...newSavedIds]);
 
       toast({
         title: "Success",
-        description: `${selectedRecipes.size} recipe(s) saved successfully!`
+        description: `${recipesToSave.length} recipe(s) saved successfully!`
       });
       setLocation('/recipes');
 
@@ -304,6 +490,25 @@ export default function RecipeResults() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const determineMealType = (recipeName: string): string => {
+    const name = recipeName.toLowerCase();
+    if (name.includes('breakfast') || name.includes('morning') || name.includes('oatmeal') || name.includes('pancake')) {
+      return 'breakfast';
+    } else if (name.includes('lunch') || name.includes('sandwich') || name.includes('salad')) {
+      return 'lunch';
+    } else if (name.includes('dinner') || name.includes('evening')) {
+      return 'dinner';
+    } else if (name.includes('snack') || name.includes('bite')) {
+      return 'snack';
+    } else {
+      const hour = new Date().getHours();
+      if (hour < 11) return 'breakfast';
+      else if (hour < 15) return 'lunch';
+      else if (hour < 20) return 'dinner';
+      else return 'snack';
     }
   };
 
@@ -423,9 +628,16 @@ export default function RecipeResults() {
                     <div className="flex-1 space-y-3">
                       {/* Recipe Header */}
                       <div className="space-y-2">
-                        <h2 className="text-lg font-bold text-gray-900 leading-tight">
-                          {recipe.name}
-                        </h2>
+                        <div className="flex items-start justify-between gap-2">
+                          <h2 className="text-lg font-bold text-gray-900 leading-tight">
+                            {recipe.name}
+                          </h2>
+                          {recipe.id && (
+                            <Badge className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200 px-2 py-0.5 text-xs font-medium flex-shrink-0">
+                              ✓ Saved
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex flex-wrap gap-1.5">
                           <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-100 px-2 py-0.5 text-xs font-medium">
                             {recipe.difficulty}
@@ -565,7 +777,18 @@ export default function RecipeResults() {
             ) : (
               <div className="flex items-center justify-center gap-3">
                 <Heart className="w-5 h-5" />
-                Save Selected Recipes ({selectedRecipes.size})
+                {(() => {
+                  const selectedArray = Array.from(selectedRecipes);
+                  const newCount = selectedArray.filter(index => !analysisData.recipes.recipeSuggestions[index].id).length;
+                  const savedCount = selectedArray.length - newCount;
+                  if (savedCount > 0 && newCount > 0) {
+                    return `Save Selected (${newCount} new, ${savedCount} already saved)`;
+                  } else if (savedCount > 0) {
+                    return `View Selected (${savedCount} already saved)`;
+                  } else {
+                    return `Save Selected Recipes (${selectedRecipes.size})`;
+                  }
+                })()}
               </div>
             )}
           </Button>

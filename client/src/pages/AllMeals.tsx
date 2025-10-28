@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Camera, Calendar, Plus } from "lucide-react";
@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
 import PullToRefresh from "@/components/PullToRefresh";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { useFoodLogsByDate, useDeleteFoodLog } from "@/hooks/queries/useFoodLogs";
+import { format } from "date-fns";
 
 interface FoodLog {
   id: number;
@@ -38,6 +40,9 @@ export default function AllMeals() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   
+  // Use today's date for fetching all meals
+  const today = format(new Date(), 'yyyy-MM-dd');
+  
   // Pull to refresh setup
   const handleRefresh = usePullToRefresh([
     ['/api/food-logs']
@@ -50,37 +55,12 @@ export default function AllMeals() {
     }
   }, [user, navigate]);
   
-  const { data, isLoading } = useQuery<FoodLogsResponse>({
-    queryKey: ["/api/food-logs"],
-    enabled: true,
-  });
+  // Use custom hook for food logs (cast to work with local interface)
+  const { data, isLoading } = useFoodLogsByDate(today);
+  const foodLogsData = data as any as FoodLogsResponse | undefined;
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/food-logs/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/food-logs"] });
-      toast({
-        title: "Success",
-        description: "Meal deleted successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete meal",
-      });
-    },
-  });
+  // Use custom delete mutation
+  const deleteMutation = useDeleteFoodLog(today);
 
   const createFoodLogMutation = useMutation({
     mutationFn: async ({ name, image, analysis }: { name: string; image?: string; analysis?: any }) => {
@@ -194,7 +174,7 @@ export default function AllMeals() {
           </Link>
         </div>
 
-        {data?.logs.length === 0 ? (
+        {foodLogsData?.logs.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -212,7 +192,7 @@ export default function AllMeals() {
               animate="show"
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
             >
-              {data?.logs.map((log) => (
+              {foodLogsData?.logs.map((log: any) => (
                 <motion.div key={log.id} variants={item}>
                   <Card className="overflow-hidden group hover:shadow-lg transition-shadow duration-300 border-[#0CC5BA]/10 bg-white/80 backdrop-blur-xl">
                     <div className="relative">

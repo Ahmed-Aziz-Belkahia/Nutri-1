@@ -1,12 +1,15 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
 import MealPlanTab from "@/components/recipes/MealPlanTab";
-import { Book, Calendar } from "lucide-react";
+import { Book, Calendar, Camera, Sparkles, Clock, ChefHat } from "lucide-react";
+import { useScannedMealsToday, useScannedMeals } from "@/hooks/queries/useFoodLogs";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 interface FoodLog {
   id: number;
@@ -64,38 +67,11 @@ export default function RecipesNew() {
     navigate(`/recipes?tab=${tab}`, { replace: true });
   };
 
-  // Fetch today's scanned recipes (last 24 hours)
-  const { data: todaysRecipes = [], isLoading: todaysLoading } = useQuery<FoodLog[]>({
-    queryKey: ['recipes', 'today'],
-    queryFn: async () => {
-      const response = await fetch('/api/food-logs/scanned?limit=10', {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch today\'s recipes');
-      const data = await response.json();
-      
-      // Filter for items from last 24 hours
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      return data.filter((log: FoodLog & { date: number }) => 
-        new Date(log.date) > yesterday
-      );
-    }
-  });
+  // Fetch today's scanned recipes using custom hook
+  const { data: todaysRecipes = [], isLoading: todaysLoading } = useScannedMealsToday();
 
-  // Fetch all recipes (all scanned meals with images)
-  const { data: allRecipes = [], isLoading: allLoading } = useQuery<FoodLog[]>({
-    queryKey: ['recipes', 'all'],
-    queryFn: async () => {
-      const response = await fetch('/api/food-logs/scanned?limit=100', {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch all recipes');
-      return response.json();
-    },
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  // Fetch all recipes using custom hook
+  const { data: allRecipes = [], isLoading: allLoading } = useScannedMeals();
 
   return (
     <BaseLayout showHeader={false}>
@@ -142,6 +118,155 @@ export default function RecipesNew() {
       <div className="py-6 space-y-6">
         {activeTab === 'recipes' ? (
           <>
+            {/* Scan Ingredients CTA Card - Dashboard Style */}
+            <div style={{ marginBottom: '20px' }}>
+              <div 
+                className="card"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(38, 168, 255, 0.08) 0%, rgba(38, 168, 255, 0.02) 100%)',
+                  border: '1px solid rgba(38, 168, 255, 0.12)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Decorative gradient overlay */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-50%',
+                  right: '-20%',
+                  width: '200px',
+                  height: '200px',
+                  background: 'radial-gradient(circle, rgba(38, 168, 255, 0.15) 0%, transparent 70%)',
+                  pointerEvents: 'none'
+                }} />
+                
+                <div style={{ position: 'relative', textAlign: 'center', padding: '8px 0' }}>
+                  {/* Icon */}
+                  <div style={{
+                    width: '64px',
+                    height: '64px',
+                    background: 'rgba(38, 168, 255, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    border: '1px solid rgba(38, 168, 255, 0.2)'
+                  }}>
+                    <Camera style={{ width: '32px', height: '32px', color: '#26A8FF' }} />
+                  </div>
+                  
+                  {/* Title */}
+                  <h2 style={{
+                    fontSize: '20px',
+                    fontWeight: '600',
+                    color: '#1f1f1e',
+                    marginBottom: '8px',
+                    lineHeight: '1.3'
+                  }}>
+                    AI-Powered Recipe Creator
+                  </h2>
+                  
+                  {/* Description */}
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#888888',
+                    marginBottom: '20px',
+                    lineHeight: '1.5',
+                    maxWidth: '320px',
+                    margin: '0 auto 20px'
+                  }}>
+                    Scan your ingredients and get instant personalized recipes
+                  </p>
+                  
+                  {/* CTA Button */}
+                  <button
+                    onClick={() => navigate('/scan-recipe')}
+                    style={{
+                      background: '#26A8FF',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '14px 32px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 4px 12px rgba(38, 168, 255, 0.25)',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 16px rgba(38, 168, 255, 0.35)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(38, 168, 255, 0.25)';
+                    }}
+                  >
+                    <Camera style={{ width: '20px', height: '20px' }} />
+                    <span>Scan Ingredients</span>
+                  </button>
+                  
+                  {/* Feature Pills */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                    marginTop: '20px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      background: 'rgba(38, 168, 255, 0.08)',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      color: '#26A8FF',
+                      fontWeight: '500'
+                    }}>
+                      <Sparkles style={{ width: '14px', height: '14px' }} />
+                      <span>AI Powered</span>
+                    </div>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      background: 'rgba(38, 168, 255, 0.08)',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      color: '#26A8FF',
+                      fontWeight: '500'
+                    }}>
+                      <Clock style={{ width: '14px', height: '14px' }} />
+                      <span>Instant</span>
+                    </div>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      background: 'rgba(38, 168, 255, 0.08)',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      color: '#26A8FF',
+                      fontWeight: '500'
+                    }}>
+                      <ChefHat style={{ width: '14px', height: '14px' }} />
+                      <span>Custom</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Today's Recipes Section */}
             {todaysRecipes.length > 0 && (
               <div className="space-y-3">
