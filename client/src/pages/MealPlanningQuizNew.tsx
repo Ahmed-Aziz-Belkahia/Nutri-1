@@ -228,7 +228,7 @@ export default function MealPlanningQuiz() {
     },
     onSuccess: async (data) => {
       console.log('[Meal Plan Quiz New] onSuccess triggered', { data });
-      setIsGeneratingMealPlan(false);
+      // Keep progress screen visible during polling
       
       console.log('[Meal Plan Quiz New] Invalidating queries...');
       // Invalidate queries
@@ -286,6 +286,8 @@ export default function MealPlanningQuiz() {
       });
       
       console.log('[Meal Plan Quiz New] Navigating to meal-plan/view...');
+      // Hide progress screen and navigate
+      setIsGeneratingMealPlan(false);
       setLocation("/meal-plan/view");
     },
     onError: (error) => {
