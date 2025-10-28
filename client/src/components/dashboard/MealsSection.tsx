@@ -204,7 +204,7 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
               )}
 
             <div 
-              onClick={() => window.location.href = `/food-logs/${meal.id}`}
+              onClick={() => window.location.href = `/recipes/food-log/${meal.id}`}
               className="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden"
               style={{
                 height: '160px',
@@ -225,7 +225,7 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
               )}
             </div>
             <div 
-              onClick={() => window.location.href = `/food-logs/${meal.id}`}
+              onClick={() => window.location.href = `/recipes/food-log/${meal.id}`}
               className="p-3 bg-white" 
               style={{
                 borderBottomLeftRadius: '16px',

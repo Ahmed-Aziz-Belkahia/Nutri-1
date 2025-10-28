@@ -357,7 +357,7 @@ export default function MealPlanView() {
         className="space-y-3 mb-6"
       >
         <Button
-          onClick={() => setLocation("/recipes?tab=meal-plan")}
+          onClick={() => setLocation("/recipes?tab=meal-plan#grocery-list")}
           className="w-full bg-white/90 backdrop-blur-sm hover:bg-white text-gray-900 border-0 py-6 text-base font-semibold rounded-3xl shadow-md"
         >
           <ShoppingBag className="w-5 h-5 mr-2" />

@@ -47,7 +47,8 @@ interface Recipe {
 
 export default function CookingMode() {
   const { id } = useParams();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  const isFoodLog = location.includes('/food-log/');
   const [session, setSession] = useState<CookingSession | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -60,9 +61,12 @@ export default function CookingMode() {
 
   // Fetch recipe
   const { data: recipe, isLoading } = useQuery<Recipe>({
-    queryKey: ['recipe', id],
+    queryKey: ['recipe', id, isFoodLog],
     queryFn: async () => {
-      const response = await fetch(`/api/recipes/${id}`, {
+      const endpoint = isFoodLog 
+        ? `/api/recipes/food-log/${id}`
+        : `/api/recipes/${id}`;
+      const response = await fetch(endpoint, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch recipe');
@@ -417,7 +421,7 @@ export default function CookingMode() {
     if (sessionTimerRef.current) clearInterval(sessionTimerRef.current);
     if (timerUpdateRef.current) clearInterval(timerUpdateRef.current);
     if (speechSynthesisRef.current) window.speechSynthesis.cancel();
-    navigate(`/recipes/${id}`);
+    navigate(isFoodLog ? `/recipes/food-log/${id}` : `/recipes/${id}`);
   };
 
   const toggleFullscreen = () => {
@@ -549,7 +553,7 @@ export default function CookingMode() {
               }}
               className="w-full py-4 bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
             >
-              🔄 Cook Again
+              Cook Again
             </button>
             <button
               onClick={handleExit}

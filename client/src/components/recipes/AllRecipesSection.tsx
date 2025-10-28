@@ -91,7 +91,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
   });
 
   const handleRecipeClick = (recipeId: number) => {
-    setLocation(`/food/${recipeId}`);
+    setLocation(`/recipes/food-log/${recipeId}`);
   };
 
   if (isLoading) {

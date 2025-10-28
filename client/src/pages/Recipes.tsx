@@ -16,7 +16,8 @@ import {
   Plus, Camera, ChevronRight, 
   Search, User, Settings, LogOut, Trash2,
   Filter, LayoutGrid, Heart, Flame,
-  CalendarDays, Coffee, Pizza, ShoppingCart, ShoppingBag, Sparkles
+  CalendarDays, Coffee, Pizza, ShoppingCart, ShoppingBag, Sparkles,
+  Book, Calendar
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -155,21 +156,28 @@ export default function Recipes() {
   const [selectedPlan, setSelectedPlan] = useState<MealPlan | null>(null);
   const [calendarDates, setCalendarDates] = useState<Date[]>([]);
   
-  // Get tab parameter from URL if available, but always default to recipes tab
-  const searchParams = new URLSearchParams(window.location.search);
-  const tabParam = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState<"recipes" | "meal-plan">(
-    tabParam === "meal-plan" ? "meal-plan" : "recipes"
-  );
+  // Get current tab from URL
+  const getCurrentTab = (): "recipes" | "meal-plan" => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tab') === 'meal-plan' ? 'meal-plan' : 'recipes';
+  };
   
-  // Update activeTab when URL parameter changes
+  // Tab state
+  const [activeTab, setActiveTab] = useState<"recipes" | "meal-plan">(getCurrentTab());
+  
+  // Watch for URL changes and update tab
   useEffect(() => {
-    if (tabParam === "meal-plan") {
-      setActiveTab("meal-plan");
-    } else if (tabParam === "recipes" || !tabParam) {
-      setActiveTab("recipes");
+    const newTab = getCurrentTab();
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
     }
-  }, [tabParam]);
+  }, [location]);
+  
+  // Handle tab click
+  const handleTabChange = (tab: "recipes" | "meal-plan") => {
+    setActiveTab(tab);
+    navigate(`/recipes?tab=${tab}`, { replace: true });
+  };
   
   // Refresh recipes data when component mounts
   useEffect(() => {
@@ -635,30 +643,47 @@ export default function Recipes() {
         animate="show"
         className="pb-24"
       >
-          {/* Redesigned Scan Ingredients Card */}
-          {/* Tab navigation */}
-          <Tabs
-            defaultValue="recipes"
-            value={activeTab}
-            onValueChange={(value) => {
-              if (value === "recipes" || value === "meal-plan") {
-                setActiveTab(value);
-              }
-            }}
-            className="w-full mb-8"
-          >
-            <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/10 backdrop-blur-sm rounded-2xl p-1">
-              <TabsTrigger value="recipes" className="text-base font-medium py-2.5 px-4 rounded-xl text-white/70 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
-                {t('navigation.recipes', 'Recipes')}
-              </TabsTrigger>
-              <TabsTrigger value="meal-plan" className="text-base font-medium py-2.5 px-4 rounded-xl text-white/70 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm transition-all">
-                {t('navigation.mealPlan', 'Meal Plan')}
-              </TabsTrigger>
-            </TabsList>
-            
+          {/* Mobile-Standard Tab Navigation */}
+          <div className="mb-6">
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleTabChange("recipes")}
+                className={`
+                  flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all
+                  ${activeTab === "recipes" 
+                    ? "bg-[#26A8FF] text-white shadow-sm" 
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }
+                `}
+              >
+                <Book className="w-4 h-4" />
+                <span>{t('navigation.recipes', 'Recipes')}</span>
+              </button>
+              <button
+                onClick={() => handleTabChange("meal-plan")}
+                className={`
+                  flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all
+                  ${activeTab === "meal-plan" 
+                    ? "bg-[#26A8FF] text-white shadow-sm" 
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }
+                `}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>{t('navigation.mealPlan', 'Meal Plan')}</span>
+              </button>
+            </div>
+          </div>
 
-            
-            <TabsContent value="recipes">
+          {/* Tab Content */}
+          {activeTab === "recipes" && (
+            <motion.div
+              key="recipes-tab"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
               {/* Scan ingredients card */}
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
@@ -803,9 +828,17 @@ export default function Recipes() {
                   </div>
                 </motion.section>
               )}
-            </TabsContent>
+            </motion.div>
+          )}
 
-            <TabsContent value="meal-plan">
+          {activeTab === "meal-plan" && (
+            <motion.div
+              key="meal-plan-tab"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
               {/* Meal Plan Content */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -1029,10 +1062,9 @@ export default function Recipes() {
                   {t('mealPlan.generateNew', 'Generate New Meal Plan')}
                 </Button>
               </div>
-            </TabsContent>
+            </motion.div>
+          )}
 
-
-          </Tabs>
       </motion.main>
         
       <Dialog open={showCreateModal} onOpenChange={(open) => setShowCreateModal(open)}>

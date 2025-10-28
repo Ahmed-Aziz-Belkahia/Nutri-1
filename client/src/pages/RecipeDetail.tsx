@@ -422,7 +422,7 @@ export default function RecipeDetail() {
 
       {/* Floating Start Cooking Button */}
       <button
-        onClick={() => navigate(`/cooking/${recipeId}`)}
+        onClick={() => navigate(isFoodLog ? `/cooking/food-log/${recipeId}` : `/cooking/${recipeId}`)}
         className="fixed bottom-24 right-5 w-16 h-16 bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-50 group"
       >
         <Play className="w-8 h-8 ml-1" />

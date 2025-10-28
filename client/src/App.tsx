@@ -358,6 +358,11 @@ function App() {
                 <RecipeDetail />
               </ProtectedRoute>
             </Route>
+            <Route path="/cooking/food-log/:id">
+              <ProtectedRoute>
+                <CookingMode />
+              </ProtectedRoute>
+            </Route>
             <Route path="/cooking/:id">
               <ProtectedRoute>
                 <CookingMode />

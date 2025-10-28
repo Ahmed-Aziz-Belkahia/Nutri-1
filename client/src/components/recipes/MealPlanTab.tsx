@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import CalendarSelector from '@/components/dashboard/CalendarSelector';
@@ -74,6 +74,18 @@ export default function MealPlanTab() {
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getDaysWithBuffer());
   const queryClient = useQueryClient();
+
+  // Scroll to grocery list if hash is present
+  useEffect(() => {
+    if (window.location.hash === '#grocery-list') {
+      setTimeout(() => {
+        const element = document.getElementById('grocery-list');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300); // Small delay to ensure content is rendered
+    }
+  }, []);
 
   // Fetch all meal plans
   const { data: allMealPlans, isLoading: plansLoading } = useQuery({
@@ -301,7 +313,7 @@ export default function MealPlanTab() {
       <MealPlanSection mealPlan={mealPlan} />
 
       {/* Weekly Grocery List Section */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div id="grocery-list" className="bg-white rounded-2xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-[#26A8FF]">Weekly Grocery List</h2>
           <span className="text-sm text-gray-500">

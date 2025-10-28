@@ -1,11 +1,11 @@
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import BaseLayout from "@/components/layouts/BaseLayout";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
 import MealPlanTab from "@/components/recipes/MealPlanTab";
-import MobileMenu from "@/components/dashboard/MobileMenu";
-import ProfileHeader from "@/components/dashboard/ProfileHeader";
 import { Book, Calendar } from "lucide-react";
 
 interface FoodLog {
@@ -29,16 +29,39 @@ interface FoodLog {
 
 export default function RecipesNew() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'recipes' | 'meal-plan'>('recipes');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMenuClosing, setIsMenuClosing] = useState(false);
+  const [location, navigate] = useLocation();
+  
+  // Get current tab from URL
+  const getCurrentTab = (): 'recipes' | 'meal-plan' => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    return tab === 'meal-plan' ? 'meal-plan' : 'recipes';
+  };
+  
+  const [activeTab, setActiveTab] = useState<'recipes' | 'meal-plan'>(getCurrentTab());
 
-  const handleCloseMenu = () => {
-    setIsMenuClosing(true);
-    setTimeout(() => {
-      setIsMenuOpen(false);
-      setIsMenuClosing(false);
-    }, 300);
+  // Sync tab with URL
+  useEffect(() => {
+    const newTab = getCurrentTab();
+    if (newTab !== activeTab) {
+      setActiveTab(newTab);
+    }
+  }, [location]);
+
+  // Ensure URL reflects current tab
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlTab = params.get('tab');
+    
+    if (!urlTab) {
+      navigate(`/recipes?tab=${activeTab}`, { replace: true });
+    }
+  }, [activeTab, navigate]);
+
+  // Handle tab change
+  const handleTabChange = (tab: 'recipes' | 'meal-plan') => {
+    setActiveTab(tab);
+    navigate(`/recipes?tab=${tab}`, { replace: true });
   };
 
   // Fetch today's scanned recipes (last 24 hours)
@@ -75,20 +98,12 @@ export default function RecipesNew() {
   });
 
   return (
-    <div 
-      className="min-h-screen bg-gray-50"
-      style={{
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-      }}
-    >
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-4 py-4">
-          <ProfileHeader user={user} onMenuClick={() => setIsMenuOpen(!isMenuOpen)} />
-
+    <BaseLayout showHeader={false}>
+      {/* Custom Header with Tabs */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 -mx-5 px-5">
+        <div className="py-4">
           {/* Title */}
-          <div className="mb-4 mt-3">
+          <div className="mb-4">
             <h1 className="text-2xl font-bold text-gray-900">Recipes</h1>
             <p className="text-sm text-gray-500 mt-0.5">
               Your scanned meal collection
@@ -98,7 +113,7 @@ export default function RecipesNew() {
           {/* Tabs */}
           <div className="flex gap-2">
             <button
-              onClick={() => setActiveTab('recipes')}
+              onClick={() => handleTabChange('recipes')}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
                 activeTab === 'recipes'
                   ? 'bg-[#26A8FF] text-white shadow-sm'
@@ -109,7 +124,7 @@ export default function RecipesNew() {
               <span>Recipes</span>
             </button>
             <button
-              onClick={() => setActiveTab('meal-plan')}
+              onClick={() => handleTabChange('meal-plan')}
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
                 activeTab === 'meal-plan'
                   ? 'bg-[#26A8FF] text-white shadow-sm'
@@ -124,7 +139,7 @@ export default function RecipesNew() {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-6 pb-24 space-y-6">
+      <div className="py-6 space-y-6">
         {activeTab === 'recipes' ? (
           <>
             {/* Today's Recipes Section */}
@@ -152,9 +167,6 @@ export default function RecipesNew() {
           <MealPlanTab />
         )}
       </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMenuOpen} isClosing={isMenuClosing} onClose={handleCloseMenu} />
-    </div>
+    </BaseLayout>
   );
 }
