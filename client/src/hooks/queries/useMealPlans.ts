@@ -48,11 +48,13 @@ export function useAllMealPlans(filters?: MealPlanFilters): UseQueryResult<MealP
       if (filters?.startDate) params.append('startDate', filters.startDate);
       if (filters?.endDate) params.append('endDate', filters.endDate);
       
-      const response = await fetch(`/api/meal-plans?${params.toString()}`, {
+      const response = await fetch(`/api/meal-plans/all`, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch meal plans');
-      return response.json();
+      const data = await response.json();
+      // API returns { weekStart, plans }, but we just need the plans array
+      return data.plans || [];
     },
     ...queryPresets.moderate,
   });
