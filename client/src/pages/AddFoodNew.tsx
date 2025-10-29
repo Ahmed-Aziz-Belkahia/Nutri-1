@@ -904,7 +904,7 @@ export default function AddFoodNew() {
               className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                 activeTab === "photo"
                   ? "bg-white text-gray-900 shadow-md"
-                  : "text-white/90"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
               whileTap={{ scale: 0.97 }}
             >

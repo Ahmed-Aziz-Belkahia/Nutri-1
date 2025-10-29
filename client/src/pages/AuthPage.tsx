@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 
   Mail,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  Sparkles
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -25,13 +27,6 @@ export default function AuthPage() {
 
   const { loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
-
-  useEffect(() => {
-    document.body.classList.add('auth-page');
-    return () => {
-      document.body.classList.remove('auth-page');
-    };
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,51 +59,30 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0CC5BA]/5 via-white to-[#0CC5BA]/10 relative overflow-hidden">
-      {/* Glassmorphic Background Elements */}
-      <div className="absolute top-20 left-20 w-[500px] h-[500px] rounded-full bg-gradient-to-br from-[#0CC5BA]/20 to-[#0CC5BA]/10 filter blur-3xl" />
-      <div className="absolute bottom-20 right-20 w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-[#0CC5BA]/15 to-teal-300/10 filter blur-3xl" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-[#0CC5BA]/10 to-emerald-200/10 filter blur-3xl" />
-      
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-[#0CC5BA]/30 rounded-full"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-            }}
-            animate={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-            }}
-            transition={{
-              duration: Math.random() * 20 + 20,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-6 lg:px-12 py-20">
+    <div className="min-h-screen gradient-bg relative overflow-hidden">
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-xl"
+          className="w-full max-w-md"
         >
-          {/* Glassmorphic Card */}
-          <div className="backdrop-blur-xl bg-white/80 rounded-3xl p-8 lg:p-12 shadow-[0_8px_32px_0_rgba(12,197,186,0.1)] border border-[#0CC5BA]/10">
-            {/* Logo/Title Section */}
-            <div className="text-center mb-10">
+          <Card className="bg-white/95 backdrop-blur-sm shadow-xl p-8 rounded-xl">
+            {/* Logo Section */}
+            <div className="flex flex-col items-center mb-8">
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                className="w-16 h-16 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-xl flex items-center justify-center mb-4 shadow-lg"
+              >
+                <Sparkles className="w-8 h-8 text-white" />
+              </motion.div>
               <motion.h1 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-4xl font-bold bg-gradient-to-r from-[#0CC5BA] to-teal-500 bg-clip-text text-transparent mb-3"
+                className="text-3xl font-bold text-gray-900 mb-2"
               >
                 NutriAI
               </motion.h1>
@@ -116,9 +90,9 @@ export default function AuthPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="text-gray-600 text-sm"
+                className="text-gray-600 text-sm text-center"
               >
-                {isLogin ? "Welcome back! Please sign in to continue" : "Create your account to get started"}
+                {isLogin ? "Welcome back! Sign in to continue" : "Create your account to get started"}
               </motion.p>
             </div>
 
@@ -129,7 +103,7 @@ export default function AuthPage() {
                   initial={{ opacity: 0, y: -10, height: 0 }}
                   animate={{ opacity: 1, y: 0, height: "auto" }}
                   exit={{ opacity: 0, y: -10, height: 0 }}
-                  className="mb-6 p-3 rounded-xl bg-red-50 border border-red-200"
+                  className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200"
                 >
                   <p className="text-red-600 text-sm text-center">{error}</p>
                 </motion.div>
@@ -137,50 +111,46 @@ export default function AuthPage() {
             </AnimatePresence>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Field */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700 ml-1">
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="text-sm font-medium text-gray-700">
                   Email
                 </label>
-                <div className="relative group">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="h-14 rounded-2xl w-full bg-white/60 backdrop-blur-sm border border-gray-200 pl-12 pr-4 transition-all focus:bg-white/80 focus:border-[#0CC5BA] focus:shadow-lg focus:shadow-[#0CC5BA]/10"
+                    className="h-12 rounded-xl w-full pl-10 pr-4 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
                     placeholder="your@email.com"
                     required
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0CC5BA] transition-colors">
-                    <Mail className="w-5 h-5" />
-                  </div>
                 </div>
               </div>
 
               {/* Password Field */}
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700 ml-1">
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <div className="relative group">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    className="h-14 rounded-2xl w-full bg-white/60 backdrop-blur-sm border border-gray-200 pl-12 pr-12 transition-all focus:bg-white/80 focus:border-[#0CC5BA] focus:shadow-lg focus:shadow-[#0CC5BA]/10"
+                    className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
                     placeholder="••••••••"
                     required
                   />
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0CC5BA] transition-colors">
-                    <Lock className="w-5 h-5" />
-                  </div>
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? 
                       <EyeOff className="h-5 w-5" /> : 
@@ -195,7 +165,7 @@ export default function AuthPage() {
                     <button
                       type="button"
                       onClick={() => setLocation("/forgot-password")}
-                      className="text-xs text-gray-500 hover:text-[#0CC5BA] transition-colors"
+                      className="text-xs text-[#26A8FF] hover:text-[#0CC5BA] transition-colors font-medium"
                     >
                       Forgot password?
                     </button>
@@ -210,28 +180,26 @@ export default function AuthPage() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2"
+                    className="space-y-1.5"
                   >
-                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700 ml-1">
+                    <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
                       Confirm Password
                     </label>
-                    <div className="relative group">
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="h-14 rounded-2xl w-full bg-white/60 backdrop-blur-sm border border-gray-200 pl-12 pr-12 transition-all focus:bg-white/80 focus:border-[#0CC5BA] focus:shadow-lg focus:shadow-[#0CC5BA]/10"
+                        className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
                         placeholder="••••••••"
                         required
                       />
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#0CC5BA] transition-colors">
-                        <Lock className="w-5 h-5" />
-                      </div>
                       <button 
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                       >
                         {showConfirmPassword ? 
                           <EyeOff className="h-5 w-5" /> : 
@@ -247,7 +215,7 @@ export default function AuthPage() {
               <Button 
                 type="submit"
                 disabled={loginMutation.isPending || registerMutation.isPending}
-                className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] to-teal-500 hover:from-[#0BB5AA] hover:to-teal-600 text-white rounded-2xl font-medium text-base transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-[#0CC5BA]/20 mt-8"
+                className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg mt-6"
               >
                 {loginMutation.isPending || registerMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -257,18 +225,8 @@ export default function AuthPage() {
               </Button>
             </form>
 
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent text-gray-500">or</span>
-              </div>
-            </div>
-
             {/* Toggle Auth Mode */}
-            <div className="text-center">
+            <div className="text-center mt-6">
               <p className="text-sm text-gray-600">
                 {isLogin ? "Don't have an account?" : "Already have an account?"}
                 {" "}
@@ -281,20 +239,20 @@ export default function AuthPage() {
                     setShowConfirmPassword(false);
                     setFormData({ email: '', password: '', confirmPassword: '' });
                   }}
-                  className="font-medium text-transparent bg-gradient-to-r from-[#0CC5BA] to-teal-500 bg-clip-text hover:from-[#0BB5AA] hover:to-teal-600 transition-all"
+                  className="font-semibold text-[#26A8FF] hover:text-[#0CC5BA] transition-colors"
                 >
                   {isLogin ? "Sign up" : "Sign in"}
                 </button>
               </p>
             </div>
-          </div>
+          </Card>
 
           {/* Footer */}
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center text-xs text-gray-500 mt-8"
+            transition={{ delay: 0.4 }}
+            className="text-center text-xs text-gray-600 mt-6"
           >
             By continuing, you agree to our Terms of Service and Privacy Policy
           </motion.p>
