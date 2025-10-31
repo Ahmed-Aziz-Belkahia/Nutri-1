@@ -230,6 +230,8 @@ export default function AddFoodNew() {
 
   // Handle gallery image selection
   const handleGalleryImageSelect = async (image: string) => {
+    // Always set as analyzing to show feedback
+    setIsAnalyzing(true);
     setSelectedGalleryImage(image);
     
     try {
@@ -239,10 +241,11 @@ export default function AddFoodNew() {
       // Store for analysis page
       localStorage.setItem('analyzingMealImage', optimizedImage);
       
-      // Navigate to analysis page
+      // Navigate to analysis page (always, even if same image)
       setLocation("/meal-analysis");
     } catch (error) {
       console.error('Gallery selection error:', error);
+      setIsAnalyzing(false);
       handleAnalysisError(error);
     }
   };

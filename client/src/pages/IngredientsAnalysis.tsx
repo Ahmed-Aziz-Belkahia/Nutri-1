@@ -218,14 +218,58 @@ export default function IngredientsAnalysis() {
         const savedRecipeIds = savedRecipes.map((r: any) => r.id);
         console.log('[IngredientsAnalysis] Saved recipe IDs:', savedRecipeIds);
         
-        // Wait a moment to show success, then redirect
-        setTimeout(() => {
-          if (!isMounted) return;
+        // Poll database to ensure recipes are retrievable before redirecting
+        let recipesReady = false;
+        let attempts = 0;
+        const maxAttempts = 15; // 30 seconds max
+        
+        console.log('[IngredientsAnalysis] Starting polling to verify recipes are retrievable...');
+        
+        while (attempts < maxAttempts && !recipesReady && isMounted) {
+          attempts++;
+          console.log(`[IngredientsAnalysis] Poll attempt ${attempts}/${maxAttempts}...`);
           
-          console.log('[IngredientsAnalysis] Redirecting to /recipe-results with IDs:', savedRecipeIds);
-          // Navigate with recipe IDs as URL params
+          // Wait 2 seconds between attempts
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          if (!isMounted) break;
+          
+          try {
+            // Try to fetch the recipes from the database
+            const verifyResponse = await fetch(`/api/food-logs?ids=${savedRecipeIds.join(',')}`, {
+              credentials: 'include'
+            });
+            
+            if (verifyResponse.ok) {
+              const verifiedData = await verifyResponse.json();
+              const verifiedRecipes = Array.isArray(verifiedData) ? verifiedData : verifiedData.logs || [];
+              
+              console.log(`[IngredientsAnalysis] Poll ${attempts}: Found ${verifiedRecipes.length} recipes in database`);
+              
+              // Check if we got all the recipes back
+              if (verifiedRecipes.length === savedRecipeIds.length) {
+                console.log('[IngredientsAnalysis] ✓ All recipes verified in database!');
+                recipesReady = true;
+                break;
+              }
+            }
+          } catch (pollError) {
+            console.error(`[IngredientsAnalysis] Poll attempt ${attempts} error:`, pollError);
+          }
+        }
+        
+        if (!isMounted) return;
+        
+        // Store ingredients data so RecipeResults can generate more recipes
+        localStorage.setItem('recipeIngredientsData', JSON.stringify(ingredients));
+        
+        if (recipesReady) {
+          console.log('[IngredientsAnalysis] Recipes verified! Redirecting to /recipe-results');
           setLocation(`/recipe-results?ids=${savedRecipeIds.join(',')}`);
-        }, 1500);
+        } else {
+          console.warn('[IngredientsAnalysis] Timeout waiting for recipes, redirecting anyway...');
+          setLocation(`/recipe-results?ids=${savedRecipeIds.join(',')}`);
+        }
       } catch (error) {
         console.error('Ingredients Analysis Error:', error);
         if (!isMounted) return;
