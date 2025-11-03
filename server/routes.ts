@@ -488,8 +488,8 @@ export function registerRoutes(app: Express): Server {
         userId: log.userId,
         name: log.name,
         description: log.description || '',
-        ingredients: log.ingredients || [],
-        instructions: log.instructions || [],
+        ingredients: ingredients,
+        instructions: instructions,
         nutritionInfo: {
           calories: log.calories,
           protein: log.protein,
@@ -1565,6 +1565,27 @@ export function registerRoutes(app: Express): Server {
 
       const log = foodLog[0];
 
+      // If this is a scanned meal with components, generate ingredients from components
+      let ingredients = log.ingredients || [];
+      let instructions = log.instructions || [];
+      
+      if ((!ingredients || ingredients.length === 0) && log.components && Array.isArray(log.components) && log.components.length > 0) {
+        // Generate ingredients list from components
+        ingredients = log.components.map((comp: any) => ({
+          name: comp.name,
+          amount: comp.quantity || 1,
+          unit: comp.servingSize || 'portion',
+          notes: comp.details?.preparation || ''
+        }));
+        
+        // Generate simple instructions from components
+        instructions = [
+          'This is a scanned meal composed of the following ingredients.',
+          `Combine all ${log.components.length} components as shown in the image.`,
+          'Adjust portions according to your dietary needs.'
+        ];
+      }
+
       // Transform food log to recipe format
       const recipeData = {
         id: log.id,
@@ -1575,8 +1596,8 @@ export function registerRoutes(app: Express): Server {
         cookTime: log.cookTime || null,
         servings: log.servings || 1,
         difficulty: log.difficulty || null,
-        ingredients: log.ingredients || [],
-        instructions: log.instructions || [],
+        ingredients: ingredients,
+        instructions: instructions,
         nutritionInfo: {
           calories: log.calories,
           protein: log.protein,
