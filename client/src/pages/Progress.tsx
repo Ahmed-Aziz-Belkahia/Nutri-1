@@ -13,7 +13,7 @@ import HeightLogWidget from '@/components/HeightLogWidget';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import Navbar from '@/components/Navbar';
+import BaseLayout from '@/components/layouts/BaseLayout';
 import { 
   AlertDialog, 
   AlertDialogAction, 
