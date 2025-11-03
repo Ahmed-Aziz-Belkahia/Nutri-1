@@ -1556,11 +1556,11 @@ export function registerRoutes(app: Express): Server {
       const foodLog = await db
         .select()
         .from(foodLogs)
-        .where(and(eq(foodLogs.id, logId), eq(foodLogs.isRecipe, true)))
+        .where(eq(foodLogs.id, logId))
         .limit(1);
 
       if (!foodLog || foodLog.length === 0) {
-        return res.status(404).json({ error: 'Recipe not found in food logs' });
+        return res.status(404).json({ error: 'Food log not found' });
       }
 
       const log = foodLog[0];
