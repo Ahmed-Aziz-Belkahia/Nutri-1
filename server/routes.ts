@@ -4656,7 +4656,7 @@ export function registerRoutes(app: Express): Server {
           cookTime: cookTime || null,
           servings: servings || 1,
           source: source || 'scanned',
-          isRecipe: isRecipe || false,
+          isRecipe: isRecipe || (!!(instructions && Array.isArray(instructions) && instructions.length > 0 && ingredients && Array.isArray(ingredients) && ingredients.length > 0)),
           cuisineType: cuisineType || null,
           mealType: mealType || null,
           difficulty: difficulty || null,
