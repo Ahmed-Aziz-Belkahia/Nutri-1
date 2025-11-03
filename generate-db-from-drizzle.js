@@ -300,6 +300,43 @@ CREATE TABLE IF NOT EXISTS daily_progress (
   completed_tasks INTEGER DEFAULT 0,
   total_tasks INTEGER DEFAULT 0
 );
+
+-- Refresh tokens table (for JWT authentication)
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at INTEGER NOT NULL,
+  is_revoked INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
+
+-- API usage tracking table (for token limitations and rate limiting)
+CREATE TABLE IF NOT EXISTS api_usage_tracking (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL,
+  tokens_used INTEGER NOT NULL DEFAULT 0,
+  cost_usd REAL NOT NULL DEFAULT 0,
+  request_date INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  model TEXT,
+  status TEXT NOT NULL DEFAULT 'success',
+  metadata TEXT
+);
+
+-- User token limits table (for premium tiers and usage limits)
+CREATE TABLE IF NOT EXISTS user_token_limits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  tier TEXT NOT NULL DEFAULT 'free',
+  daily_token_limit INTEGER NOT NULL DEFAULT 10000,
+  monthly_token_limit INTEGER NOT NULL DEFAULT 200000,
+  daily_used INTEGER NOT NULL DEFAULT 0,
+  monthly_used INTEGER NOT NULL DEFAULT 0,
+  last_reset_daily INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  last_reset_monthly INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+);
 `;
 
 try {
@@ -331,7 +368,10 @@ const criticalColumns = {
   'meal_plans': ['total_calories'],
   'weight_logs': ['logged_at'],
   'recipes_in_meal_plan': ['order'],
-  'food_logs': ['description', 'ingredients', 'instructions', 'prep_time', 'cook_time', 'servings', 'source', 'is_recipe']
+  'food_logs': ['description', 'ingredients', 'instructions', 'prep_time', 'cook_time', 'servings', 'source', 'is_recipe'],
+  'refresh_tokens': ['user_id', 'token', 'expires_at', 'is_revoked'],
+  'api_usage_tracking': ['user_id', 'endpoint', 'tokens_used', 'cost_usd'],
+  'user_token_limits': ['user_id', 'tier', 'daily_token_limit', 'monthly_token_limit']
 };
 
 let allValid = true;
