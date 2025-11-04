@@ -473,14 +473,14 @@ export default function IngredientsAnalysis() {
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex flex-col items-center justify-center px-5 py-8"
+      <div className="relative h-full flex flex-col items-center px-5 py-8 overflow-y-auto"
         style={{ 
           paddingTop: 'max(32px, env(safe-area-inset-top, 32px))',
           paddingBottom: 'max(32px, env(safe-area-inset-bottom, 32px))'
         }}
       >
         {/* Main Content Container */}
-        <div className="w-full max-w-md space-y-8">
+        <div className={`w-full max-w-md space-y-8 ${currentState !== 'confirming' ? 'min-h-full flex flex-col justify-center' : ''}`}>
           
           {/* Image with Circular Progress Ring */}
           <div className="flex flex-col items-center">
@@ -676,9 +676,9 @@ export default function IngredientsAnalysis() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="w-full max-w-2xl mx-auto"
+                className="w-full max-w-2xl mx-auto my-4"
               >
-                <div className="bg-white rounded-3xl shadow-2xl p-6 space-y-6 border-2 border-gray-100">
+                <div className="bg-white rounded-3xl shadow-2xl p-6 space-y-6 border-2 border-gray-100 mb-8">
                   {/* Header */}
                   <div className="text-center space-y-2">
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-[#26A8FF] to-cyan-600 bg-clip-text text-transparent">
@@ -690,7 +690,7 @@ export default function IngredientsAnalysis() {
                   </div>
 
                   {/* Ingredients List */}
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <div className="space-y-2 max-h-[40vh] overflow-y-auto">
                     {detectedIngredients.map((ingredient, index) => (
                       <motion.div
                         key={index}
