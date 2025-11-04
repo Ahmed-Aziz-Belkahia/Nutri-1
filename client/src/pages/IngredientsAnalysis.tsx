@@ -307,9 +307,10 @@ export default function IngredientsAnalysis() {
             sodium: recipe.nutritionInfo?.sodium || recipe.sodium || 500,
             image: imageData,
             isRecipe: true,
-            source: 'ingredient_scan',
+            source: 'ingredient_generation', // Different source to separate from scanned meals
             components: detectedIngredients.map((ing: any) => ing.name),
-            isAnalyzing: true
+            isAnalyzing: true,
+            hideFromToday: true // Flag to hide from today's scans
           };
 
           const saveResponse = await fetch('/api/food-logs', {

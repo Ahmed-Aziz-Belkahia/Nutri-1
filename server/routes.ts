@@ -648,13 +648,15 @@ export function registerRoutes(app: Express): Server {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
 
       // Get all food logs with images (scanned meals)
+      // Exclude ingredient-generated recipes (source = 'ingredient_generation')
       const scannedLogs = await db
         .select()
         .from(foodLogs)
         .where(
           and(
             eq(foodLogs.userId, req.user!.id),
-            sql`${foodLogs.image} IS NOT NULL AND ${foodLogs.image} != ''`
+            sql`${foodLogs.image} IS NOT NULL AND ${foodLogs.image} != ''`,
+            sql`(${foodLogs.source} IS NULL OR ${foodLogs.source} != 'ingredient_generation')`
           )
         )
         .orderBy(desc(foodLogs.date))
@@ -662,7 +664,8 @@ export function registerRoutes(app: Express): Server {
 
       console.log('[Food Logs API] Retrieved scanned logs:', {
         count: scannedLogs.length,
-        userId: req.user!.id
+        userId: req.user!.id,
+        excludedIngredientGeneration: true
       });
 
       res.json(scannedLogs);

@@ -266,19 +266,36 @@ export default function RecipeResults() {
       }
       
       // Fetch each recipe from the food logs endpoint
-      const recipePromises = recipeIds.map(id => 
-        fetch(`/api/food-logs/${id}`, {
-          credentials: 'include'
-        }).then(res => res.ok ? res.json() : null)
-      );
+      const recipePromises = recipeIds.map(async id => {
+        try {
+          const response = await fetch(`/api/food-logs/${id}`, {
+            credentials: 'include'
+          });
+          if (!response.ok) {
+            console.error(`[RecipeResults] Failed to fetch recipe ${id}: ${response.status}`);
+            return null;
+          }
+          const data = await response.json();
+          console.log(`[RecipeResults] Successfully fetched recipe ${id}:`, data);
+          return data;
+        } catch (error) {
+          console.error(`[RecipeResults] Error fetching recipe ${id}:`, error);
+          return null;
+        }
+      });
       
       const recipes = await Promise.all(recipePromises);
       const validRecipes = recipes.filter(r => r !== null);
       
-      console.log('[RecipeResults] Fetched recipes:', validRecipes);
+      console.log('[RecipeResults] Fetched recipes:', {
+        total: recipeIds.length,
+        successful: validRecipes.length,
+        failed: recipeIds.length - validRecipes.length
+      });
       
       if (validRecipes.length === 0) {
-        throw new Error('No recipes found');
+        console.error('[RecipeResults] No recipes could be fetched from database');
+        throw new Error('No recipes found in database. They may still be saving...');
       }
       
       // Transform to expected format
@@ -311,13 +328,44 @@ export default function RecipeResults() {
       setIsLoading(false);
     } catch (error) {
       console.error('[RecipeResults] Failed to fetch recipes from database:', error);
+      
+      // If we have ingredients data, offer to regenerate
+      const storedIngredients = localStorage.getItem('recipeIngredientsData');
+      if (storedIngredients) {
+        try {
+          const ingredientsData = JSON.parse(storedIngredients);
+          setError('Recipes are still being saved. Generating fresh recipes...');
+          
+          // Wait a bit then try to generate fresh recipes
+          setTimeout(() => {
+            generateRecipesFromIngredients({
+              ingredients: ingredientsData,
+              preferences: {
+                difficulty: 'Medium',
+                timeNeeded: 30,
+                flavor: 'Mixed'
+              }
+            });
+          }, 1000);
+          return;
+        } catch (e) {
+          console.error('[RecipeResults] Could not parse stored ingredients:', e);
+        }
+      }
+      
       setError('Failed to load recipes');
       setIsLoading(false);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load recipes. Please try again."
+        description: "Failed to load recipes. Redirecting back...",
+        duration: 3000
       });
+      
+      // Redirect back to scan page after 3 seconds
+      setTimeout(() => {
+        setLocation('/scan-recipe');
+      }, 3000);
     }
   };
 
