@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import SimpleCameraCapture from "@/components/SimpleCameraCapture";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import BaseLayout from "@/components/layouts/BaseLayout";
 
 interface BodyAnalysis {
   bodyFatPercentage: number;
@@ -154,6 +155,38 @@ export default function UnifiedProgress() {
   };
 
   // Handle file upload with enhanced progress feedback
+  // Helper function to fix iOS image orientation
+  const fixImageOrientation = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+
+          // Set canvas dimensions to image dimensions
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Draw the image onto the canvas (this automatically fixes orientation on iOS)
+          ctx.drawImage(img, 0, 0);
+
+          // Convert canvas to base64
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -180,30 +213,19 @@ export default function UnifiedProgress() {
 
     setUploadingPhoto(true);
     
-    // Convert file to base64 for preview and upload
-    const reader = new FileReader();
-    const base64String = await new Promise<string>((resolve, reject) => {
-      reader.onloadend = () => {
-        if (reader.result) {
-          resolve(reader.result as string);
-        } else {
-          reject(new Error('Failed to convert image'));
-        }
-      };
-      reader.onerror = () => reject(new Error('Failed to read image'));
-      reader.readAsDataURL(file);
-    });
-
-    // Set preview immediately
-    setUploadPreview(base64String);
-    
-    // Show immediate feedback
-    toast({
-      title: "Uploading...",
-      description: "Processing progress photo",
-    });
-
     try {
+      // Fix iOS orientation and convert to base64
+      const base64String = await fixImageOrientation(file);
+
+      // Set preview immediately
+      setUploadPreview(base64String);
+      
+      // Show immediate feedback
+      toast({
+        title: "Uploading...",
+        description: "Processing progress photo",
+      });
+
       await uploadPhoto(base64String, 'latest');
       
       // Explicitly refetch photos to update the analyze button state
@@ -361,66 +383,8 @@ export default function UnifiedProgress() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f9f9] to-[#f0f4ff] relative overflow-hidden">
-      {/* Abstract background pattern matching Dashboard */}
-      <div className="absolute inset-0 opacity-5" style={{ 
-        backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
-      }}></div>
-      
-      {/* Colorful abstract shapes matching Dashboard */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-600/5 filter blur-3xl -translate-y-1/3 translate-x-1/3" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-500/5 filter blur-3xl translate-y-1/3 -translate-x-1/3" />
-      <div className="absolute top-1/2 left-1/4 w-[300px] h-[300px] rounded-full bg-emerald-500/5 filter blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] rounded-full bg-pink-500/5 filter blur-3xl" />
-
-      <div className="max-w-[600px] mx-auto relative z-10 pt-4 px-4">
-        {/* Header matching Dashboard design */}
-        <motion.header
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/50 rounded-2xl shadow-sm"
-        >
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="bg-[#0CC5BA]/10 p-2 rounded-full">
-                  <Activity className="h-5 w-5 text-[#0CC5BA]" />
-                </div>
-                <h1 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">
-                  Progress
-                </h1>
-              </div>
-              
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative cursor-pointer"
-                onClick={() => setLocation('/profile')}
-              >
-                <div className="relative">
-                  <button
-                    className="w-12 h-12 rounded-full bg-[#0CC5BA] flex items-center justify-center text-white text-xl font-semibold hover:bg-[#0CC5BA]/90 transition-colors overflow-hidden"
-                  >
-                    {user?.profileImage ? (
-                      <img 
-                        src={user.profileImage} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span>{user?.email ? user.email[0].toUpperCase() : 'U'}</span>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.header>
-
-        <div className="mt-6 space-y-6 pb-32">
+    <BaseLayout onRefresh={handleRefresh}>
+      <div className="space-y-6">
         {/* Overview + Trend */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -861,8 +825,6 @@ export default function UnifiedProgress() {
         >
           <SourcesDisclaimer />
         </motion.div>
-        </div>
-      </div>
 
       {/* Hidden file input */}
       <input
@@ -1108,6 +1070,7 @@ export default function UnifiedProgress() {
           </motion.div>
         </motion.div>
       )}
-    </div>
+      </div>
+    </BaseLayout>
   );
 }

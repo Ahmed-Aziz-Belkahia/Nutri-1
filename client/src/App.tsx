@@ -210,8 +210,8 @@ function App() {
   }
 
   // Show bottom nav only on main app pages when authenticated
-  // Exclude /dashboard as it has its own navbar
-  const showBottomNav = user && ['/dashboard-old', '/enhanced-dashboard', '/progress', '/progress-new', '/settings', '/meals', '/profile', '/analytics'].includes(location);
+  // Exclude /dashboard and /progress as they have their own navbar via BaseLayout
+  const showBottomNav = user && ['/dashboard-old', '/enhanced-dashboard', '/settings', '/meals', '/profile', '/analytics'].includes(location);
 
   // Use black background for camera-based pages only
   const isFullScreenCameraPage = location === '/scan-recipe' || location === '/add-food' || location === '/enhanced-add-food' || location === '/meal-analysis' || location === '/ingredients-analysis';
