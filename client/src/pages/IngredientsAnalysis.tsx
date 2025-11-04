@@ -37,6 +37,7 @@ export default function IngredientsAnalysis() {
   const { toast } = useToast();
   const hasAnalyzed = useRef(false);
   const analysisStarted = useRef(false);
+  const isPolling = useRef(false);
 
   // Get image from localStorage
   const imageData = localStorage.getItem('analyzingIngredientsImage');
@@ -45,7 +46,8 @@ export default function IngredientsAnalysis() {
     console.log('[IngredientsAnalysis] Component mounted');
     console.log('[IngredientsAnalysis] imageData exists:', !!imageData);
     
-    if (!imageData) {
+    // Don't redirect if we're in the middle of polling
+    if (!imageData && !isPolling.current) {
       console.log('[IngredientsAnalysis] No image data found, redirecting to /scan-recipe');
       setLocation('/scan-recipe');
       return;
@@ -336,14 +338,16 @@ export default function IngredientsAnalysis() {
       sessionStorage.setItem('lastGeneratedRecipes', JSON.stringify(recipesResult));
       localStorage.setItem('savedRecipeIds', JSON.stringify(savedRecipes.map(r => r.id)));
 
-      // Complete!
-      setCurrentState('complete');
-      localStorage.removeItem('analyzingIngredientsImage');
-
       // Just pass the recipe IDs - RecipeResults will fetch from DB
       const savedRecipeIds = savedRecipes.map((r: any) => r.id);
       console.log('[IngredientsAnalysis] Saved recipe IDs:', savedRecipeIds);
 
+      // Keep showing finalizing state while polling database
+      setCurrentState('finalizing');
+      
+      // Set polling flag to prevent redirect during polling
+      isPolling.current = true;
+      
       // Poll database to ensure recipes are retrievable before redirecting
       let recipesReady = false;
       let attempts = 0;
@@ -381,6 +385,13 @@ export default function IngredientsAnalysis() {
 
       // Store ingredients data so RecipeResults can generate more recipes
       localStorage.setItem('recipeIngredientsData', JSON.stringify(detectedIngredients));
+
+      // Clear polling flag
+      isPolling.current = false;
+      
+      // Now set complete and clean up before redirecting
+      setCurrentState('complete');
+      localStorage.removeItem('analyzingIngredientsImage');
 
       if (recipesReady) {
         console.log('[IngredientsAnalysis] Recipes verified! Redirecting to /recipe-results');
