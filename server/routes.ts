@@ -488,8 +488,8 @@ export function registerRoutes(app: Express): Server {
         userId: log.userId,
         name: log.name,
         description: log.description || '',
-        ingredients: ingredients,
-        instructions: instructions,
+        ingredients: log.ingredients || [],
+        instructions: log.instructions || [],
         nutritionInfo: {
           calories: log.calories,
           protein: log.protein,
