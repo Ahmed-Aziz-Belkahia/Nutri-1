@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
-import { Sparkles, Check, Loader2, Search, ChefHat, Utensils, BookOpen } from 'lucide-react';
+import { Sparkles, Check, Loader2, Search, ChefHat, Utensils, BookOpen, Plus, Trash2, Edit2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type AnalysisState = 'detecting' | 'analyzing' | 'confirming' | 'generating' | 'finalizing' | 'complete' | 'error';
 
@@ -29,6 +31,11 @@ export default function IngredientsAnalysis() {
   const [, setLocation] = useLocation();
   const [currentState, setCurrentState] = useState<AnalysisState>('detecting');
   const [detectedIngredients, setDetectedIngredients] = useState<Ingredient[]>([]);
+  const [difficulty, setDifficulty] = useState<string>('Medium');
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editQuantity, setEditQuantity] = useState('');
+  const [editUnit, setEditUnit] = useState('');
   const { toast } = useToast();
   const hasAnalyzed = useRef(false);
   const analysisStarted = useRef(false);
@@ -114,9 +121,9 @@ export default function IngredientsAnalysis() {
         localStorage.setItem('scannedIngredients', JSON.stringify(ingredients));
         sessionStorage.setItem('lastAnalyzedIngredients', JSON.stringify(ingredients));
         
-        // Step 3: Automatically generate recipes (no confirmation needed)
-        console.log('[IngredientsAnalysis] State: generating recipes automatically...');
-        await generateRecipes(ingredients, 'Medium');
+        // Step 3: Show confirmation screen for editing
+        setCurrentState('confirming');
+        console.log('[IngredientsAnalysis] State: confirming, waiting for user to confirm ingredients...');
       } catch (error) {
         console.error('Ingredients Analysis Error:', error);
         if (!isMounted) return;
@@ -142,6 +149,75 @@ export default function IngredientsAnalysis() {
 
     performAnalysis();
   }, [imageData, setLocation, toast]);
+
+  // Handler functions for ingredient editing
+  const handleEditIngredient = (index: number) => {
+    const ingredient = detectedIngredients[index];
+    setEditingIndex(index);
+    setEditName(ingredient.name);
+    setEditQuantity(ingredient.quantity || '');
+    setEditUnit(ingredient.unit || '');
+  };
+
+  const handleSaveEdit = () => {
+    if (editingIndex === null) return;
+    
+    const updatedIngredients = [...detectedIngredients];
+    updatedIngredients[editingIndex] = {
+      name: editName,
+      quantity: editQuantity,
+      unit: editUnit
+    };
+    
+    setDetectedIngredients(updatedIngredients);
+    localStorage.setItem('scannedIngredients', JSON.stringify(updatedIngredients));
+    setEditingIndex(null);
+    setEditName('');
+    setEditQuantity('');
+    setEditUnit('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditName('');
+    setEditQuantity('');
+    setEditUnit('');
+  };
+
+  const handleAddIngredient = () => {
+    const newIngredient = { name: '', quantity: '', unit: '' };
+    setDetectedIngredients([...detectedIngredients, newIngredient]);
+    setEditingIndex(detectedIngredients.length);
+    setEditName('');
+    setEditQuantity('');
+    setEditUnit('');
+  };
+
+  const handleRemoveIngredient = (index: number) => {
+    const updatedIngredients = detectedIngredients.filter((_, i) => i !== index);
+    setDetectedIngredients(updatedIngredients);
+    localStorage.setItem('scannedIngredients', JSON.stringify(updatedIngredients));
+    
+    if (editingIndex === index) {
+      setEditingIndex(null);
+      setEditName('');
+      setEditQuantity('');
+      setEditUnit('');
+    }
+  };
+
+  const handleConfirmAndGenerate = async () => {
+    if (detectedIngredients.length === 0) {
+      toast({
+        title: "No Ingredients",
+        description: "Please add at least one ingredient to generate recipes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    await generateRecipes(detectedIngredients, difficulty);
+  };
 
   // Generate recipes from ingredients
   const generateRecipes = async (ingredients: Ingredient[], selectedDifficulty: string) => {
@@ -578,7 +654,7 @@ export default function IngredientsAnalysis() {
 
           {/* Current Step Label */}
           <AnimatePresence mode="wait">
-            {!isComplete && !hasError && (
+            {!isComplete && !hasError && currentState !== 'confirming' && (
               <motion.div
                 key={currentState}
                 initial={{ opacity: 0, y: 10 }}
@@ -592,6 +668,148 @@ export default function IngredientsAnalysis() {
                     {analysisSteps.find(s => s.id === currentState)?.label || 'Processing...'}
                   </span>
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Ingredient Confirmation Screen */}
+          <AnimatePresence>
+            {currentState === 'confirming' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="w-full space-y-6"
+              >
+                {/* Ingredients List */}
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">Detected Ingredients</h2>
+                    <Button
+                      onClick={handleAddIngredient}
+                      size="sm"
+                      className="bg-gradient-to-r from-[#26A8FF] to-cyan-500 hover:from-[#1a8fdf] hover:to-cyan-600"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Add
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {detectedIngredients.map((ingredient, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-2xl p-4 border border-cyan-200"
+                      >
+                        {editingIndex === index ? (
+                          <div className="space-y-3">
+                            <Input
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              placeholder="Ingredient name"
+                              className="bg-white"
+                            />
+                            <div className="flex gap-2">
+                              <Input
+                                value={editQuantity}
+                                onChange={(e) => setEditQuantity(e.target.value)}
+                                placeholder="Quantity"
+                                className="bg-white flex-1"
+                              />
+                              <Input
+                                value={editUnit}
+                                onChange={(e) => setEditUnit(e.target.value)}
+                                placeholder="Unit"
+                                className="bg-white flex-1"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={handleSaveEdit}
+                                size="sm"
+                                className="flex-1 bg-green-500 hover:bg-green-600"
+                              >
+                                <Check className="w-4 h-4 mr-1" />
+                                Save
+                              </Button>
+                              <Button
+                                onClick={handleCancelEdit}
+                                size="sm"
+                                variant="outline"
+                                className="flex-1"
+                              >
+                                <X className="w-4 h-4 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-800">{ingredient.name}</p>
+                              {(ingredient.quantity || ingredient.unit) && (
+                                <p className="text-sm text-gray-600">
+                                  {ingredient.quantity} {ingredient.unit}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => handleEditIngredient(index)}
+                                size="sm"
+                                variant="ghost"
+                                className="text-[#26A8FF] hover:text-[#1a8fdf] hover:bg-cyan-100"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                onClick={() => handleRemoveIngredient(index)}
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-600 hover:bg-red-100"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Difficulty Selector */}
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Recipe Difficulty</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {['Easy', 'Medium', 'Hard'].map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => setDifficulty(level)}
+                        className={`py-3 px-4 rounded-xl font-semibold transition-all ${
+                          difficulty === level
+                            ? 'bg-gradient-to-r from-[#26A8FF] to-cyan-500 text-white shadow-lg shadow-blue-500/30'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Generate Button */}
+                <Button
+                  onClick={handleConfirmAndGenerate}
+                  className="w-full py-6 text-lg font-bold bg-gradient-to-r from-[#26A8FF] to-cyan-500 hover:from-[#1a8fdf] hover:to-cyan-600 rounded-2xl shadow-xl"
+                  disabled={detectedIngredients.length === 0}
+                >
+                  <ChefHat className="w-5 h-5 mr-2" />
+                  Generate Recipes
+                </Button>
               </motion.div>
             )}
           </AnimatePresence>
