@@ -720,9 +720,9 @@ export default function RecipeResults() {
                 {/* View Recipe Button */}
                 <Button
                   onClick={async () => {
-                    // If recipe has an ID (saved in database), use food-log route
+                    // If recipe has an ID (saved in database), use recipes/food-log route
                     if (recipe.id) {
-                      setLocation(`/food-log/${recipe.id}`);
+                      setLocation(`/recipes/food-log/${recipe.id}`);
                       return;
                     }
                     
@@ -765,7 +765,7 @@ export default function RecipeResults() {
 
                       if (saveResponse.ok) {
                         const savedRecipe = await saveResponse.json();
-                        setLocation(`/food-log/${savedRecipe.log.id}`);
+                        setLocation(`/recipes/food-log/${savedRecipe.log.id}`);
                       } else {
                         throw new Error('Failed to save recipe');
                       }
