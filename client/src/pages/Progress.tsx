@@ -534,69 +534,8 @@ export default function ProgressPage() {
 
 
   return (
-    <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen relative overflow-hidden pb-32">
-        {/* Subtle emerald blobs background */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-32 -left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-emerald-600/20 blur-3xl" />
-        </div>
-      <motion.header
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 w-full bg-white/20 backdrop-blur-xl z-10 border-b border-white/30 shadow-sm"
-      >
-        <div className="w-full max-w-[500px] mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-start sm:items-center justify-between gap-4">
-            <div className="flex-1 min-w-0 space-y-2">
-              <motion.h1
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className="text-3xl sm:text-4xl font-extrabold bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 bg-clip-text text-transparent truncate"
-              >
-                NutriAI
-              </motion.h1>
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex flex-wrap items-center gap-2"
-              >
-                <span className="text-sm sm:text-base text-gray-500 truncate">
-                  Track your transformation journey
-                </span>
-              </motion.div>
-            </div>
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="relative"
-              ref={dropdownRef}
-            >
-        <div className="relative">
-                <button
-          className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-xl font-semibold hover:from-emerald-500/90 hover:to-emerald-600/90 transition-colors overflow-hidden border border-white/20"
-                  onClick={() => setLocation('/profile')}
-                >
-                  {user?.profileImage ? (
-                    <img 
-                      src={user.profileImage} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span>{userInitial}</span>
-                  )}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.header>
-
-      {/* Main Content - Carousel */}
-  <div className="max-w-[500px] mx-auto px-4 py-6">
+    <BaseLayout onRefresh={handleRefresh}>
+      <div className="space-y-6">
         {/* Carousel navigation */}
         <div className="flex justify-between items-center mb-6 px-2">
           {progressSections.map((section, index) => (
@@ -1185,9 +1124,7 @@ export default function ProgressPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      <Navbar />
       </div>
-    </PullToRefresh>
+    </BaseLayout>
   );
 }
