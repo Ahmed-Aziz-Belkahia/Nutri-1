@@ -719,8 +719,64 @@ export default function RecipeResults() {
 
                 {/* View Recipe Button */}
                 <Button
-                  onClick={() => {
-                    setLocation(`/recipe-detail?recipe=${encodeURIComponent(JSON.stringify(recipe))}`);
+                  onClick={async () => {
+                    // If recipe has an ID (saved in database), use ID-based route
+                    if (recipe.id) {
+                      setLocation(`/recipe-detail/${recipe.id}`);
+                      return;
+                    }
+                    
+                    // If recipe is not saved, save it first then navigate
+                    try {
+                      const imageData = analysisData?.image || localStorage.getItem('analyzingIngredientsImage');
+                      
+                      const formattedRecipe = {
+                        name: recipe.name,
+                        description: recipe.description || `Recipe generated from scanned ingredients`,
+                        mealType: recipe.mealType || 'dinner',
+                        ingredients: recipe.ingredients,
+                        instructions: recipe.instructions,
+                        prepTime: recipe.prepTime,
+                        cookTime: recipe.cookingTime,
+                        servings: 2,
+                        difficulty: recipe.difficulty,
+                        cuisineType: recipe.cuisine || 'International',
+                        calories: recipe.nutritionalInfo.calories,
+                        protein: recipe.nutritionalInfo.protein,
+                        carbs: recipe.nutritionalInfo.carbs,
+                        fat: recipe.nutritionalInfo.fat,
+                        fiber: 5,
+                        sugar: 8,
+                        sodium: 500,
+                        image: imageData,
+                        isRecipe: true,
+                        source: 'ingredient_generation',
+                        components: analysisData?.ingredients?.map((ing: any) => ing.name) || [],
+                        isAnalyzing: true,
+                        hideFromToday: true
+                      };
+
+                      const saveResponse = await fetch('/api/food-logs', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formattedRecipe),
+                        credentials: 'include'
+                      });
+
+                      if (saveResponse.ok) {
+                        const savedRecipe = await saveResponse.json();
+                        setLocation(`/recipe-detail/${savedRecipe.log.id}`);
+                      } else {
+                        throw new Error('Failed to save recipe');
+                      }
+                    } catch (error) {
+                      console.error('Failed to save recipe:', error);
+                      toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: "Failed to save recipe. Please try again."
+                      });
+                    }
                   }}
                   className="w-full py-3 bg-[#26A8FF] hover:bg-[#1A8FE8] text-white rounded-xl font-semibold text-base shadow-sm transition-all duration-200"
                 >
