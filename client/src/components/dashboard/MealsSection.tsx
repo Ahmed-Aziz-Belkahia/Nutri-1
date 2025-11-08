@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Drawer } from 'vaul';
-import { MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { MoreVertical, Edit2, Trash2, AlertTriangle, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Meal {
   id: number;
@@ -26,7 +27,19 @@ interface MealsSectionProps {
 
 export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: MealsSectionProps) {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [mealToDelete, setMealToDelete] = useState<{ id: number; name: string } | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const selectedMealIdRef = useRef<number | null>(null);
+  
+  // Debug: Log the foodLogs to see what we're getting
+  useEffect(() => {
+    console.log('MealsSection foodLogs:', foodLogs);
+    if (foodLogs && foodLogs.length > 0) {
+      console.log('First meal:', foodLogs[0]);
+      console.log('First meal ID:', foodLogs[0].id);
+    }
+  }, [foodLogs]);
 
   // Close menu when clicking outside (desktop only)
   useEffect(() => {
@@ -50,6 +63,8 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
 
   const handleMenuToggle = (mealId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('Menu toggled for meal ID:', mealId);
+    selectedMealIdRef.current = mealId;
     setOpenMenuId(openMenuId === mealId ? null : mealId);
   };
 
@@ -59,36 +74,60 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
 
   const handleEdit = (mealId: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    
+    console.log('handleEdit called with mealId:', mealId, 'type:', typeof mealId);
+    
     setOpenMenuId(null);
-    window.location.href = `/food-logs/${openMenuId}/edit`;
+    
+    // Safety check to ensure mealId is valid
+    if (!mealId || mealId === null || mealId === undefined) {
+      console.error('Invalid meal ID - cannot edit. Received:', mealId);
+      alert(`Cannot edit meal - invalid ID: ${mealId}`);
+      return;
+    }
+    
+    console.log('Navigating to /meal/' + mealId);
+    window.location.href = `/meal/${mealId}`;
   };
 
   const handleDelete = async (mealId: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setOpenMenuId(null);
     
-    if (confirm('Are you sure you want to delete this meal?')) {
-      try {
-        const response = await fetch(`/api/food-logs/${openMenuId}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        });
+    // Find the meal to get its name
+    const meal = scannedMeals.find(m => m.id === mealId);
+    setMealToDelete({ id: mealId, name: meal?.name || 'this meal' });
+    setShowDeleteDialog(true);
+  };
 
-        if (!response.ok) {
-          throw new Error('Failed to delete meal');
-        }
+  const confirmDelete = async () => {
+    if (!mealToDelete) return;
 
-        // Call the callback if provided
-        if (onDeleteMeal) {
-          onDeleteMeal(openMenuId!);
-        }
+    try {
+      const response = await fetch(`/api/food-logs/${mealToDelete.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
 
-        // Reload the page to refresh data
-        window.location.reload();
-      } catch (error) {
-        console.error('Error deleting meal:', error);
-        alert('Failed to delete meal. Please try again.');
+      if (!response.ok) {
+        throw new Error('Failed to delete meal');
       }
+
+      // Call the callback if provided
+      if (onDeleteMeal) {
+        onDeleteMeal(mealToDelete.id);
+      }
+
+      setShowDeleteDialog(false);
+      setMealToDelete(null);
+
+      // Reload the page to refresh data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting meal:', error);
+      alert('Failed to delete meal. Please try again.');
+      setShowDeleteDialog(false);
+      setMealToDelete(null);
     }
   };
 
@@ -141,14 +180,28 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
             {/* Menu content */}
             <div className="px-4 pb-8">
               <button
-                onClick={() => handleEdit(openMenuId!)}
+                onClick={() => {
+                  console.log('Edit button clicked! selectedMealIdRef:', selectedMealIdRef.current);
+                  const mealId = selectedMealIdRef.current;
+                  if (mealId !== null) {
+                    console.log('Calling handleEdit with mealId:', mealId);
+                    handleEdit(mealId);
+                  } else {
+                    console.error('selectedMealIdRef is null, cannot edit');
+                  }
+                }}
                 className="w-full px-4 py-4 text-left text-base text-gray-700 hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors rounded-lg"
               >
                 <Edit2 className="w-5 h-5" />
                 Edit Meal
               </button>
               <button
-                onClick={() => handleDelete(openMenuId!)}
+                onClick={() => {
+                  const mealId = selectedMealIdRef.current;
+                  if (mealId !== null) {
+                    handleDelete(mealId);
+                  }
+                }}
                 className="w-full px-4 py-4 text-left text-base text-red-600 hover:bg-red-50 active:bg-red-100 flex items-center gap-3 transition-colors rounded-lg"
               >
                 <Trash2 className="w-5 h-5" />
@@ -269,6 +322,103 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
         }
       `}</style>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteDialog && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1002]"
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setMealToDelete(null);
+              }}
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
+            >
+              <div className="w-full max-w-md">
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                {/* Header with gradient */}
+                <div className="relative bg-gradient-to-br from-red-500 via-red-600 to-rose-600 px-6 py-8 text-white">
+                  {/* Close button */}
+                  <button
+                    onClick={() => {
+                      setShowDeleteDialog(false);
+                      setMealToDelete(null);
+                    }}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  {/* Icon */}
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                    >
+                      <AlertTriangle className="w-8 h-8 text-white" />
+                    </motion.div>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold text-center mb-2">
+                    Delete Meal?
+                  </h3>
+                  <p className="text-white/90 text-center text-sm">
+                    This action cannot be undone
+                  </p>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 py-6">
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-6">
+                    <p className="text-gray-600 text-sm text-center">
+                      Are you sure you want to delete
+                    </p>
+                    <p className="text-gray-900 font-semibold text-center mt-1 text-base">
+                      "{mealToDelete?.name}"
+                    </p>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setShowDeleteDialog(false);
+                        setMealToDelete(null);
+                      }}
+                      className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all text-base"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={confirmDelete}
+                      className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 active:scale-95 transition-all shadow-lg shadow-red-500/30 text-base"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }

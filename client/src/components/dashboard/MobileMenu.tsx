@@ -1,4 +1,5 @@
 import { Drawer } from 'vaul';
+import { useAuth } from '@/hooks/use-auth';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -7,9 +8,20 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, isClosing, onClose }: MobileMenuProps) {
+  const { logout } = useAuth();
+  
   const handleNavigation = (url: string) => {
     onClose();
     setTimeout(() => window.location.href = url, 300);
+  };
+
+  const handleLogout = async () => {
+    onClose();
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -29,14 +41,8 @@ export default function MobileMenu({ isOpen, isClosing, onClose }: MobileMenuPro
             />
 
             <MenuButton
-              icon={<SettingsIcon />}
-              label="Settings"
-              onClick={() => handleNavigation('/settings')}
-            />
-
-            <MenuButton
               icon={<ClipboardIcon />}
-              label="Meal Planning"
+              label="Generate New Meal Plan"
               onClick={() => handleNavigation('/meal-planning-quiz')}
             />
 
@@ -45,7 +51,7 @@ export default function MobileMenu({ isOpen, isClosing, onClose }: MobileMenuPro
             <MenuButton
               icon={<LogoutIcon />}
               label="Logout"
-              onClick={() => handleNavigation('/logout')}
+              onClick={handleLogout}
               isLogout
             />
           </div>

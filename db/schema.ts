@@ -6,6 +6,7 @@ import { z } from 'zod';
 // User schema
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  username: text("username").notNull().unique(),
   email: text("email").unique().notNull(),
   password: text("password").notNull(),
   hasCompletedOnboarding: integer("has_completed_onboarding", { mode: 'boolean' }).default(false),

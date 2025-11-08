@@ -10,8 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import axios from 'axios';
 import type { UserProfile } from "@/types/User";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-// Removed AlertDialog in favor of custom themed modal
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -71,6 +69,12 @@ export default function Profile() {
   const [goalWeight, setGoalWeight] = useState<string>(profile?.goalWeight?.toString() || '70');
   const [activityLevel, setActivityLevel] = useState<string>(profile?.activityLevel || 'Moderate');
   
+  // Metrics dialog state
+  const [metricsDialogOpen, setMetricsDialogOpen] = useState(false);
+  const [height, setHeight] = useState<string>(profile?.height?.toString() || '170');
+  const [currentWeight, setCurrentWeight] = useState<string>(profile?.currentWeight?.toString() || '70');
+  const [age, setAge] = useState<string>(profile?.age?.toString() || '25');
+  
   // Nutritional goals dialog state
   const [nutritionDialogOpen, setNutritionDialogOpen] = useState(false);
   const [calories, setCalories] = useState<string>((profile?.caloriesGoal || 2000).toString());
@@ -100,6 +104,11 @@ export default function Profile() {
       setWeightGoal(profile.weightGoal || 'maintain');
       setGoalWeight(profile.goalWeight?.toString() || '70');
       setActivityLevel(profile.activityLevel || 'Moderate');
+      
+      // Update metrics values
+      setHeight(profile.height?.toString() || '170');
+      setCurrentWeight(profile.currentWeight?.toString() || '70');
+      setAge(profile.age?.toString() || '25');
       
       // Update nutritional values - convert percentages to grams
       const calorieGoal = profile.caloriesGoal || 2000;
@@ -430,7 +439,12 @@ export default function Profile() {
                 <h3 className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
                   Body Metrics
                 </h3>
-                <Button size="icon" variant="outline" className="rounded-full h-8 w-8 border-[#0CC5BA]/30 hover:bg-[#0CC5BA]/10 hover:border-[#0CC5BA]">
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  className="rounded-full h-8 w-8 border-[#0CC5BA]/30 hover:bg-[#0CC5BA]/10 hover:border-[#0CC5BA]"
+                  onClick={() => setMetricsDialogOpen(true)}
+                >
                   <Edit2 className="h-4 w-4 text-[#0CC5BA]" />
                 </Button>
               </div>
@@ -484,111 +498,14 @@ export default function Profile() {
                 <h3 className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
                   Goals & Activity
                 </h3>
-                <Dialog open={goalsDialogOpen} onOpenChange={setGoalsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="icon" variant="outline" className="rounded-full h-8 w-8 border-[#0CC5BA]/30 hover:bg-[#0CC5BA]/10 hover:border-[#0CC5BA]">
-                      <Edit2 className="h-4 w-4 text-[#0CC5BA]" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px] w-[90vw] dialog-top-positioned">
-                    <DialogHeader>
-                      <DialogTitle>Edit Goals & Activity</DialogTitle>
-                      <DialogDescription>
-                        Update your weight goals and activity level to get personalized recommendations.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
-                      <div className="space-y-2">
-                        <Label htmlFor="weightGoal">Weight Goal</Label>
-                        <Select value={weightGoal} onValueChange={setWeightGoal}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select your weight goal" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="loss">Weight Loss</SelectItem>
-                            <SelectItem value="maintain">Maintain Weight</SelectItem>
-                            <SelectItem value="gain">Weight Gain</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="goalWeight">Goal Weight (kg)</Label>
-                        <Input 
-                          id="goalWeight"
-                          type="number"
-                          min="1"
-                          value={goalWeight}
-                          onChange={(e) => setGoalWeight(e.target.value)}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="activityLevel">Poziom aktywności</Label>
-                        <Select value={activityLevel} onValueChange={setActivityLevel}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Wybierz poziom aktywności" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Sedentary">Siedzący tryb życia (brak ćwiczeń)</SelectItem>
-                            <SelectItem value="Light">Lekka aktywność (1-3 dni w tygodniu)</SelectItem>
-                            <SelectItem value="Moderate">Umiarkowana aktywność (3-5 dni w tygodniu)</SelectItem>
-                            <SelectItem value="Active">Wysoka aktywność (6-7 dni w tygodniu)</SelectItem>
-                            <SelectItem value="Very Active">Bardzo aktywny (2x dziennie)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button 
-                        type="submit" 
-                        className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:opacity-90"
-                        onClick={async () => {
-                          try {
-                            // Direct API call to ensure weight goals and activity level are updated
-                            try {
-                              const response = await fetch('/api/user/profile', {
-                                method: 'PUT',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                  goalWeight: parseFloat(goalWeight),
-                                  weightGoal: weightGoal,
-                                  activityLevel: activityLevel
-                                }),
-                              });
-                              
-                              if (!response.ok) {
-                                throw new Error('Failed to update goals and activity');
-                              }
-                            } catch (error) {
-                              console.error('Error updating goals and activity:', error);
-                              throw error;
-                            }
-                            
-                            await refetchProfile();
-                            
-                            toast({
-                              title: "Goals updated",
-                              description: "Your goals and activity level have been updated."
-                            });
-                            
-                            setGoalsDialogOpen(false);
-                          } catch (error) {
-                            toast({
-                              variant: "destructive",
-                              title: "Error",
-                              description: "Failed to update goals. Please try again."
-                            });
-                          }
-                        }}
-                      >
-                        Save changes
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <Button 
+                  size="icon" 
+                  variant="outline" 
+                  className="rounded-full h-8 w-8 border-[#0CC5BA]/30 hover:bg-[#0CC5BA]/10 hover:border-[#0CC5BA]"
+                  onClick={() => setGoalsDialogOpen(true)}
+                >
+                  <Edit2 className="h-4 w-4 text-[#0CC5BA]" />
+                </Button>
               </div>
               
               <Card className="bg-white/70 backdrop-blur-md border border-white/30 shadow-sm rounded-2xl overflow-hidden">
@@ -1158,6 +1075,272 @@ export default function Profile() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Goals & Activity Edit Modal */}
+      <AnimatePresence>
+        {goalsDialogOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1002]"
+              onClick={() => setGoalsDialogOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
+            >
+              <div className="w-full max-w-md">
+                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                  <div className="relative bg-gradient-to-br from-[#0CC5BA] via-[#0CC5BA] to-blue-500 px-6 py-8 text-white flex-shrink-0">
+                    <button
+                      onClick={() => setGoalsDialogOpen(false)}
+                      className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      >
+                        <Target className="w-8 h-8 text-white" />
+                      </motion.div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-center mb-2">Edit Goals & Activity</h3>
+                    <p className="text-white/90 text-center text-sm">Update your targets to get personalized recommendations</p>
+                  </div>
+                  <div className="px-6 py-6 overflow-y-auto flex-1">
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="weightGoal" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Target className="w-4 h-4 text-[#0CC5BA]" />
+                          Weight Goal
+                        </Label>
+                        <Select value={weightGoal} onValueChange={setWeightGoal}>
+                          <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]">
+                            <SelectValue placeholder="Select your weight goal" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="loss">Weight Loss</SelectItem>
+                            <SelectItem value="maintain">Maintain Weight</SelectItem>
+                            <SelectItem value="gain">Weight Gain</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="goalWeight" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Scale className="w-4 h-4 text-[#0CC5BA]" />
+                          Goal Weight (kg)
+                        </Label>
+                        <Input 
+                          id="goalWeight"
+                          type="number"
+                          min="1"
+                          value={goalWeight}
+                          onChange={(e) => setGoalWeight(e.target.value)}
+                          className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]"
+                          placeholder="Enter your goal weight"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="activityLevel" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Activity className="w-4 h-4 text-[#0CC5BA]" />
+                          Activity Level
+                        </Label>
+                        <Select value={activityLevel} onValueChange={setActivityLevel}>
+                          <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]">
+                            <SelectValue placeholder="Select activity level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Sedentary">Sedentary (no exercise)</SelectItem>
+                            <SelectItem value="Light">Light (1-3 days/week)</SelectItem>
+                            <SelectItem value="Moderate">Moderate (3-5 days/week)</SelectItem>
+                            <SelectItem value="Active">Active (6-7 days/week)</SelectItem>
+                            <SelectItem value="Very Active">Very Active (2x daily)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex-shrink-0">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setGoalsDialogOpen(false)}
+                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-all text-base"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/user/profile', {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                goalWeight: parseFloat(goalWeight),
+                                weightGoal: weightGoal,
+                                activityLevel: activityLevel
+                              }),
+                            });
+                            if (!response.ok) throw new Error('Failed to update goals and activity');
+                            await refetchProfile();
+                            toast({ title: "Goals updated", description: "Your goals and activity level have been updated." });
+                            setGoalsDialogOpen(false);
+                          } catch (error) {
+                            toast({ variant: "destructive", title: "Error", description: "Failed to update goals. Please try again." });
+                          }
+                        }}
+                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 active:scale-95 transition-all shadow-lg shadow-[#0CC5BA]/30 text-base"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Metrics Edit Modal */}
+      <AnimatePresence>
+        {metricsDialogOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1002]"
+              onClick={() => setMetricsDialogOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
+            >
+              <div className="w-full max-w-md">
+                <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                  <div className="relative bg-gradient-to-br from-[#0CC5BA] via-[#0CC5BA] to-blue-500 px-6 py-8 text-white">
+                    <button
+                      onClick={() => setMetricsDialogOpen(false)}
+                      className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                      >
+                        <Ruler className="w-8 h-8 text-white" />
+                      </motion.div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-center mb-2">Edit Body Metrics</h3>
+                    <p className="text-white/90 text-center text-sm">Update your physical measurements</p>
+                  </div>
+                  <div className="px-6 py-6">
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="height" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Ruler className="w-4 h-4 text-[#0CC5BA]" />
+                          Height (cm)
+                        </Label>
+                        <Input 
+                          id="height"
+                          type="number"
+                          min="1"
+                          value={height}
+                          onChange={(e) => setHeight(e.target.value)}
+                          className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]"
+                          placeholder="Enter your height"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="currentWeight" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Scale className="w-4 h-4 text-[#0CC5BA]" />
+                          Current Weight (kg)
+                        </Label>
+                        <Input 
+                          id="currentWeight"
+                          type="number"
+                          min="1"
+                          step="0.1"
+                          value={currentWeight}
+                          onChange={(e) => setCurrentWeight(e.target.value)}
+                          className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]"
+                          placeholder="Enter your current weight"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="age" className="text-gray-700 font-medium flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-[#0CC5BA]" />
+                          Age (years)
+                        </Label>
+                        <Input 
+                          id="age"
+                          type="number"
+                          min="1"
+                          max="120"
+                          value={age}
+                          onChange={(e) => setAge(e.target.value)}
+                          className="h-12 rounded-xl border-gray-200 focus:border-[#0CC5BA] focus:ring-[#0CC5BA]"
+                          placeholder="Enter your age"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setMetricsDialogOpen(false)}
+                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-all text-base"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/user/profile', {
+                              method: 'PUT',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                height: parseFloat(height),
+                                currentWeight: parseFloat(currentWeight),
+                                age: parseInt(age)
+                              }),
+                            });
+                            if (!response.ok) throw new Error('Failed to update metrics');
+                            await refetchProfile();
+                            toast({ title: "Metrics updated", description: "Your body metrics have been updated." });
+                            setMetricsDialogOpen(false);
+                          } catch (error) {
+                            toast({ variant: "destructive", title: "Error", description: "Failed to update metrics. Please try again." });
+                          }
+                        }}
+                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 active:scale-95 transition-all shadow-lg shadow-[#0CC5BA]/30 text-base"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

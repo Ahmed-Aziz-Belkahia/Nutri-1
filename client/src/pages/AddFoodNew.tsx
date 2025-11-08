@@ -81,7 +81,6 @@ export default function AddFoodNew() {
   const [errorMessage, setErrorMessage] = useState("");
   const [errorSuggestion, setErrorSuggestion] = useState("");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
-  const [selectedGalleryImage, setSelectedGalleryImage] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -124,11 +123,40 @@ export default function AddFoodNew() {
     },
   });
 
-  // Request camera permission
+  // Request camera permission - only check on first mount, don't request repeatedly
   useEffect(() => {
-    if (activeTab === "photo") {
-      requestCameraPermission();
-    }
+    const checkCameraPermission = async () => {
+      if (activeTab !== "photo") return;
+      
+      try {
+        // Check if we have permission without triggering a prompt
+        // The Webcam component will handle the actual stream request
+        if ('permissions' in navigator) {
+          const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
+          if (result.state === 'granted') {
+            setCameraReady(true);
+            setCameraError(null);
+          } else if (result.state === 'denied') {
+            setCameraError("Camera access denied. Please enable camera permissions.");
+            setCameraReady(false);
+          } else {
+            // Permission is 'prompt' - let Webcam component handle it
+            setCameraReady(true);
+          }
+        } else {
+          // Permissions API not supported (older iOS), just assume ready
+          // and let Webcam component handle permission request
+          setCameraReady(true);
+        }
+      } catch (err) {
+        console.error('Camera permission check error:', err);
+        // If permission check fails, still try to show webcam
+        // It will handle the permission request itself
+        setCameraReady(true);
+      }
+    };
+
+    checkCameraPermission();
   }, [activeTab]);
 
   const requestCameraPermission = async () => {
@@ -230,9 +258,7 @@ export default function AddFoodNew() {
 
   // Handle gallery image selection
   const handleGalleryImageSelect = async (image: string) => {
-    // Always set as analyzing to show feedback
     setIsAnalyzing(true);
-    setSelectedGalleryImage(image);
     
     try {
       // Convert to WebP for optimization
@@ -241,7 +267,7 @@ export default function AddFoodNew() {
       // Store for analysis page
       localStorage.setItem('analyzingMealImage', optimizedImage);
       
-      // Navigate to analysis page (always, even if same image)
+      // Navigate to analysis page
       setLocation("/meal-analysis");
     } catch (error) {
       console.error('Gallery selection error:', error);

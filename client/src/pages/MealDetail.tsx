@@ -1,1764 +1,970 @@
-import React from "react";
-import { useLocation, useParams } from "wouter";
-import { ChevronLeft, Trash2, Calendar, Clock, Layers, Apple, Activity, ChevronDown, ChevronUp, ArrowLeft, ArrowRight, X, Edit, Save, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { motion, AnimatePresence } from "framer-motion";
-import { useFoodLog } from "../hooks/use-food-log";
-import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { useState, useCallback, useMemo, useEffect } from "react";
-import useEmblaCarousel from 'embla-carousel-react';
-import { useTranslation } from "react-i18next";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { FoodComponent, FoodComponentDetails, Meal } from '../types/food';
-import { ComponentEditor } from '../components/ComponentEditor';
-import { useUser } from "@/hooks/use-user";
-import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'wouter';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ArrowLeft, 
+  Clock, 
+  Flame, 
+  Edit3, 
+  Save, 
+  X,
+  Plus,
+  Minus,
+  Check,
+  ChefHat,
+  Users,
+  AlertCircle,
+  Upload,
+  Trash2
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-// Format the serving size string according to requirements
-function formatServingSize(servingSize?: string, quantity?: number): string {
-  // If servingSize starts with "1 1/2 ", remove the leading "1 "
-  if (servingSize?.match(/^1\s+1\/2\s+/)) {
-    return servingSize.replace(/^1\s+/, '');
-  }
-  // If servingSize already starts with a number, use it as is
-  else if (servingSize?.match(/^\d+\s+/)) {
-    return servingSize;
-  } 
-  // Otherwise format with quantity and add plural if needed
-  else {
-    const qty = quantity || 1;
-    const base = servingSize?.replace(/^(one|1)\s+/i, '') || 'serving';
-    return `${qty} ${base}${qty > 1 ? 's' : ''}`;
-  }
+interface FoodComponent {
+  name: string;
+  quantity?: number;
+  unit?: string;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
 }
 
-const MealComponentView = ({ 
-  components,
-  emblaRef,
-  expandedComponent,
-  setExpandedComponent,
-  onDeleteComponent
-}: { 
-  components: FoodComponent[],
-  emblaRef: any,
-  expandedComponent: string | null,
-  setExpandedComponent: (name: string | null) => void,
-  onDeleteComponent: (index: number) => void
-}) => {
-  const { t } = useTranslation();
-  
-  // Create a local state to track which components should be visible
-  const [visibleComponents, setVisibleComponents] = useState<FoodComponent[]>(components);
-  
-  // Update visible components when the main components list changes
-  useEffect(() => {
-    setVisibleComponents(components);
-  }, [components]);
-  
-  // Handle component removal with animation - using local state for immediate UI feedback
-  const handleRemoveComponent = (index: number) => {
-    // First update local state to immediately remove the component from the UI
-    const filteredComponents = visibleComponents.filter((_, i) => i !== index);
-    setVisibleComponents(filteredComponents);
-    
-    // Then call the parent delete handler to update the backend
-    setTimeout(() => {
-      onDeleteComponent(index);
-    }, 100); // Short delay to allow animation to start
-  };
-  
-  // Force Embla to recalculate after component removal
-  useEffect(() => {
-    if (emblaRef.current) {
-      const api = emblaRef.current.parentElement?.__emblaApi;
-      if (api) {
-        setTimeout(() => {
-          api.reInit();
-        }, 300); // Delay to allow animation to complete
-      }
-    }
-  }, [visibleComponents.length, emblaRef]);
-  
-  // Also recalculate when main components list changes
-  useEffect(() => {
-    if (emblaRef.current && emblaRef.current.parentElement?.__emblaApi) {
-      setTimeout(() => {
-        emblaRef.current.parentElement.__emblaApi.reInit();
-      }, 100);
-    }
-  }, [components.length, emblaRef]);
-  
-  return (
-    <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex gap-4 -ml-4">
-          <AnimatePresence initial={false}>
-            {visibleComponents.map((component, index) => (
-              <motion.div
-                key={`${component.name}-${index}`}
-                className="min-w-[280px] pl-4 flex-shrink-0"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.85, opacity: 0, y: -20, height: 0, marginBottom: 0 }}
-                transition={{ 
-                  duration: 0.3,
-                  delay: index * 0.05,
-                  height: { delay: 0.1, duration: 0.2 }
-                }}
-                layout
-              >
-                <motion.div
-                  className="rounded-xl bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
-                  layout
-                >
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-[#0CC5BA]/10 flex items-center justify-center">
-                          <Apple className="h-5 w-5 text-[#0CC5BA]" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900">{component.name}</h4>
-                          <p className="text-sm text-gray-500">
-                            {formatServingSize(component.servingSize, component.quantity)}
-                          </p>
-                        </div>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0 rounded-full text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveComponent(index);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div 
-                      className="mb-2 cursor-pointer"
-                      onClick={() => setExpandedComponent(expandedComponent === component.name ? null : component.name)}
-                    >
-                      <div className="grid grid-cols-2 gap-2">
-                        {[
-                          { label: t("macros.calories", "Calories"), value: component.calories, unit: "kcal" },
-                          { label: t("macros.protein", "Protein"), value: component.protein, unit: "g" },
-                          { label: t("macros.carbs", "Carbs"), value: component.carbs, unit: "g" },
-                          { label: t("macros.fat", "Fat"), value: component.fat, unit: "g" }
-                        ].map((macro, i) => (
-                          <div key={i} className="bg-[#0CC5BA]/5 p-2 rounded-lg">
-                            <p className="text-xs text-gray-500">{macro.label}</p>
-                            <p className="font-medium text-[#0CC5BA]">
-                              {macro.value}{macro.unit}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {expandedComponent === component.name && component.details && (
-                      <div className="mt-4 pt-4 border-t border-[#0CC5BA]/10">
-                        <h5 className="text-sm font-medium text-gray-700 mb-2">{t("meal.additionalDetails", "Dodatkowe szczegóły")}</h5>
-                        <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                          {typeof component.details === 'object' && component.details && 'type' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.type", "Typ")}:</span> {String(component.details.type || '')}</div>
-                          )}
-                          {typeof component.details === 'object' && component.details && 'cookingMethod' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.cookingMethod", "Metoda gotowania")}:</span> {String(component.details.cookingMethod || '')}</div>
-                          )}
-                          {typeof component.details === 'object' && component.details && 'preparation' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.preparation", "Przygotowanie")}:</span> {String(component.details.preparation || '')}</div>
-                          )}
-                          {typeof component.details === 'object' && component.details && 'texture' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.texture", "Tekstura")}:</span> {String(component.details.texture || '')}</div>
-                          )}
-                          {typeof component.details === 'object' && component.details && 'temperature' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.temperature", "Temperatura")}:</span> {String(component.details.temperature || '')}</div>
-                          )}
-                          {typeof component.details === 'object' && component.details && 'estimatedWeight' in component.details && (
-                            <div><span className="text-gray-500">{t("meal.details.estimatedWeight", "Szacowana waga")}:</span> {String(component.details.estimatedWeight || '')}</div>
-                          )}
-                        </div>
-                        
-                        {typeof component.details === 'object' && component.details && 
-                        'seasonings' in component.details && 
-                        component.details.seasonings && 
-                        Array.isArray(component.details.seasonings) && 
-                        component.details.seasonings.length > 0 ? (
-                          <div className="mt-2">
-                            <span className="text-gray-500 text-xs">{t("meal.details.seasonings", "Przyprawy")}:</span> 
-                            <span className="text-xs text-gray-600"> {(component.details.seasonings as string[]).join(', ')}</span>
-                          </div>
-                        ) : null
-                        }
-                        
-                        {typeof component.details === 'object' && component.details && 
-                        'garnishes' in component.details && 
-                        component.details.garnishes && 
-                        Array.isArray(component.details.garnishes) && 
-                        component.details.garnishes.length > 0 ? (
-                          <div className="mt-1">
-                            <span className="text-gray-500 text-xs">{t("meal.details.garnishes", "Dekoracja")}:</span> 
-                            <span className="text-xs text-gray-600"> {(component.details.garnishes as string[]).join(', ')}</span>
-                          </div>
-                        ) : null
-                        }
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </div>
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white/80 to-transparent pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white/80 to-transparent pointer-events-none" />
-    </div>
-  );
-};
+interface MealData {
+  id: number;
+  name: string;
+  image?: string;
+  imageUrl?: string;
+  description?: string;
+  mealType?: string;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+  components?: FoodComponent[];
+  instructions?: string[];
+  date?: string;
+}
 
 export default function MealDetail() {
-  const { t } = useTranslation();
-  const [showFullImage, setShowFullImage] = useState(false);
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: 'start',
-    containScroll: 'trimSnaps',
-    dragFree: true
-  });
-
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const [location, setLocation] = useLocation();
+  const [location, navigate] = useLocation();
+  const mealId = location.split('/').pop();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const mealId = parseInt(location.split('/').pop() || '0');
-  const { user } = useUser(); // Get user profile for macro goals
-  const [expandedComponent, setExpandedComponent] = useState<string | null>(null);
-  // State to track expanded component details in the food details section
-  const [expandedDetails, setExpandedDetails] = useState<number[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // State for editing meal details
-  const [editingComponentIndex, setEditingComponentIndex] = useState<number | null>(null);
-  const [editingDetail, setEditingDetail] = useState<string | null>(null);
-  const [editedValue, setEditedValue] = useState<string>('');
-  const [editingSeasonings, setEditingSeasonings] = useState<boolean>(false);
-  const [seasoningsInput, setSeassoningsInput] = useState<string>('');
-  const [editingGarnishes, setEditingGarnishes] = useState<boolean>(false);
-  const [garnishesInput, setGarnishesInput] = useState<string>('');
+  const [meal, setMeal] = useState<MealData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
-  // Full component editing mode state
-  const [editingComponent, setEditingComponent] = useState<boolean>(false);
-  const [editedComponent, setEditedComponent] = useState<FoodComponent | null>(null);
+  // Editable fields
+  const [editedData, setEditedData] = useState({
+    name: '',
+    description: '',
+    imageUrl: '',
+    prepTime: 15,
+    cookTime: 30,
+    servings: 1,
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    components: [] as FoodComponent[],
+    instructions: [] as string[]
+  });
   
-  // Usunięto zmienną stanu editingMacro, aby uniknąć problemów z kolejnością hooków
-  
-  // Handle image upload
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    
-    const file = e.target.files[0];
-    
-    // Check file size (limit to 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: t("meal.imageTooLarge", "Zbyt duży rozmiar zdjęcia"),
-        description: t("meal.imageSizeLimit", "Maksymalny rozmiar zdjęcia to 5MB")
-      });
-      return;
-    }
-    
-    // Create FormData for upload
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('mealId', mealId.toString());
-    
+  const [servingMultiplier, setServingMultiplier] = useState(1);
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    fetchMealDetails();
+  }, [mealId]);
+
+  const fetchMealDetails = async () => {
     try {
-      const response = await fetch(`/api/food-logs/${mealId}/image`, {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
+      setLoading(true);
+      setError(null);
       
+      const response = await fetch(`/api/food-logs/${mealId}`, {
+        credentials: 'include'
+      });
+
       if (!response.ok) {
-        throw new Error(await response.text());
+        throw new Error('Failed to fetch meal details');
       }
+
+      const data = await response.json();
+      setMeal(data);
       
-      const result = await response.json();
-      
-      // Update meal with new image URL
-      if (meal) {
-        const updatedMeal = { ...meal, image: result.imageUrl };
-        updateMealMutation.mutate(updatedMeal);
-      }
-      
-      toast({
-        title: t("meal.imageUploadSuccess", "Sukces"),
-        description: t("meal.imageUploadedSuccessfully", "Zdjęcie posiłku zostało pomyślnie dodane")
+      // Initialize editable data
+      setEditedData({
+        name: data.name || '',
+        description: data.description || '',
+        imageUrl: data.image || data.imageUrl || '',
+        prepTime: data.prepTime || 15,
+        cookTime: data.cookTime || 30,
+        servings: data.servings || 1,
+        calories: data.calories || 0,
+        protein: data.protein || 0,
+        carbs: data.carbs || 0,
+        fat: data.fat || 0,
+        components: data.components || [],
+        instructions: data.instructions || []
       });
-      
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: t("meal.imageUploadError", "Błąd podczas przesyłania"),
-        description: error instanceof Error ? error.message : t("meal.imageUploadFailed", "Nie udało się przesłać zdjęcia")
-      });
+    } catch (err) {
+      console.error('Error fetching meal:', err);
+      setError('Failed to load meal details');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Use React Query to fetch the specific meal by ID
-  const { data: meal, isLoading: isMealLoading } = useQuery<Meal>({
-    queryKey: ["/api/food-logs", mealId],
-    queryFn: async () => {
-      console.log("[MealDetail] Fetching meal by ID:", mealId);
-      const response = await fetch(`/api/food-logs/${mealId}`, {
-        credentials: "include"
-      });
+  const handleSave = async () => {
+    if (!meal) return;
+    
+    try {
+      setIsSaving(true);
       
-      if (!response.ok) {
-        throw new Error(`Failed to fetch meal: ${await response.text()}`);
-      }
+      // Prepare update data
+      const updateData = {
+        name: editedData.name,
+        description: editedData.description,
+        image: editedData.imageUrl,
+        prepTime: editedData.prepTime,
+        cookTime: editedData.cookTime,
+        servings: editedData.servings,
+        calories: editedData.calories,
+        protein: editedData.protein,
+        carbs: editedData.carbs,
+        fat: editedData.fat,
+        components: editedData.components,
+        instructions: editedData.instructions
+      };
       
-      return response.json();
-    },
-    enabled: mealId > 0
-  });
-
-  // Pull-to-refresh functionality
-  const handleRefresh = usePullToRefresh([`/api/food-logs/${mealId}`]);
-
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
       const response = await fetch(`/api/food-logs/${mealId}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updateData)
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        throw new Error('Failed to update meal');
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/food-logs"] });
+
+      const updatedMeal = await response.json();
+      
+      // Keep our edited data as the source of truth
+      // Only update with API response if it provides valid values
+      const mergedData = {
+        name: editedData.name, // Always keep what user edited
+        description: editedData.description,
+        imageUrl: editedData.imageUrl,
+        prepTime: editedData.prepTime,
+        cookTime: editedData.cookTime,
+        servings: editedData.servings,
+        calories: editedData.calories,
+        protein: editedData.protein,
+        carbs: editedData.carbs,
+        fat: editedData.fat,
+        components: editedData.components,
+        instructions: editedData.instructions
+      };
+      
+      // Update meal with response data for any future fetches
+      setMeal({ ...updatedMeal, ...mergedData });
+      setEditedData(mergedData);
+      
+      setIsEditing(false);
+      toast({
+        title: "Success",
+        description: "Meal updated successfully!",
+      });
+    } catch (err) {
+      console.error('Error updating meal:', err);
+      toast({
+        title: "Error",
+        description: "Failed to update meal",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!meal) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      const response = await fetch(`/api/food-logs/${mealId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete meal');
+      }
+
       toast({
         title: "Success",
         description: "Meal deleted successfully",
       });
-      setLocation('/dashboard');
-    },
-    onError: (error) => {
+      
+      // Navigate back to dashboard
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error deleting meal:', err);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to delete meal",
+        description: "Failed to delete meal",
+        variant: "destructive",
       });
-    },
-  });
-  
-  // Mutation for updating meal components
-  const updateMealMutation = useMutation({
-    mutationFn: async (updatedMeal: Meal) => {
-      const response = await fetch(`/api/food-logs/${mealId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(updatedMeal),
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        throw new Error('Failed to upload image');
       }
+
+      const data = await response.json();
+      setEditedData(prev => ({ ...prev, imageUrl: data.url }));
       
-      return await response.json();
-    },
-    onSuccess: (data) => {
-      // Logowanie danych odpowiedzi dla debugowania
-      if (data) {
-        console.log("[MealDetail] Update successful with data:", data);
-      }
-      
-      // Invalidate query cache to force reload from server
-      queryClient.invalidateQueries({ queryKey: ["/api/food-logs"] });
-      
-      // Powiadamiamy użytkownika o sukcesie
       toast({
-        title: "Sukces",
-        description: "Wartości zostały zaktualizowane pomyślnie",
+        title: "Success",
+        description: "Image uploaded successfully!",
       });
-      
-      // Reset editing states
-      setEditingComponentIndex(null);
-      setEditingDetail(null);
-      setEditedValue('');
-      setEditingSeasonings(false);
-      setEditingGarnishes(false);
-      
-      // Usunięto resetowanie stanu editingMacro
-    },
-    onError: (error) => {
+    } catch (err) {
+      console.error('Error uploading image:', err);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update meal details",
+        description: "Failed to upload image",
+        variant: "destructive",
       });
     }
-  });
+  };
 
-  function getMealTime(date: Date): string {
-    const hour = date.getHours();
-    if (hour < 10) return t("meal.types.breakfast", "Śniadanie");
-    if (hour < 14) return t("meal.types.lunch", "Obiad");
-    if (hour < 18) return t("meal.types.snack", "Przekąska");
-    return t("meal.types.dinner", "Kolacja");
-  }
+  const addIngredient = () => {
+    setEditedData(prev => ({
+      ...prev,
+      components: [...prev.components, { name: '', quantity: 0, unit: '' }]
+    }));
+  };
 
-  if (isMealLoading) {
+  const updateIngredient = (index: number, field: keyof FoodComponent, value: any) => {
+    setEditedData(prev => ({
+      ...prev,
+      components: prev.components.map((comp, i) => 
+        i === index ? { ...comp, [field]: value } : comp
+      )
+    }));
+  };
+
+  const removeIngredient = (index: number) => {
+    setEditedData(prev => ({
+      ...prev,
+      components: prev.components.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addInstruction = () => {
+    setEditedData(prev => ({
+      ...prev,
+      instructions: [...prev.instructions, '']
+    }));
+  };
+
+  const updateInstruction = (index: number, value: string) => {
+    setEditedData(prev => ({
+      ...prev,
+      instructions: prev.instructions.map((inst, i) => 
+        i === index ? value : inst
+      )
+    }));
+  };
+
+  const removeInstruction = (index: number) => {
+    setEditedData(prev => ({
+      ...prev,
+      instructions: prev.instructions.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleIngredientToggle = (index: number) => {
+    const newChecked = new Set(checkedIngredients);
+    if (newChecked.has(index)) {
+      newChecked.delete(index);
+    } else {
+      newChecked.add(index);
+    }
+    setCheckedIngredients(newChecked);
+  };
+
+  const handleStepToggle = (index: number) => {
+    const newCompleted = new Set(completedSteps);
+    if (newCompleted.has(index)) {
+      newCompleted.delete(index);
+    } else {
+      newCompleted.add(index);
+    }
+    setCompletedSteps(newCompleted);
+  };
+
+  const adjustedNutrition = (value: number | undefined) => {
+    if (!value) return 0;
+    return Math.round(value * servingMultiplier);
+  };
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0CC5BA]"></div>
-          <p className="text-gray-500">Loading meal details...</p>
+      <div className="min-h-screen gradient-bg">
+        <div className="max-w-7xl mx-auto">
+          <div className="w-full h-[50vh] bg-gray-200 animate-pulse" />
+          <div className="px-4 py-8">
+            <div className="h-8 w-64 bg-gray-200 rounded mb-4 animate-pulse" />
+            <div className="h-4 w-full bg-gray-200 rounded mb-2 animate-pulse" />
+            <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+            <div className="grid grid-cols-4 gap-4 mt-8">
+              <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+              <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+              <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+              <div className="h-24 bg-gray-200 rounded-xl animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (!meal) {
+  if (error || !meal) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5">
-        <p className="text-gray-500">Meal not found</p>
+      <div className="min-h-screen gradient-bg flex items-center justify-center">
+        <div className="text-center px-4">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Meal</h2>
+          <p className="text-gray-600 mb-6">{error || 'Something went wrong'}</p>
+          <div className="space-y-2">
+            <button
+              onClick={fetchMealDetails}
+              className="px-6 py-3 bg-[#26A8FF] text-white rounded-lg hover:bg-[#1A8FE6] transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => window.history.back()}
+              className="block w-full px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const parseComponents = (mealData: Meal): FoodComponent[] => {
-    // Primero verificamos si ya hay componentes definidos
-    if (mealData.components && Array.isArray(mealData.components)) {
-      console.log('[MealDetail] Using existing components:', mealData.components.length);
-      return mealData.components.map(comp => ({
-        name: comp.name,
-        calories: typeof comp.calories === 'number' ? comp.calories : parseFloat(comp.calories as string),
-        protein: typeof comp.protein === 'number' ? comp.protein : parseFloat(comp.protein as string),
-        carbs: typeof comp.carbs === 'number' ? comp.carbs : parseFloat(comp.carbs as string),
-        fat: typeof comp.fat === 'number' ? comp.fat : parseFloat(comp.fat as string),
-        servingSize: comp.servingSize || '1 serving',
-        quantity: comp.quantity || 1,
-        details: comp.details || undefined
-      }));
-    }
-
-    console.log('[MealDetail] No components found, parsing from meal name');
-    
-    // Si no hay componentes, intentamos extraerlos del nombre de la comida
-    const components = mealData.name.split(',')
-      .filter((item: string) => item.trim())
-      .map((item: string) => item.trim());
-
-    // Si ni siquiera hay comas en el nombre, usamos el nombre completo como un componente
-    if (components.length === 0) {
-      const totalMacros = {
-        calories: typeof mealData.calories === 'number' ? mealData.calories : parseFloat(mealData.calories as string),
-        protein: typeof mealData.protein === 'number' ? mealData.protein : parseFloat(mealData.protein as string),
-        carbs: typeof mealData.carbs === 'number' ? mealData.carbs : parseFloat(mealData.carbs as string),
-        fat: typeof mealData.fat === 'number' ? mealData.fat : parseFloat(mealData.fat as string)
-      };
-      
-      return [{
-        name: mealData.name.trim(),
-        calories: totalMacros.calories,
-        protein: totalMacros.protein,
-        carbs: totalMacros.carbs,
-        fat: totalMacros.fat,
-        quantity: 1,
-        servingSize: '1 serving'
-      }];
-    }
-
-    const componentCount = components.length;
-    const totalMacros = {
-      calories: typeof mealData.calories === 'number' ? mealData.calories : parseFloat(mealData.calories as string),
-      protein: typeof mealData.protein === 'number' ? mealData.protein : parseFloat(mealData.protein as string),
-      carbs: typeof mealData.carbs === 'number' ? mealData.carbs : parseFloat(mealData.carbs as string),
-      fat: typeof mealData.fat === 'number' ? mealData.fat : parseFloat(mealData.fat as string)
-    };
-
-    const perComponentMacros = {
-      calories: totalMacros.calories / componentCount,
-      protein: totalMacros.protein / componentCount,
-      carbs: totalMacros.carbs / componentCount,
-      fat: totalMacros.fat / componentCount
-    };
-
-    return components.map((component: string) => {
-      const quantityMatch = component.match(/^(\d+)\s+/);
-      const quantity = quantityMatch ? parseInt(quantityMatch[1]) : 1;
-      const name = quantityMatch
-        ? component.slice(quantityMatch[0].length)
-        : component;
-
-      return {
-        name: name.trim(),
-        calories: Math.round(perComponentMacros.calories),
-        protein: parseFloat((perComponentMacros.protein).toFixed(1)),
-        carbs: parseFloat((perComponentMacros.carbs).toFixed(1)),
-        fat: parseFloat((perComponentMacros.fat).toFixed(1)),
-        quantity,
-        servingSize: '1 serving'
-      };
-    });
-  };
-
-  // Zamiast używać useMemo, co powoduje problemy z kolejnością hooków,
-  // używamy zwykłej zmiennej, która jest tworzona tylko gdy meal istnieje
-  let mainComponents: FoodComponent[] = [];
-  if (meal) {
-    mainComponents = parseComponents(meal);
-  }
-
-  // Helper function to toggle expanded state for food component details
-  const toggleExpandedDetails = (index: number) => {
-    setExpandedDetails(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(i => i !== index);
-      } else {
-        return [...prev, index];
-      }
-    });
-  };
-  
-  // Function to start full component editing mode
-  const startEditingComponent = (componentIndex: number) => {
-    setEditingComponentIndex(componentIndex);
-    setEditingComponent(true);
-    setEditedComponent(JSON.parse(JSON.stringify(mainComponents[componentIndex]))); // Deep copy
-    // Reset other editing states
-    setEditingDetail(null);
-    setEditedValue('');
-    setEditingSeasonings(false);
-    setEditingGarnishes(false);
-  };
-
-  // Function to start editing a specific component detail
-  const startEditing = (componentIndex: number, detailKey: string, initialValue: string) => {
-    setEditingComponentIndex(componentIndex);
-    setEditingDetail(detailKey);
-    setEditedValue(initialValue || '');
-    setEditingSeasonings(false);
-    setEditingGarnishes(false);
-  };
-  
-  // Function to start editing seasonings
-  const startEditingSeasonings = (componentIndex: number) => {
-    const component = mainComponents[componentIndex];
-    if (!component?.details?.seasonings) return;
-    
-    setEditingComponentIndex(componentIndex);
-    setEditingSeasonings(true);
-    setSeassoningsInput(component.details.seasonings.join(', '));
-    setEditingGarnishes(false);
-    setEditingDetail(null);
-  };
-  
-  // Function to start editing garnishes
-  const startEditingGarnishes = (componentIndex: number) => {
-    const component = mainComponents[componentIndex];
-    if (!component?.details?.garnishes) return;
-    
-    setEditingComponentIndex(componentIndex);
-    setEditingGarnishes(true);
-    setGarnishesInput(component.details.garnishes.join(', '));
-    setEditingSeasonings(false);
-    setEditingDetail(null);
-  };
-  
-  // Function to save the edited value
-  const saveEditedDetail = () => {
-    if (editingComponentIndex === null) return;
-    
-    const newComponents = [...mainComponents];
-    const component = { ...newComponents[editingComponentIndex] };
-    
-    if (!component.details) {
-      component.details = {};
-    }
-    
-    // Create a copy of details to avoid mutating the original
-    component.details = { ...component.details };
-    
-    if (editingDetail) {
-      component.details[editingDetail] = editedValue;
-    } else if (editingSeasonings) {
-      component.details.seasonings = seasoningsInput
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-    } else if (editingGarnishes) {
-      component.details.garnishes = garnishesInput
-        .split(',')
-        .map(s => s.trim())
-        .filter(s => s.length > 0);
-    }
-    
-    newComponents[editingComponentIndex] = component;
-    
-    const updatedMeal = {
-      ...meal,
-      components: newComponents
-    };
-    
-    updateMealMutation.mutate(updatedMeal);
-  };
-  
-  // Function to save edited component (from ComponentEditor)
-  const saveEditedComponent = (updatedComponent: FoodComponent) => {
-    if (editingComponentIndex === null) return;
-    
-    const newComponents = [...mainComponents];
-    newComponents[editingComponentIndex] = updatedComponent;
-    
-    const updatedMeal = {
-      ...meal,
-      components: newComponents
-    };
-    
-    updateMealMutation.mutate(updatedMeal);
-    
-    // Reset editing state
-    setEditingComponent(false);
-    setEditingComponentIndex(null);
-    setEditedComponent(null);
-  };
-  
-  // Function to cancel component editing
-  const cancelEditingComponent = () => {
-    setEditingComponent(false);
-    setEditingComponentIndex(null);
-    setEditedComponent(null);
-  };
-  
-  // Function to cancel editing
-  const cancelEditing = () => {
-    setEditingComponentIndex(null);
-    setEditingDetail(null);
-    setEditedValue('');
-    setEditingSeasonings(false);
-    setEditingGarnishes(false);
-  };
-  
-  // Removed the macro editing function
-
-  // We're not using this state anymore since we're using local state in MealComponentView
-
-  // Function to handle component deletion with immediate visual feedback
-  const handleDeleteComponent = (indexToDelete: number) => {
-    if (!meal) return;
-    
-    // Make a copy of components
-    const newComponents = [...mainComponents];
-    
-    // If we're left with only one component, don't proceed
-    if (newComponents.length <= 1) {
-      toast({
-        variant: "destructive",
-        title: t("meal.components.deleteError", "Błąd usuwania"),
-        description: t("meal.components.cannotDeleteLast", "Nie można usunąć ostatniego składnika posiłku")
-      });
-      return;
-    }
-    
-    // Create a copy to avoid mutating the original array directly
-    const componentsAfterDeletion = [...newComponents];
-    
-    // Remove the component at the specified index
-    componentsAfterDeletion.splice(indexToDelete, 1);
-    
-    // Calculate new total macros based on remaining components
-    const newTotalCalories = componentsAfterDeletion.reduce((sum, comp) => sum + (comp.calories || 0), 0);
-    const newTotalProtein = componentsAfterDeletion.reduce((sum, comp) => sum + (comp.protein || 0), 0);
-    const newTotalCarbs = componentsAfterDeletion.reduce((sum, comp) => sum + (comp.carbs || 0), 0);
-    const newTotalFat = componentsAfterDeletion.reduce((sum, comp) => sum + (comp.fat || 0), 0);
-    
-    // Update the meal with new components and adjusted macros
-    const updatedMeal = {
-      ...meal,
-      components: componentsAfterDeletion,
-      calories: newTotalCalories,
-      protein: newTotalProtein,
-      carbs: newTotalCarbs,
-      fat: newTotalFat
-    };
-    
-    // Immediately update the UI to reflect the deletion
-    queryClient.setQueryData(["/api/food-logs"], (oldData: any) => {
-      if (!oldData || !oldData.logs) return oldData;
-      
-      return {
-        ...oldData,
-        logs: oldData.logs.map((log: any) => 
-          log.id === meal.id ? updatedMeal : log
-        )
-      };
-    });
-    
-    // Send the update to the server
-    updateMealMutation.mutate(updatedMeal, {
-      onError: () => {
-        toast({
-          variant: "destructive",
-          title: t("meal.components.deleteError", "Błąd usuwania"),
-          description: t("meal.components.failedToDelete", "Nie udało się usunąć składnika")
-        });
-        // Revert optimistic update on error
-        queryClient.invalidateQueries({ queryKey: ["/api/food-logs"] });
-      }
-    });
-  };
-  
-  // Calcular los totales basados en los componentes o usar los valores del meal directamente
-  const calculateTotalMacros = () => {
-    if (!meal) return { calories: 0, protein: 0, carbs: 0, fat: 0 };
-    
-    // Si hay componentes, calculamos los totales sumando cada componente
-    if (mainComponents.length > 0) {
-      const totals = mainComponents.reduce((acc, component) => {
-        return {
-          calories: acc.calories + (typeof component.calories === 'number' ? component.calories : 0),
-          protein: acc.protein + (typeof component.protein === 'number' ? component.protein : 0),
-          carbs: acc.carbs + (typeof component.carbs === 'number' ? component.carbs : 0),
-          fat: acc.fat + (typeof component.fat === 'number' ? component.fat : 0),
-        };
-      }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
-      
-      return {
-        calories: Math.round(totals.calories),
-        protein: Number(totals.protein.toFixed(1)),
-        carbs: Number(totals.carbs.toFixed(1)),
-        fat: Number(totals.fat.toFixed(1))
-      };
-    }
-    
-    // Si no hay componentes, usamos los valores del meal
-    return {
-      calories: typeof meal.calories === 'number' ? meal.calories : parseFloat(meal.calories as string),
-      protein: typeof meal.protein === 'number' ? meal.protein : parseFloat(meal.protein as string),
-      carbs: typeof meal.carbs === 'number' ? meal.carbs : parseFloat(meal.carbs as string),
-      fat: typeof meal.fat === 'number' ? meal.fat : parseFloat(meal.fat as string)
-    };
-  };
-  
-  const totalMacros = calculateTotalMacros();
-  
-  // Get profile macro goals or default values
-  const calorieGoal = user?.profile?.goals?.calories || 2000;
-  const proteinGoal = user?.profile?.goals?.protein || 150;
-  const carbsGoal = user?.profile?.goals?.carbs || 200;
-  const fatGoal = user?.profile?.goals?.fat || 67;
-
-  // Calculate percentage of daily goals
-  const caloriePercentage = Math.round((totalMacros.calories / calorieGoal) * 100);
-  const proteinPercentage = Math.round((totalMacros.protein / proteinGoal) * 100);
-  const carbsPercentage = Math.round((totalMacros.carbs / carbsGoal) * 100);
-  const fatPercentage = Math.round((totalMacros.fat / fatGoal) * 100);
-
-  const macroDetails = [
-    {
-      name: t("macros.totalCalories", "Kalorie łącznie"),
-      value: totalMacros.calories,
-      unit: "kcal",
-      breakdown: [
-        `${t("macros.protein", "Białko")}: ${totalMacros.protein}g`,
-        `${t("macros.carbs", "Węglowodany")}: ${totalMacros.carbs}g`,
-        `${t("macros.fat", "Tłuszcz")}: ${totalMacros.fat}g`,
-        `${t("macros.dailyGoal", "Cel dzienny")}: ${caloriePercentage}% (${calorieGoal} kcal)`
-      ]
-    },
-    {
-      name: t("macros.totalFat", "Tłuszcz łącznie"),
-      value: totalMacros.fat,
-      unit: "g",
-      breakdown: [
-        `${t("macros.saturatedFat", "Tłuszcze nasycone")}: ${(totalMacros.fat * 0.3).toFixed(1)}g`,
-        `${t("macros.unsaturatedFat", "Tłuszcze nienasycone")}: ${(totalMacros.fat * 0.7).toFixed(1)}g`,
-        `${t("macros.dailyGoal", "Cel dzienny")}: ${fatPercentage}% (${fatGoal}g)`
-      ]
-    },
-    {
-      name: t("macros.totalCarbs", "Węglowodany łącznie"),
-      value: totalMacros.carbs,
-      unit: "g",
-      breakdown: [
-        `${t("macros.fiber", "Błonnik")}: ${(totalMacros.carbs * 0.1).toFixed(1)}g`,
-        `${t("macros.sugar", "Cukier")}: ${(totalMacros.carbs * 0.2).toFixed(1)}g`,
-        `${t("macros.dailyGoal", "Cel dzienny")}: ${carbsPercentage}% (${carbsGoal}g)`
-      ]
-    },
-    {
-      name: t("macros.protein", "Białko"),
-      value: totalMacros.protein,
-      unit: "g",
-      breakdown: [
-        `${t("macros.essentialAminoAcids", "Niezbędne aminokwasy")}: ${Math.round(totalMacros.protein * 0.4)}%`,
-        `${t("macros.bcaa", "BCAA")}: ${(totalMacros.protein * 0.2).toFixed(1)}g`,
-        `${t("macros.dailyGoal", "Cel dzienny")}: ${proteinPercentage}% (${proteinGoal}g)`
-      ]
-    }
-  ];
-
-
-
+  const mealImage = editedData.imageUrl || meal.image || meal.imageUrl;
+  const displayData = editedData;
 
   return (
-    <AnimatePresence>
-      {showFullImage && meal?.image && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-lg flex items-center justify-center"
-          onClick={() => setShowFullImage(false)}
-        >
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.9 }}
-            className="relative max-w-[90vw] max-h-[90vh]"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute -top-12 right-0 text-white hover:bg-white/20"
-              onClick={() => setShowFullImage(false)}
-            >
-              <X className="h-6 w-6" />
-            </Button>
-            <img
-              src={meal.image}
-              alt={meal.name}
-              className="w-full h-full object-contain rounded-lg"
+    <div className="min-h-screen gradient-bg pb-20">
+      {/* Hero Image Section */}
+      <div className="relative h-[50vh] md:h-[60vh] bg-gradient-to-b from-gray-200 to-gray-300">
+        {mealImage ? (
+          <img 
+            src={mealImage} 
+            alt={displayData.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <ChefHat className="w-24 h-24 text-gray-400" />
+          </div>
+        )}
+        
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        
+        {/* Image Upload Button (Edit Mode) */}
+        {isEditing && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
             />
-          </motion.div>
-        </motion.div>
-      )}
-
-      <motion.div
-        className="fixed inset-0 bg-gradient-to-br from-[#0CC5BA]/5 to-blue-500/5 backdrop-blur-md z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.div
-          className="fixed inset-y-0 right-0 w-full sm:w-[600px] bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-xl shadow-2xl overflow-y-auto"
-          initial={{ x: "100%" }}
-          animate={{ x: 0 }}
-          exit={{ x: "100%" }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-4 bg-black/50 backdrop-blur-sm rounded-full shadow-lg hover:bg-black/70 transition-all"
+            >
+              <Upload className="w-8 h-8 text-white" />
+            </button>
+          </>
+        )}
+        
+        <button
+          onClick={() => window.history.back()}
+          className="absolute top-4 left-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
         >
-          <div className="sticky top-0 z-50 px-4 py-3 flex justify-between items-center border-b border-white/20 backdrop-blur-xl bg-white/60">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-100/50"
-              onClick={() => setLocation('/dashboard')}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this meal?')) {
-                  deleteMutation.mutate();
-                }
-              }}
-            >
-              <Trash2 className="h-5 w-5" />
-            </Button>
-          </div>
-
-          <div className="w-full px-6 lg:px-12 py-6 space-y-6">
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card className="overflow-hidden rounded-3xl border-0 shadow-xl bg-gradient-to-br from-white/90 to-white/70">
-                <div className="relative">
-                  {meal.image ? (
-                    <div className="relative aspect-video w-full overflow-hidden rounded-t-3xl group">
-                      <img
-                        src={meal.image}
-                        alt={meal.name}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
-                        onClick={() => setShowFullImage(true)}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      
-                      {/* Change photo button overlay */}
-                      <div 
-                        className="absolute top-3 right-3 h-10 w-10 bg-white/80 backdrop-blur-sm rounded-full 
-                                  flex items-center justify-center cursor-pointer shadow-md hover:bg-white 
-                                  hover:scale-105 transition-all duration-200 z-10"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          document.getElementById('meal-image-upload')?.click();
-                        }}
-                      >
-                        <input
-                          id="meal-image-upload"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleImageUpload}
-                        />
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#0CC5BA]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                      </div>
-                    </div>
-                  ) : (
-                    <div 
-                      className="h-32 bg-gradient-to-br from-[#0CC5BA]/20 to-blue-500/20 flex items-center justify-center cursor-pointer relative"
-                      onClick={() => document.getElementById('meal-image-upload')?.click()}
-                    >
-                      <input
-                        id="meal-image-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
-                      <div className="flex flex-col items-center">
-                        <div className="h-12 w-12 rounded-full bg-white/80 flex items-center justify-center mb-2">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#0CC5BA]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        </div>
-                        <p className="text-sm text-[#0CC5BA] font-medium">{t("meal.addPhoto", "Dodaj zdjęcie")}</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="p-6">
-                    <motion.h1
-                      className="text-3xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent mb-4"
-                    >
-                      {meal.name}
-                    </motion.h1>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Clock className="h-4 w-4" />
-                        <span>{getMealTime(new Date(meal.date))}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        <span>{format(new Date(meal.date), 'MMM d, yyyy')}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="space-y-6"
-            >
-              <Card className="p-6 rounded-3xl border-0 shadow-lg bg-gradient-to-br from-white/90 to-white/70">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <Layers className="h-5 w-5 text-[#0CC5BA]" />
-                    <h3 className="text-xl font-semibold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                      {t("meal.components", "Składniki posiłku")}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={scrollPrev}
-                      className="h-8 w-8 rounded-full hover:bg-[#0CC5BA]/10"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={scrollNext}
-                      className="h-8 w-8 rounded-full hover:bg-[#0CC5BA]/10"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                <MealComponentView 
-                  components={mainComponents}
-                  emblaRef={emblaRef}
-                  expandedComponent={expandedComponent}
-                  setExpandedComponent={setExpandedComponent}
-                  onDeleteComponent={handleDeleteComponent}
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </button>
+        
+        {!isEditing && (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="absolute top-4 left-16 p-3 bg-red-500/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-600 transition-all"
+          >
+            <Trash2 className="w-5 h-5 text-white" />
+          </button>
+        )}
+        
+        {isEditing && (
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              // Reset to original meal data
+              if (meal) {
+                setEditedData({
+                  name: meal.name || '',
+                  description: meal.description || '',
+                  imageUrl: meal.image || meal.imageUrl || '',
+                  prepTime: meal.prepTime || 15,
+                  cookTime: meal.cookTime || 30,
+                  servings: meal.servings || 1,
+                  calories: meal.calories || 0,
+                  protein: meal.protein || 0,
+                  carbs: meal.carbs || 0,
+                  fat: meal.fat || 0,
+                  components: meal.components || [],
+                  instructions: meal.instructions || []
+                });
+              }
+            }}
+            className="absolute top-4 right-16 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
+          >
+            <X className="w-5 h-5 text-gray-700" />
+          </button>
+        )}
+        <button
+          onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+          disabled={isSaving}
+          className="absolute top-4 right-4 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all flex items-center gap-2 disabled:opacity-50"
+        >
+          {isSaving ? (
+            <>
+              <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm font-medium">Saving...</span>
+            </>
+          ) : isEditing ? (
+            <>
+              <Save className="w-4 h-4" />
+              <span className="text-sm font-medium">Save</span>
+            </>
+          ) : (
+            <>
+              <Edit3 className="w-4 h-4" />
+              <span className="text-sm font-medium">Edit</span>
+            </>
+          )}
+        </button>
+        
+        {/* Title Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="max-w-7xl mx-auto">
+            {isEditing ? (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={editedData.name}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, name: e.target.value }))}
+                  className="text-3xl md:text-4xl font-bold text-white bg-transparent border-b-2 border-white/50 pb-2 w-full focus:outline-none focus:border-white"
+                  placeholder="Meal name..."
                 />
-              </Card>
-
-              <Card className="p-6 rounded-3xl border-0 shadow-lg bg-gradient-to-br from-white/90 to-white/70">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <Activity className="h-5 w-5 text-[#0CC5BA]" />
-                    <h3 className="text-xl font-semibold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                      {t("meal.nutritionOverview", "Przegląd wartości odżywczych")}
-                    </h3>
-                  </div>
-                  
-                  {/* Removed macro editing button as requested */}
-                </div>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {macroDetails.map((macro, index) => (
-                      <motion.div
-                        key={macro.name}
-                        initial={{ scale: 0.95, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: index * 0.1 }}
-                        className="p-4 rounded-xl bg-gradient-to-br from-[#0CC5BA]/5 to-[#0CC5BA]/10"
-                      >
-                        <h4 className="text-sm text-gray-600 mb-1">{macro.name}</h4>
-                        <p className="text-2xl font-bold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                          {macro.value}{macro.unit}
-                        </p>
-                        <div className="mt-2 space-y-1">
-                          {macro.breakdown.map((detail, i) => (
-                            <p key={i} className="text-xs text-gray-500">{detail}</p>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-              </Card>
-
-              {/* Enhanced Food Details Section */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="p-6 rounded-3xl border-0 shadow-lg bg-gradient-to-br from-white/90 to-white/70 overflow-hidden">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center shadow-md">
-                      <Layers className="h-5 w-5 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                      {t("meal.foodDetails", "Szczegóły potrawy")}
-                    </h3>
-                  </div>
-                  
-                  {mainComponents.filter(component => component.details).map((component, index) => (
-                    <motion.div 
-                      key={index} 
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.15 }}
-                      className="mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-white to-[#F5FCFB] border border-[#0CC5BA]/20 shadow-lg"
-                    >
-                      <div 
-                        className="bg-gradient-to-r from-[#0CC5BA] to-[#0CC5BA]/90 px-5 py-3.5 border-b border-[#0CC5BA]/10 relative overflow-hidden cursor-pointer"
-                        onClick={() => toggleExpandedDetails(index)}
-                      >
-                        <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-white/10"></div>
-                        <div className="absolute right-12 bottom-0 w-12 h-12 rounded-full bg-white/10"></div>
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-xl text-white">{component.name}</h4>
-                          <div className="flex items-center gap-2 text-white">
-                            {expandedDetails.includes(index) && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  startEditingComponent(index);
-                                }}
-                              >
-                                <Edit className="h-3.5 w-3.5" />
-                              </Button>
-                            )}
-                            {expandedDetails.includes(index) ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Component Editor - full editing mode */}
-                      {expandedDetails.includes(index) && editingComponent && editingComponentIndex === index && editedComponent && (
-                        <div className="p-5">
-                          <ComponentEditor 
-                            component={editedComponent} 
-                            onSave={saveEditedComponent}
-                            onCancel={cancelEditingComponent}
-                          />
-                        </div>
-                      )}
-                      
-                      {/* Regular component details view */}
-                      {expandedDetails.includes(index) && component.details && !editingComponent && (
-                        <div className="p-5">
-                          {/* Basic Info */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            {/* Left column */}
-                            <div className="space-y-4">
-                              <h5 className="text-sm font-semibold text-[#0CC5BA] uppercase tracking-wider mb-3 flex items-center">
-                                <div className="w-1 h-4 bg-[#0CC5BA] rounded-full mr-2"></div>
-                                {t("meal.details.basicProperties", "Podstawowe właściwości")}
-                              </h5>
-                              
-                              {'type' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#0CC5BA]/10">
-                                    <Activity className="h-4 w-4 text-[#0CC5BA]" />
-                                  </div>
-                                  <div className="flex-grow">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.type", "Typ")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'type' ? (
-                                      <div className="flex items-center gap-2">
-                                        <Input 
-                                          className="h-8 text-sm"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100" 
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <div className="flex justify-between items-center">
-                                        <div className="text-sm text-gray-800 font-medium">{String(component.details.type || '')}</div>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                          onClick={() => startEditing(index, 'type', String(component.details?.type || ''))}
-                                        >
-                                          <Edit className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'preparation' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
-                                    <Clock className="h-4 w-4 text-blue-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.preparation", "Przygotowanie")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'preparation' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz sposób przygotowania"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details.preparation || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'preparation' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'preparation', String(component.details?.preparation || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'texture' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-purple-50">
-                                    <Activity className="h-4 w-4 text-purple-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.texture", "Tekstura")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'texture' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz teksturę"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details.texture || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'texture' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'texture', String(component.details?.texture || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'estimatedWeight' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-amber-50">
-                                    <Activity className="h-4 w-4 text-amber-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.weight", "Waga")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'estimatedWeight' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz wagę"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details?.estimatedWeight || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'estimatedWeight' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'estimatedWeight', String(component.details?.estimatedWeight || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                            
-                            {/* Right column */}
-                            <div className="space-y-4">
-                              <h5 className="text-sm font-semibold text-[#0CC5BA] uppercase tracking-wider mb-3 flex items-center">
-                                <div className="w-1 h-4 bg-[#0CC5BA] rounded-full mr-2"></div>
-                                {t("meal.details.cookingDetails", "Szczegóły przygotowania")}
-                              </h5>
-                              
-                              {'cookingMethod' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-orange-50">
-                                    <Activity className="h-4 w-4 text-orange-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.cookingMethod", "Metoda gotowania")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'cookingMethod' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz metodę gotowania"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details?.cookingMethod || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'cookingMethod' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'cookingMethod', String(component.details?.cookingMethod || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'doneness' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-red-50">
-                                    <Activity className="h-4 w-4 text-red-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.doneness", "Stopień wypieczenia")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'doneness' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz stopień wypieczenia"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details?.doneness || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'doneness' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'doneness', String(component.details?.doneness || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'temperature' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-50">
-                                    <Activity className="h-4 w-4 text-blue-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.temperature", "Temperatura")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'temperature' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz temperaturę"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details?.temperature || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'temperature' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'temperature', String(component.details?.temperature || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                              
-                              {'color' in component.details && (
-                                <div className="flex items-center gap-3 p-2.5 rounded-lg bg-white shadow-sm border border-gray-100">
-                                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-50">
-                                    <Activity className="h-4 w-4 text-indigo-500" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-xs text-gray-500 font-medium">{t("meal.details.color", "Kolor")}</div>
-                                    {editingComponentIndex === index && editingDetail === 'color' ? (
-                                      <div className="mt-1">
-                                        <Input 
-                                          className="text-sm"
-                                          placeholder="Wpisz kolor"
-                                          value={editedValue}
-                                          onChange={(e) => setEditedValue(e.target.value)}
-                                        />
-                                      </div>
-                                    ) : (
-                                      <div className="text-sm text-gray-800 font-medium">{String(component.details?.color || '')}</div>
-                                    )}
-                                  </div>
-                                  <div>
-                                    {editingComponentIndex === index && editingDetail === 'color' ? (
-                                      <div className="flex gap-2">
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon" 
-                                          className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                          onClick={saveEditedDetail}
-                                        >
-                                          <Check className="h-3 w-3" />
-                                        </Button>
-                                        <Button 
-                                          variant="ghost" 
-                                          size="icon"
-                                          className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                          onClick={cancelEditing}
-                                        >
-                                          <X className="h-3 w-3" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                        onClick={() => startEditing(index, 'color', String(component.details?.color || ''))}
-                                      >
-                                        <Edit className="h-3 w-3" />
-                                      </Button>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Presentation details */}
-                          {'presentation' in component.details && (
-                            <div className="bg-gradient-to-r from-[#0CC5BA]/5 to-transparent p-4 rounded-xl mt-4 border border-[#0CC5BA]/10">
-                              <div className="flex justify-between items-center mb-2">
-                                <h5 className="text-sm font-semibold text-[#0CC5BA] flex items-center gap-2">
-                                  <Activity className="h-4 w-4" />
-                                  {t("meal.details.presentation", "Prezentacja")}
-                                </h5>
-                                
-                                {editingComponentIndex === index && editingDetail === 'presentation' ? (
-                                  <div className="flex gap-2">
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                      onClick={saveEditedDetail}
-                                    >
-                                      <Check className="h-3 w-3" />
-                                    </Button>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon"
-                                      className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                      onClick={cancelEditing}
-                                    >
-                                      <X className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                    onClick={() => startEditing(index, 'presentation', String(component.details?.presentation || ''))}
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                )}
-                              </div>
-                              
-                              {editingComponentIndex === index && editingDetail === 'presentation' ? (
-                                <div className="mt-2">
-                                  <Textarea 
-                                    className="text-sm min-h-[80px]"
-                                    placeholder="Opisz sposób prezentacji potrawy"
-                                    value={editedValue}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditedValue(e.target.value)}
-                                  />
-                                </div>
-                              ) : (
-                                <p className="text-sm text-gray-700 italic">{String(component.details?.presentation || '')}</p>
-                              )}
-                            </div>
-                          )}
-                          
-                          {/* Seasonings & Garnishes */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                            {/* Seasonings */}
-                            {component.details.seasonings && 
-                             Array.isArray(component.details.seasonings) && 
-                             (component.details.seasonings.length > 0 || editingComponentIndex === index && editingSeasonings) && (
-                              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                <div className="flex justify-between items-center mb-3">
-                                  <h5 className="text-sm font-semibold text-[#0CC5BA] flex items-center gap-2">
-                                    <Activity className="h-4 w-4" />
-                                    {t("meal.details.seasonings", "Przyprawy")}
-                                  </h5>
-                                  
-                                  {editingComponentIndex === index && editingSeasonings ? (
-                                    <div className="flex gap-2">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                        onClick={saveEditedDetail}
-                                      >
-                                        <Check className="h-3 w-3" />
-                                      </Button>
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon"
-                                        className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                        onClick={cancelEditing}
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                      onClick={() => startEditingSeasonings(index)}
-                                    >
-                                      <Edit className="h-3 w-3" />
-                                    </Button>
-                                  )}
-                                </div>
-                                
-                                {editingComponentIndex === index && editingSeasonings ? (
-                                  <div className="mt-2">
-                                    <Input 
-                                      className="text-sm"
-                                      placeholder="Przyprawy oddzielone przecinkami, np. sól, pieprz, bazylia"
-                                      value={seasoningsInput}
-                                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSeassoningsInput(e.target.value)}
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">{t("meal.details.seasoningsHint", "Wpisz przyprawy oddzielone przecinkami")}</p>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-wrap gap-2">
-                                    {component.details.seasonings.map((seasoning, idx) => (
-                                      <span key={idx} className="inline-flex rounded-full px-3 py-1 bg-[#0CC5BA]/10 text-[#0CC5BA] text-xs font-medium">
-                                        {seasoning}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Garnishes */}
-                            {component.details.garnishes && 
-                             Array.isArray(component.details.garnishes) && 
-                             (component.details.garnishes.length > 0 || editingComponentIndex === index && editingGarnishes) && (
-                              <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                <div className="flex justify-between items-center mb-3">
-                                  <h5 className="text-sm font-semibold text-green-600 flex items-center gap-2">
-                                    <Activity className="h-4 w-4" />
-                                    {t("meal.details.garnishes", "Dodatki")}
-                                  </h5>
-                                  
-                                  {editingComponentIndex === index && editingGarnishes ? (
-                                    <div className="flex gap-2">
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="h-6 w-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100"
-                                        onClick={saveEditedDetail}
-                                      >
-                                        <Check className="h-3 w-3" />
-                                      </Button>
-                                      <Button 
-                                        variant="ghost" 
-                                        size="icon"
-                                        className="h-6 w-6 rounded-full bg-red-50 text-red-600 hover:bg-red-100"
-                                        onClick={cancelEditing}
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-6 w-6 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                      onClick={() => startEditingGarnishes(index)}
-                                    >
-                                      <Edit className="h-3 w-3" />
-                                    </Button>
-                                  )}
-                                </div>
-                                
-                                {editingComponentIndex === index && editingGarnishes ? (
-                                  <div className="mt-2">
-                                    <Input 
-                                      className="text-sm"
-                                      placeholder="Dodatki oddzielone przecinkami, np. pietruszka, szczypiorek, cytryna"
-                                      value={garnishesInput}
-                                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGarnishesInput(e.target.value)}
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1">{t("meal.details.garnishesHint", "Wpisz dodatki oddzielone przecinkami")}</p>
-                                  </div>
-                                ) : (
-                                  <div className="flex flex-wrap gap-2">
-                                    {component.details.garnishes.map((garnish, idx) => (
-                                      <span key={idx} className="inline-flex rounded-full px-3 py-1 bg-green-50 text-green-600 text-xs font-medium">
-                                        {garnish}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </Card>
-              </motion.div>
-
-            </motion.div>
+                <textarea
+                  value={editedData.description}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, description: e.target.value }))}
+                  className="text-white/90 text-lg bg-transparent border-b border-white/30 pb-2 w-full focus:outline-none focus:border-white/50 resize-none"
+                  placeholder="Add description..."
+                  rows={2}
+                />
+              </div>
+            ) : (
+              <>
+                <h1 className="text-3xl md:text-4xl font-bold text-white">{meal.name}</h1>
+                {meal.description && (
+                  <p className="text-white/90 mt-2 text-lg">{meal.description}</p>
+                )}
+              </>
+            )}
           </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Quick Info Bar */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">Prep Time</p>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editedData.prepTime}
+                    onChange={(e) => setEditedData(prev => ({ ...prev, prepTime: parseInt(e.target.value) || 0 }))}
+                    className="font-semibold text-gray-900 w-full border-b border-gray-200 focus:border-[#26A8FF] focus:outline-none"
+                    min="0"
+                  />
+                ) : (
+                  <p className="font-semibold text-gray-900">{displayData.prepTime || 15} min</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Flame className="w-5 h-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">Cook Time</p>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editedData.cookTime}
+                    onChange={(e) => setEditedData(prev => ({ ...prev, cookTime: parseInt(e.target.value) || 0 }))}
+                    className="font-semibold text-gray-900 w-full border-b border-gray-200 focus:border-[#26A8FF] focus:outline-none"
+                    min="0"
+                  />
+                ) : (
+                  <p className="font-semibold text-gray-900">{displayData.cookTime || 30} min</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Users className="w-5 h-5 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">Servings</p>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editedData.servings}
+                    onChange={(e) => setEditedData(prev => ({ ...prev, servings: parseInt(e.target.value) || 1 }))}
+                    className="font-semibold text-gray-900 w-full border-b border-gray-200 focus:border-[#26A8FF] focus:outline-none"
+                    min="1"
+                  />
+                ) : (
+                  <p className="font-semibold text-gray-900">{displayData.servings || 1}</p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Flame className="w-5 h-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">Calories</p>
+                {isEditing ? (
+                  <input
+                    type="number"
+                    value={editedData.calories}
+                    onChange={(e) => setEditedData(prev => ({ ...prev, calories: parseInt(e.target.value) || 0 }))}
+                    className="font-semibold text-gray-900 w-full border-b border-gray-200 focus:border-[#26A8FF] focus:outline-none"
+                    min="0"
+                  />
+                ) : (
+                  <p className="font-semibold text-gray-900">{Math.round(displayData.calories || 0)} kcal</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nutrition Cards */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="bg-white rounded-xl p-6 text-center shadow-sm"
+          >
+            {isEditing ? (
+              <>
+                <input
+                  type="number"
+                  value={editedData.protein}
+                  onChange={(e) => setEditedData(prev => ({ ...prev, protein: parseFloat(e.target.value) || 0 }))}
+                  className="text-3xl font-bold text-blue-600 mb-1 w-full text-center border-b border-blue-200 focus:border-blue-600 focus:outline-none"
+                  min="0"
+                  step="0.1"
+                />
+              </>
+            ) : (
+              <div className="text-3xl font-bold text-blue-600 mb-1">
+                {adjustedNutrition(displayData.protein)}g
+              </div>
+            )}
+            <div className="text-sm text-gray-600">Protein</div>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="bg-white rounded-xl p-6 text-center shadow-sm"
+          >
+            {isEditing ? (
+              <input
+                type="number"
+                value={editedData.carbs}
+                onChange={(e) => setEditedData(prev => ({ ...prev, carbs: parseFloat(e.target.value) || 0 }))}
+                className="text-3xl font-bold text-green-600 mb-1 w-full text-center border-b border-green-200 focus:border-green-600 focus:outline-none"
+                min="0"
+                step="0.1"
+              />
+            ) : (
+              <div className="text-3xl font-bold text-green-600 mb-1">
+                {adjustedNutrition(displayData.carbs)}g
+              </div>
+            )}
+            <div className="text-sm text-gray-600">Carbs</div>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            className="bg-white rounded-xl p-6 text-center shadow-sm"
+          >
+            {isEditing ? (
+              <input
+                type="number"
+                value={editedData.fat}
+                onChange={(e) => setEditedData(prev => ({ ...prev, fat: parseFloat(e.target.value) || 0 }))}
+                className="text-3xl font-bold text-orange-600 mb-1 w-full text-center border-b border-orange-200 focus:border-orange-600 focus:outline-none"
+                min="0"
+                step="0.1"
+              />
+            ) : (
+              <div className="text-3xl font-bold text-orange-600 mb-1">
+                {adjustedNutrition(displayData.fat)}g
+              </div>
+            )}
+            <div className="text-sm text-gray-600">Fat</div>
+          </motion.div>
+        </div>
+
+        {!isEditing && (
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Adjust Servings</h3>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setServingMultiplier(Math.max(0.5, servingMultiplier - 0.5))}
+                  className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="text-2xl font-bold text-gray-900 min-w-[60px] text-center">
+                  {servingMultiplier}x
+                </span>
+                <button
+                  onClick={() => setServingMultiplier(servingMultiplier + 0.5)}
+                  className="w-10 h-10 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Ingredients Section */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Ingredients</h3>
+              {isEditing && (
+                <button
+                  onClick={addIngredient}
+                  className="flex items-center gap-2 px-3 py-1 bg-[#26A8FF] text-white rounded-lg hover:bg-[#1A8FE6] transition-colors text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              )}
+            </div>
+            <div className="space-y-3">
+              {displayData.components && displayData.components.length > 0 ? (
+                displayData.components.map((component, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className={`flex items-center gap-3 p-3 rounded-lg ${
+                      isEditing ? 'bg-gray-50' : 'hover:bg-gray-50 cursor-pointer'
+                    }`}
+                    onClick={() => !isEditing && handleIngredientToggle(index)}
+                  >
+                    {!isEditing && (
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                        checkedIngredients.has(index) 
+                          ? 'bg-[#26A8FF] border-[#26A8FF]' 
+                          : 'border-gray-300'
+                      }`}>
+                        {checkedIngredients.has(index) && (
+                          <Check className="w-3 h-3 text-white" />
+                        )}
+                      </div>
+                    )}
+                    
+                    {isEditing ? (
+                      <div className="flex-1 flex gap-2 items-center">
+                        <input
+                          type="number"
+                          value={component.quantity || ''}
+                          onChange={(e) => updateIngredient(index, 'quantity', parseFloat(e.target.value) || 0)}
+                          className="w-20 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
+                          placeholder="Qty"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <input
+                          type="text"
+                          value={component.unit || ''}
+                          onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+                          className="w-24 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
+                          placeholder="Unit"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <input
+                          type="text"
+                          value={component.name}
+                          onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                          className="flex-1 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
+                          placeholder="Ingredient name"
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeIngredient(index);
+                          }}
+                          className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className={`flex-1 ${
+                        checkedIngredients.has(index) ? 'line-through text-gray-400' : 'text-gray-700'
+                      }`}>
+                        {component.quantity && component.unit ? `${component.quantity} ${component.unit} ` : ''}
+                        {component.name}
+                      </span>
+                    )}
+                  </motion.div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-8">No ingredients available</p>
+              )}
+            </div>
+          </div>
+
+          {/* Instructions Section */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Instructions</h3>
+              {isEditing && (
+                <button
+                  onClick={addInstruction}
+                  className="flex items-center gap-2 px-3 py-1 bg-[#26A8FF] text-white rounded-lg hover:bg-[#1A8FE6] transition-colors text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add
+                </button>
+              )}
+            </div>
+            <div className="space-y-4">
+              {displayData.instructions && displayData.instructions.length > 0 ? (
+                displayData.instructions.map((step, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="flex gap-4"
+                  >
+                    {!isEditing && (
+                      <button
+                        onClick={() => handleStepToggle(index)}
+                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${
+                          completedSteps.has(index)
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}
+                      >
+                        {completedSteps.has(index) ? <Check className="w-4 h-4" /> : index + 1}
+                      </button>
+                    )}
+                    
+                    {isEditing ? (
+                      <div className="flex-1 flex gap-2 items-start">
+                        <span className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center font-semibold text-sm text-gray-600 mt-1">
+                          {index + 1}
+                        </span>
+                        <textarea
+                          value={step}
+                          onChange={(e) => updateInstruction(index, e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:border-[#26A8FF] focus:outline-none resize-none"
+                          placeholder="Enter instruction..."
+                          rows={2}
+                        />
+                        <button
+                          onClick={() => removeInstruction(index)}
+                          className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors mt-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <p className={`text-gray-700 pt-1 ${
+                        completedSteps.has(index) ? 'line-through opacity-50' : ''
+                      }`}>
+                        {step}
+                      </p>
+                    )}
+                  </motion.div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-8">No instructions available</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isDeleting && setShowDeleteConfirm(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-6"
+            >
+              <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+                {/* Header with gradient */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 px-6 py-5 border-b border-red-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <AlertCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">Delete Meal?</h3>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        This action cannot be undone. The meal will be permanently removed from your log.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="p-6">
+                  {/* Meal Info */}
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+                    <div className="flex items-center gap-3">
+                      {mealImage ? (
+                        <img 
+                          src={mealImage} 
+                          alt={meal?.name}
+                          className="w-16 h-16 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl bg-gray-200 flex items-center justify-center">
+                          <ChefHat className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{meal?.name}</p>
+                        <p className="text-sm text-gray-500">{meal?.calories || 0} calories</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3">
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-2xl h-12 font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isDeleting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Deleting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="w-4 h-4" />
+                          <span>Delete Meal</span>
+                        </>
+                      )}
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                      className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl h-12 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

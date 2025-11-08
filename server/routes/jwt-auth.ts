@@ -91,8 +91,12 @@ router.post('/register', async (req, res: Response) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
+    // Generate username from email
+    const username = email.split('@')[0];
+    
     // Create user
     const userData = {
+      username,
       email,
       password: await crypto.hash(password),
       hasCompletedOnboarding: Boolean(profile),

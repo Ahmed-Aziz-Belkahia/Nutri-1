@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Upload, User, Target, Heart, Zap, Clock, Star, CalendarDays, Calendar, TrendingDown } from 'lucide-react';
+import { Camera, Upload, User, Target, Heart, Zap, Clock, Star, CalendarDays, Calendar, TrendingDown, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 type OnboardingData = {
   perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change' | 'other')[];
@@ -70,6 +70,7 @@ const calculateCalories = (data: OnboardingData) => {
     return 2000;
   }
 
+  // WHO/FAO/UNU activity multipliers
   const activityMultipliers = {
     sedentary: 1.2,
     light: 1.375,
@@ -78,19 +79,43 @@ const calculateCalories = (data: OnboardingData) => {
     very_active: 1.9
   };
 
+  // WHO/FAO/UNU BMR formulas (age and gender-specific)
   let bmr;
+  const age = data.age;
+  const weight = data.weight;
+  const height = data.height;
+  
   if (data.gender === 'male') {
-    bmr = 88.362 + (13.397 * data.weight) + (4.799 * data.height) - (5.677 * data.age);
+    if (age >= 18 && age <= 29) {
+      bmr = (15.057 * weight) + (1.004 * height) + 705;
+    } else if (age >= 30 && age <= 59) {
+      bmr = (11.472 * weight) + (8.73 * height) + 873;
+    } else if (age >= 60) {
+      bmr = (11.711 * weight) + (5.878 * height) + 587;
+    } else {
+      // Fallback for under 18
+      bmr = (15.057 * weight) + (1.004 * height) + 705;
+    }
   } else {
-    bmr = 447.593 + (9.247 * data.weight) + (3.098 * data.height) - (4.330 * data.age);
+    if (age >= 18 && age <= 29) {
+      bmr = (14.818 * weight) + (4.65 * height) + 486;
+    } else if (age >= 30 && age <= 59) {
+      bmr = (8.126 * weight) + (8.45 * height) + 845;
+    } else if (age >= 60) {
+      bmr = (9.082 * weight) + (6.588 * height) + 658;
+    } else {
+      // Fallback for under 18
+      bmr = (14.818 * weight) + (4.65 * height) + 486;
+    }
   }
 
-  const tdee = bmr * (activityMultipliers[data.activityLevel as keyof typeof activityMultipliers] || 1.2);
+  const tdee = bmr * (activityMultipliers[data.activityLevel as keyof typeof activityMultipliers] || 1.55);
 
+  // WHO recommended adjustments
   const goalAdjustments = {
-    loss: -500,
+    loss: -500,    // 500 kcal deficit for ~0.5kg/week loss
     maintain: 0,
-    gain: 500
+    gain: 300      // 300 kcal surplus for healthy mass gain
   };
 
   return Math.round(tdee + (goalAdjustments[data.weightGoal as keyof typeof goalAdjustments] || 0));
@@ -100,8 +125,8 @@ export default function OnboardingQuiz() {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<OnboardingData>(initialFormData);
   const [visionBoardPage, setVisionBoardPage] = useState(0);
-  const [visionBoardData, setVisionBoardData] = useState<any>(null);
-  const [isGeneratingVisionBoard, setIsGeneratingVisionBoard] = useState(false);
+  const [showFormulaExplanation, setShowFormulaExplanation] = useState(false);
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -143,63 +168,53 @@ export default function OnboardingQuiz() {
     return { weeks, months, weeklyProgress };
   };
 
-  const generateVisionBoard = async () => {
-    // Use goals to generate motivation
-    const description = formData.perfectGoal.length > 0 ? `I want to achieve: ${formData.perfectGoal.join(', ')}` : 
-       formData.customGoal || 'I want to improve my health and well-being';
-
-    setIsGeneratingVisionBoard(true);
-    try {
-      const response = await fetch('/api/generate-motivation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dreamDescription: description,
-          goals: formData.perfectGoal,
-          customGoal: formData.customGoal,
-          currentWeight: formData.weight,
-          goalWeight: formData.goalWeight
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setVisionBoardData(data);
-        setVisionBoardPage(1);
-      }
-    } catch (error) {
-      console.error('Error generating vision board:', error);
-    } finally {
-      setIsGeneratingVisionBoard(false);
-    }
-  };
-
   const mutation = useMutation({
     mutationFn: async (data: OnboardingData) => {
       const formDataToSend = new FormData();
       
-      // Calculate nutrition values
+      // Calculate nutrition values using WHO formula
       const age = data.age;
       const weight = data.weight;
       const goalWeight = data.goalWeight;
       const height = data.height;
       
-      // Calculate daily calories and macros
-      const bmr = data.gender === 'male' 
-        ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
-        : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+      // WHO/FAO/UNU BMR calculation
+      let bmr;
+      if (data.gender === 'male') {
+        if (age >= 18 && age <= 29) {
+          bmr = (15.057 * weight) + (1.004 * height) + 705;
+        } else if (age >= 30 && age <= 59) {
+          bmr = (11.472 * weight) + (8.73 * height) + 873;
+        } else if (age >= 60) {
+          bmr = (11.711 * weight) + (5.878 * height) + 587;
+        } else {
+          bmr = (15.057 * weight) + (1.004 * height) + 705;
+        }
+      } else {
+        if (age >= 18 && age <= 29) {
+          bmr = (14.818 * weight) + (4.65 * height) + 486;
+        } else if (age >= 30 && age <= 59) {
+          bmr = (8.126 * weight) + (8.45 * height) + 845;
+        } else if (age >= 60) {
+          bmr = (9.082 * weight) + (6.588 * height) + 658;
+        } else {
+          bmr = (14.818 * weight) + (4.65 * height) + 486;
+        }
+      }
       
       const activityMultiplier = {
         sedentary: 1.2,
         light: 1.375,
         moderate: 1.55,
         active: 1.725,
-        extra: 1.9
-      }[data.activityLevel] || 1.2;
+        very_active: 1.9
+      }[data.activityLevel] || 1.55;
       
       const tdee = bmr * activityMultiplier;
+      
+      // WHO recommended adjustments
       const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
-                           data.weightGoal === 'gain' ? tdee + 500 : tdee;
+                           data.weightGoal === 'gain' ? tdee + 300 : tdee;
       
       // Create profile data matching the backend expectation
       const profileData = {
@@ -276,8 +291,9 @@ export default function OnboardingQuiz() {
   });
 
   const handleNext = () => {
-    if (step === 7 && !isGeneratingVisionBoard) {
-      generateVisionBoard();
+    if (step === 7) {
+      // Go directly to plan display (no loading needed)
+      setVisionBoardPage(1);
       setStep(8);
     } else if (step === 8 && visionBoardPage < 2) {
       setVisionBoardPage(prev => prev + 1);
@@ -306,7 +322,7 @@ export default function OnboardingQuiz() {
       case 5: return !formData.goalWeight || formData.goalWeight < 30;
       case 6: return !formData.activityLevel;
       case 7: return false;
-      case 8: return visionBoardPage === 0 && isGeneratingVisionBoard;
+      case 8: return false; // Always allow navigation on vision board pages
       default: return false;
     }
   };
@@ -1202,9 +1218,9 @@ export default function OnboardingQuiz() {
                         <div className="h-48 w-48 relative">
                           <div className="absolute inset-0 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-full p-1">
                             <div className="h-full w-full bg-white rounded-full flex items-center justify-center overflow-hidden">
-                              {formData.profileImage ? (
+                              {profileImagePreview ? (
                                 <img 
-                                  src={URL.createObjectURL(formData.profileImage)} 
+                                  src={profileImagePreview} 
                                   alt="Profile" 
                                   className="w-full h-full rounded-full object-cover"
                                 />
@@ -1233,6 +1249,14 @@ export default function OnboardingQuiz() {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
+                            // Create preview URL for the image
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setProfileImagePreview(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                            
+                            // Store the file in form data
                             setFormData(prev => ({ ...prev, profileImage: file }));
                           }
                         }}
@@ -1336,12 +1360,12 @@ export default function OnboardingQuiz() {
                               },
                               { 
                                 label: 'Carbs', 
-                                value: Math.round(calculateCalories(formData) * 0.45 / 4),
+                                value: Math.round(calculateCalories(formData) * 0.4 / 4),
                                 color: 'from-amber-500 to-orange-500'
                               },
                               { 
                                 label: 'Fats', 
-                                value: Math.round(calculateCalories(formData) * 0.25 / 9),
+                                value: Math.round(calculateCalories(formData) * 0.3 / 9),
                                 color: 'from-purple-500 to-pink-500'
                               }
                             ].map((macro, index) => (
@@ -1360,6 +1384,225 @@ export default function OnboardingQuiz() {
                             ))}
                           </div>
                         </div>
+
+                        {/* Formula Explanation Dropdown */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.6 }}
+                        >
+                          <button
+                            onClick={() => setShowFormulaExplanation(!showFormulaExplanation)}
+                            className="w-full flex items-center justify-between p-4 bg-white/95 backdrop-blur-sm rounded-xl hover:bg-gray-50 transition-colors border border-gray-200"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Info className="w-5 h-5 text-[#26A8FF]" />
+                              <span className="font-semibold text-gray-900 text-sm">
+                                How we calculated your daily needs
+                              </span>
+                            </div>
+                            {showFormulaExplanation ? (
+                              <ChevronUp className="w-5 h-5 text-gray-600" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-gray-600" />
+                            )}
+                          </button>
+                          
+                          <AnimatePresence>
+                            {showFormulaExplanation && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="overflow-hidden"
+                              >
+                                <div className="mt-2 p-6 bg-white/95 backdrop-blur-sm rounded-xl border border-gray-200 shadow-lg">
+                                  <div className="space-y-4">
+                                    {/* BMR Section */}
+                                    <div>
+                                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                                        <div className="w-2 h-2 rounded-full bg-[#26A8FF]"></div>
+                                        1. BMR (Basal Metabolic Rate)
+                                      </h4>
+                                      <p className="text-xs text-gray-600 mb-2">
+                                        Using WHO/FAO/UNU equations (most accurate):
+                                      </p>
+                                      {(() => {
+                                        const isMale = formData.gender === 'male';
+                                        const age = formData.age;
+                                        const weight = formData.weight;
+                                        const height = formData.height;
+                                        let bmr = 0;
+                                        
+                                        if (isMale) {
+                                          if (age >= 18 && age <= 29) bmr = (15.057 * weight) + (1.004 * height) + 705;
+                                          else if (age >= 30 && age <= 59) bmr = (11.472 * weight) + (8.73 * height) + 873;
+                                          else if (age >= 60) bmr = (11.711 * weight) + (5.878 * height) + 587;
+                                          else bmr = (15.057 * weight) + (1.004 * height) + 705;
+                                        } else {
+                                          if (age >= 18 && age <= 29) bmr = (14.818 * weight) + (4.65 * height) + 486;
+                                          else if (age >= 30 && age <= 59) bmr = (8.126 * weight) + (8.45 * height) + 845;
+                                          else if (age >= 60) bmr = (9.082 * weight) + (6.588 * height) + 658;
+                                          else bmr = (14.818 * weight) + (4.65 * height) + 486;
+                                        }
+                                        
+                                        return (
+                                          <div className={`${isMale ? 'bg-blue-50' : 'bg-pink-50'} p-3 rounded-lg text-xs`}>
+                                            {isMale ? (
+                                              <>
+                                                {age >= 18 && age <= 29 && (
+                                                  <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
+                                                )}
+                                                {age >= 30 && age <= 59 && (
+                                                  <p className="font-mono text-[10px]">BMR = (11.472 × {weight}kg) + (8.73 × {height}cm) + 873</p>
+                                                )}
+                                                {age >= 60 && (
+                                                  <p className="font-mono text-[10px]">BMR = (11.711 × {weight}kg) + (5.878 × {height}cm) + 587</p>
+                                                )}
+                                                {age < 18 && (
+                                                  <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
+                                                )}
+                                              </>
+                                            ) : (
+                                              <>
+                                                {age >= 18 && age <= 29 && (
+                                                  <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
+                                                )}
+                                                {age >= 30 && age <= 59 && (
+                                                  <p className="font-mono text-[10px]">BMR = (8.126 × {weight}kg) + (8.45 × {height}cm) + 845</p>
+                                                )}
+                                                {age >= 60 && (
+                                                  <p className="font-mono text-[10px]">BMR = (9.082 × {weight}kg) + (6.588 × {height}cm) + 658</p>
+                                                )}
+                                                {age < 18 && (
+                                                  <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
+                                                )}
+                                              </>
+                                            )}
+                                            <p className={`mt-2 font-semibold ${isMale ? 'text-blue-600' : 'text-pink-600'}`}>
+                                              = {Math.round(bmr)} kcal/day
+                                            </p>
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+
+                                    {/* TDEE Section */}
+                                    <div>
+                                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                        2. TDEE (Total Daily Energy Expenditure)
+                                      </h4>
+                                      <p className="text-xs text-gray-600 mb-2">
+                                        BMR × activity factor:
+                                      </p>
+                                      {(() => {
+                                        const activityMultipliers: { [key: string]: number } = {
+                                          sedentary: 1.2,
+                                          light: 1.375,
+                                          moderate: 1.55,
+                                          active: 1.725,
+                                          very_active: 1.9
+                                        };
+                                        const activityLabels: { [key: string]: string } = {
+                                          sedentary: 'sedentary lifestyle',
+                                          light: 'light activity',
+                                          moderate: 'moderate activity',
+                                          active: 'active lifestyle',
+                                          very_active: 'very active'
+                                        };
+                                        
+                                        const isMale = formData.gender === 'male';
+                                        const age = formData.age;
+                                        const weight = formData.weight;
+                                        const height = formData.height;
+                                        let bmr = 0;
+                                        
+                                        if (isMale) {
+                                          if (age >= 18 && age <= 29) bmr = (15.057 * weight) + (1.004 * height) + 705;
+                                          else if (age >= 30 && age <= 59) bmr = (11.472 * weight) + (8.73 * height) + 873;
+                                          else if (age >= 60) bmr = (11.711 * weight) + (5.878 * height) + 587;
+                                          else bmr = (15.057 * weight) + (1.004 * height) + 705;
+                                        } else {
+                                          if (age >= 18 && age <= 29) bmr = (14.818 * weight) + (4.65 * height) + 486;
+                                          else if (age >= 30 && age <= 59) bmr = (8.126 * weight) + (8.45 * height) + 845;
+                                          else if (age >= 60) bmr = (9.082 * weight) + (6.588 * height) + 658;
+                                          else bmr = (14.818 * weight) + (4.65 * height) + 486;
+                                        }
+                                        
+                                        const multiplier = activityMultipliers[formData.activityLevel] || 1.55;
+                                        const tdee = Math.round(bmr * multiplier);
+                                        
+                                        return (
+                                          <div className="bg-green-50 p-3 rounded-lg text-xs">
+                                            <p className="font-mono text-[10px]">
+                                              TDEE = {Math.round(bmr)} × {multiplier} ({activityLabels[formData.activityLevel] || 'moderate activity'})
+                                            </p>
+                                            <p className="mt-2 font-semibold text-green-600">= {tdee} kcal/day</p>
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+
+                                    {/* Goal Adjustment */}
+                                    <div>
+                                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                                        <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                                        3. Adjusted for Your Goal
+                                      </h4>
+                                      <div className="bg-orange-50 p-3 rounded-lg text-xs">
+                                        {formData.weightGoal === 'loss' && (
+                                          <>
+                                            <p>Goal: <strong>Weight Loss</strong></p>
+                                            <p className="font-mono text-[10px] mt-2">
+                                              Daily calories = TDEE - 500 kcal
+                                            </p>
+                                            <p className="text-[10px] text-gray-600 mt-1">
+                                              500 kcal deficit/day = ~0.5 kg loss per week
+                                            </p>
+                                          </>
+                                        )}
+                                        {formData.weightGoal === 'gain' && (
+                                          <>
+                                            <p>Goal: <strong>Weight Gain</strong></p>
+                                            <p className="font-mono text-[10px] mt-2">
+                                              Daily calories = TDEE + 300 kcal
+                                            </p>
+                                            <p className="text-[10px] text-gray-600 mt-1">
+                                              300 kcal surplus/day for healthy mass gain
+                                            </p>
+                                          </>
+                                        )}
+                                        {formData.weightGoal === 'maintain' && (
+                                          <>
+                                            <p>Goal: <strong>Maintain Weight</strong></p>
+                                            <p className="font-mono text-[10px] mt-2">
+                                              Daily calories = TDEE
+                                            </p>
+                                            <p className="text-[10px] text-gray-600 mt-1">
+                                              Energy balance for weight maintenance
+                                            </p>
+                                          </>
+                                        )}
+                                        <p className="mt-3 font-semibold text-orange-600">
+                                          = {calculateCalories(formData)} kcal/day
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Source Reference */}
+                                    <div className="pt-3 border-t border-gray-200">
+                                      <p className="text-[10px] text-gray-500">
+                                        <strong>Source:</strong> WHO/FAO/UNU Expert Consultation on Energy and Protein Requirements (2004)
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
 
                         {/* Visual Goal Progress Preview */}
                         <motion.div 
@@ -1512,38 +1755,7 @@ export default function OnboardingQuiz() {
                       </motion.div>
                     )}
 
-                    {/* Loading State */}
-                    {visionBoardPage === 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="text-center space-y-6 py-8"
-                      >
-                        <div className="relative w-24 h-24 mx-auto">
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-0 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] rounded-full opacity-20"
-                          />
-                          <motion.div
-                            animate={{ rotate: -360 }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-2 bg-gradient-to-r from-[#26A8FF] to-[#0CC5BA] rounded-full opacity-30"
-                          />
-                          <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="absolute inset-4 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] rounded-full flex items-center justify-center"
-                          >
-                            <Target className="w-8 h-8 text-white" />
-                          </motion.div>
-                        </div>
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] bg-clip-text text-transparent">
-                          Preparing Your Vision Board
-                        </h2>
-                        <p className="text-sm text-gray-600">Calculating your personalized nutrition plan...</p>
-                      </motion.div>
-                    )}
+                    {/* Loading State - Removed, no longer needed */}
                   </div>
                 )}
               </div>
@@ -1555,7 +1767,6 @@ export default function OnboardingQuiz() {
                     <Button
                       variant="ghost"
                       onClick={handleBack}
-                      disabled={step === 8 && visionBoardPage === 0}
                       className="flex items-center text-gray-600 hover:text-gray-800 hover:bg-white/50 backdrop-blur-sm px-6 py-3 rounded-2xl transition-all duration-300"
                     >
                       <span className="mr-2 text-lg">←</span>

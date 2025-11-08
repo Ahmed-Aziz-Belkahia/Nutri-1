@@ -120,6 +120,13 @@ export default function Onboarding() {
       height = parseFloat(formData.height);
     }
 
+    // Map workout frequency to activity level
+    const activityLevelMap: { [key: string]: string } = {
+      "0-2": "light",
+      "3-5": "moderate",
+      "6+": "very_active"
+    };
+
     return (
       <OnboardingCompletion
         formData={{
@@ -129,7 +136,7 @@ export default function Onboarding() {
           weight: formData.weight,
           goalWeight: formData.goalWeight,
           weightGoal: formData.weightGoal,
-          activityLevel: formData.activityLevel,
+          activityLevel: activityLevelMap[formData.activityLevel] || "moderate",
         }}
       />
     );

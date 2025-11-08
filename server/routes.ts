@@ -6247,8 +6247,8 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         weight: parseFloat(userProfile.currentWeight.toString()),
         goalWeight: parseFloat(userProfile.goalWeight.toString()),
         height: parseFloat(userProfile.height.toString()),
-        age: 30, // Default age since it's not stored in current schema
-        gender: 'male', // Default gender since it's not stored in current schema
+        age: userProfile.age || 30, // Use stored age or default to 30
+        gender: userProfile.gender || 'male', // Use stored gender or default to male
         activityLevel: userProfile.activityLevel,
         weightGoal: userProfile.weightGoal,
         perfectGoal: userProfile.weightGoal === 'loss' ? ['weight_loss'] : 
@@ -6284,12 +6284,32 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         };
       };
 
-      // Calculate BMR and daily calories
+      // Calculate BMR using WHO/FAO/UNU equations (more accurate than Harris-Benedict)
+      // Based on age, gender, and weight in kg
       const calculateBMR = (weight: number, height: number, age: number, gender: string) => {
+        // WHO equations use weight in kg and return kcal/day
         if (gender === 'male') {
-          return 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+          if (age >= 18 && age <= 29) {
+            return (15.057 * weight) + (1.004 * height) + 705;
+          } else if (age >= 30 && age <= 59) {
+            return (11.472 * weight) + (8.73 * height) + 873;
+          } else if (age >= 60) {
+            return (11.711 * weight) + (5.878 * height) + 587;
+          }
+        } else { // female
+          if (age >= 18 && age <= 29) {
+            return (14.818 * weight) + (4.65 * height) + 486;
+          } else if (age >= 30 && age <= 59) {
+            return (8.126 * weight) + (8.45 * height) + 845;
+          } else if (age >= 60) {
+            return (9.082 * weight) + (6.588 * height) + 658;
+          }
+        }
+        // Fallback to Mifflin-St Jeor if age is outside ranges
+        if (gender === 'male') {
+          return (10 * weight) + (6.25 * height) - (5 * age) + 5;
         } else {
-          return 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+          return (10 * weight) + (6.25 * height) - (5 * age) - 161;
         }
       };
 
@@ -6411,6 +6431,9 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       const visionBoardData = {
         userId: req.user!.id,
         macros,
+        bmr: Math.round(bmr),
+        tdee: Math.round(tdee),
+        calorieAdjustment: Math.round(dailyCalories - tdee),
         timeline,
         motivation,
         personalData: {

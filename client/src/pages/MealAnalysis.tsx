@@ -33,15 +33,6 @@ export default function MealAnalysis() {
   // Get image from route params or localStorage
   const imageData = params?.image ? decodeURIComponent(params.image) : localStorage.getItem('analyzingMealImage');
 
-  // Generate a hash from the image data to detect duplicates
-  const getImageHash = async (data: string): Promise<string> => {
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data.substring(0, 1000)); // Use first 1KB for hash
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
-  };
-
   useEffect(() => {
     console.log('[MealAnalysis] Component mounted');
     console.log('[MealAnalysis] imageData exists:', !!imageData);
@@ -54,20 +45,6 @@ export default function MealAnalysis() {
     }
 
     const checkAndAnalyze = async () => {
-      // Generate hash of the image
-      const imageHash = await getImageHash(imageData);
-      console.log('[MealAnalysis] Image hash:', imageHash);
-      
-      // Check if this exact image was analyzed before
-      const previousAnalysis = localStorage.getItem(`analysis_${imageHash}`);
-      if (previousAnalysis) {
-        const foodId = previousAnalysis;
-        console.log('[MealAnalysis] Found previous analysis for this image, redirecting to:', foodId);
-        localStorage.removeItem('analyzingMealImage');
-        setLocation(`/recipes/food-log/${foodId}`);
-        return;
-      }
-
       // Prevent duplicate analysis - use a flag that persists across strict mode remounts
       if (analysisStarted.current) {
         console.log('[MealAnalysis] Analysis already started, skipping');
@@ -78,7 +55,7 @@ export default function MealAnalysis() {
       const storedResult = sessionStorage.getItem('lastAnalyzedFoodId');
       if (storedResult && hasAnalyzed.current) {
         console.log('[MealAnalysis] Found previous analysis result, redirecting to:', storedResult);
-        setLocation(`/recipes/food-log/${storedResult}`);
+        setLocation(`/meal/${storedResult}`);
         return;
       }
       
@@ -156,10 +133,7 @@ export default function MealAnalysis() {
         const foodId = response?.log?.id;
         if (foodId) {
           sessionStorage.setItem('lastAnalyzedFoodId', foodId.toString());
-          // Store the image hash with the food ID for future duplicate detection
-          const imageHash = await getImageHash(imageData);
-          localStorage.setItem(`analysis_${imageHash}`, foodId.toString());
-          console.log('[MealAnalysis] Stored analysis result for hash:', imageHash);
+          console.log('[MealAnalysis] Stored analysis result, foodId:', foodId);
         }
         
         // Wait a moment to show success, then redirect
@@ -170,9 +144,9 @@ export default function MealAnalysis() {
           console.log('[MealAnalysis] Extracted foodId:', foodId);
           
           if (foodId) {
-            console.log('[MealAnalysis] Redirecting to /recipes/food-log/' + foodId);
+            console.log('[MealAnalysis] Redirecting to /meal/' + foodId);
             sessionStorage.removeItem('lastAnalyzedFoodId'); // Clean up after redirect
-            setLocation(`/recipes/food-log/${foodId}`);
+            setLocation(`/meal/${foodId}`);
           } else {
             console.log('[MealAnalysis] No foodId found, redirecting to dashboard');
             setLocation('/dashboard');

@@ -50,6 +50,7 @@ export function useRecipes(filters?: RecipeFilters): UseQueryResult<Recipe[]> {
       return response.json();
     },
     ...queryPresets.moderate,
+    refetchOnMount: 'always',
   });
 }
 
@@ -65,6 +66,7 @@ export function useCreatedRecipes(): UseQueryResult<Recipe[]> {
       return response.json();
     },
     ...queryPresets.moderate,
+    refetchOnMount: 'always',
   });
 }
 
@@ -80,6 +82,7 @@ export function useSavedRecipes(): UseQueryResult<Recipe[]> {
       return response.json();
     },
     ...queryPresets.moderate,
+    refetchOnMount: 'always',
   });
 }
 
@@ -95,6 +98,7 @@ export function useScannedMeals(): UseQueryResult<Recipe[]> {
       return response.json();
     },
     ...queryPresets.moderate,
+    refetchOnMount: 'always',
   });
 }
 

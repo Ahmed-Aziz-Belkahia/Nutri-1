@@ -132,13 +132,41 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
   "tags": ["tag1", "tag2"]
 }
 
-WAŻNE:
+WAŻNE ZASADY DOTYCZĄCE CZASÓW PRZYGOTOWANIA:
+
+**prepTime (czas przygotowania)**:
+- To TYLKO czas na przygotowanie składników (mycie, krojenie, mieszanie)
+- Nie wliczaj czasu gotowania, pieczenia, smażenia
+- Dla prostych dań (kanapki, sałatki): 5-10 minut
+- Dla średniej złożoności (pasta, omlety): 10-15 minut
+- Dla złożonych dań (dużo składników do pokrojenia): 15-25 minut
+- Dla bardzo złożonych (wiele procesów przygotowawczych): 25-40 minut
+
+**cookTime (czas gotowania)**:
+- To czas aktywnego gotowania/pieczenia/smażenia
+- Dla smażenia: 5-15 minut
+- Dla gotowania makaronów: 10-15 minut
+- Dla pieczenia w piekarniku: 20-45 minut
+- Dla duszenia: 20-60 minut
+- Dla grillowania: 10-30 minut
+
+**Przykłady realistycznych czasów**:
+- Kanapka: prepTime: 5, cookTime: 0
+- Jajecznica: prepTime: 3, cookTime: 5
+- Pasta z sosem: prepTime: 10, cookTime: 15
+- Sałatka: prepTime: 10, cookTime: 0
+- Pizza domowa: prepTime: 20, cookTime: 15
+- Kurczak pieczony: prepTime: 15, cookTime: 45
+- Zupa: prepTime: 15, cookTime: 30
+
+INNE ZASADY:
 - Jeśli rozpoznajesz przepis (np. Pizza Margherita, Spaghetti Carbonara), wypełnij pola: ingredients, instructions, prepTime, cookTime, cuisineType, difficulty
-- Jeśli to proste jedzenie bez przepisu, zostaw te pola puste lub null
+- Jeśli to proste jedzenie bez przepisu lub gotowe danie (np. kupione w sklepie), zostaw prepTime i cookTime jako null lub ustaw na 0
+- Dla gotowych/pakowanych produktów: prepTime: 0 lub null, cookTime: 0 lub null
 - ingredients powinny być bazowane na components, ale w formie składników do gotowania
 - instructions to kroki gotowania (tylko dla rozpoznawalnych przepisów)
-- prepTime i cookTime w minutach
-- Zawsze dołącz co najmniej jeden element w components`
+- Zawsze dołącz co najmniej jeden element w components
+- Bądź REALISTYCZNY z czasami - nie zawyżaj ich`
             },
             {
               type: "image_url",

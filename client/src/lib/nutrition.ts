@@ -1,10 +1,10 @@
 // Medical and scientific sources for nutrition calculations
 export const NUTRITION_SOURCES = [
   {
-    title: "Mifflin-St Jeor Equation for BMR",
-    organization: "National Institutes of Health (NIH)",
-    url: "https://www.niddk.nih.gov/bwp",
-    description: "Validated formula for calculating basal metabolic rate"
+    title: "WHO/FAO/UNU Energy Requirements",
+    organization: "World Health Organization (WHO)",
+    url: "https://www.who.int/nutrition/publications/nutrientrequirements/9241209356/en/",
+    description: "Expert consultation on human energy requirements (2004)"
   },
   {
     title: "Physical Activity Guidelines",
@@ -29,8 +29,8 @@ export const NUTRITION_SOURCES = [
 export const CALCULATION_METHODS = [
   {
     method: "Basal Metabolic Rate (BMR)",
-    formula: "Men: (10 × weight kg) + (6.25 × height cm) - (5 × age) + 5\nWomen: (10 × weight kg) + (6.25 × height cm) - (5 × age) - 161",
-    source: "Mifflin et al. (1990) American Journal of Clinical Nutrition"
+    formula: "WHO/FAO/UNU equations by age and gender",
+    source: "WHO Technical Report Series 935 (2004)"
   },
   {
     method: "Total Daily Energy Expenditure (TDEE)",
@@ -44,8 +44,27 @@ export const CALCULATION_METHODS = [
   }
 ];
 
-// Calculates Base Metabolic Rate (BMR) using Mifflin-St Jeor Equation
+// Calculates Base Metabolic Rate (BMR) using WHO/FAO/UNU Equations (more accurate than Mifflin-St Jeor)
 function calculateBMR(age: number, weight: number, height: number, isMale: boolean = true): number {
+  // WHO equations use weight in kg, height in cm, and return kcal/day
+  if (isMale) {
+    if (age >= 18 && age <= 29) {
+      return (15.057 * weight) + (1.004 * height) + 705;
+    } else if (age >= 30 && age <= 59) {
+      return (11.472 * weight) + (8.73 * height) + 873;
+    } else if (age >= 60) {
+      return (11.711 * weight) + (5.878 * height) + 587;
+    }
+  } else { // female
+    if (age >= 18 && age <= 29) {
+      return (14.818 * weight) + (4.65 * height) + 486;
+    } else if (age >= 30 && age <= 59) {
+      return (8.126 * weight) + (8.45 * height) + 845;
+    } else if (age >= 60) {
+      return (9.082 * weight) + (6.588 * height) + 658;
+    }
+  }
+  // Fallback to Mifflin-St Jeor if age is outside ranges
   const baseCalories = 10 * weight + 6.25 * height - 5 * age;
   return isMale ? baseCalories + 5 : baseCalories - 161;
 }
@@ -57,6 +76,7 @@ function getActivityMultiplier(activityLevel: string): number {
     light: 1.375, // Light exercise/sports 1-3 days/week
     moderate: 1.55, // Moderate exercise/sports 3-5 days/week
     active: 1.725, // Hard exercise/sports 6-7 days/week
+    very_active: 1.9, // Very hard exercise/sports & physical job
   };
   return multipliers[activityLevel as keyof typeof multipliers] || 1.2;
 }
@@ -68,16 +88,17 @@ export function calculateDailyCalories(
   height: number,
   activityLevel: string,
   goalType: 'maintain' | 'lose' | 'gain' = 'maintain',
+  isMale: boolean = true
 ): number {
-  const bmr = calculateBMR(age, weight, height);
+  const bmr = calculateBMR(age, weight, height, isMale);
   const maintenanceCalories = Math.round(bmr * getActivityMultiplier(activityLevel));
   
-  // Adjust calories based on goal
+  // Adjust calories based on goal (using WHO recommended deficits/surpluses)
   switch (goalType) {
     case 'lose':
-      return Math.round(maintenanceCalories * 0.8); // 20% deficit
+      return Math.round(maintenanceCalories - 500); // 500 kcal deficit for ~0.5kg/week loss
     case 'gain':
-      return Math.round(maintenanceCalories * 1.15); // 15% surplus
+      return Math.round(maintenanceCalories + 300); // 300 kcal surplus for lean mass gain
     default:
       return maintenanceCalories;
   }

@@ -69,20 +69,20 @@ export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.REPL_ID || "nutri-ai-secret-key-development-12345",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Don't save empty sessions
     cookie: {
       secure: false,
       sameSite: 'lax' as const,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year - user stays logged in
       httpOnly: true,
       path: '/',
     },
     store: new MemoryStore({
-      checkPeriod: 86400000,
-      ttl: 24 * 60 * 60 * 1000, // 24 hours
+      checkPeriod: 86400000, // Prune expired entries every 24h
+      ttl: 365 * 24 * 60 * 60 * 1000, // 1 year
     }),
     name: 'sessionId',
-    rolling: true, // Reset expiry on activity
+    rolling: true, // Reset expiry on each request - keeps user logged in indefinitely with activity
   };
 
   app.use(session(sessionSettings));

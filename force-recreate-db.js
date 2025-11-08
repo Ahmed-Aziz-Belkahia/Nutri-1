@@ -1,57 +1,70 @@
 #!/usr/bin/env node
 
 /**
- * FORCE RECREATE DATABASE - Drops all tables and recreates with correct schema
- * USE THIS WHEN: Database schema is corrupted and needs complete reset
- * WARNING: This DELETES ALL DATA
+ * Comprehensive Database Setup Script
+ * 
+ * This script ensures all tables are created with the correct schema.
+ * Use this script after deleting the database to recreate it from scratch.
+ * 
+ * Usage: node force-recreate-db.js
+ * 
+ * Features:
+ * - Creates all 20+ tables with complete schema
+ * - Ensures food_logs has all 24 columns
+ * - Creates authentication tables (refresh_tokens, user_token_limits)
+ * - Creates performance indexes
+ * - Validates schema after creation
+ * - Backs up existing database before recreation
  */
 
 import Database from 'better-sqlite3';
+import * as fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('🚨 FORCE DATABASE RECREATION - ALL DATA WILL BE LOST\n');
+console.log('� Starting comprehensive database setup...\n');
 
-const dbPath = path.join(__dirname, 'local.db');
-const db = new Database(dbPath);
+const DB_PATH = path.join(__dirname, 'local.db');
 
-// Drop all tables first
-console.log('🗑️  Dropping all existing tables...\n');
-
-const dropTables = [
-  'DROP TABLE IF EXISTS user_badges',
-  'DROP TABLE IF EXISTS badges',
-  'DROP TABLE IF EXISTS recipe_comments',
-  'DROP TABLE IF EXISTS recipe_likes',
-  'DROP TABLE IF EXISTS shopping_list_items',
-  'DROP TABLE IF EXISTS recipes_in_meal_plan',
-  'DROP TABLE IF EXISTS meal_plans',
-  'DROP TABLE IF EXISTS recipes',
-  'DROP TABLE IF EXISTS weight_logs',
-  'DROP TABLE IF EXISTS progress_photos',
-  'DROP TABLE IF EXISTS daily_progress',
-  'DROP TABLE IF EXISTS notifications',
-  'DROP TABLE IF EXISTS password_reset_tokens',
-  'DROP TABLE IF EXISTS user_nutrition_preferences',
-  'DROP TABLE IF EXISTS user_dietary_preferences',
-  'DROP TABLE IF EXISTS food_logs',
-  'DROP TABLE IF EXISTS users',
-  'DROP TABLE IF EXISTS sqlite_sequence',
-];
-
-for (const dropSQL of dropTables) {
-  try {
-    db.exec(dropSQL);
-    console.log(`   ✅ Dropped: ${dropSQL.split(' ')[4]}`);
-  } catch (e) {
-    // Table might not exist, that's okay
-  }
+// Check if database exists and back it up
+if (fs.existsSync(DB_PATH)) {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupPath = path.join(__dirname, `local.db.backup.${timestamp}`);
+  console.log(`⚠️  Database exists. Creating backup: ${path.basename(backupPath)}`);
+  fs.copyFileSync(DB_PATH, backupPath);
+  console.log('✅ Backup created\n');
 }
 
-console.log('\n🏗️  Creating tables with CORRECT schema...\n');
+const db = new Database(DB_PATH);
+
+try {
+  // Enable foreign keys
+  db.exec('PRAGMA foreign_keys = ON');
+  
+  console.log('🗑️  Dropping all existing tables...\n');
+  
+  // Drop tables in correct order (respecting foreign key constraints)
+  const dropOrder = [
+    'user_badges', 'recipe_comments', 'recipe_likes', 'recipes_in_meal_plan',
+    'shopping_list_items', 'meal_plans', 'recipes', 'food_logs', 'weight_logs',
+    'progress_photos', 'daily_progress', 'notifications', 'password_reset_tokens',
+    'user_dietary_preferences', 'user_nutrition_preferences', 'refresh_tokens',
+    'user_token_limits', 'api_usage_tracking', 'badges', 'users'
+  ];
+  
+  for (const table of dropOrder) {
+    try {
+      db.exec(`DROP TABLE IF EXISTS ${table}`);
+      console.log(`  ✓ Dropped ${table}`);
+    } catch (e) {
+      // Ignore if table doesn't exist
+    }
+  }
+  
+  console.log('\n🏗️  Creating tables with complete schema...\n');
 
 // Create tables with CORRECT schema (especially recipes_in_meal_plan with "order" column)
 const schema = `

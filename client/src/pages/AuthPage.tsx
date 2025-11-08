@@ -9,8 +9,7 @@ import {
   Mail,
   Lock,
   Eye,
-  EyeOff,
-  Sparkles
+  EyeOff
 } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -74,18 +73,10 @@ export default function AuthPage() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
-                className="w-16 h-16 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-xl flex items-center justify-center mb-4 shadow-lg"
+                className="mb-6"
               >
-                <Sparkles className="w-8 h-8 text-white" />
+                <img src="/logo.png" alt="NutriAI" className="h-20 w-auto object-contain" />
               </motion.div>
-              <motion.h1 
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="text-3xl font-bold text-gray-900 mb-2"
-              >
-                NutriAI
-              </motion.h1>
               <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -100,12 +91,12 @@ export default function AuthPage() {
             <AnimatePresence>
               {error && (
                 <motion.div 
-                  initial={{ opacity: 0, y: -10, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: "auto" }}
-                  exit={{ opacity: 0, y: -10, height: 0 }}
-                  className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
                 >
-                  <p className="text-red-600 text-sm text-center">{error}</p>
+                  {error}
                 </motion.div>
               )}
             </AnimatePresence>

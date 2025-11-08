@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { Camera, Upload, ArrowRight, TrendingDown, Calendar, Target, Flame } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Camera, Upload, ArrowRight, TrendingDown, Calendar, Target, Flame, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,6 +24,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [showFormulaExplanation, setShowFormulaExplanation] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -41,8 +42,43 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
     weight,
     height,
     formData.activityLevel,
-    formData.weightGoal as "maintain" | "lose" | "gain"
+    formData.weightGoal as "maintain" | "lose" | "gain",
+    isMale  // Pass the gender parameter
   );
+
+  // Calculate BMR and TDEE for explanation
+  const calculateBMR = (age: number, weight: number, height: number, isMale: boolean): number => {
+    if (isMale) {
+      if (age >= 18 && age <= 29) {
+        return (15.057 * weight) + (1.004 * height) + 705;
+      } else if (age >= 30 && age <= 59) {
+        return (11.472 * weight) + (8.73 * height) + 873;
+      } else if (age >= 60) {
+        return (11.711 * weight) + (5.878 * height) + 587;
+      }
+    } else {
+      if (age >= 18 && age <= 29) {
+        return (14.818 * weight) + (4.65 * height) + 486;
+      } else if (age >= 30 && age <= 59) {
+        return (8.126 * weight) + (8.45 * height) + 845;
+      } else if (age >= 60) {
+        return (9.082 * weight) + (6.588 * height) + 658;
+      }
+    }
+    return 0;
+  };
+
+  const activityMultipliers: { [key: string]: number } = {
+    sedentary: 1.2,
+    light: 1.375,
+    moderate: 1.55,
+    active: 1.725,
+    very_active: 1.9
+  };
+
+  const bmr = Math.round(calculateBMR(age, weight, height, isMale));
+  const activityMultiplier = activityMultipliers[formData.activityLevel] || 1.2;
+  const tdee = Math.round(bmr * activityMultiplier);
 
   const macros = calculateMacros(dailyCalories);
   
@@ -342,6 +378,161 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                   <div className="text-xs text-gray-600">Fat</div>
                 </Card>
               </div>
+            </motion.div>
+
+            {/* Formula Explanation Dropdown */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="mb-8"
+            >
+              <button
+                onClick={() => setShowFormulaExplanation(!showFormulaExplanation)}
+                className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Info className="w-5 h-5 text-blue-500" />
+                  <span className="font-semibold text-gray-900 text-sm">
+                    How we calculated your daily needs
+                  </span>
+                </div>
+                {showFormulaExplanation ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {showFormulaExplanation && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <Card className="mt-2 p-6 bg-white border-gray-200">
+                      <div className="space-y-4">
+                        {/* BMR Section */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                            1. BMR (Basal Metabolic Rate)
+                          </h4>
+                          <p className="text-xs text-gray-600 mb-2">
+                            Using WHO/FAO/UNU equations (most accurate):
+                          </p>
+                          {isMale ? (
+                            <div className="bg-blue-50 p-3 rounded-lg text-xs">
+                              {age >= 18 && age <= 29 && (
+                                <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
+                              )}
+                              {age >= 30 && age <= 59 && (
+                                <p className="font-mono text-[10px]">BMR = (11.472 × {weight}kg) + (8.73 × {height}cm) + 873</p>
+                              )}
+                              {age >= 60 && (
+                                <p className="font-mono text-[10px]">BMR = (11.711 × {weight}kg) + (5.878 × {height}cm) + 587</p>
+                              )}
+                              <p className="mt-2 font-semibold text-blue-600">= {bmr} kcal/day</p>
+                            </div>
+                          ) : (
+                            <div className="bg-pink-50 p-3 rounded-lg text-xs">
+                              {age >= 18 && age <= 29 && (
+                                <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
+                              )}
+                              {age >= 30 && age <= 59 && (
+                                <p className="font-mono text-[10px]">BMR = (8.126 × {weight}kg) + (8.45 × {height}cm) + 845</p>
+                              )}
+                              {age >= 60 && (
+                                <p className="font-mono text-[10px]">BMR = (9.082 × {weight}kg) + (6.588 × {height}cm) + 658</p>
+                              )}
+                              <p className="mt-2 font-semibold text-pink-600">= {bmr} kcal/day</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* TDEE Section */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            2. TDEE (Total Daily Energy Expenditure)
+                          </h4>
+                          <p className="text-xs text-gray-600 mb-2">
+                            BMR × activity factor:
+                          </p>
+                          <div className="bg-green-50 p-3 rounded-lg text-xs">
+                            <p className="font-mono text-[10px]">
+                              TDEE = {bmr} × {activityMultiplier} ({
+                                formData.activityLevel === 'sedentary' ? 'sedentary lifestyle' :
+                                formData.activityLevel === 'light' ? 'light activity' :
+                                formData.activityLevel === 'moderate' ? 'moderate activity' :
+                                formData.activityLevel === 'active' ? 'active lifestyle' :
+                                'very active'
+                              })
+                            </p>
+                            <p className="mt-2 font-semibold text-green-600">= {tdee} kcal/day</p>
+                          </div>
+                        </div>
+
+                        {/* Goal Adjustment */}
+                        <div>
+                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                            <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                            3. Adjusted for Your Goal
+                          </h4>
+                          <div className="bg-orange-50 p-3 rounded-lg text-xs">
+                            {formData.weightGoal === 'loss' && (
+                              <>
+                                <p>Goal: <strong>Weight Loss</strong></p>
+                                <p className="font-mono text-[10px] mt-2">
+                                  Daily calories = {tdee} - 500 kcal
+                                </p>
+                                <p className="text-[10px] text-gray-600 mt-1">
+                                  500 kcal deficit/day = ~0.5 kg loss per week
+                                </p>
+                              </>
+                            )}
+                            {formData.weightGoal === 'gain' && (
+                              <>
+                                <p>Goal: <strong>Weight Gain</strong></p>
+                                <p className="font-mono text-[10px] mt-2">
+                                  Daily calories = {tdee} + 300 kcal
+                                </p>
+                                <p className="text-[10px] text-gray-600 mt-1">
+                                  300 kcal surplus/day for healthy mass gain
+                                </p>
+                              </>
+                            )}
+                            {formData.weightGoal === 'maintain' && (
+                              <>
+                                <p>Goal: <strong>Maintain Weight</strong></p>
+                                <p className="font-mono text-[10px] mt-2">
+                                  Daily calories = {tdee} kcal
+                                </p>
+                                <p className="text-[10px] text-gray-600 mt-1">
+                                  Energy balance for weight maintenance
+                                </p>
+                              </>
+                            )}
+                            <p className="mt-3 font-semibold text-orange-600">
+                              = {dailyCalories} kcal/day
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Source Reference */}
+                        <div className="pt-3 border-t border-gray-200">
+                          <p className="text-[10px] text-gray-500">
+                            <strong>Source:</strong> WHO/FAO/UNU Expert Consultation on Energy and Protein Requirements (2004)
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
 
             {/* Let's get it done button */}
