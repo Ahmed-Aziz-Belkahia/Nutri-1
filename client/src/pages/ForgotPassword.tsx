@@ -30,18 +30,15 @@ export default function ForgotPassword() {
       if (response.ok) {
         console.log('[ForgotPassword] Email sent successfully, redirecting...');
         console.log('[ForgotPassword] Email:', email);
-        console.log('[ForgotPassword] Redirect URL:', `/verify-code?email=${encodeURIComponent(email)}`);
+        const redirectUrl = `/verify-code?email=${encodeURIComponent(email)}`;
+        console.log('[ForgotPassword] Redirect URL:', redirectUrl);
         setSuccess(true);
         
-        // Try immediate redirect to test
-        console.log('[ForgotPassword] Attempting redirect now...');
-        setLocation(`/verify-code?email=${encodeURIComponent(email)}`);
-        
-        // Also keep the timeout as backup
+        // Use window.location for reliable redirect
         setTimeout(() => {
-          console.log('[ForgotPassword] Timeout redirect executing...');
-          setLocation(`/verify-code?email=${encodeURIComponent(email)}`);
-        }, 2000);
+          console.log('[ForgotPassword] Executing redirect via window.location...');
+          window.location.href = redirectUrl;
+        }, 1500);
       } else {
         console.error('[ForgotPassword] Error:', data.error);
         setError(data.error || "Failed to send reset code");
