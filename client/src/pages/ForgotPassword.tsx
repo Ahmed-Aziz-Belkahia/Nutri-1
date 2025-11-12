@@ -29,10 +29,17 @@ export default function ForgotPassword() {
 
       if (response.ok) {
         console.log('[ForgotPassword] Email sent successfully, redirecting...');
+        console.log('[ForgotPassword] Email:', email);
+        console.log('[ForgotPassword] Redirect URL:', `/verify-code?email=${encodeURIComponent(email)}`);
         setSuccess(true);
-        // Redirect to verify code page after 2 seconds
+        
+        // Try immediate redirect to test
+        console.log('[ForgotPassword] Attempting redirect now...');
+        setLocation(`/verify-code?email=${encodeURIComponent(email)}`);
+        
+        // Also keep the timeout as backup
         setTimeout(() => {
-          console.log('[ForgotPassword] Redirecting to verify-code page');
+          console.log('[ForgotPassword] Timeout redirect executing...');
           setLocation(`/verify-code?email=${encodeURIComponent(email)}`);
         }, 2000);
       } else {
