@@ -28,13 +28,8 @@ export default function ForgotPassword() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('[ForgotPassword] Email sent successfully, redirecting...');
-        console.log('[ForgotPassword] Email:', email);
-        const redirectUrl = `/verify-code?email=${encodeURIComponent(email)}`;
-        console.log('[ForgotPassword] Redirect URL:', redirectUrl);
-        
-        // Instead of showing success animation, redirect immediately
-        window.location.href = redirectUrl;
+        // Redirect to reset password page with email parameter
+        window.location.href = `/reset-password?email=${encodeURIComponent(email)}`;
       } else {
         console.error('[ForgotPassword] Error:', data.error);
         setError(data.error || "Failed to send reset code");

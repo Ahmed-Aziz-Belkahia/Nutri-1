@@ -30,8 +30,7 @@ import CreateRecipe from "./pages/CreateRecipe";
 import RecipeScanner from "./pages/RecipeScanner";
 import IngredientConfirmation from "./pages/IngredientConfirmation";
 import ForgotPassword from "./pages/ForgotPassword";
-import VerifyCode from "./pages/VerifyCode";
-import CreateNewPassword from "./pages/CreateNewPassword";
+import ResetPassword from "./pages/ResetPassword";
 import RecipeResults from "./pages/RecipeResults";
 import SimpleCookingMode from "./pages/SimpleCookingMode";
 import Privacy from "./pages/Privacy";
@@ -234,8 +233,7 @@ function App() {
           {/* Common routes accessible to all users */}
           <Route path="/privacy" component={Privacy} />
           <Route path="/forgot-password" component={ForgotPassword} />
-          <Route path="/verify-code" component={VerifyCode} />
-          <Route path="/create-new-password" component={CreateNewPassword} />
+          <Route path="/reset-password" component={ResetPassword} />
 
           {user ? (
             // Protected routes for authenticated users

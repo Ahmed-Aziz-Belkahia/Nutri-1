@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
-export default function CreateNewPassword() {
+export default function ResetPassword() {
   const [, setLocation] = useLocation();
   const [location] = useLocation();
   const [email, setEmail] = useState("");
@@ -18,23 +18,51 @@ export default function CreateNewPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [step, setStep] = useState<"code" | "password">("code");
 
-  // Get email and code from URL params
+  // Get email from URL params
   useEffect(() => {
     const params = new URLSearchParams(location.split('?')[1] || '');
     const emailParam = params.get('email');
-    const codeParam = params.get('code');
-    
-    if (emailParam && codeParam) {
+    if (emailParam) {
       setEmail(decodeURIComponent(emailParam));
-      setCode(codeParam);
-    } else {
-      // If missing params, redirect back to forgot password
-      setLocation("/forgot-password");
     }
-  }, [location, setLocation]);
+  }, [location]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (code.length !== 6) {
+      setError("Please enter the complete 6-digit code");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/verify-reset-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Code verified, move to password step
+        setStep("password");
+      } else {
+        setError(data.error || "Invalid or expired code");
+      }
+    } catch (error) {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -63,12 +91,36 @@ export default function CreateNewPassword() {
 
       if (response.ok) {
         setSuccess(true);
-        // Redirect to login after 3 seconds
+        // Redirect to auth after 3 seconds
         setTimeout(() => {
-          setLocation("/auth");
+          window.location.href = "/auth";
         }, 3000);
       } else {
         setError(data.error || "Failed to reset password");
+      }
+    } catch (error) {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        alert("New code sent to your email!");
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to resend code");
       }
     } catch (error) {
       setError("Network error. Please try again.");
@@ -110,14 +162,108 @@ export default function CreateNewPassword() {
                     <span>Redirecting to login...</span>
                   </div>
                 </motion.div>
-              ) : (
+              ) : step === "code" ? (
                 <motion.div
-                  key="form"
+                  key="code"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {/* Logo Section */}
+                  {/* Logo Section - Code Step */}
+                  <div className="flex flex-col items-center mb-8">
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.1, duration: 0.3 }}
+                      className="w-20 h-20 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-full flex items-center justify-center mb-6"
+                    >
+                      <Shield className="w-10 h-10 text-white" />
+                    </motion.div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                      Verify Your Code
+                    </h1>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-gray-600 text-sm text-center"
+                    >
+                      Enter the 6-digit code sent to
+                      <br />
+                      <span className="font-medium text-gray-900">{email}</span>
+                    </motion.p>
+                  </div>
+
+                  {/* Error Message */}
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+                      >
+                        <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-700">{error}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Code Form */}
+                  <form onSubmit={handleVerifyCode} className="space-y-6">
+                    <div className="space-y-2">
+                      <label htmlFor="code" className="text-sm font-medium text-gray-700 block text-center">
+                        Verification Code
+                      </label>
+                      <Input
+                        id="code"
+                        type="text"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="000000"
+                        className="h-16 rounded-xl border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 text-center text-3xl font-mono tracking-[0.5em] font-semibold"
+                        maxLength={6}
+                        required
+                        disabled={isLoading}
+                        autoFocus
+                      />
+                      <p className="text-xs text-gray-500 text-center mt-2">
+                        Code expires in 15 minutes
+                      </p>
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isLoading || code.length !== 6}
+                      className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        "Verify Code"
+                      )}
+                    </Button>
+
+                    <div className="text-center">
+                      <button
+                        type="button"
+                        onClick={handleResendCode}
+                        disabled={isLoading}
+                        className="text-sm text-[#26A8FF] hover:text-[#0CC5BA] transition-colors font-medium disabled:opacity-50"
+                      >
+                        Didn't receive the code? Resend
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="password"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  {/* Logo Section - Password Step */}
                   <div className="flex flex-col items-center mb-8">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
@@ -155,9 +301,8 @@ export default function CreateNewPassword() {
                     )}
                   </AnimatePresence>
 
-                  {/* Form */}
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Email Display */}
+                  {/* Password Form */}
+                  <form onSubmit={handleResetPassword} className="space-y-4">
                     {email && (
                       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
                         <p className="text-sm text-blue-900 text-center">
@@ -233,7 +378,6 @@ export default function CreateNewPassword() {
                       </div>
                     </div>
 
-                    {/* Submit Button */}
                     <Button
                       type="submit"
                       disabled={isLoading || !newPassword || !confirmPassword}
