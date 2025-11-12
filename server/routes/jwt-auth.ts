@@ -518,6 +518,41 @@ router.post('/forgot-password', async (req, res: Response) => {
 });
 
 /**
+ * POST /api/auth/verify-reset-code
+ * Verify reset code without changing password
+ */
+router.post('/verify-reset-code', async (req, res: Response) => {
+  try {
+    const { code } = req.body;
+
+    if (!code) {
+      return res.status(400).json({ error: 'Verification code is required' });
+    }
+
+    // Verify reset code
+    const result = await verifyPasswordResetToken(code);
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.message || 'Invalid or expired code' });
+    }
+
+    console.log('[JWT Auth] Code verification successful');
+
+    res.json({
+      ok: true,
+      message: 'Code is valid'
+    });
+
+  } catch (error) {
+    console.error('[JWT Auth] Verify code error:', error);
+    res.status(500).json({
+      error: 'Code verification failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
  * POST /api/auth/reset-password
  * Reset password with verification code
  */
