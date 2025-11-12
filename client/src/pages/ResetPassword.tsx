@@ -221,7 +221,7 @@ export default function ResetPassword() {
                         value={code}
                         onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                         placeholder="000000"
-                        className="h-16 rounded-xl border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 text-center text-3xl font-mono tracking-[0.5em] font-semibold"
+                        className="h-16 rounded-xl bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 text-center text-3xl font-mono tracking-[0.5em] font-semibold"
                         maxLength={6}
                         required
                         disabled={isLoading}
