@@ -10,6 +10,7 @@ import MealPlanSection from "@/components/dashboard/MealPlanSection";
 import { useFoodLogsByDate, useDailyTotals } from "@/hooks/queries/useFoodLogs";
 import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
 import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { createInvalidator } from "@/lib/queryUtils";
 
@@ -68,6 +69,9 @@ export default function DashboardNew() {
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // Fetch user profile for calorie goals (from WHO formula in onboarding)
+  const { data: userProfile } = useUserProfile();
+
   // Fetch food logs for selected date using custom hook
   const { data: foodLogsData, isLoading: logsLoading } = useFoodLogsByDate(selectedDate);
   const foodLogs = foodLogsData?.logs || [];
@@ -106,46 +110,6 @@ export default function DashboardNew() {
       isPurchased: item.isChecked || false
     }));
   }, [groceryListData]);
-
-  // Calculate macro percentages based on targets
-  const macroData = [
-    {
-      id: 'calories',
-      title: 'Eaten Calories',
-      current: Math.round(dailyTotals.calories),
-      target: (mealPlan as any)?.targetCalories || 2500,
-      unit: 'cal',
-      color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.calories / ((mealPlan as any)?.targetCalories || 2500)) * 100))
-    },
-    {
-      id: 'carbs',
-      title: 'Carbohydrates',
-      current: Math.round(dailyTotals.carbs),
-      target: (mealPlan as any)?.targetCarbs || 300,
-      unit: 'g',
-      color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.carbs / ((mealPlan as any)?.targetCarbs || 300)) * 100))
-    },
-    {
-      id: 'protein',
-      title: 'Protein',
-      current: Math.round(dailyTotals.protein),
-      target: (mealPlan as any)?.targetProtein || 150,
-      unit: 'g',
-      color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.protein / ((mealPlan as any)?.targetProtein || 150)) * 100))
-    },
-    {
-      id: 'fat',
-      title: 'Fat',
-      current: Math.round(dailyTotals.fat),
-      target: (mealPlan as any)?.targetFat || 80,
-      unit: 'g',
-      color: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.fat / ((mealPlan as any)?.targetFat || 80)) * 100))
-    }
-  ];
 
   // Debug log for grocery list
   useEffect(() => {
@@ -247,7 +211,7 @@ export default function DashboardNew() {
         onPrevious={handlePreviousMacro}
         onNext={handleNextMacro}
         onDotClick={handleDotClick}
-        mealPlan={mealPlan}
+        userProfile={userProfile}
       />
 
       <MealsSection 

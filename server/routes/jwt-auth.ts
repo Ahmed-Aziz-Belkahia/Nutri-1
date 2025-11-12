@@ -505,7 +505,7 @@ router.post('/forgot-password', async (req, res: Response) => {
 
     res.json({
       ok: true,
-      message: 'If an account with that email exists, a password reset link has been sent.'
+      message: 'If an account with that email exists, a verification code has been sent.'
     });
 
   } catch (error) {
@@ -519,21 +519,21 @@ router.post('/forgot-password', async (req, res: Response) => {
 
 /**
  * POST /api/auth/reset-password
- * Reset password with token
+ * Reset password with verification code
  */
 router.post('/reset-password', async (req, res: Response) => {
   try {
-    const { token, newPassword } = req.body;
+    const { code, newPassword } = req.body;
 
-    if (!token || !newPassword) {
-      return res.status(400).json({ error: 'Token and new password are required' });
+    if (!code || !newPassword) {
+      return res.status(400).json({ error: 'Verification code and new password are required' });
     }
 
-    // Verify reset token
-    const result = await verifyPasswordResetToken(token);
+    // Verify reset code
+    const result = await verifyPasswordResetToken(code);
 
     if (!result.success || !result.userId) {
-      return res.status(400).json({ error: result.message || 'Invalid or expired token' });
+      return res.status(400).json({ error: result.message || 'Invalid or expired code' });
     }
 
     // Hash new password

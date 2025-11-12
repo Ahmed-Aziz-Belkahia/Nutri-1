@@ -8,13 +8,20 @@ interface DailyTotals {
   fat: number;
 }
 
+interface UserProfile {
+  caloriesGoal?: number;
+  proteinGoal?: number;
+  carbsGoal?: number;
+  fatGoal?: number;
+}
+
 interface MacroCardProps {
   dailyTotals: DailyTotals;
   currentCardIndex: number;
   onPrevious: () => void;
   onNext: () => void;
   onDotClick: (index: number) => void;
-  mealPlan?: any;
+  userProfile?: UserProfile;
 }
 
 export default function MacroCard({ 
@@ -23,7 +30,7 @@ export default function MacroCard({
   onPrevious, 
   onNext, 
   onDotClick,
-  mealPlan
+  userProfile
 }: MacroCardProps) {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
@@ -56,12 +63,26 @@ export default function MacroCard({
     return percentage >= 75 ? '#ffffff' : '#888888';
   };
 
+  // Calculate target macros from user profile
+  // caloriesGoal is the WHO formula result from onboarding
+  // proteinGoal, carbsGoal, fatGoal are percentages (e.g., 30 means 30%)
+  const targetCalories = userProfile?.caloriesGoal || 2500;
+  const targetProtein = userProfile?.proteinGoal && userProfile?.caloriesGoal
+    ? Math.round((userProfile.proteinGoal / 100) * userProfile.caloriesGoal / 4) // 4 cal/g for protein
+    : 150;
+  const targetCarbs = userProfile?.carbsGoal && userProfile?.caloriesGoal
+    ? Math.round((userProfile.carbsGoal / 100) * userProfile.caloriesGoal / 4) // 4 cal/g for carbs
+    : 300;
+  const targetFat = userProfile?.fatGoal && userProfile?.caloriesGoal
+    ? Math.round((userProfile.fatGoal / 100) * userProfile.caloriesGoal / 9) // 9 cal/g for fat
+    : 80;
+
   const macroData = [
     {
       id: 'calories',
       title: 'Eaten Calories',
       current: Math.round(dailyTotals.calories),
-      target: mealPlan?.targetCalories || 2500,
+      target: targetCalories,
       unit: 'cal',
       backgroundColors: {
         light: 'rgba(212, 238, 255, 0.6)',
@@ -74,13 +95,13 @@ export default function MacroCard({
         saturated: '#1AA3FF'
       },
       accentColor: '#26A8FF',
-      percentage: Math.min(100, Math.round((dailyTotals.calories / (mealPlan?.targetCalories || 2500)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.calories / targetCalories) * 100))
     },
     {
       id: 'protein',
       title: 'Eaten Protein',
       current: Math.round(dailyTotals.protein),
-      target: mealPlan?.targetProtein || 150,
+      target: targetProtein,
       unit: 'gr',
       backgroundColors: {
         light: 'rgba(255, 227, 192, 0.6)',
@@ -93,13 +114,13 @@ export default function MacroCard({
         saturated: '#FF8C00'
       },
       accentColor: 'darkorange',
-      percentage: Math.min(100, Math.round((dailyTotals.protein / (mealPlan?.targetProtein || 150)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.protein / targetProtein) * 100))
     },
     {
       id: 'carbs',
       title: 'Eaten Carbs',
       current: Math.round(dailyTotals.carbs),
-      target: mealPlan?.targetCarbs || 300,
+      target: targetCarbs,
       unit: 'gr',
       backgroundColors: {
         light: 'rgba(223, 255, 220, 0.6)',
@@ -112,13 +133,13 @@ export default function MacroCard({
         saturated: '#19BC0D'
       },
       accentColor: '#19BC0D',
-      percentage: Math.min(100, Math.round((dailyTotals.carbs / (mealPlan?.targetCarbs || 300)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.carbs / targetCarbs) * 100))
     },
     {
       id: 'fat',
       title: 'Eaten Fat',
       current: Math.round(dailyTotals.fat),
-      target: mealPlan?.targetFat || 80,
+      target: targetFat,
       unit: 'gr',
       backgroundColors: {
         light: 'rgba(255, 244, 244, 0.6)',
@@ -131,7 +152,7 @@ export default function MacroCard({
         saturated: '#FF2727'
       },
       accentColor: 'red',
-      percentage: Math.min(100, Math.round((dailyTotals.fat / (mealPlan?.targetFat || 80)) * 100))
+      percentage: Math.min(100, Math.round((dailyTotals.fat / targetFat) * 100))
     }
   ];
 

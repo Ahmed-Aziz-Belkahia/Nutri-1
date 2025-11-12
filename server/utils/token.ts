@@ -12,6 +12,14 @@ export const generateToken = (): string => {
 };
 
 /**
+ * Generate a 6-digit verification code
+ * @returns A 6-digit numeric string
+ */
+export const generate6DigitCode = (): string => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+/**
  * Generate a verification token for a user
  * Note: Since we don't have verification columns in the database,
  * we'll use the passwordResetTokens table with a different type
@@ -51,28 +59,28 @@ export const createEmailVerificationToken = async (userId: number): Promise<stri
 };
 
 /**
- * Create a password reset token for a user
+ * Create a password reset token for a user (6-digit code)
  * @param userId User ID
- * @returns The generated reset token
+ * @returns The generated 6-digit reset code
  */
 export const createPasswordResetToken = async (userId: number): Promise<string> => {
   try {
-    const token = generateToken();
+    const code = generate6DigitCode();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1); // Token expires in 1 hour
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Code expires in 15 minutes
     
-    // Update user with reset token
+    // Update user with reset code
     await db.update(users)
       .set({
-        resetToken: token,
+        resetToken: code,
         resetTokenExpiresAt: expiresAt
       })
       .where(eq(users.id, userId));
     
-    return token;
+    return code;
   } catch (error) {
-    console.error('Error generating password reset token:', error);
-    throw new Error('Failed to generate password reset token');
+    console.error('Error generating password reset code:', error);
+    throw new Error('Failed to generate password reset code');
   }
 };
 
@@ -126,66 +134,66 @@ export const verifyEmailToken = async (token: string): Promise<{ success: boolea
 };
 
 /**
- * Generate a password reset token for a user
+ * Generate a password reset token for a user (6-digit code)
  * @param userId User ID
- * @returns The generated reset token
+ * @returns The generated 6-digit reset code
  */
 export const generatePasswordResetToken = async (userId: number): Promise<string> => {
   try {
-    const token = generateToken();
+    const code = generate6DigitCode();
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1); // Token expires in 1 hour
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Code expires in 15 minutes
     
-    // Update user with reset token
+    // Update user with reset code
     await db.update(users)
       .set({
-        resetToken: token,
+        resetToken: code,
         resetTokenExpiresAt: expiresAt
       })
       .where(eq(users.id, userId));
     
-    return token;
+    return code;
   } catch (error) {
-    console.error('Error generating password reset token:', error);
-    throw new Error('Failed to generate password reset token');
+    console.error('Error generating password reset code:', error);
+    throw new Error('Failed to generate password reset code');
   }
 };
 
 /**
- * Verify a password reset token
- * @param token The reset token
+ * Verify a password reset token (6-digit code)
+ * @param code The 6-digit reset code
  * @returns Object with success status, message, and userId if successful
  */
-export const verifyPasswordResetToken = async (token: string): Promise<{ success: boolean; message: string; userId?: number }> => {
+export const verifyPasswordResetToken = async (code: string): Promise<{ success: boolean; message: string; userId?: number }> => {
   try {
     const now = new Date();
     
-    // Find user with matching token
+    // Find user with matching code
     const user = await db.query.users.findFirst({
-      where: eq(users.resetToken, token)
+      where: eq(users.resetToken, code)
     });
     
-    // Check if token exists and is not expired
+    // Check if code exists and is not expired
     if (!user) {
-      return { success: false, message: 'Invalid reset token' };
+      return { success: false, message: 'Invalid verification code' };
     }
     
     if (!user.resetTokenExpiresAt) {
-      return { success: false, message: 'Reset token has no expiration date' };
+      return { success: false, message: 'Verification code has no expiration date' };
     }
     
     if (user.resetTokenExpiresAt < now) {
-      return { success: false, message: 'Reset token has expired' };
+      return { success: false, message: 'Verification code has expired. Please request a new one.' };
     }
     
     return {
       success: true,
-      message: 'Token is valid',
+      message: 'Code is valid',
       userId: user.id
     };
   } catch (error) {
-    console.error('Error verifying password reset token:', error);
-    return { success: false, message: 'Failed to verify password reset token' };
+    console.error('Error verifying password reset code:', error);
+    return { success: false, message: 'Failed to verify password reset code' };
   }
 };
 
