@@ -32,13 +32,9 @@ export default function ForgotPassword() {
         console.log('[ForgotPassword] Email:', email);
         const redirectUrl = `/verify-code?email=${encodeURIComponent(email)}`;
         console.log('[ForgotPassword] Redirect URL:', redirectUrl);
-        setSuccess(true);
         
-        // Use window.location for reliable redirect
-        setTimeout(() => {
-          console.log('[ForgotPassword] Executing redirect via window.location...');
-          window.location.href = redirectUrl;
-        }, 1500);
+        // Instead of showing success animation, redirect immediately
+        window.location.href = redirectUrl;
       } else {
         console.error('[ForgotPassword] Error:', data.error);
         setError(data.error || "Failed to send reset code");
