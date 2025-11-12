@@ -65,7 +65,7 @@ export default function CreateNewPassword() {
         setSuccess(true);
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          setLocation("/login");
+          setLocation("/auth");
         }, 3000);
       } else {
         setError(data.error || "Failed to reset password");

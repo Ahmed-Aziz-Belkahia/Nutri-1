@@ -28,12 +28,15 @@ export default function ForgotPassword() {
       const data = await response.json();
 
       if (response.ok) {
+        console.log('[ForgotPassword] Email sent successfully, redirecting...');
         setSuccess(true);
         // Redirect to verify code page after 2 seconds
         setTimeout(() => {
+          console.log('[ForgotPassword] Redirecting to verify-code page');
           setLocation(`/verify-code?email=${encodeURIComponent(email)}`);
         }, 2000);
       } else {
+        console.error('[ForgotPassword] Error:', data.error);
         setError(data.error || "Failed to send reset code");
       }
     } catch (error) {
@@ -156,7 +159,7 @@ export default function ForgotPassword() {
 
                     <button
                       type="button"
-                      onClick={() => setLocation("/login")}
+                      onClick={() => setLocation("/auth")}
                       className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 transition-colors py-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
