@@ -91,10 +91,32 @@ export default function ResetPassword() {
 
       if (response.ok) {
         setSuccess(true);
-        // Redirect to auth after 3 seconds
-        setTimeout(() => {
-          window.location.href = "/auth";
-        }, 3000);
+        
+        // Auto-login after password reset
+        try {
+          const loginResponse = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password: newPassword }),
+          });
+
+          if (loginResponse.ok) {
+            // Login successful, redirect to dashboard
+            setTimeout(() => {
+              window.location.href = "/dashboard";
+            }, 2000);
+          } else {
+            // Login failed, redirect to auth page
+            setTimeout(() => {
+              window.location.href = "/auth";
+            }, 2000);
+          }
+        } catch (error) {
+          // Error during login, redirect to auth page
+          setTimeout(() => {
+            window.location.href = "/auth";
+          }, 2000);
+        }
       } else {
         setError(data.error || "Failed to reset password");
       }
@@ -155,11 +177,11 @@ export default function ResetPassword() {
                     Password Reset Successfully!
                   </h3>
                   <p className="text-gray-600">
-                    You can now log in with your new password.
+                    Logging you in...
                   </p>
                   <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Redirecting to login...</span>
+                    <span>Redirecting to dashboard...</span>
                   </div>
                 </motion.div>
               ) : step === "code" ? (
