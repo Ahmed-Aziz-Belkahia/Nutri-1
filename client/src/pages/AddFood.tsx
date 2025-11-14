@@ -127,9 +127,12 @@ export default function AddFood() {
 
   // Handle form submission for manual entry
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsAnalyzing(true);
     try {
+      console.log('[AddFood] Manual form submission:', values);
+      
       // Add to food log
-      await addFood({
+      const result = await addFood({
         name: values.name,
         calories: Number(values.calories),
         protein: Number(values.protein),
@@ -137,21 +140,27 @@ export default function AddFood() {
         fat: Number(values.fat),
         image: null
       });
+      
+      console.log('[AddFood] Food added successfully:', result);
 
       toast({
         title: "Success",
         description: `Added ${values.name} to log`,
       });
 
-      setLocation("/dashboard");
+      // Small delay to ensure backend has processed
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 500);
     } catch (error) {
-      console.error('Error adding food:', error);
+      console.error('[AddFood] Error adding food:', error);
       
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add food to log",
+        description: error instanceof Error ? error.message : "Failed to add food to log",
       });
+      setIsAnalyzing(false);
     }
   };
 
