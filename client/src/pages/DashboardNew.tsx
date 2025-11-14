@@ -186,6 +186,12 @@ export default function DashboardNew() {
           refetchType: 'active'
         });
 
+        // Invalidate recent food logs for recipes page
+        await queryClient.invalidateQueries({ 
+          queryKey: ['/api/food-logs/recent-all'],
+          refetchType: 'active'
+        });
+
         console.log('[DASHBOARD] Queries refreshed, showing success message');
 
         toast({
