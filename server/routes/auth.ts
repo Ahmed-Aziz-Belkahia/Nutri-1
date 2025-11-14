@@ -67,6 +67,7 @@ router.post('/register', async (req: Request, res: Response) => {
     });
     
     return res.status(201).json({ 
+      ok: true,
       message: 'Registration successful. Please check your email for a verification code.',
       userId: newUser.id,
       requiresVerification: true

@@ -21,12 +21,15 @@ import {
   verifyEmailToken,
   generatePasswordResetToken as createPasswordResetToken,
   verifyPasswordResetToken,
-  clearPasswordResetToken
+  clearPasswordResetToken,
+  generateEmailVerificationCode,
+  verifyEmailVerificationCode
 } from '../utils/token';
 import {
   sendVerificationEmail,
   sendWelcomeEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendVerificationCodeEmail
 } from '../services/email';
 
 const router = Router();
@@ -107,7 +110,8 @@ router.post('/register', async (req, res: Response) => {
       longestStreak: 0,
       experiencePoints: 0,
       level: 1,
-      isAdmin: false
+      isAdmin: false,
+      isEmailVerified: false
     };
     
     const [newUser] = await db
@@ -161,51 +165,22 @@ router.post('/register', async (req, res: Response) => {
       console.error('[JWT Auth] Error creating token limits:', error);
     }
 
-    // Generate verification token and send email
-    try {
-      const verificationToken = await createEmailVerificationToken(newUser.id);
-      await sendVerificationEmail(email, verificationToken);
-      await sendWelcomeEmail(email, profile?.name || null);
-      console.log('[JWT Auth] Verification and welcome emails sent');
-    } catch (emailError) {
-      console.error('[JWT Auth] Error sending emails:', emailError);
-    }
-
-    // Generate JWT tokens
-    const accessToken = generateAccessToken(newUser.id, newUser.email);
-    const refreshToken = generateRefreshToken(newUser.id, newUser.email);
-
-    // Store refresh token in database
-    const { refreshTokenExpiry } = getTokenExpiryDates();
-    await storeRefreshToken(newUser.id, refreshToken, refreshTokenExpiry);
-
-    // Set tokens in HTTP-only cookies
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 15 * 60 * 1000 // 15 minutes
-    });
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    // Generate 6-digit verification code
+    const code = await generateEmailVerificationCode(newUser.id);
+    
+    // Send verification code email (but don't wait for it or block registration)
+    sendVerificationCodeEmail(email, code).catch(error => {
+      console.error('[JWT Auth] Failed to send verification email:', error);
     });
 
     console.log('[JWT Auth] Registration successful for:', email);
 
+    // Don't log the user in automatically - they need to verify email first
     res.status(201).json({
       ok: true,
-      message: 'Registration successful',
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        hasCompletedOnboarding: newUser.hasCompletedOnboarding
-      },
-      accessToken,
-      refreshToken
+      message: 'Registration successful. Please check your email for a verification code.',
+      requiresVerification: true,
+      userId: newUser.id
     });
 
   } catch (error) {

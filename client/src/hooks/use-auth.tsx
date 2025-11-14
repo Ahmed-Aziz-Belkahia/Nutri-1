@@ -52,6 +52,7 @@ type RegisterData = LoginData & {
 type AuthResponse = {
   ok: boolean;
   error?: string;
+  requiresVerification?: boolean;
 };
 
 type AuthContextType = {
