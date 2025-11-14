@@ -156,24 +156,44 @@ export default function DashboardNew() {
         setTimeout(() => setProcessingStep("Updating nutrition totals..."), 1000);
 
         // Add the food to the log
-        await addFood(foodData);
+        const result = await addFood(foodData);
+        console.log('[DASHBOARD] Food added successfully:', result);
 
         setProcessingStep("Complete!");
         setProcessingComplete(true);
+
+        // Clear the pending data immediately
+        localStorage.removeItem('pendingManualFood');
+
+        // Force immediate refetch of food logs using the correct query keys
+        console.log('[DASHBOARD] Refetching food logs for date:', selectedDate);
+        
+        await queryClient.refetchQueries({ 
+          queryKey: ['food-logs', 'date', selectedDate],
+          type: 'active',
+          exact: true
+        });
+
+        await queryClient.refetchQueries({ 
+          queryKey: ['food-logs', 'totals', selectedDate],
+          type: 'active',
+          exact: true
+        });
+
+        // Also invalidate all food logs to be safe
+        await queryClient.invalidateQueries({ 
+          queryKey: ['food-logs'],
+          refetchType: 'active'
+        });
+
+        console.log('[DASHBOARD] Queries refreshed, showing success message');
 
         toast({
           title: "Success",
           description: `Added ${foodData.name} to your log`,
         });
 
-        // Clear the pending data
-        localStorage.removeItem('pendingManualFood');
-
-        // Invalidate queries to refresh data
-        const invalidator = createInvalidator(queryClient);
-        invalidator.foodLogs(selectedDate);
-
-        // Hide the processing screen after a brief delay
+        // Hide the processing screen after showing success
         setTimeout(() => {
           setIsProcessingManualFood(false);
           setProcessingComplete(false);
@@ -190,6 +210,7 @@ export default function DashboardNew() {
 
         localStorage.removeItem('pendingManualFood');
         setIsProcessingManualFood(false);
+        setProcessingComplete(false);
       }
     };
 
