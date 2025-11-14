@@ -306,30 +306,36 @@ export default function AddFoodNew() {
 
   // Handle manual form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsAnalyzing(true);
     try {
-      await addFood({
+      console.log('[AddFoodNew] Manual form submission:', values);
+      
+      // Store in localStorage instead of calling addFood directly
+      localStorage.setItem('pendingManualFood', JSON.stringify({
         name: values.name,
         calories: Number(values.calories),
         protein: Number(values.protein),
         carbs: Number(values.carbs),
         fat: Number(values.fat),
         image: null
-      });
+      }));
 
       toast({
-        title: "Success",
-        description: `Added ${values.name} to log`,
+        title: "Processing",
+        description: `Adding ${values.name} to your log...`,
       });
 
+      // Redirect immediately - dashboard will process
       setLocation("/dashboard");
     } catch (error) {
-      console.error('Error adding food:', error);
+      console.error('[AddFoodNew] Error preparing food:', error);
       
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add food to log",
+        description: error instanceof Error ? error.message : "Failed to add food to log",
       });
+      setIsAnalyzing(false);
     }
   };
 
@@ -342,12 +348,17 @@ export default function AddFoodNew() {
         throw new Error('Please enter a food description');
       }
       
+      console.log('[AddFoodNew] Analyzing text:', values.text);
+      
+      // Analyze with Gemini AI
       const result = await analyzeFoodText(values.text);
+      console.log('[AddFoodNew] Analysis result:', result);
       
       if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
         throw new Error('Invalid analysis result: Missing required data');
       }
       
+      // Prepare food data
       const foodData = {
         name: result.name,
         calories: typeof result.calories === 'number' ? result.calories : 0,
@@ -358,16 +369,20 @@ export default function AddFoodNew() {
         image: null
       };
       
-      await addFood(foodData);
+      console.log('[AddFoodNew] Storing AI analyzed food data:', foodData);
+      
+      // Store in localStorage (same as manual entry)
+      localStorage.setItem('pendingManualFood', JSON.stringify(foodData));
 
       toast({
-        title: "Success",
-        description: `Added ${result.name} to your log`,
+        title: "Analysis Complete",
+        description: `Adding ${result.name} to your log...`,
       });
 
+      // Redirect to dashboard
       setLocation("/dashboard");
     } catch (error) {
-      console.error('Error in text submission process:', error);
+      console.error('[AddFoodNew] Error in text submission process:', error);
       
       toast({
         variant: "destructive",
@@ -376,7 +391,6 @@ export default function AddFoodNew() {
           ? error.message 
           : "Failed to analyze food description. Try being more specific or use manual entry."
       });
-    } finally {
       setIsAnalyzing(false);
     }
   };
