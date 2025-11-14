@@ -131,29 +131,25 @@ export default function AddFood() {
     try {
       console.log('[AddFood] Manual form submission:', values);
       
-      // Add to food log
-      const result = await addFood({
+      // Store the food data in localStorage for the analyzing screen
+      localStorage.setItem('pendingManualFood', JSON.stringify({
         name: values.name,
         calories: Number(values.calories),
         protein: Number(values.protein),
         carbs: Number(values.carbs),
         fat: Number(values.fat),
         image: null
-      });
-      
-      console.log('[AddFood] Food added successfully:', result);
+      }));
 
       toast({
-        title: "Success",
-        description: `Added ${values.name} to log`,
+        title: "Processing",
+        description: `Adding ${values.name} to your log...`,
       });
 
-      // Small delay to ensure backend has processed
-      setTimeout(() => {
-        setLocation("/dashboard");
-      }, 500);
+      // Navigate to dashboard where the food will be processed
+      setLocation("/dashboard");
     } catch (error) {
-      console.error('[AddFood] Error adding food:', error);
+      console.error('[AddFood] Error preparing food:', error);
       
       toast({
         variant: "destructive",

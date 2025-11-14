@@ -13,6 +13,10 @@ import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { createInvalidator } from "@/lib/queryUtils";
+import { useFoodLog } from "@/hooks/use-food-log";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import { Loader2, CheckCircle } from "lucide-react";
 
 interface GroceryItem {
   id: number;
@@ -64,10 +68,15 @@ function getLast3MonthsPlus7Days() {
 export default function DashboardNew() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { addFood } = useFoodLog();
+  const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getLast3MonthsPlus7Days());
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isProcessingManualFood, setIsProcessingManualFood] = useState(false);
+  const [processingStep, setProcessingStep] = useState<string>("");
+  const [processingComplete, setProcessingComplete] = useState(false);
 
   // Fetch user profile for calorie goals (from WHO formula in onboarding)
   const { data: userProfile } = useUserProfile();
@@ -128,6 +137,64 @@ export default function DashboardNew() {
     console.log('[DASHBOARD] Selected date changed to:', selectedDate);
     console.log('[DASHBOARD] Current meal plan:', mealPlan);
   }, [selectedDate, mealPlan]);
+
+  // Process pending manual food entry
+  useEffect(() => {
+    const processPendingManualFood = async () => {
+      const pendingData = localStorage.getItem('pendingManualFood');
+      if (!pendingData) return;
+
+      try {
+        setIsProcessingManualFood(true);
+        setProcessingStep("Preparing your meal entry...");
+        
+        const foodData = JSON.parse(pendingData);
+        console.log('[DASHBOARD] Processing pending manual food:', foodData);
+
+        // Simulate progress steps
+        setTimeout(() => setProcessingStep("Adding to your food log..."), 500);
+        setTimeout(() => setProcessingStep("Updating nutrition totals..."), 1000);
+
+        // Add the food to the log
+        await addFood(foodData);
+
+        setProcessingStep("Complete!");
+        setProcessingComplete(true);
+
+        toast({
+          title: "Success",
+          description: `Added ${foodData.name} to your log`,
+        });
+
+        // Clear the pending data
+        localStorage.removeItem('pendingManualFood');
+
+        // Invalidate queries to refresh data
+        const invalidator = createInvalidator(queryClient);
+        invalidator.foodLogs(selectedDate);
+
+        // Hide the processing screen after a brief delay
+        setTimeout(() => {
+          setIsProcessingManualFood(false);
+          setProcessingComplete(false);
+        }, 1500);
+
+      } catch (error) {
+        console.error('[DASHBOARD] Error processing manual food:', error);
+        
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to add food",
+        });
+
+        localStorage.removeItem('pendingManualFood');
+        setIsProcessingManualFood(false);
+      }
+    };
+
+    processPendingManualFood();
+  }, []); // Only run once on mount
 
   // Auto-scroll carousel every 5 seconds
   useEffect(() => {
@@ -199,6 +266,81 @@ export default function DashboardNew() {
 
   return (
     <BaseLayout>
+      {/* Manual Food Processing Screen */}
+      {isProcessingManualFood && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-[#0E95A7] via-[#1E6F7D] to-[#0D8495]"
+        >
+          <div className="text-center px-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+              className="w-24 h-24 mx-auto mb-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+            >
+              {processingComplete ? (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <CheckCircle className="w-12 h-12 text-white" />
+                </motion.div>
+              ) : (
+                <Loader2 className="w-12 h-12 text-white animate-spin" />
+              )}
+            </motion.div>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-3xl font-bold text-white mb-4"
+            >
+              {processingComplete ? "Added!" : "Processing..."}
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-white/90 text-lg"
+            >
+              {processingStep}
+            </motion.p>
+
+            {/* Progress dots */}
+            {!processingComplete && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="flex justify-center gap-2 mt-8"
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      delay: i * 0.2,
+                    }}
+                    className="w-2 h-2 bg-white rounded-full"
+                  />
+                ))}
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       <CalendarSelector 
         allDays={allDays}
         selectedDate={selectedDate}
