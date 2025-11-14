@@ -112,6 +112,154 @@ export const sendVerificationEmail = async (
 };
 
 /**
+ * Sends an email verification code to a user (6-digit code)
+ * @param email User's email address
+ * @param code 6-digit verification code
+ */
+export const sendVerificationCodeEmail = async (
+  email: string,
+  code: string
+): Promise<void> => {
+  try {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Verify Your Email</title>
+        <style>
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+          }
+          .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+          .header {
+            background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%);
+            padding: 40px;
+            text-align: center;
+          }
+          .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+          }
+          .content {
+            padding: 40px;
+          }
+          .greeting {
+            font-size: 18px;
+            color: #1f1f1e;
+            margin-bottom: 20px;
+          }
+          .message {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+          }
+          .code-container {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px dashed #0CC5BA;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+          }
+          .code-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+          .code {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0CC5BA;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+          }
+          .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 14px;
+          }
+          .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+          }
+          .footer-link {
+            color: #0CC5BA;
+            text-decoration: none;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>✉️ Verify Your Email</h1>
+          </div>
+          <div class="content">
+            <div class="greeting">Welcome to NutriAI!</div>
+            <div class="message">
+              Thank you for signing up. To complete your registration and start your nutrition journey, 
+              please verify your email address using the code below:
+            </div>
+            <div class="code-container">
+              <div class="code-label">Your Verification Code</div>
+              <div class="code">${code}</div>
+            </div>
+            <div class="message">
+              This code will expire in <strong>15 minutes</strong> for security reasons.
+            </div>
+            <div class="warning">
+              <strong>⚠️ Important:</strong> If you didn't create an account with NutriAI, 
+              please ignore this email.
+            </div>
+          </div>
+          <div class="footer">
+            <p>Need help? Contact us at <a href="mailto:support@nutriai.pl" class="footer-link">support@nutriai.pl</a></p>
+            <p style="color: #999; font-size: 12px; margin-top: 20px;">
+              © 2025 NutriAI. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    await sendEmail(
+      email,
+      'Verify Your Email - NutriAI',
+      html
+    );
+  } catch (error) {
+    console.error('Error sending verification code email:', error);
+    // Log but don't throw to avoid breaking registration
+    console.log(`[Email Service] Verification code email could not be sent to ${email}, but continuing registration`);
+  }
+};
+
+/**
  * Sends a password reset email to a user with a verification code
  * @param email User's email address
  * @param code 6-digit verification code

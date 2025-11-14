@@ -8,12 +8,15 @@ import {
   verifyEmailToken, 
   generatePasswordResetToken, 
   verifyPasswordResetToken, 
-  clearPasswordResetToken 
+  clearPasswordResetToken,
+  generateEmailVerificationCode,
+  verifyEmailVerificationCode
 } from '../utils/token';
 import { 
   sendVerificationEmail, 
   sendPasswordResetEmail, 
-  sendWelcomeEmail 
+  sendWelcomeEmail,
+  sendVerificationCodeEmail
 } from '../services/email';
 
 const router = Router();
@@ -47,22 +50,24 @@ router.post('/register', async (req: Request, res: Response) => {
         currentStreak: 0,
         longestStreak: 0,
         experiencePoints: 0,
-        level: 1
+        level: 1,
+        isEmailVerified: false
     };
     
     const [newUser] = await db.insert(users)
       .values(userData)
       .returning({ id: users.id });
     
-    // Generate verification token
-    const token = await generateVerificationToken(newUser.id);
+    // Generate 6-digit verification code
+    const code = await generateEmailVerificationCode(newUser.id);
     
-    // Send verification email
-    await sendVerificationEmail(email, token);
+    // Send verification code email
+    await sendVerificationCodeEmail(email, code);
     
     return res.status(201).json({ 
-      message: 'Registration successful. Please check your email to verify your account.',
-      userId: newUser.id
+      message: 'Registration successful. Please check your email for a verification code.',
+      userId: newUser.id,
+      requiresVerification: true
     });
     
   } catch (error) {
@@ -230,6 +235,82 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Resend verification error:', error);
     return res.status(500).json({ error: 'Failed to resend verification email. Please try again.' });
+  }
+});
+
+// Verify email with code (6-digit code)
+router.post('/verify-email-code', async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+    
+    if (!email || !code) {
+      return res.status(400).json({ error: 'Email and verification code are required' });
+    }
+    
+    const result = await verifyEmailVerificationCode(email, code);
+    
+    if (!result.success) {
+      return res.status(400).json({ error: result.message });
+    }
+    
+    // Send welcome email after successful verification
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, result.userId as number)
+    });
+    
+    if (user) {
+      await sendWelcomeEmail(user.email);
+    }
+    
+    return res.status(200).json({ message: result.message });
+    
+  } catch (error) {
+    console.error('Email verification with code error:', error);
+    return res.status(500).json({ error: 'Email verification failed. Please try again.' });
+  }
+});
+
+// Resend verification code (6-digit code)
+router.post('/resend-verification-code', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    
+    // Check if user exists
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email)
+    });
+    
+    if (!user) {
+      // For security reasons, don't reveal if email exists or not
+      return res.status(200).json({ 
+        message: 'If an account with that email exists, a verification code has been sent.' 
+      });
+    }
+    
+    // Check if email is already verified
+    if (user.isEmailVerified) {
+      return res.status(400).json({ 
+        error: 'Email is already verified. Please sign in.' 
+      });
+    }
+    
+    // Generate new verification code
+    const code = await generateEmailVerificationCode(user.id);
+    
+    // Send verification code email
+    await sendVerificationCodeEmail(email, code);
+    
+    return res.status(200).json({ 
+      message: 'Verification code has been sent. Please check your inbox.' 
+    });
+    
+  } catch (error) {
+    console.error('Resend verification code error:', error);
+    return res.status(500).json({ error: 'Failed to resend verification code. Please try again.' });
   }
 });
 

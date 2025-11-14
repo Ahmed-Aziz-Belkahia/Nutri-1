@@ -10,8 +10,6 @@ import Footer from "./components/Footer";
 import AuthPage from "./pages/AuthPage";
 import DashboardNew from "./pages/DashboardNew";
 import LandingPage from "./pages/LandingPage";
-import Progress from "./pages/Progress";
-import ProgressNew from "./pages/Progress";
 import Settings from "./pages/Settings";
 import EnhancedDashboard from "./pages/EnhancedDashboard";
 import DetailedNutrition from "./pages/DetailedNutrition";
@@ -74,6 +72,7 @@ import DebugLogin from "./pages/DebugLogin";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import EmailVerifiedPage from "./pages/EmailVerifiedPage";
+import VerifyEmail from "./pages/VerifyEmail";
 
 // Import our emotional journey pages
 import EmotionalLandingPage from "./pages/EmotionalLandingPage";
@@ -502,6 +501,7 @@ function App() {
           // Public routes for unauthenticated users
           <>
             <Route path="/auth" component={AuthPage} />
+            <Route path="/verify-email" component={VerifyEmail} />
             <Route path="/test-login" component={TestLogin} />
             <Route path="/debug-login" component={DebugLogin} />
             <Route path="/emotional-landing" component={EmotionalLandingPage} />

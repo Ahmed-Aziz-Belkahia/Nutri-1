@@ -20,6 +20,86 @@ export const generate6DigitCode = (): string => {
 };
 
 /**
+ * Generate an email verification code for a user (6-digit code)
+ * @param userId User ID
+ * @returns The generated 6-digit verification code
+ */
+export const generateEmailVerificationCode = async (userId: number): Promise<string> => {
+  try {
+    const code = generate6DigitCode();
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15); // Code expires in 15 minutes
+    
+    // Update user with verification code
+    await db.update(users)
+      .set({
+        verificationCode: code,
+        verificationCodeExpiresAt: expiresAt
+      })
+      .where(eq(users.id, userId));
+    
+    return code;
+  } catch (error) {
+    console.error('Error generating email verification code:', error);
+    throw new Error('Failed to generate email verification code');
+  }
+};
+
+/**
+ * Verify an email verification code (6-digit code)
+ * @param email User's email address
+ * @param code The 6-digit verification code
+ * @returns Object with success status, message, and userId if successful
+ */
+export const verifyEmailVerificationCode = async (email: string, code: string): Promise<{ success: boolean; message: string; userId?: number }> => {
+  try {
+    const now = new Date();
+    
+    // Find user with matching email and code
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email)
+    });
+    
+    // Check if user exists
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
+    
+    // Check if verification code matches
+    if (user.verificationCode !== code) {
+      return { success: false, message: 'Invalid verification code' };
+    }
+    
+    // Check if code has expired
+    if (!user.verificationCodeExpiresAt) {
+      return { success: false, message: 'No verification code found' };
+    }
+    
+    if (user.verificationCodeExpiresAt < now) {
+      return { success: false, message: 'Verification code has expired. Please request a new one.' };
+    }
+    
+    // Mark email as verified and clear verification code
+    await db.update(users)
+      .set({
+        isEmailVerified: true,
+        verificationCode: null,
+        verificationCodeExpiresAt: null
+      })
+      .where(eq(users.id, user.id));
+    
+    return {
+      success: true,
+      message: 'Email verified successfully',
+      userId: user.id
+    };
+  } catch (error) {
+    console.error('Error verifying email verification code:', error);
+    return { success: false, message: 'Failed to verify email verification code' };
+  }
+};
+
+/**
  * Generate a verification token for a user
  * Note: Since we don't have verification columns in the database,
  * we'll use the passwordResetTokens table with a different type

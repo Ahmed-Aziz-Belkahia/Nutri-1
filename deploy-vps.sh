@@ -69,10 +69,14 @@ npm run db:push
 print_status "Database schema updated"
 
 # Run any custom migrations (for backward compatibility)
+print_info "Running custom migrations..."
 if [ -f "add-age-gender-migration.js" ]; then
-    print_info "Running custom migrations..."
     node add-age-gender-migration.js
 fi
+if [ -f "migrations/add-email-verification.js" ]; then
+    node migrations/add-email-verification.js
+fi
+print_status "Custom migrations completed"
 
 # Build the application
 print_info "Building application..."

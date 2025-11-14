@@ -49,7 +49,12 @@ export default function AuthPage() {
       });
 
       if (result.ok) {
-        setLocation("/onboarding");
+        if (!isLogin && result.requiresVerification) {
+          // Redirect to email verification page with email parameter
+          setLocation(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+        } else {
+          setLocation("/onboarding");
+        }
       }
     } catch (error: any) {
       console.error('Auth error:', error);
