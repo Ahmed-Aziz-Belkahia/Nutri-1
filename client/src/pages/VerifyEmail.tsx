@@ -5,10 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Mail, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function VerifyEmail() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const [email, setEmail] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -95,6 +97,10 @@ export default function VerifyEmail() {
       }
 
       setIsVerified(true);
+      
+      // Invalidate user query to trigger re-fetch and auto-login
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      
       toast({
         title: "Email verified!",
         description: "Your account has been created successfully.",
