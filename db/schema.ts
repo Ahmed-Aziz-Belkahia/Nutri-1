@@ -25,6 +25,17 @@ export const users = sqliteTable("users", {
   isAdmin: integer("is_admin", { mode: 'boolean' }).default(false),
 });
 
+// Pending registrations (email verification before account creation)
+export const pendingRegistrations = sqliteTable("pending_registrations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  verificationCode: text("verification_code").notNull(),
+  verificationCodeExpiresAt: integer("verification_code_expires_at", { mode: 'timestamp' }).notNull(),
+  profileData: text("profile_data", { mode: 'json' }),
+  createdAt: integer("created_at", { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+});
+
 // Types and validation schemas for authentication
 export const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -369,7 +380,6 @@ export const passwordResetTokensRelations = relations(passwordResetTokens, ({ on
 }));
 
 // Types and validation schemas
-export type SelectUser = typeof users.$inferSelect;
 export type Recipe = typeof recipes.$inferSelect;
 export type RecipeLike = typeof recipeLikes.$inferSelect;
 export type RecipeComment = typeof recipeComments.$inferSelect;

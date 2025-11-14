@@ -97,12 +97,12 @@ export default function VerifyEmail() {
       setIsVerified(true);
       toast({
         title: "Email verified!",
-        description: "Your email has been successfully verified.",
+        description: "Your account has been created successfully.",
       });
 
-      // Wait 2 seconds before redirecting to let user see success message
+      // Wait 2 seconds before redirecting to onboarding
       setTimeout(() => {
-        setLocation('/auth');
+        setLocation('/onboarding');
       }, 2000);
 
     } catch (error) {

@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { db } from '@db';
-import { users, userNutritionPreferences, refreshTokens, userTokenLimits } from '@db/schema';
+import { users, userNutritionPreferences, refreshTokens, userTokenLimits, pendingRegistrations } from '@db/schema';
 import { eq } from 'drizzle-orm';
 import {
   generateAccessToken,
@@ -94,14 +94,105 @@ router.post('/register', async (req, res: Response) => {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
+    // Check if there's already a pending registration
+    const [existingPending] = await db
+      .select()
+      .from(pendingRegistrations)
+      .where(eq(pendingRegistrations.email, email))
+      .limit(1);
+
+    // Delete existing pending registration if found
+    if (existingPending) {
+      await db
+        .delete(pendingRegistrations)
+        .where(eq(pendingRegistrations.email, email));
+    }
+
+    // Hash password
+    const hashedPassword = await crypto.hash(password);
+
+    // Generate 6-digit verification code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Store pending registration
+    await db.insert(pendingRegistrations).values({
+      email,
+      password: hashedPassword,
+      verificationCode: code,
+      verificationCodeExpiresAt: expiresAt,
+      profileData: profile ? JSON.stringify(profile) : null,
+    });
+
+    console.log('[JWT Auth] Pending registration created for:', email);
+
+    // Send verification code email (but don't wait for it or block registration)
+    sendVerificationCodeEmail(email, code).catch(error => {
+      console.error('[JWT Auth] Failed to send verification email:', error);
+    });
+
+    console.log('[JWT Auth] Registration initiated for:', email);
+
+    // Don't create the account yet - they need to verify email first
+    res.status(201).json({
+      ok: true,
+      message: 'Please check your email for a verification code to complete registration.',
+      requiresVerification: true
+    });
+
+  } catch (error) {
+    console.error('[JWT Auth] Registration error:', error);
+    res.status(500).json({
+      error: 'Registration failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/verify-email-code
+ * Verify email with code and complete registration
+ */
+router.post('/verify-email-code', async (req, res: Response) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ error: 'Email and verification code are required' });
+    }
+
+    // Find pending registration
+    const [pending] = await db
+      .select()
+      .from(pendingRegistrations)
+      .where(eq(pendingRegistrations.email, email))
+      .limit(1);
+
+    if (!pending) {
+      return res.status(400).json({ error: 'No pending registration found for this email' });
+    }
+
+    // Check if code matches
+    if (pending.verificationCode !== code) {
+      return res.status(400).json({ error: 'Invalid verification code' });
+    }
+
+    // Check if code has expired
+    if (new Date() > new Date(pending.verificationCodeExpiresAt)) {
+      return res.status(400).json({ error: 'Verification code has expired' });
+    }
+
+    // Parse profile data
+    const profile = pending.profileData ? JSON.parse(pending.profileData) : null;
+
     // Generate username from email
     const username = email.split('@')[0];
-    
-    // Create user
+
+    // Create the actual user account
     const userData = {
       username,
       email,
-      password: await crypto.hash(password),
+      password: pending.password, // Already hashed
       hasCompletedOnboarding: Boolean(profile),
       lastActivityDate: new Date().toISOString().split('T')[0] as any,
       profileImage: null,
@@ -111,15 +202,15 @@ router.post('/register', async (req, res: Response) => {
       experiencePoints: 0,
       level: 1,
       isAdmin: false,
-      isEmailVerified: false
+      isEmailVerified: true // Mark as verified since they just verified
     };
-    
+
     const [newUser] = await db
       .insert(users)
       .values(userData)
       .returning();
 
-    console.log('[JWT Auth] User created:', newUser.id);
+    console.log('[JWT Auth] User account created after verification:', newUser.id);
 
     // Create nutrition preferences if provided
     if (profile && newUser) {
@@ -165,28 +256,112 @@ router.post('/register', async (req, res: Response) => {
       console.error('[JWT Auth] Error creating token limits:', error);
     }
 
-    // Generate 6-digit verification code
-    const code = await generateEmailVerificationCode(newUser.id);
-    
-    // Send verification code email (but don't wait for it or block registration)
+    // Delete the pending registration
+    await db
+      .delete(pendingRegistrations)
+      .where(eq(pendingRegistrations.email, email));
+
+    // Send welcome email
+    sendWelcomeEmail(email, profile?.name || null).catch(error => {
+      console.error('[JWT Auth] Failed to send welcome email:', error);
+    });
+
+    // Generate JWT tokens and log the user in
+    const accessToken = generateAccessToken(newUser.id, newUser.email);
+    const refreshToken = generateRefreshToken(newUser.id, newUser.email);
+
+    // Store refresh token in database
+    const { refreshTokenExpiry } = getTokenExpiryDates();
+    await storeRefreshToken(newUser.id, refreshToken, refreshTokenExpiry);
+
+    // Set tokens in HTTP-only cookies
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    console.log('[JWT Auth] Email verified and account created:', email);
+
+    res.json({
+      ok: true,
+      message: 'Email verified successfully. Your account has been created!',
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        hasCompletedOnboarding: newUser.hasCompletedOnboarding
+      }
+    });
+
+  } catch (error) {
+    console.error('[JWT Auth] Email verification error:', error);
+    res.status(500).json({
+      error: 'Email verification failed',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
+/**
+ * POST /api/auth/resend-verification-code
+ * Resend verification code for pending registration
+ */
+router.post('/resend-verification-code', async (req, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find pending registration
+    const [pending] = await db
+      .select()
+      .from(pendingRegistrations)
+      .where(eq(pendingRegistrations.email, email))
+      .limit(1);
+
+    if (!pending) {
+      // For security reasons, don't reveal if email exists or not
+      return res.status(200).json({
+        message: 'If a pending registration exists, a verification code has been sent.'
+      });
+    }
+
+    // Generate new 6-digit verification code
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Update pending registration with new code
+    await db
+      .update(pendingRegistrations)
+      .set({
+        verificationCode: code,
+        verificationCodeExpiresAt: expiresAt
+      })
+      .where(eq(pendingRegistrations.email, email));
+
+    // Send verification code email (but don't wait for it)
     sendVerificationCodeEmail(email, code).catch(error => {
       console.error('[JWT Auth] Failed to send verification email:', error);
     });
 
-    console.log('[JWT Auth] Registration successful for:', email);
-
-    // Don't log the user in automatically - they need to verify email first
-    res.status(201).json({
-      ok: true,
-      message: 'Registration successful. Please check your email for a verification code.',
-      requiresVerification: true,
-      userId: newUser.id
+    return res.status(200).json({
+      message: 'Verification code has been sent. Please check your inbox.'
     });
 
   } catch (error) {
-    console.error('[JWT Auth] Registration error:', error);
+    console.error('[JWT Auth] Resend verification code error:', error);
     res.status(500).json({
-      error: 'Registration failed',
+      error: 'Failed to resend verification code',
       message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
