@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
   Loader2, 
@@ -194,6 +194,19 @@ export default function Recipes() {
   // Use custom hooks for recipes (cast to match local types)
   const { data: createdRecipes, isLoading: isLoadingCreated } = useCreatedRecipes();
   const { data: savedRecipes, isLoading: isLoadingSaved } = useSavedRecipes();
+  
+  // Fetch recent food logs using React Query
+  const { data: recentFoodLogs = [] } = useQuery({
+    queryKey: ['/api/food-logs/recent-all'],
+    queryFn: async () => {
+      const response = await fetch('/api/food-logs/recent-all?limit=20', {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch recent meals');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
   
   // Use custom hooks for meal plans (cast to match local types)
   const { data: todayMealPlanData, isLoading: isTodayLoading, error: todayError } = useTodaysMealPlan();
@@ -755,6 +768,82 @@ export default function Recipes() {
                         <p>No matching saved recipes found with your current filters.</p>
                       </div>
                     )}
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Recent Meals Section (Food Logs) - NEW */}
+              {recentFoodLogs && recentFoodLogs.length > 0 && (
+                <motion.section 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="mb-8"
+                >
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="bg-white/20 backdrop-blur-sm p-2 rounded-full">
+                      <Utensils className="h-5 w-5 text-white" />
+                    </div>
+                    <h2 className="text-xl font-bold text-white">
+                      {t('recipes.recentMeals', 'My Recent Meals')}
+                    </h2>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {recentFoodLogs.map((meal: any) => (
+                      <Card
+                        key={meal.id}
+                        className="overflow-hidden rounded-3xl border-none shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer group bg-white/10 backdrop-blur-sm"
+                        onClick={() => {
+                          // For food logs, we might want to show details differently
+                          // For now, just show a toast
+                          toast({
+                            title: meal.name,
+                            description: `${meal.calories} cal • ${meal.protein}g protein`
+                          });
+                        }}
+                      >
+                        <div className="relative h-44 overflow-hidden">
+                          {meal.image || meal.imageUrl ? (
+                            <img 
+                              src={meal.image || meal.imageUrl} 
+                              alt={meal.name}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+                              <Utensils className="w-16 h-16 text-white/80" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        </div>
+                        
+                        <div className="p-5 bg-white/5 backdrop-blur-sm">
+                          <h3 className="text-xl font-bold leading-tight mb-2 text-white group-hover:text-white/80 transition-colors line-clamp-2">
+                            {meal.name}
+                          </h3>
+                          
+                          <div className="flex flex-wrap gap-2 text-sm text-white/80">
+                            <div className="flex items-center gap-1">
+                              <Flame className="w-4 h-4" />
+                              <span>{meal.calories} cal</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-semibold">P:</span>
+                              <span>{meal.protein}g</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-semibold">C:</span>
+                              <span>{meal.carbs}g</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="font-semibold">F:</span>
+                              <span>{meal.fat}g</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
                   </div>
                 </motion.section>
               )}

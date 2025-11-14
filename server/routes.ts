@@ -642,6 +642,34 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Get all recent food logs with full details (for recipes page)
+  app.get("/api/food-logs/recent-all", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
+
+      // Get recent food logs with all details
+      const recentLogs = await db
+        .select()
+        .from(foodLogs)
+        .where(eq(foodLogs.userId, req.user!.id))
+        .orderBy(desc(foodLogs.date))
+        .limit(limit);
+
+      console.log('[Food Logs API] Retrieved recent logs with full details:', {
+        count: recentLogs.length,
+        userId: req.user!.id
+      });
+
+      res.json(recentLogs);
+    } catch (error) {
+      console.error('Error fetching recent meals:', error);
+      res.status(500).json({
+        error: 'Failed to fetch recent meals',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Get all scanned meals (food logs with images) for recipes page
   app.get("/api/food-logs/scanned", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
