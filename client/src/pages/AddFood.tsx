@@ -366,12 +366,12 @@ export default function AddFood() {
       }
       
       // Use the API to analyze the food description
-      console.log('Analyzing text:', values.text);
+      console.log('[AddFood] Analyzing text:', values.text);
       
       try {
         // This will use the improved analyzeFoodText function that handles name improvements
         const result = await analyzeFoodText(values.text);
-        console.log('Analysis result:', result);
+        console.log('[AddFood] Analysis result:', result);
         
         // Ensure we have the required properties before proceeding
         if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
@@ -389,21 +389,20 @@ export default function AddFood() {
           image: null
         };
         
-        console.log('Sending processed food data to be logged:', foodData);
+        console.log('[AddFood] Storing AI analyzed food data:', foodData);
         
-        // Add the analyzed food to log
-        const addResult = await addFood(foodData);
-        console.log('Food added to log:', addResult);
+        // Store the food data in localStorage for the analyzing screen
+        localStorage.setItem('pendingManualFood', JSON.stringify(foodData));
 
         toast({
-          title: "Success",
-          description: `Added ${result.name} to your log`,
+          title: "Analysis Complete",
+          description: `Adding ${result.name} to your log...`,
         });
 
-        // Navigate to dashboard
+        // Navigate to dashboard where the food will be processed
         setLocation("/dashboard");
       } catch (analysisError) {
-        console.error('Food analysis error:', analysisError);
+        console.error('[AddFood] Food analysis error:', analysisError);
         throw new Error(
           analysisError instanceof Error 
             ? analysisError.message 
@@ -411,7 +410,7 @@ export default function AddFood() {
         );
       }
     } catch (error) {
-      console.error('Error in text submission process:', error);
+      console.error('[AddFood] Error in text submission process:', error);
       
       toast({
         variant: "destructive",
@@ -420,7 +419,6 @@ export default function AddFood() {
           ? error.message 
           : "Failed to analyze food description. Try being more specific or use manual entry."
       });
-    } finally {
       setIsAnalyzing(false);
     }
   };
