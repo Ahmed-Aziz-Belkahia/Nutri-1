@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Webcam from 'react-webcam';
-import { Camera, AlertTriangle, X, Loader2, Sparkles } from "lucide-react";
+import { Camera, AlertTriangle, X, Loader2, Sparkles, Image as ImageIcon, Pencil, AlignLeft } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText } from '@/lib/vision';
 
