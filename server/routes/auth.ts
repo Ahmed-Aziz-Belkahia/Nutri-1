@@ -61,8 +61,10 @@ router.post('/register', async (req: Request, res: Response) => {
     // Generate 6-digit verification code
     const code = await generateEmailVerificationCode(newUser.id);
     
-    // Send verification code email
-    await sendVerificationCodeEmail(email, code);
+    // Send verification code email (but don't wait for it or block registration)
+    sendVerificationCodeEmail(email, code).catch(error => {
+      console.error('Failed to send verification email:', error);
+    });
     
     return res.status(201).json({ 
       message: 'Registration successful. Please check your email for a verification code.',
@@ -301,8 +303,10 @@ router.post('/resend-verification-code', async (req: Request, res: Response) => 
     // Generate new verification code
     const code = await generateEmailVerificationCode(user.id);
     
-    // Send verification code email
-    await sendVerificationCodeEmail(email, code);
+    // Send verification code email (but don't wait for it or block the response)
+    sendVerificationCodeEmail(email, code).catch(error => {
+      console.error('Failed to send verification email:', error);
+    });
     
     return res.status(200).json({ 
       message: 'Verification code has been sent. Please check your inbox.' 
