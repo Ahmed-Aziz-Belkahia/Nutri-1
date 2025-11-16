@@ -13,6 +13,11 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       callbackURL: process.env.GOOGLE_CALLBACK_URL!,
       scope: ['profile', 'email'],
+      // Add parameters to help with WebView compatibility
+      authorizationParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

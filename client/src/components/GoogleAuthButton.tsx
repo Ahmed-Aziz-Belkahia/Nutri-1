@@ -9,8 +9,34 @@ export function GoogleAuthButton({
   mode = 'login', 
   className = '' 
 }: GoogleAuthButtonProps) {
+  
+  // Detect if running in a WebView
+  const isWebView = () => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipod|ipad/.test(ua);
+    const isAndroid = /android/.test(ua);
+    const isSafari = /safari/.test(ua) && !/chrome/.test(ua);
+    const isChrome = /chrome/.test(ua);
+    
+    return (
+      (isIOS && !isSafari) ||
+      (isAndroid && !isChrome) ||
+      ua.includes('wv') ||
+      ua.includes('webview')
+    );
+  };
+
   const handleGoogleAuth = () => {
-    window.location.href = '/api/auth/google';
+    const authUrl = `${window.location.origin}/api/auth/google`;
+    
+    // If in WebView, try to open in system browser
+    if (isWebView()) {
+      alert('Google Sign-In must be opened in your default browser.\n\nPlease open this URL in Safari or Chrome:\n\n' + authUrl);
+      return;
+    }
+    
+    // Normal browser - just redirect
+    window.location.href = authUrl;
   };
 
   const buttonText = mode === 'login' 
