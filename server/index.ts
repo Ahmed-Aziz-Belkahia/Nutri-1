@@ -11,6 +11,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import jwtAuthRoutes from './routes/jwt-auth';
+import googleAuthRoutes from './routes/google-auth';
+import passport from './auth/passport-google';
 import { initializeTokenLimitCronJobs } from './cron/token-limit-cron';
 
 // Load environment variables from .env file
@@ -26,6 +28,9 @@ app.use(helmet({
 
 // Cookie parser middleware (required for JWT cookies)
 app.use(cookieParser());
+
+// Initialize Passport middleware
+app.use(passport.initialize());
 
 // Parse allowed origins from environment or use permissive setting in development
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
@@ -169,6 +174,10 @@ async function initializeApp() {
     // Register JWT authentication routes
     app.use('/api/auth', jwtAuthRoutes);
     log("✅ JWT authentication routes registered");
+
+    // Register Google OAuth routes
+    app.use('/api/auth', googleAuthRoutes);
+    log("✅ Google OAuth routes registered");
 
     // Register application routes
     registerRoutes(app);

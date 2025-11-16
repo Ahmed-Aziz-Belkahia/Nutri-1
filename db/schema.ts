@@ -23,6 +23,14 @@ export const users = sqliteTable("users", {
   experiencePoints: integer("experience_points"),
   level: integer("level"),
   isAdmin: integer("is_admin", { mode: 'boolean' }).default(false),
+  
+  // Google OAuth fields
+  googleId: text("google_id"),
+  googleEmail: text("google_email"),
+  googlePicture: text("google_picture"),
+  authProvider: text("auth_provider").default("local"), // 'local', 'google', or 'both'
+  emailVerifiedVia: text("email_verified_via"), // 'email', 'google'
+  lastLoginAt: integer("last_login_at", { mode: 'timestamp' }),
 });
 
 // Pending registrations (email verification before account creation)
