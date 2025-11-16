@@ -31,7 +31,16 @@ export function GoogleAuthButton({
     
     // If in WebView, try to open in system browser
     if (isWebView()) {
-      alert('Google Sign-In must be opened in your default browser.\n\nPlease open this URL in Safari or Chrome:\n\n' + authUrl);
+      // Try to copy URL to clipboard
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(authUrl).then(() => {
+          alert('✅ URL copied to clipboard!\n\nGoogle Sign-In must be opened in your default browser (Safari or Chrome).\n\nThe URL has been copied. Please paste it in your browser.');
+        }).catch(() => {
+          alert('Google Sign-In must be opened in your default browser.\n\nPlease copy and open this URL in Safari or Chrome:\n\n' + authUrl);
+        });
+      } else {
+        alert('Google Sign-In must be opened in your default browser.\n\nPlease copy and open this URL in Safari or Chrome:\n\n' + authUrl);
+      }
       return;
     }
     
