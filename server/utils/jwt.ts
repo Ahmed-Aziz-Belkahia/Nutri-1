@@ -7,8 +7,8 @@ import { eq, and, gt, lt } from 'drizzle-orm';
 // JWT Configuration
 const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET || 'nutri-ai-access-secret-key-change-in-production';
 const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || 'nutri-ai-refresh-secret-key-change-in-production';
-const ACCESS_TOKEN_EXPIRY = '15m'; // 15 minutes
-const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
+const ACCESS_TOKEN_EXPIRY = '1d'; // 1 day (longer to reduce refresh frequency)
+const REFRESH_TOKEN_EXPIRY = '365d'; // 365 days (1 year for persistent sessions)
 
 // Token payload interface
 export interface TokenPayload {
@@ -339,7 +339,7 @@ export function getTokenExpiryDates() {
   const now = new Date();
   
   return {
-    accessTokenExpiry: new Date(now.getTime() + 15 * 60 * 1000), // 15 minutes
-    refreshTokenExpiry: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days
+    accessTokenExpiry: new Date(now.getTime() + 24 * 60 * 60 * 1000), // 1 day
+    refreshTokenExpiry: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000) // 365 days (1 year)
   };
 }

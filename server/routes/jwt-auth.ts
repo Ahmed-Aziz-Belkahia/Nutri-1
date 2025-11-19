@@ -279,14 +279,14 @@ router.post('/verify-email-code', async (req, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 365 * 24 * 60 * 60 * 1000 // 365 days (1 year)
     });
 
     console.log('[JWT Auth] Email verified and account created:', email);
@@ -411,14 +411,14 @@ router.post('/login', async (req, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 365 * 24 * 60 * 60 * 1000 // 365 days (1 year)
     });
 
     console.log('[JWT Auth] Login successful for:', email);
@@ -480,7 +480,7 @@ router.post('/refresh', async (req, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
     console.log('[JWT Auth] Token refreshed for user:', decoded.userId);

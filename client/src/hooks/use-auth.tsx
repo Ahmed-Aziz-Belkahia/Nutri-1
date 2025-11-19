@@ -69,6 +69,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Auto-refresh token every 20 hours (before the 24-hour expiry)
+  React.useEffect(() => {
+    const refreshInterval = setInterval(async () => {
+      try {
+        console.log('[Auth] Auto-refreshing access token...');
+        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        console.log('[Auth] Token auto-refreshed successfully');
+      } catch (error) {
+        console.error('[Auth] Auto-refresh failed:', error);
+      }
+    }, 20 * 60 * 60 * 1000); // 20 hours in milliseconds
+
+    // Also refresh token on mount to restore session after restart
+    const refreshOnMount = async () => {
+      try {
+        console.log('[Auth] Refreshing token on mount...');
+        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        console.log('[Auth] Token refreshed on mount');
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      } catch (error) {
+        console.log('[Auth] No valid refresh token found on mount');
+      }
+    };
+    refreshOnMount();
+
+    return () => clearInterval(refreshInterval);
+  }, [queryClient]);
+
   const { data: user, isLoading } = useQuery<User | null>({
     queryKey: ["user"],
     queryFn: async () => {
