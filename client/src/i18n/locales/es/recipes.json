@@ -1,0 +1,74 @@
+{
+  "title": "Recipes",
+  "search": "Search recipes",
+  "filters": {
+    "all": "All Recipes",
+    "favorites": "Favorites",
+    "myRecipes": "My Recipes",
+    "recent": "Recently Viewed",
+    "category": "Category",
+    "difficulty": "Difficulty",
+    "time": "Cooking Time"
+  },
+  "categories": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snacks": "Snacks",
+    "dessert": "Dessert",
+    "drinks": "Drinks",
+    "vegan": "Vegan",
+    "vegetarian": "Vegetarian",
+    "glutenFree": "Gluten-Free",
+    "dairyFree": "Dairy-Free",
+    "lowCarb": "Low Carb",
+    "highProtein": "High Protein"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "details": {
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "nutrition": "Nutrition Facts",
+    "servings": "Servings",
+    "prepTime": "Prep Time",
+    "cookTime": "Cook Time",
+    "totalTime": "Total Time",
+    "difficulty": "Difficulty",
+    "calories": "Calories per serving",
+    "addToMealPlan": "Add to Meal Plan",
+    "saveRecipe": "Save Recipe",
+    "share": "Share"
+  },
+  "create": {
+    "title": "Create Recipe",
+    "name": "Recipe Name",
+    "description": "Description",
+    "category": "Category",
+    "servings": "Servings",
+    "prepTime": "Preparation Time",
+    "cookTime": "Cooking Time",
+    "ingredients": "Ingredients",
+    "addIngredient": "Add Ingredient",
+    "instructions": "Instructions",
+    "addStep": "Add Step",
+    "uploadPhoto": "Upload Photo",
+    "save": "Save Recipe",
+    "success": "Recipe created successfully",
+    "error": "Failed to create recipe"
+  },
+  "generate": {
+    "title": "Generate Recipe",
+    "aiGenerate": "AI Generate Recipe",
+    "prompt": "What would you like to cook?",
+    "preferences": "Dietary Preferences",
+    "generate": "Generate",
+    "generating": "Generating recipe...",
+    "success": "Recipe generated!"
+  },
+  "noRecipes": "No recipes found",
+  "addFirst": "Add your first recipe"
+}

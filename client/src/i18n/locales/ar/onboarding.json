@@ -1,0 +1,98 @@
+{
+  "welcome": {
+    "title": "Welcome to NutriAI",
+    "subtitle": "Let's personalize your nutrition journey",
+    "start": "Get Started"
+  },
+  "steps": {
+    "personalInfo": "Personal Info",
+    "goals": "Your Goals",
+    "activity": "Activity Level",
+    "preferences": "Preferences",
+    "complete": "Complete"
+  },
+  "personalInfo": {
+    "title": "Tell us about yourself",
+    "subtitle": "This helps us personalize your experience",
+    "name": "Your Name",
+    "age": "Age",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "height": "Height",
+    "weight": "Current Weight",
+    "heightPlaceholder": "Enter height in cm",
+    "weightPlaceholder": "Enter weight in kg"
+  },
+  "goals": {
+    "title": "What's your goal?",
+    "subtitle": "Choose what you want to achieve",
+    "loseWeight": "Lose Weight",
+    "loseWeightDesc": "Create a calorie deficit for weight loss",
+    "gainWeight": "Gain Weight",
+    "gainWeightDesc": "Build muscle with calorie surplus",
+    "maintain": "Maintain Weight",
+    "maintainDesc": "Stay at your current weight",
+    "goalWeight": "Goal Weight",
+    "goalWeightDesc": "What weight would you like to reach?",
+    "timeline": "Expected Timeline",
+    "timelineDesc": "Based on healthy weight loss/gain rate"
+  },
+  "activity": {
+    "title": "Activity Level",
+    "subtitle": "How active are you?",
+    "sedentary": "Sedentary",
+    "sedentaryDesc": "Little or no exercise",
+    "light": "Lightly Active",
+    "lightDesc": "Light exercise 1-3 days/week",
+    "moderate": "Moderately Active",
+    "moderateDesc": "Moderate exercise 3-5 days/week",
+    "active": "Very Active",
+    "activeDesc": "Hard exercise 6-7 days/week",
+    "veryActive": "Extra Active",
+    "veryActiveDesc": "Very hard exercise & physical job"
+  },
+  "preferences": {
+    "title": "Dietary Preferences",
+    "subtitle": "Any dietary restrictions or preferences?",
+    "none": "None",
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "glutenFree": "Gluten-Free",
+    "dairyFree": "Dairy-Free",
+    "halal": "Halal",
+    "kosher": "Kosher",
+    "paleo": "Paleo",
+    "keto": "Keto",
+    "other": "Other"
+  },
+  "complete": {
+    "title": "You're All Set!",
+    "subtitle": "Your personalized plan is ready",
+    "calorieGoal": "Daily Calorie Goal",
+    "proteinGoal": "Protein Goal",
+    "carbsGoal": "Carbs Goal",
+    "fatGoal": "Fat Goal",
+    "formulaExplanation": "How we calculated this",
+    "bmr": "BMR (Basal Metabolic Rate)",
+    "tdee": "TDEE (Total Daily Energy Expenditure)",
+    "adjustment": "Adjusted for Your Goal",
+    "startJourney": "Start Your Journey",
+    "uploadProfile": "Upload Profile Picture"
+  },
+  "calculation": {
+    "bmrTitle": "1. BMR (Basal Metabolic Rate)",
+    "bmrDesc": "Using Mifflin-St Jeor equation (most widely used):",
+    "tdeeTitle": "2. TDEE (Total Daily Energy Expenditure)",
+    "tdeeDesc": "BMR × activity factor:",
+    "adjustmentTitle": "3. Adjusted for Your Goal",
+    "weightLoss": "Weight Loss",
+    "weightLossDesc": "500 kcal deficit/day = ~0.5 kg loss per week",
+    "weightGain": "Weight Gain",
+    "weightGainDesc": "300 kcal surplus/day for healthy mass gain",
+    "maintain": "Maintain Weight",
+    "maintainDesc": "Energy balance for weight maintenance",
+    "source": "Source",
+    "sourceText": "Mifflin-St Jeor Equation - American Dietetic Association (2005)"
+  }
+}

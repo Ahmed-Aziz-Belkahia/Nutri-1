@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import App from './App';
 import "./index.css";
 // Import i18n configuration
-import "./i18n";
+import "./i18n/config";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");

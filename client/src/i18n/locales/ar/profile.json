@@ -1,0 +1,81 @@
+{
+  "title": "Profile",
+  "personalInfo": {
+    "title": "Personal Information",
+    "name": "Name",
+    "email": "Email",
+    "age": "Age",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "height": "Height",
+    "weight": "Current Weight",
+    "profilePicture": "Profile Picture",
+    "uploadPhoto": "Upload Photo"
+  },
+  "bodyMetrics": {
+    "title": "Body Metrics",
+    "currentWeight": "Current Weight",
+    "goalWeight": "Goal Weight",
+    "height": "Height",
+    "age": "Age",
+    "bmi": "BMI",
+    "bodyFat": "Body Fat Percentage"
+  },
+  "goals": {
+    "title": "Goals & Activity",
+    "weightGoal": "Weight Goal",
+    "goalWeight": "Goal Weight",
+    "activityLevel": "Activity Level",
+    "weightLoss": "Weight Loss",
+    "weightGain": "Weight Gain",
+    "maintain": "Maintain Weight",
+    "sedentary": "Sedentary",
+    "sedentaryDesc": "Little or no exercise",
+    "light": "Light",
+    "lightDesc": "Exercise 1-3 days/week",
+    "moderate": "Moderate",
+    "moderateDesc": "Exercise 3-5 days/week",
+    "active": "Active",
+    "activeDesc": "Exercise 6-7 days/week",
+    "veryActive": "Very Active",
+    "veryActiveDesc": "Intense exercise daily"
+  },
+  "nutrition": {
+    "title": "Nutrition Goals",
+    "dailyCalories": "Daily Calorie Goal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "macros": "Macronutrients",
+    "editGoals": "Edit Goals",
+    "autoCalculate": "Calculate for Me"
+  },
+  "preferences": {
+    "title": "Preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "units": "Units",
+    "metric": "Metric",
+    "imperial": "Imperial"
+  },
+  "account": {
+    "title": "Account",
+    "changePassword": "Change Password",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "deleteAccount": "Delete Account",
+    "logout": "Logout"
+  },
+  "deleteAccount": {
+    "title": "Delete Account",
+    "warning": "This action is permanent. All your data will be removed.",
+    "confirm": "Are you sure?",
+    "deleted": "Your account has been deleted",
+    "cancel": "Cancel",
+    "delete": "Delete Account"
+  },
+  "updateSuccess": "Profile updated successfully",
+  "updateError": "Failed to update profile"
+}

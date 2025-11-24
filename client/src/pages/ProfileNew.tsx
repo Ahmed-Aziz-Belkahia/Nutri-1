@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Target, Scale, Ruler, Edit2, Save, X, LogOut, Award, Utensils, Zap, Calendar, FileText, Trash2, Activity, Star, Loader2, Heart } from "lucide-react";
+import { Camera, Target, Scale, Ruler, Edit2, Save, X, LogOut, Award, Utensils, Zap, Calendar, FileText, Trash2, Activity, Star, Loader2, Heart, Globe } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BaseLayout from "@/components/layouts/BaseLayout";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Profile() {
   const { user, isLoading: isLoadingUser, refetch: refetchUser, logout } = useUser();
@@ -516,11 +517,29 @@ export default function Profile() {
         </div>
       </motion.div>
 
-      {/* Account Actions */}
+      {/* Language & Preferences */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
+        className="mb-6"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xl font-bold gradient-text">Language & Preferences</h3>
+        </div>
+        
+        <div className="glass-card">
+          <div className="p-6">
+            <LanguageSwitcher variant="menu" />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Account Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
         className="mb-6"
       >
         <div className="glass-card">

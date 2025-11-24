@@ -28,6 +28,45 @@ html, body, #root {
   width: 100% !important;
 }
 
+/* ============================================
+   RTL SUPPORT
+   ============================================ */
+
+/* Apply RTL text direction */
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+/* Flip flex directions for RTL */
+html[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+/* Adjust spacing for RTL */
+html[dir="rtl"] .ml-auto {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+html[dir="rtl"] .mr-auto {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Fix text alignment for RTL */
+html[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+html[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* Rotate icons that need flipping */
+html[dir="rtl"] .icon-rtl {
+  transform: scaleX(-1);
+}
+
 /* Prevent scrolling on auth page */
 body.auth-page {
   overflow: hidden !important;

@@ -1,0 +1,50 @@
+{
+  "welcome": "Welcome, {{name}}!",
+  "greeting": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening"
+  },
+  "overview": {
+    "title": "Today's Overview",
+    "caloriesConsumed": "Calories Consumed",
+    "caloriesRemaining": "Calories Remaining",
+    "caloriesGoal": "Daily Goal",
+    "macros": "Macronutrients",
+    "waterIntake": "Water Intake",
+    "mealsLogged": "Meals Logged",
+    "streak": "Day Streak"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "logMeal": "Log Meal",
+    "scanFood": "Scan Food",
+    "addWater": "Add Water",
+    "logWeight": "Log Weight",
+    "generateMealPlan": "Generate Meal Plan",
+    "viewRecipes": "View Recipes"
+  },
+  "recentMeals": {
+    "title": "Recent Meals",
+    "viewAll": "View All Meals",
+    "noMeals": "No meals logged yet",
+    "logYourFirst": "Log your first meal to start tracking"
+  },
+  "progress": {
+    "title": "Your Progress",
+    "weeklyGoal": "Weekly Goal",
+    "caloriesThis Week": "Calories This Week",
+    "averageDaily": "Average Daily",
+    "daysCompleted": "Days Completed",
+    "onTrack": "You're on track!",
+    "needsAttention": "Needs attention"
+  },
+  "stats": {
+    "title": "Quick Stats",
+    "currentWeight": "Current Weight",
+    "goalWeight": "Goal Weight",
+    "toGo": "to go",
+    "bmi": "BMI",
+    "bodyFat": "Body Fat"
+  }
+}
