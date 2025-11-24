@@ -280,5 +280,25 @@
     "setup2FA": "Setup Two-Factor Authentication",
     "deleteAccount": "Delete Account",
     "infoCard": "Keep your account secure by using a strong password and enabling two-factor authentication."
+  },
+  "privacySettings": {
+    "title": "Privacy",
+    "backToSettings": "Back to Settings",
+    "items": {
+      "profileVisibility": {
+        "title": "Profile Visibility",
+        "description": "Make your profile visible to other users"
+      },
+      "dataSharing": {
+        "title": "Data Sharing",
+        "description": "Share your progress with the community"
+      },
+      "analyticsCollection": {
+        "title": "Analytics Collection",
+        "description": "Help us improve by sharing usage data"
+      }
+    },
+    "infoCard": "Your privacy is important to us. We only collect and share data according to your preferences and our privacy policy.",
+    "deleteAllData": "Delete All My Data"
   }
 }

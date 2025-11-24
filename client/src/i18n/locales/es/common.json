@@ -280,5 +280,25 @@
     "setup2FA": "Configurar autenticación de dos factores",
     "deleteAccount": "Eliminar cuenta",
     "infoCard": "Mantén tu cuenta segura usando una contraseña fuerte y activando la autenticación de dos factores."
+  },
+  "privacySettings": {
+    "title": "Privacidad",
+    "backToSettings": "Volver a configuración",
+    "items": {
+      "profileVisibility": {
+        "title": "Visibilidad del perfil",
+        "description": "Haz tu perfil visible para otros usuarios"
+      },
+      "dataSharing": {
+        "title": "Compartir datos",
+        "description": "Comparte tu progreso con la comunidad"
+      },
+      "analyticsCollection": {
+        "title": "Recopilación de análisis",
+        "description": "Ayúdanos a mejorar compartiendo datos de uso"
+      }
+    },
+    "infoCard": "Tu privacidad es importante para nosotros. Solo recopilamos y compartimos datos según tus preferencias y nuestra política de privacidad.",
+    "deleteAllData": "Eliminar todos mis datos"
   }
 }

@@ -4,9 +4,11 @@ import { ChevronLeft, Lock } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function PrivacyPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation(['common']);
   const [profileVisibility, setProfileVisibility] = useState(true);
   const [dataSharing, setDataSharing] = useState(false);
   const [analyticsCollection, setAnalyticsCollection] = useState(true);
@@ -56,7 +58,7 @@ export default function PrivacyPage() {
             <div className="flex items-center ml-2">
               <Lock className="h-5 w-5 text-[#0CC5BA] mr-2" />
               <h1 className="text-xl font-medium bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                Privacy
+                {t('common:privacySettings.title')}
               </h1>
             </div>
           </div>
@@ -72,8 +74,8 @@ export default function PrivacyPage() {
         <motion.div variants={itemVariants} className="p-4 rounded-2xl bg-white/50 backdrop-blur-lg border border-white/20 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Profile Visibility</div>
-              <div className="text-sm text-gray-500">Make your profile visible to other users</div>
+              <div className="text-base font-medium">{t('common:privacySettings.items.profileVisibility.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:privacySettings.items.profileVisibility.description')}</div>
             </div>
             <Switch
               checked={profileVisibility}
@@ -86,8 +88,8 @@ export default function PrivacyPage() {
         <motion.div variants={itemVariants} className="p-4 rounded-2xl bg-white/50 backdrop-blur-lg border border-white/20 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Data Sharing</div>
-              <div className="text-sm text-gray-500">Share your progress with the community</div>
+              <div className="text-base font-medium">{t('common:privacySettings.items.dataSharing.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:privacySettings.items.dataSharing.description')}</div>
             </div>
             <Switch
               checked={dataSharing}
@@ -100,8 +102,8 @@ export default function PrivacyPage() {
         <motion.div variants={itemVariants} className="p-4 rounded-2xl bg-white/50 backdrop-blur-lg border border-white/20 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Analytics Collection</div>
-              <div className="text-sm text-gray-500">Help us improve by sharing usage data</div>
+              <div className="text-base font-medium">{t('common:privacySettings.items.analyticsCollection.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:privacySettings.items.analyticsCollection.description')}</div>
             </div>
             <Switch
               checked={analyticsCollection}
@@ -119,8 +121,7 @@ export default function PrivacyPage() {
           className="mt-8 p-4 rounded-2xl bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 border border-white/20 backdrop-blur-md"
         >
           <p className="text-sm text-gray-600 leading-relaxed">
-            Your privacy is important to us. We only collect and share data according to your preferences 
-            and our privacy policy.
+            {t('common:privacySettings.infoCard')}
           </p>
         </motion.div>
 
@@ -130,7 +131,7 @@ export default function PrivacyPage() {
             className="w-full text-red-500 hover:text-red-600 bg-white/50 backdrop-blur-lg border-white/20"
             onClick={() => {/* TODO: Implement data deletion */}}
           >
-            Delete All My Data
+            {t('common:privacySettings.deleteAllData')}
           </Button>
         </motion.div>
       </motion.div>
