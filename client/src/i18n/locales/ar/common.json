@@ -326,5 +326,20 @@
     "getStarted": "ابدأ الآن",
     "signIn": "تسجيل الدخول",
     "termsNotice": "بالمتابعة، أنت توافق على الشروط وسياسة الخصوصية"
+  },
+  "debugLogin": {
+    "title": "تصحيح المصادقة",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "loginButton": "تسجيل الدخول",
+    "loggingIn": "جاري تسجيل الدخول...",
+    "checkAuthStatus": "التحقق من حالة المصادقة",
+    "checkCookies": "التحقق من ملفات تعريف الارتباط",
+    "responseTitle": "الاستجابة:",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "loginSuccessDesc": "تم تسجيل دخولك بنجاح",
+    "loginFailed": "فشل تسجيل الدخول"
   }
 }

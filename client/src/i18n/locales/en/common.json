@@ -326,5 +326,20 @@
     "getStarted": "Get Started",
     "signIn": "Sign In",
     "termsNotice": "By continuing, you agree to our Terms & Privacy Policy"
+  },
+  "debugLogin": {
+    "title": "Debug Authentication",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Log In",
+    "loggingIn": "Logging in...",
+    "checkAuthStatus": "Check Auth Status",
+    "checkCookies": "Check Cookies",
+    "responseTitle": "Response:",
+    "loginSuccess": "Login Successful",
+    "loginSuccessDesc": "You have been logged in successfully",
+    "loginFailed": "Login Failed"
   }
 }

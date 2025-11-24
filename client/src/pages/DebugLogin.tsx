@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export default function DebugLogin() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function DebugLogin() {
   const [response, setResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useTranslation(['common']);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +38,8 @@ export default function DebugLogin() {
 
       setResponse(data);
       toast({
-        title: 'Login Successful',
-        description: 'You have been logged in successfully'
+        title: t('common:debugLogin.loginSuccess'),
+        description: t('common:debugLogin.loginSuccessDesc')
       });
 
       // Check authentication status
@@ -46,7 +48,7 @@ export default function DebugLogin() {
       setError(err.message);
       toast({
         variant: 'destructive',
-        title: 'Login Failed',
+        title: t('common:debugLogin.loginFailed'),
         description: err.message
       });
     } finally {
@@ -90,28 +92,28 @@ export default function DebugLogin() {
   return (
     <div className="min-h-screen p-6 flex flex-col">
       <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg w-full">
-        <h1 className="text-2xl font-bold mb-6">Debug Authentication</h1>
+        <h1 className="text-2xl font-bold mb-6">{t('common:debugLogin.title')}</h1>
         
         <form onSubmit={handleLogin} className="space-y-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:debugLogin.emailLabel')}</label>
             <Input 
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="Enter your email"
+              placeholder={t('common:debugLogin.emailPlaceholder')}
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('common:debugLogin.passwordLabel')}</label>
             <Input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              placeholder="Enter your password"
+              placeholder={t('common:debugLogin.passwordPlaceholder')}
             />
           </div>
           
@@ -120,7 +122,7 @@ export default function DebugLogin() {
             className="w-full"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Log In'}
+            {isLoading ? t('common:debugLogin.loggingIn') : t('common:debugLogin.loginButton')}
           </Button>
         </form>
         
@@ -131,7 +133,7 @@ export default function DebugLogin() {
             onClick={checkAuthStatus}
             className="flex-1"
           >
-            Check Auth Status
+            {t('common:debugLogin.checkAuthStatus')}
           </Button>
           
           <Button 
@@ -140,7 +142,7 @@ export default function DebugLogin() {
             onClick={checkCookies}
             className="flex-1"
           >
-            Check Cookies
+            {t('common:debugLogin.checkCookies')}
           </Button>
         </div>
         
@@ -152,7 +154,7 @@ export default function DebugLogin() {
         
         {response && (
           <div className="mt-4 p-3 bg-gray-100 border border-gray-300 rounded">
-            <h3 className="font-bold mb-2">Response:</h3>
+            <h3 className="font-bold mb-2">{t('common:debugLogin.responseTitle')}</h3>
             <pre className="text-xs overflow-auto whitespace-pre-wrap">
               {JSON.stringify(response, null, 2)}
             </pre>

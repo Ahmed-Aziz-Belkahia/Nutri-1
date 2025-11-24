@@ -326,5 +326,20 @@
     "getStarted": "Comenzar",
     "signIn": "Iniciar sesión",
     "termsNotice": "Al continuar, aceptas nuestros Términos y Política de privacidad"
+  },
+  "debugLogin": {
+    "title": "Depuración de autenticación",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo electrónico",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingresa tu contraseña",
+    "loginButton": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión...",
+    "checkAuthStatus": "Verificar estado de autenticación",
+    "checkCookies": "Verificar cookies",
+    "responseTitle": "Respuesta:",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "loginSuccessDesc": "Has iniciado sesión correctamente",
+    "loginFailed": "Error al iniciar sesión"
   }
 }

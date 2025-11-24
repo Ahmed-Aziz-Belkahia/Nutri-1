@@ -326,5 +326,20 @@
     "getStarted": "Commencer",
     "signIn": "Se connecter",
     "termsNotice": "En continuant, vous acceptez nos Conditions et notre Politique de confidentialité"
+  },
+  "debugLogin": {
+    "title": "Débogage de l'authentification",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "Entrez votre e-mail",
+    "passwordLabel": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "loginButton": "Se connecter",
+    "loggingIn": "Connexion en cours...",
+    "checkAuthStatus": "Vérifier l'état d'authentification",
+    "checkCookies": "Vérifier les cookies",
+    "responseTitle": "Réponse:",
+    "loginSuccess": "Connexion réussie",
+    "loginSuccessDesc": "Vous avez été connecté avec succès",
+    "loginFailed": "Échec de la connexion"
   }
 }
