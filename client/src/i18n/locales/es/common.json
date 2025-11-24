@@ -314,5 +314,17 @@
     "logoutSuccessDesc": "¡Hasta pronto!",
     "logoutError": "Error al cerrar sesión",
     "logoutErrorDesc": "Por favor, inténtalo de nuevo"
+  },
+  "landing": {
+    "appName": "NutriAI",
+    "tagline": "Tu entrenador personal de nutrición con IA para una vida saludable",
+    "features": {
+      "aiScan": "Escaneo IA",
+      "mealPlans": "Planes de comida",
+      "track": "Seguimiento"
+    },
+    "getStarted": "Comenzar",
+    "signIn": "Iniciar sesión",
+    "termsNotice": "Al continuar, aceptas nuestros Términos y Política de privacidad"
   }
 }

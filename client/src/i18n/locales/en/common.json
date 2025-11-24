@@ -314,5 +314,17 @@
     "logoutSuccessDesc": "See you next time!",
     "logoutError": "Error logging out",
     "logoutErrorDesc": "Please try again"
+  },
+  "landing": {
+    "appName": "NutriAI",
+    "tagline": "Your personal AI nutrition coach for healthy living",
+    "features": {
+      "aiScan": "AI Scan",
+      "mealPlans": "Meal Plans",
+      "track": "Track"
+    },
+    "getStarted": "Get Started",
+    "signIn": "Sign In",
+    "termsNotice": "By continuing, you agree to our Terms & Privacy Policy"
   }
 }

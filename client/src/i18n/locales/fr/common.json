@@ -314,5 +314,17 @@
     "logoutSuccessDesc": "À bientôt!",
     "logoutError": "Erreur lors de la déconnexion",
     "logoutErrorDesc": "Veuillez réessayer"
+  },
+  "landing": {
+    "appName": "NutriAI",
+    "tagline": "Votre coach personnel en nutrition par IA pour une vie saine",
+    "features": {
+      "aiScan": "Scan IA",
+      "mealPlans": "Plans de repas",
+      "track": "Suivre"
+    },
+    "getStarted": "Commencer",
+    "signIn": "Se connecter",
+    "termsNotice": "En continuant, vous acceptez nos Conditions et notre Politique de confidentialité"
   }
 }
