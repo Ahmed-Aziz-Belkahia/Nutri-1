@@ -5,8 +5,10 @@ import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, Shield } from "lu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export default function ResetPassword() {
+  const { t } = useTranslation(['auth']);
   const [, setLocation] = useLocation();
   const [location] = useLocation();
   const [email, setEmail] = useState("");
@@ -34,7 +36,7 @@ export default function ResetPassword() {
     setError("");
 
     if (code.length !== 6) {
-      setError("Please enter the complete 6-digit code");
+      setError(t('auth:resetPassword.verifyCode.errorInvalidCode'));
       return;
     }
 
@@ -53,10 +55,10 @@ export default function ResetPassword() {
         // Code verified, move to password step
         setStep("password");
       } else {
-        setError(data.error || "Invalid or expired code");
+        setError(data.error || t('auth:resetPassword.verifyCode.errorCodeFailed'));
       }
     } catch (error) {
-      setError("Network error. Please try again.");
+      setError(t('auth:resetPassword.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -68,13 +70,13 @@ export default function ResetPassword() {
 
     // Validate passwords match
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('auth:resetPassword.createPassword.errorPasswordMatch'));
       return;
     }
 
     // Validate password strength
     if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
+      setError(t('auth:resetPassword.createPassword.errorPasswordLength'));
       return;
     }
 
@@ -118,10 +120,10 @@ export default function ResetPassword() {
           }, 2000);
         }
       } else {
-        setError(data.error || "Failed to reset password");
+        setError(data.error || t('auth:resetPassword.createPassword.errorResetFailed'));
       }
     } catch (error) {
-      setError("Network error. Please try again.");
+      setError(t('auth:resetPassword.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -142,10 +144,10 @@ export default function ResetPassword() {
         alert("New code sent to your email!");
       } else {
         const data = await response.json();
-        setError(data.error || "Failed to resend code");
+        setError(data.error || t('auth:forgotPassword.error'));
       }
     } catch (error) {
-      setError("Network error. Please try again.");
+      setError(t('auth:resetPassword.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -174,14 +176,14 @@ export default function ResetPassword() {
                     <CheckCircle className="w-10 h-10 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    Password Reset Successfully!
+                    {t('auth:resetPassword.success.title')}
                   </h3>
                   <p className="text-gray-600">
-                    Logging you in...
+                    {t('auth:resetPassword.success.message')}
                   </p>
                   <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Redirecting to dashboard...</span>
+                    <span>{t('auth:resetPassword.success.redirecting')}</span>
                   </div>
                 </motion.div>
               ) : step === "code" ? (
@@ -202,7 +204,7 @@ export default function ResetPassword() {
                       <Shield className="w-10 h-10 text-white" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                      Verify Your Code
+                      {t('auth:resetPassword.verifyCode.title')}
                     </h1>
                     <motion.p
                       initial={{ opacity: 0 }}
@@ -210,7 +212,7 @@ export default function ResetPassword() {
                       transition={{ delay: 0.3 }}
                       className="text-gray-600 text-sm text-center"
                     >
-                      Enter the 6-digit code sent to
+                      {t('auth:resetPassword.verifyCode.subtitle')}
                       <br />
                       <span className="font-medium text-gray-900">{email}</span>
                     </motion.p>
@@ -235,14 +237,14 @@ export default function ResetPassword() {
                   <form onSubmit={handleVerifyCode} className="space-y-6">
                     <div className="space-y-2">
                       <label htmlFor="code" className="text-sm font-medium text-gray-700 block text-center">
-                        Verification Code
+                        {t('auth:resetPassword.verifyCode.code')}
                       </label>
                       <Input
                         id="code"
                         type="text"
                         value={code}
                         onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        placeholder="000000"
+                        placeholder={t('auth:resetPassword.verifyCode.codePlaceholder')}
                         className="h-16 rounded-xl bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 text-center text-3xl font-mono tracking-[0.5em] font-semibold"
                         maxLength={6}
                         required
@@ -250,7 +252,7 @@ export default function ResetPassword() {
                         autoFocus
                       />
                       <p className="text-xs text-gray-500 text-center mt-2">
-                        Code expires in 15 minutes
+                        {t('auth:resetPassword.verifyCode.codeExpires')}
                       </p>
                     </div>
 
@@ -262,7 +264,7 @@ export default function ResetPassword() {
                       {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        "Verify Code"
+                        t('auth:resetPassword.verifyCode.verifyButton')
                       )}
                     </Button>
 
@@ -273,7 +275,7 @@ export default function ResetPassword() {
                         disabled={isLoading}
                         className="text-sm text-[#26A8FF] hover:text-[#0CC5BA] transition-colors font-medium disabled:opacity-50"
                       >
-                        Didn't receive the code? Resend
+                        {t('auth:resetPassword.verifyCode.resendCode')}
                       </button>
                     </div>
                   </form>
@@ -296,7 +298,7 @@ export default function ResetPassword() {
                       <Lock className="w-10 h-10 text-white" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                      Create New Password
+                      {t('auth:resetPassword.createPassword.title')}
                     </h1>
                     <motion.p
                       initial={{ opacity: 0 }}
@@ -304,7 +306,7 @@ export default function ResetPassword() {
                       transition={{ delay: 0.3 }}
                       className="text-gray-600 text-sm text-center"
                     >
-                      Enter a new password for your account
+                      {t('auth:resetPassword.createPassword.subtitle')}
                     </motion.p>
                   </div>
 
@@ -328,7 +330,7 @@ export default function ResetPassword() {
                     {email && (
                       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
                         <p className="text-sm text-blue-900 text-center">
-                          <span className="font-medium">Resetting password for:</span>
+                          <span className="font-medium">{t('auth:resetPassword.createPassword.resettingFor')}</span>
                           <br />
                           {email}
                         </p>
@@ -338,7 +340,7 @@ export default function ResetPassword() {
                     {/* Password Field */}
                     <div className="space-y-1.5">
                       <label htmlFor="newPassword" className="text-sm font-medium text-gray-700">
-                        New Password
+                        {t('auth:resetPassword.createPassword.newPassword')}
                       </label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -348,7 +350,7 @@ export default function ResetPassword() {
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
-                          placeholder="••••••••"
+                          placeholder={t('auth:resetPassword.createPassword.passwordPlaceholder')}
                           required
                           disabled={isLoading}
                         />
@@ -365,14 +367,14 @@ export default function ResetPassword() {
                         </button>
                       </div>
                       <p className="text-xs text-gray-500">
-                        Must be at least 6 characters
+                        {t('auth:resetPassword.createPassword.passwordRequirement')}
                       </p>
                     </div>
 
                     {/* Confirm Password Field */}
                     <div className="space-y-1.5">
                       <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                        Confirm New Password
+                        {t('auth:resetPassword.createPassword.confirmPassword')}
                       </label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -382,7 +384,7 @@ export default function ResetPassword() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
-                          placeholder="••••••••"
+                          placeholder={t('auth:resetPassword.createPassword.passwordPlaceholder')}
                           required
                           disabled={isLoading}
                         />
@@ -408,7 +410,7 @@ export default function ResetPassword() {
                       {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        "Reset Password"
+                        t('auth:resetPassword.createPassword.resetButton')
                       )}
                     </Button>
                   </form>
@@ -424,12 +426,12 @@ export default function ResetPassword() {
             transition={{ delay: 0.4 }}
             className="text-center text-xs text-gray-600 mt-6"
           >
-            Need help?{" "}
+            {t('auth:resetPassword.needHelp')}{" "}
             <a
               href="mailto:support@nutriai.pl"
               className="text-[#26A8FF] hover:text-[#0CC5BA] font-medium"
             >
-              Contact Support
+              {t('auth:resetPassword.contactSupport')}
             </a>
           </motion.p>
         </motion.div>

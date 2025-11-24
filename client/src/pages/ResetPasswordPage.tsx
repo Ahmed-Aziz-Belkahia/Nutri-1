@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, Lock, Loader2, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation(['auth']);
   const { token } = useParams();
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -24,12 +26,12 @@ export default function ResetPasswordPage() {
     
     // Validation
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('auth:resetPassword.createPassword.errorPasswordLength'));
       return;
     }
     
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth:resetPassword.createPassword.errorPasswordMatch'));
       return;
     }
     
@@ -41,8 +43,8 @@ export default function ResetPasswordPage() {
       if (response.data.success) {
         setIsSuccess(true);
         toast({
-          title: 'Password reset successful',
-          description: 'Your password has been successfully reset. You can now log in with your new password.',
+          title: t('auth:resetPassword.success.toastTitle'),
+          description: t('auth:resetPassword.success.toastDescription'),
         });
         
         // Redirect to login page after a delay
@@ -50,11 +52,11 @@ export default function ResetPasswordPage() {
           navigate('/login');
         }, 3000);
       } else {
-        setError(response.data.message || 'Failed to reset password');
+        setError(response.data.message || t('auth:resetPassword.createPassword.errorResetFailed'));
       }
     } catch (error: any) {
       console.error('Password reset error:', error);
-      setError(error.response?.data?.message || 'An unexpected error occurred');
+      setError(error.response?.data?.message || t('auth:resetPassword.unexpectedError'));
     } finally {
       setIsLoading(false);
     }
@@ -85,8 +87,8 @@ export default function ResetPasswordPage() {
             </div>
             
             <div className="pt-8 pb-4 text-center">
-              <h1 className="text-white text-2xl font-bold mt-2">Reset Your Password</h1>
-              <p className="text-white/80 mt-2">Enter your new password below</p>
+              <h1 className="text-white text-2xl font-bold mt-2">{t('auth:resetPassword.createPassword.titleAlt')}</h1>
+              <p className="text-white/80 mt-2">{t('auth:resetPassword.createPassword.subtitleAlt')}</p>
             </div>
           </div>
           
@@ -96,15 +98,15 @@ export default function ResetPasswordPage() {
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
                   <CheckCircle2 className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Password Reset Successful</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('auth:resetPassword.success.titleAlt')}</h2>
                 <p className="text-gray-600 mb-6">
-                  Your password has been successfully reset. You will be redirected to the login page shortly.
+                  {t('auth:resetPassword.success.messageAlt')}
                 </p>
                 <Button
                   onClick={() => navigate('/login')}
                   className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white hover:opacity-90"
                 >
-                  Go to Login
+                  {t('auth:resetPassword.createPassword.goToLogin')}
                 </Button>
               </div>
             ) : (
@@ -119,7 +121,7 @@ export default function ResetPasswordPage() {
                       <Lock className="w-4 h-4 text-red-500" />
                     </div>
                     <div>
-                      <div className="font-semibold">Password reset failed</div>
+                      <div className="font-semibold">{t('auth:resetPassword.createPassword.errorResetFailedAlt')}</div>
                       <div className="text-sm opacity-90">{error}</div>
                     </div>
                   </motion.div>
@@ -128,14 +130,14 @@ export default function ResetPasswordPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      New Password
+                      {t('auth:resetPassword.createPassword.newPassword')}
                     </label>
                     <Input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="h-11 rounded-lg"
-                      placeholder="Enter new password"
+                      placeholder={t('auth:resetPassword.createPassword.newPasswordPlaceholder')}
                       required
                       minLength={6}
                     />
@@ -143,14 +145,14 @@ export default function ResetPasswordPage() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Confirm Password
+                      {t('auth:resetPassword.createPassword.confirmPasswordAlt')}
                     </label>
                     <Input
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="h-11 rounded-lg"
-                      placeholder="Confirm your password"
+                      placeholder={t('auth:resetPassword.createPassword.confirmPasswordPlaceholder')}
                       required
                       minLength={6}
                     />
@@ -164,10 +166,10 @@ export default function ResetPasswordPage() {
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Processing...</span>
+                        <span>{t('auth:resetPassword.processing')}</span>
                       </div>
                     ) : (
-                      <span>Reset Password</span>
+                      <span>{t('auth:resetPassword.createPassword.resetButton')}</span>
                     )}
                   </Button>
                 </div>
