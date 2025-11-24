@@ -6,8 +6,10 @@ import { Loader2, Mail, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 export default function VerifyEmail() {
+  const { t } = useTranslation(['auth']);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -71,7 +73,7 @@ export default function VerifyEmail() {
     const verificationCode = code.join('');
     
     if (verificationCode.length !== 6) {
-      setError('Please enter all 6 digits');
+      setError(t('auth:verifyEmail.errorAllDigits'));
       return;
     }
 
@@ -91,7 +93,7 @@ export default function VerifyEmail() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Verification failed');
+        setError(data.error || t('auth:verifyEmail.errorVerification'));
         setIsVerifying(false);
         return;
       }
@@ -102,8 +104,8 @@ export default function VerifyEmail() {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       
       toast({
-        title: "Email verified!",
-        description: "Your account has been created successfully.",
+        title: t('auth:verifyEmail.success.toastTitle'),
+        description: t('auth:verifyEmail.success.toastDescription'),
       });
 
       // Wait 2 seconds before redirecting to onboarding
@@ -113,7 +115,7 @@ export default function VerifyEmail() {
 
     } catch (error) {
       console.error('Verification error:', error);
-      setError('An unexpected error occurred. Please try again.');
+      setError(t('auth:verifyEmail.errorUnexpected'));
       setIsVerifying(false);
     }
   };
@@ -135,14 +137,14 @@ export default function VerifyEmail() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to resend code');
+        setError(data.error || t('auth:verifyEmail.errorResend'));
         setIsResending(false);
         return;
       }
 
       toast({
-        title: "Code sent!",
-        description: "A new verification code has been sent to your email.",
+        title: t('auth:verifyEmail.resendSuccess.toastTitle'),
+        description: t('auth:verifyEmail.resendSuccess.toastDescription'),
       });
 
       // Clear the code inputs
@@ -151,7 +153,7 @@ export default function VerifyEmail() {
 
     } catch (error) {
       console.error('Resend error:', error);
-      setError('Failed to resend code. Please try again.');
+      setError(t('auth:verifyEmail.errorResendFailed'));
     } finally {
       setIsResending(false);
     }
@@ -173,7 +175,7 @@ export default function VerifyEmail() {
               className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-6"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="text-sm">Back to sign in</span>
+              <span className="text-sm">{t('auth:verifyEmail.backToSignIn')}</span>
             </button>
 
             {/* Success State */}
@@ -194,8 +196,8 @@ export default function VerifyEmail() {
                   >
                     <CheckCircle2 className="h-10 w-10 text-white" />
                   </motion.div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Email Verified!</h2>
-                  <p className="text-gray-600">Redirecting you to sign in...</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('auth:verifyEmail.success.title')}</h2>
+                  <p className="text-gray-600">{t('auth:verifyEmail.success.message')}</p>
                 </motion.div>
               ) : (
                 <motion.div
@@ -216,9 +218,9 @@ export default function VerifyEmail() {
                         <Mail className="h-8 w-8 text-white" />
                       </div>
                     </motion.div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('auth:verifyEmail.title')}</h1>
                     <p className="text-gray-600 text-sm text-center">
-                      We've sent a 6-digit code to<br />
+                      {t('auth:verifyEmail.subtitle')}<br />
                       <strong className="text-gray-900">{email}</strong>
                     </p>
                   </div>
@@ -240,7 +242,7 @@ export default function VerifyEmail() {
                   {/* Code Inputs */}
                   <div className="mb-6">
                     <label className="text-sm font-medium text-gray-700 mb-3 block">
-                      Enter Verification Code
+                      {t('auth:verifyEmail.codeLabel')}
                     </label>
                     <div className="flex gap-2 justify-center">
                       {code.map((digit, index) => (
@@ -270,21 +272,21 @@ export default function VerifyEmail() {
                     {isVerifying ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <span>Verify Email</span>
+                      <span>{t('auth:verifyEmail.verifyButton')}</span>
                     )}
                   </Button>
 
                   {/* Resend Code */}
                   <div className="text-center">
                     <p className="text-sm text-gray-600 mb-2">
-                      Didn't receive the code?
+                      {t('auth:verifyEmail.didntReceive')}
                     </p>
                     <button
                       onClick={handleResendCode}
                       disabled={isResending}
                       className="text-sm font-semibold text-[#26A8FF] hover:text-[#0CC5BA] transition-colors disabled:opacity-50"
                     >
-                      {isResending ? "Sending..." : "Resend code"}
+                      {isResending ? t('auth:verifyEmail.sending') : t('auth:verifyEmail.resendCode')}
                     </button>
                   </div>
                 </motion.div>
@@ -299,7 +301,7 @@ export default function VerifyEmail() {
             transition={{ delay: 0.4 }}
             className="text-center text-xs text-gray-600 mt-6"
           >
-            The code will expire in 15 minutes
+            {t('auth:verifyEmail.codeExpires')}
           </motion.p>
         </motion.div>
       </div>
