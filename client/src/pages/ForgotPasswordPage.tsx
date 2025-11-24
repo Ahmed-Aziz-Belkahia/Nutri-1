@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, Mail, Loader2, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation(['auth']);
   const [, navigate] = useLocation();
   const { toast } = useToast();
   
@@ -21,7 +23,7 @@ export default function ForgotPasswordPage() {
     setError(null);
     
     if (!email) {
-      setError('Please enter your email address');
+      setError(t('auth:forgotPassword.errorEmail'));
       return;
     }
     
@@ -33,15 +35,15 @@ export default function ForgotPasswordPage() {
       if (response.data.success) {
         setIsSuccess(true);
         toast({
-          title: 'Recovery email sent',
-          description: 'If an account exists with this email, you will receive a recovery link shortly.',
+          title: t('auth:forgotPassword.toastTitle'),
+          description: t('auth:forgotPassword.toastDescription'),
         });
       } else {
         // We handle this differently since we don't want to reveal if the email exists
         setIsSuccess(true);
         toast({
-          title: 'Recovery email sent',
-          description: 'If an account exists with this email, you will receive a recovery link shortly.',
+          title: t('auth:forgotPassword.toastTitle'),
+          description: t('auth:forgotPassword.toastDescription'),
         });
       }
     } catch (error: any) {
@@ -49,8 +51,8 @@ export default function ForgotPasswordPage() {
       // Even on error, we don't want to reveal if the email exists
       setIsSuccess(true);
       toast({
-        title: 'Recovery email sent',
-        description: 'If an account exists with this email, you will receive a recovery link shortly.',
+        title: t('auth:forgotPassword.toastTitle'),
+        description: t('auth:forgotPassword.toastDescription'),
       });
     } finally {
       setIsLoading(false);
@@ -82,8 +84,8 @@ export default function ForgotPasswordPage() {
             </div>
             
             <div className="pt-8 pb-4 text-center">
-              <h1 className="text-white text-2xl font-bold mt-2">Forgot Password</h1>
-              <p className="text-white/80 mt-2">We'll send you a link to reset your password</p>
+              <h1 className="text-white text-2xl font-bold mt-2">{t('auth:forgotPassword.titleAlt')}</h1>
+              <p className="text-white/80 mt-2">{t('auth:forgotPassword.subtitleAlt')}</p>
             </div>
           </div>
           
@@ -93,15 +95,15 @@ export default function ForgotPasswordPage() {
                 <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
                   <CheckCircle2 className="h-8 w-8 text-green-600" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Check Your Email</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('auth:forgotPassword.successAlt')}</h2>
                 <p className="text-gray-600 mb-6">
-                  If an account exists with the email <strong>{email}</strong>, we've sent instructions to reset your password.
+                  {t('auth:forgotPassword.successMessageAlt', { email: email })}
                 </p>
                 <Button
                   onClick={() => navigate('/login')}
                   className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white hover:opacity-90"
                 >
-                  Return to Login
+                  {t('auth:forgotPassword.returnToLogin')}
                 </Button>
               </div>
             ) : (
@@ -116,7 +118,7 @@ export default function ForgotPasswordPage() {
                       <Mail className="w-4 h-4 text-red-500" />
                     </div>
                     <div>
-                      <div className="font-semibold">Error</div>
+                      <div className="font-semibold">{t('common:error')}</div>
                       <div className="text-sm opacity-90">{error}</div>
                     </div>
                   </motion.div>
@@ -125,14 +127,14 @@ export default function ForgotPasswordPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email Address
+                      {t('auth:forgotPassword.email')}
                     </label>
                     <Input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="h-11 rounded-lg"
-                      placeholder="Enter your email address"
+                      placeholder={t('auth:forgotPassword.emailPlaceholder')}
                       required
                     />
                   </div>
@@ -145,21 +147,21 @@ export default function ForgotPasswordPage() {
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Sending...</span>
+                        <span>{t('auth:forgotPassword.sending')}</span>
                       </div>
                     ) : (
-                      <span>Send Recovery Link</span>
+                      <span>{t('auth:forgotPassword.sendButtonAlt')}</span>
                     )}
                   </Button>
                   
                   <div className="text-center mt-4">
                     <p className="text-sm text-gray-600">
-                      Remembered your password?{' '}
+                      {t('auth:forgotPassword.rememberPassword')}{' '}
                       <a 
                         onClick={() => navigate('/login')} 
                         className="text-blue-600 hover:underline cursor-pointer"
                       >
-                        Sign in
+                        {t('auth:forgotPassword.signIn')}
                       </a>
                     </p>
                   </div>

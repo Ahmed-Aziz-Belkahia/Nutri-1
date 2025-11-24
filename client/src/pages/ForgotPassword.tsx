@@ -5,8 +5,10 @@ import { Mail, ArrowLeft, CheckCircle, AlertCircle, Loader2 } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 export default function ForgotPassword() {
+  const { t } = useTranslation(['auth']);
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,10 +34,10 @@ export default function ForgotPassword() {
         window.location.href = `/reset-password?email=${encodeURIComponent(email)}`;
       } else {
         console.error('[ForgotPassword] Error:', data.error);
-        setError(data.error || "Failed to send reset code");
+        setError(data.error || t('auth:forgotPassword.error'));
       }
     } catch (error) {
-      setError("Network error. Please try again.");
+      setError(t('auth:forgotPassword.networkError'));
     } finally {
       setIsLoading(false);
     }
@@ -64,14 +66,14 @@ export default function ForgotPassword() {
                     <CheckCircle className="w-10 h-10 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    Code Sent Successfully!
+                    {t('auth:forgotPassword.success')}
                   </h3>
                   <p className="text-gray-600">
-                    Check your email for the verification code.
+                    {t('auth:forgotPassword.successMessage')}
                   </p>
                   <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Redirecting...</span>
+                    <span>{t('auth:forgotPassword.redirecting')}</span>
                   </div>
                 </motion.div>
               ) : (
@@ -92,7 +94,7 @@ export default function ForgotPassword() {
                       <Mail className="w-10 h-10 text-white" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                      Reset Your Password
+                      {t('auth:forgotPassword.title')}
                     </h1>
                     <motion.p
                       initial={{ opacity: 0 }}
@@ -100,7 +102,7 @@ export default function ForgotPassword() {
                       transition={{ delay: 0.3 }}
                       className="text-gray-600 text-sm text-center"
                     >
-                      Enter your email and we'll send you a verification code
+                      {t('auth:forgotPassword.subtitle')}
                     </motion.p>
                   </div>
 
@@ -123,7 +125,7 @@ export default function ForgotPassword() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-1.5">
                       <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                        Email Address
+                        {t('auth:forgotPassword.email')}
                       </label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -132,7 +134,7 @@ export default function ForgotPassword() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="your@email.com"
+                          placeholder={t('auth:forgotPassword.emailPlaceholder')}
                           className="h-12 rounded-xl w-full pl-10 pr-4 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
                           required
                           disabled={isLoading}
@@ -148,7 +150,7 @@ export default function ForgotPassword() {
                       {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        "Send Verification Code"
+                        t('auth:forgotPassword.sendButton')
                       )}
                     </Button>
 
@@ -158,7 +160,7 @@ export default function ForgotPassword() {
                       className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-gray-900 transition-colors py-2"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      Back to Login
+                      {t('auth:forgotPassword.backToLogin')}
                     </button>
                   </form>
                 </motion.div>
@@ -173,12 +175,12 @@ export default function ForgotPassword() {
             transition={{ delay: 0.4 }}
             className="text-center text-xs text-gray-600 mt-6"
           >
-            Need help?{" "}
+            {t('auth:forgotPassword.needHelp')}{" "}
             <a
               href="mailto:support@nutriai.pl"
               className="text-[#26A8FF] hover:text-[#0CC5BA] font-medium"
             >
-              Contact Support
+              {t('auth:forgotPassword.contactSupport')}
             </a>
           </motion.p>
         </motion.div>
