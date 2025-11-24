@@ -17,40 +17,39 @@ export default function Settings() {
     ['/api/user/profile']
   ]);
 
+  const { t } = useTranslation(['common']);
+
   const handleLogout = async () => {
     try {
       await logout();
       // Use window.location for direct navigation to auth page
       window.location.href = '/auth';
       toast({
-        title: "Logged out successfully",
-        description: "See you next time!",
+        title: t('common:settings.logoutSuccess'),
+        description: t('common:settings.logoutSuccessDesc'),
       });
     } catch (error) {
       toast({
-        title: "Error logging out",
-        description: "Please try again",
+        title: t('common:settings.logoutError'),
+        description: t('common:settings.logoutErrorDesc'),
         variant: "destructive",
       });
     }
   };
 
-  const { t } = useTranslation();
-
   const settingsItems = [
-
     {
       icon: <FileText className="w-5 h-5" />,
-      label: t('settings.privacyPolicy', 'Privacy Policy'),
+      label: t('common:settings.privacyPolicy'),
       onClick: () => setLocation('/privacy'),
-      description: t('settings.privacyPolicyDesc', 'View our privacy policy'),
+      description: t('common:settings.privacyPolicyDesc'),
       color: "#0CC5BA"
     },
     {
       icon: <LogOut className="w-5 h-5" />,
-      label: t('settings.logout', 'Logout'),
+      label: t('common:settings.logout'),
       onClick: handleLogout,
-      description: t('settings.logoutDesc', 'Sign out of your account'),
+      description: t('common:settings.logoutDesc'),
       color: "#FF0000"
     }
   ];
@@ -100,7 +99,7 @@ export default function Settings() {
               <ChevronLeft className="h-6 w-6" />
             </motion.button>
             <h1 className="text-xl font-medium ml-2 bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-              Account
+              {t('common:settings.title')}
             </h1>
           </div>
         </div>
@@ -146,9 +145,9 @@ export default function Settings() {
             className="text-center mt-4 relative z-10"
           >
             <h2 className="text-2xl font-semibold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-              {user?.email?.split('@')[0] || 'User'}
+              {user?.email?.split('@')[0] || t('common:settings.userPlaceholder')}
             </h2>
-            <p className="text-gray-500 mt-1">{user?.email || 'No email available'}</p>
+            <p className="text-gray-500 mt-1">{user?.email || t('common:settings.noEmailAvailable')}</p>
           </motion.div>
         </motion.div>
 

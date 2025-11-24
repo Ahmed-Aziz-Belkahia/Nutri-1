@@ -300,5 +300,19 @@
     },
     "infoCard": "Tu privacidad es importante para nosotros. Solo recopilamos y compartimos datos según tus preferencias y nuestra política de privacidad.",
     "deleteAllData": "Eliminar todos mis datos"
+  },
+  "settings": {
+    "title": "Cuenta",
+    "backToDashboard": "Volver al panel",
+    "userPlaceholder": "Usuario",
+    "noEmailAvailable": "Sin correo disponible",
+    "privacyPolicy": "Política de privacidad",
+    "privacyPolicyDesc": "Ver nuestra política de privacidad",
+    "logout": "Cerrar sesión",
+    "logoutDesc": "Cerrar sesión de tu cuenta",
+    "logoutSuccess": "Sesión cerrada con éxito",
+    "logoutSuccessDesc": "¡Hasta pronto!",
+    "logoutError": "Error al cerrar sesión",
+    "logoutErrorDesc": "Por favor, inténtalo de nuevo"
   }
 }

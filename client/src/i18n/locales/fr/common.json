@@ -300,5 +300,19 @@
     },
     "infoCard": "Votre vie privée est importante pour nous. Nous collectons et partageons uniquement les données conformément à vos préférences et à notre politique de confidentialité.",
     "deleteAllData": "Supprimer toutes mes données"
+  },
+  "settings": {
+    "title": "Compte",
+    "backToDashboard": "Retour au tableau de bord",
+    "userPlaceholder": "Utilisateur",
+    "noEmailAvailable": "Aucun e-mail disponible",
+    "privacyPolicy": "Politique de confidentialité",
+    "privacyPolicyDesc": "Consultez notre politique de confidentialité",
+    "logout": "Se déconnecter",
+    "logoutDesc": "Déconnexion de votre compte",
+    "logoutSuccess": "Déconnexion réussie",
+    "logoutSuccessDesc": "À bientôt!",
+    "logoutError": "Erreur lors de la déconnexion",
+    "logoutErrorDesc": "Veuillez réessayer"
   }
 }

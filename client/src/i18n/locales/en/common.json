@@ -300,5 +300,19 @@
     },
     "infoCard": "Your privacy is important to us. We only collect and share data according to your preferences and our privacy policy.",
     "deleteAllData": "Delete All My Data"
+  },
+  "settings": {
+    "title": "Account",
+    "backToDashboard": "Back to Dashboard",
+    "userPlaceholder": "User",
+    "noEmailAvailable": "No email available",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyDesc": "View our privacy policy",
+    "logout": "Logout",
+    "logoutDesc": "Sign out of your account",
+    "logoutSuccess": "Logged out successfully",
+    "logoutSuccessDesc": "See you next time!",
+    "logoutError": "Error logging out",
+    "logoutErrorDesc": "Please try again"
   }
 }

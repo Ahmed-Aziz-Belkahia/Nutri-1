@@ -300,5 +300,19 @@
     },
     "infoCard": "خصوصيتك مهمة بالنسبة لنا. نحن نجمع ونشارك البيانات فقط وفقاً لتفضيلاتك وسياسة الخصوصية الخاصة بنا.",
     "deleteAllData": "حذف جميع بياناتي"
+  },
+  "settings": {
+    "title": "الحساب",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "userPlaceholder": "مستخدم",
+    "noEmailAvailable": "لا يوجد بريد إلكتروني",
+    "privacyPolicy": "سياسة الخصوصية",
+    "privacyPolicyDesc": "عرض سياسة الخصوصية",
+    "logout": "تسجيل الخروج",
+    "logoutDesc": "تسجيل الخروج من حسابك",
+    "logoutSuccess": "تم تسجيل الخروج بنجاح",
+    "logoutSuccessDesc": "نراك في المرة القادمة!",
+    "logoutError": "خطأ في تسجيل الخروج",
+    "logoutErrorDesc": "يرجى المحاولة مرة أخرى"
   }
 }
