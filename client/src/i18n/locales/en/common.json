@@ -118,5 +118,91 @@
     "october": "October",
     "november": "November",
     "december": "December"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "backToProfile": "Back to Profile",
+    "intro": "At NutriAi, we are committed to protecting your privacy and ensuring that your personal information is handled securely and responsibly. This Privacy Policy explains how we collect, use, and safeguard your information when you use our application (\"App\") and associated services.",
+    "section1": {
+      "title": "1. Information We Collect",
+      "intro": "We collect the following types of information:",
+      "userProvided": {
+        "title": "a) Information You Provide to Us:",
+        "personal": "Personal Information: When you use NutriAi, we may collect information such as your name, email address, and other details you provide.",
+        "health": "Health Data: If you input dietary or health-related information, it will only be used to provide personalized recommendations within the app."
+      },
+      "autoCollected": {
+        "title": "b) Automatically Collected Information:",
+        "device": "Device Information: We may collect details about your device, such as the device model, operating system version, and unique device identifiers.",
+        "usage": "Usage Data: Information about how you interact with the app, including pages accessed, features used, and session duration.",
+        "log": "Log Information: This includes IP address, app crashes, and error reports."
+      },
+      "thirdParty": {
+        "title": "c) Third-Party Data:",
+        "description": "If you connect NutriAi to third-party services (e.g., Google Fit), we may collect data from those services as permitted by their privacy policies."
+      }
+    },
+    "section2": {
+      "title": "2. How We Use Your Information",
+      "intro": "We use the information we collect to:",
+      "point1": "Provide, maintain, and improve the app's functionality.",
+      "point2": "Personalize your experience and provide tailored dietary recommendations.",
+      "point3": "Communicate with you regarding updates, promotional offers, and support requests.",
+      "point4": "Analyze app usage to enhance performance and user satisfaction.",
+      "point5": "Comply with legal obligations and enforce our terms of service."
+    },
+    "section3": {
+      "title": "3. How We Share Your Information",
+      "intro": "We do not sell your personal information to third parties. However, we may share your information in the following situations:",
+      "serviceProviders": {
+        "title": "a) Service Providers:",
+        "description": "We may share information with trusted third-party vendors who help us operate the app, such as hosting providers and analytics tools."
+      },
+      "legalCompliance": {
+        "title": "b) Legal Compliance:",
+        "intro": "We may disclose your information if required by law or if we believe it is necessary to:",
+        "point1": "Protect the rights, property, or safety of NutriAi, our users, or the public.",
+        "point2": "Respond to legal processes, such as subpoenas or court orders."
+      },
+      "businessTransfers": {
+        "title": "c) Business Transfers:",
+        "description": "In the event of a merger, acquisition, or sale of assets, your information may be transferred to the relevant parties."
+      }
+    },
+    "section4": {
+      "title": "4. Data Security",
+      "description": "We take reasonable measures to protect your information from unauthorized access, loss, misuse, or alteration. These measures include encryption, secure servers, and regular security audits. However, no method of data transmission or storage is completely secure, and we cannot guarantee absolute security."
+    },
+    "section5": {
+      "title": "5. Your Choices and Rights",
+      "accessUpdate": {
+        "title": "a) Access and Update:",
+        "description": "You can access and update your personal information through the app settings."
+      },
+      "optOut": {
+        "title": "b) Opt-Out:",
+        "description": "You can opt out of receiving promotional communications by following the unsubscribe instructions in our emails or contacting us directly."
+      },
+      "dataDeletion": {
+        "title": "c) Data Deletion:",
+        "description": "If you wish to delete your account or personal data, you can make a request through the app or contact us."
+      },
+      "permissions": {
+        "title": "d) Permissions:",
+        "description": "You can manage app permissions (e.g., location or health data) through your device settings."
+      }
+    },
+    "section6": {
+      "title": "6. Third-Party Links",
+      "description": "The app may contain links to third-party websites or services. We are not responsible for the privacy practices of these external sites and encourage you to review their privacy policies before providing any information."
+    },
+    "section7": {
+      "title": "7. Children's Privacy",
+      "description": "NutriAi is not intended for use by individuals under the age of 13. We do not knowingly collect personal information from children. If we become aware that we have inadvertently collected such data, we will delete it promptly."
+    },
+    "section8": {
+      "title": "8. Changes to This Privacy Policy",
+      "description": "We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. Any updates will be posted within the app, and the \"Effective Date\" at the top of this policy will be revised. Your continued use of NutriAi after changes indicates your acceptance of the updated policy."
+    }
   }
 }

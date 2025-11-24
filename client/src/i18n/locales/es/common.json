@@ -118,5 +118,91 @@
     "october": "October",
     "november": "November",
     "december": "December"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "backToProfile": "Volver al perfil",
+    "intro": "En NutriAi, estamos comprometidos a proteger tu privacidad y garantizar que tu información personal se maneje de forma segura y responsable. Esta Política de privacidad explica cómo recopilamos, usamos y protegemos tu información cuando usas nuestra aplicación (\"App\") y servicios asociados.",
+    "section1": {
+      "title": "1. Información que recopilamos",
+      "intro": "Recopilamos los siguientes tipos de información:",
+      "userProvided": {
+        "title": "a) Información que nos proporcionas:",
+        "personal": "Información personal: Cuando usas NutriAi, podemos recopilar información como tu nombre, dirección de correo electrónico y otros detalles que proporciones.",
+        "health": "Datos de salud: Si ingresas información dietética o relacionada con la salud, solo se usará para proporcionar recomendaciones personalizadas dentro de la aplicación."
+      },
+      "autoCollected": {
+        "title": "b) Información recopilada automáticamente:",
+        "device": "Información del dispositivo: Podemos recopilar detalles sobre tu dispositivo, como el modelo del dispositivo, la versión del sistema operativo y los identificadores únicos del dispositivo.",
+        "usage": "Datos de uso: Información sobre cómo interactúas con la aplicación, incluidas las páginas accedidas, las funciones utilizadas y la duración de la sesión.",
+        "log": "Información de registro: Esto incluye la dirección IP, fallos de la aplicación e informes de errores."
+      },
+      "thirdParty": {
+        "title": "c) Datos de terceros:",
+        "description": "Si conectas NutriAi a servicios de terceros (por ejemplo, Google Fit), podemos recopilar datos de esos servicios según lo permitan sus políticas de privacidad."
+      }
+    },
+    "section2": {
+      "title": "2. Cómo usamos tu información",
+      "intro": "Usamos la información que recopilamos para:",
+      "point1": "Proporcionar, mantener y mejorar la funcionalidad de la aplicación.",
+      "point2": "Personalizar tu experiencia y proporcionar recomendaciones dietéticas adaptadas.",
+      "point3": "Comunicarnos contigo sobre actualizaciones, ofertas promocionales y solicitudes de soporte.",
+      "point4": "Analizar el uso de la aplicación para mejorar el rendimiento y la satisfacción del usuario.",
+      "point5": "Cumplir con las obligaciones legales y hacer cumplir nuestros términos de servicio."
+    },
+    "section3": {
+      "title": "3. Cómo compartimos tu información",
+      "intro": "No vendemos tu información personal a terceros. Sin embargo, podemos compartir tu información en las siguientes situaciones:",
+      "serviceProviders": {
+        "title": "a) Proveedores de servicios:",
+        "description": "Podemos compartir información con proveedores externos de confianza que nos ayudan a operar la aplicación, como proveedores de alojamiento y herramientas de análisis."
+      },
+      "legalCompliance": {
+        "title": "b) Cumplimiento legal:",
+        "intro": "Podemos divulgar tu información si la ley lo requiere o si creemos que es necesario para:",
+        "point1": "Proteger los derechos, la propiedad o la seguridad de NutriAi, nuestros usuarios o el público.",
+        "point2": "Responder a procesos legales, como citaciones u órdenes judiciales."
+      },
+      "businessTransfers": {
+        "title": "c) Transferencias comerciales:",
+        "description": "En caso de fusión, adquisición o venta de activos, tu información puede transferirse a las partes relevantes."
+      }
+    },
+    "section4": {
+      "title": "4. Seguridad de datos",
+      "description": "Tomamos medidas razonables para proteger tu información del acceso no autorizado, pérdida, uso indebido o alteración. Estas medidas incluyen cifrado, servidores seguros y auditorías de seguridad regulares. Sin embargo, ningún método de transmisión o almacenamiento de datos es completamente seguro, y no podemos garantizar la seguridad absoluta."
+    },
+    "section5": {
+      "title": "5. Tus opciones y derechos",
+      "accessUpdate": {
+        "title": "a) Acceso y actualización:",
+        "description": "Puedes acceder y actualizar tu información personal a través de la configuración de la aplicación."
+      },
+      "optOut": {
+        "title": "b) Exclusión voluntaria:",
+        "description": "Puedes optar por no recibir comunicaciones promocionales siguiendo las instrucciones de cancelación de suscripción en nuestros correos electrónicos o contactándonos directamente."
+      },
+      "dataDeletion": {
+        "title": "c) Eliminación de datos:",
+        "description": "Si deseas eliminar tu cuenta o datos personales, puedes hacer una solicitud a través de la aplicación o contactarnos."
+      },
+      "permissions": {
+        "title": "d) Permisos:",
+        "description": "Puedes administrar los permisos de la aplicación (por ejemplo, ubicación o datos de salud) a través de la configuración de tu dispositivo."
+      }
+    },
+    "section6": {
+      "title": "6. Enlaces de terceros",
+      "description": "La aplicación puede contener enlaces a sitios web o servicios de terceros. No somos responsables de las prácticas de privacidad de estos sitios externos y te recomendamos que revises sus políticas de privacidad antes de proporcionar información."
+    },
+    "section7": {
+      "title": "7. Privacidad de los niños",
+      "description": "NutriAi no está destinado a ser utilizado por personas menores de 13 años. No recopilamos intencionalmente información personal de niños. Si nos enteramos de que hemos recopilado inadvertidamente dichos datos, los eliminaremos de inmediato."
+    },
+    "section8": {
+      "title": "8. Cambios a esta política de privacidad",
+      "description": "Podemos actualizar esta Política de privacidad de vez en cuando para reflejar cambios en nuestras prácticas o requisitos legales. Cualquier actualización se publicará dentro de la aplicación, y la \"Fecha de vigencia\" en la parte superior de esta política se revisará. Tu uso continuado de NutriAi después de los cambios indica tu aceptación de la política actualizada."
+    }
   }
 }
