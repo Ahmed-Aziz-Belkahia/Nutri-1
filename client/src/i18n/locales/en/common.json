@@ -204,5 +204,24 @@
       "title": "8. Changes to This Privacy Policy",
       "description": "We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. Any updates will be posted within the app, and the \"Effective Date\" at the top of this policy will be revised. Your continued use of NutriAi after changes indicates your acceptance of the updated policy."
     }
+  },
+  "about": {
+    "title": "About",
+    "backToSettings": "Back to Settings",
+    "appName": "Nutri AI",
+    "version": "Version 1.0.0",
+    "aboutTitle": "About Nutri AI",
+    "aboutDescription": "Nutri AI is an advanced nutrition tracking platform that helps you maintain a healthy lifestyle through AI-powered meal tracking and personalized recommendations.",
+    "featuresTitle": "Features",
+    "features": {
+      "aiRecognition": "AI-powered food recognition",
+      "tracking": "Personalized nutrition tracking",
+      "monitoring": "Progress monitoring",
+      "recommendations": "Smart recommendations",
+      "database": "Comprehensive meal database"
+    },
+    "creditsTitle": "Credits",
+    "creditsDescription": "Created with ❤️ by the Nutri AI team",
+    "copyright": "© 2025 Nutri AI. All rights reserved."
   }
 }

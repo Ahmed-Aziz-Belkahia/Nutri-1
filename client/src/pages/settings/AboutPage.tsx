@@ -1,8 +1,10 @@
 import { ChevronLeft } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function AboutPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation(['common']);
 
   return (
     <div className="min-h-screen bg-white">
@@ -12,7 +14,7 @@ export default function AboutPage() {
             <button onClick={() => setLocation("/settings")} className="-ml-2 p-2">
               <ChevronLeft className="h-6 w-6" />
             </button>
-            <h1 className="text-lg font-medium ml-2">About</h1>
+            <h1 className="text-lg font-medium ml-2">{t('common:about.title')}</h1>
           </div>
         </div>
       </header>
@@ -22,39 +24,39 @@ export default function AboutPage() {
           <div className="w-20 h-20 bg-[#10c4bc] rounded-2xl flex items-center justify-center mb-4">
             <span className="text-3xl text-white">🥗</span>
           </div>
-          <h2 className="text-xl font-semibold">Nutri AI</h2>
-          <p className="text-sm text-gray-500 mt-1">Version 1.0.0</p>
+          <h2 className="text-xl font-semibold">{t('common:about.appName')}</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('common:about.version')}</p>
         </div>
 
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-900">About Nutri AI</h3>
+            <h3 className="text-sm font-medium text-gray-900">{t('common:about.aboutTitle')}</h3>
             <p className="mt-2 text-sm text-gray-500">
-              Nutri AI is an advanced nutrition tracking platform that helps you maintain a healthy lifestyle through AI-powered meal tracking and personalized recommendations.
+              {t('common:about.aboutDescription')}
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-900">Features</h3>
+            <h3 className="text-sm font-medium text-gray-900">{t('common:about.featuresTitle')}</h3>
             <ul className="mt-2 text-sm text-gray-500 space-y-2">
-              <li>• AI-powered food recognition</li>
-              <li>• Personalized nutrition tracking</li>
-              <li>• Progress monitoring</li>
-              <li>• Smart recommendations</li>
-              <li>• Comprehensive meal database</li>
+              <li>• {t('common:about.features.aiRecognition')}</li>
+              <li>• {t('common:about.features.tracking')}</li>
+              <li>• {t('common:about.features.monitoring')}</li>
+              <li>• {t('common:about.features.recommendations')}</li>
+              <li>• {t('common:about.features.database')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-900">Credits</h3>
+            <h3 className="text-sm font-medium text-gray-900">{t('common:about.creditsTitle')}</h3>
             <p className="mt-2 text-sm text-gray-500">
-              Created with ❤️ by the Nutri AI team
+              {t('common:about.creditsDescription')}
             </p>
           </div>
 
           <div className="pt-4">
             <div className="text-xs text-center text-gray-400">
-              © 2025 Nutri AI. All rights reserved.
+              {t('common:about.copyright')}
             </div>
           </div>
         </div>
