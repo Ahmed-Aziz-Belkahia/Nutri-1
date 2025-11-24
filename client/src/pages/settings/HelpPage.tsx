@@ -2,34 +2,36 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, HelpCircle, ExternalLink } from "lucide-react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function HelpPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation(['common']);
 
   const helpItems = [
     {
-      title: "Getting Started",
-      description: "Learn the basics of using Nutri AI",
+      title: t('common:help.items.gettingStarted.title'),
+      description: t('common:help.items.gettingStarted.description'),
       link: "#"
     },
     {
-      title: "Tracking Meals",
-      description: "How to log and track your meals effectively",
+      title: t('common:help.items.trackingMeals.title'),
+      description: t('common:help.items.trackingMeals.description'),
       link: "#"
     },
     {
-      title: "Progress Tracking",
-      description: "Understanding your progress metrics",
+      title: t('common:help.items.progressTracking.title'),
+      description: t('common:help.items.progressTracking.description'),
       link: "#"
     },
     {
-      title: "FAQ",
-      description: "Frequently asked questions",
+      title: t('common:help.items.faq.title'),
+      description: t('common:help.items.faq.description'),
       link: "#"
     },
     {
-      title: "Contact Support",
-      description: "Get help from our support team",
+      title: t('common:help.items.contactSupport.title'),
+      description: t('common:help.items.contactSupport.description'),
       link: "#"
     }
   ];
@@ -79,7 +81,7 @@ export default function HelpPage() {
             <div className="flex items-center ml-2">
               <HelpCircle className="h-5 w-5 text-[#0CC5BA] mr-2" />
               <h1 className="text-xl font-medium bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                Help & Support
+                {t('common:help.title')}
               </h1>
             </div>
           </div>
@@ -119,7 +121,7 @@ export default function HelpPage() {
           className="mt-8 p-4 rounded-2xl bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 border border-white/20 backdrop-blur-md"
         >
           <p className="text-sm text-gray-600 leading-relaxed">
-            Can't find what you're looking for? Contact our support team and we'll get back to you as soon as possible.
+            {t('common:help.infoCard')}
           </p>
         </motion.div>
       </motion.div>

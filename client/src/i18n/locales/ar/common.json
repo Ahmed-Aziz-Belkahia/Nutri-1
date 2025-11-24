@@ -223,5 +223,32 @@
     "creditsTitle": "الفريق",
     "creditsDescription": "صُنع بـ ❤️ من قبل فريق Nutri AI",
     "copyright": "© 2025 Nutri AI. جميع الحقوق محفوظة."
+  },
+  "help": {
+    "title": "المساعدة والدعم",
+    "backToSettings": "العودة إلى الإعدادات",
+    "items": {
+      "gettingStarted": {
+        "title": "البدء",
+        "description": "تعلم أساسيات استخدام Nutri AI"
+      },
+      "trackingMeals": {
+        "title": "تتبع الوجبات",
+        "description": "كيفية تسجيل وتتبع وجباتك بفعالية"
+      },
+      "progressTracking": {
+        "title": "تتبع التقدم",
+        "description": "فهم مقاييس تقدمك"
+      },
+      "faq": {
+        "title": "الأسئلة الشائعة",
+        "description": "الأسئلة المتكررة"
+      },
+      "contactSupport": {
+        "title": "اتصل بالدعم",
+        "description": "احصل على المساعدة من فريق الدعم لدينا"
+      }
+    },
+    "infoCard": "لا يمكنك العثور على ما تبحث عنه؟ اتصل بفريق الدعم لدينا وسنعود إليك في أقرب وقت ممكن."
   }
 }

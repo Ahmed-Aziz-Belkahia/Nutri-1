@@ -223,5 +223,32 @@
     "creditsTitle": "Credits",
     "creditsDescription": "Created with ❤️ by the Nutri AI team",
     "copyright": "© 2025 Nutri AI. All rights reserved."
+  },
+  "help": {
+    "title": "Help & Support",
+    "backToSettings": "Back to Settings",
+    "items": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "Learn the basics of using Nutri AI"
+      },
+      "trackingMeals": {
+        "title": "Tracking Meals",
+        "description": "How to log and track your meals effectively"
+      },
+      "progressTracking": {
+        "title": "Progress Tracking",
+        "description": "Understanding your progress metrics"
+      },
+      "faq": {
+        "title": "FAQ",
+        "description": "Frequently asked questions"
+      },
+      "contactSupport": {
+        "title": "Contact Support",
+        "description": "Get help from our support team"
+      }
+    },
+    "infoCard": "Can't find what you're looking for? Contact our support team and we'll get back to you as soon as possible."
   }
 }

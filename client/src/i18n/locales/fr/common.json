@@ -223,5 +223,32 @@
     "creditsTitle": "Crédits",
     "creditsDescription": "Créé avec ❤️ par l'équipe Nutri AI",
     "copyright": "© 2025 Nutri AI. Tous droits réservés."
+  },
+  "help": {
+    "title": "Aide et support",
+    "backToSettings": "Retour aux paramètres",
+    "items": {
+      "gettingStarted": {
+        "title": "Commencer",
+        "description": "Apprenez les bases de l'utilisation de Nutri AI"
+      },
+      "trackingMeals": {
+        "title": "Suivi des repas",
+        "description": "Comment enregistrer et suivre vos repas efficacement"
+      },
+      "progressTracking": {
+        "title": "Suivi des progrès",
+        "description": "Comprendre vos métriques de progrès"
+      },
+      "faq": {
+        "title": "FAQ",
+        "description": "Questions fréquemment posées"
+      },
+      "contactSupport": {
+        "title": "Contacter le support",
+        "description": "Obtenez de l'aide de notre équipe de support"
+      }
+    },
+    "infoCard": "Vous ne trouvez pas ce que vous cherchez? Contactez notre équipe de support et nous vous répondrons dans les plus brefs délais."
   }
 }
