@@ -13,8 +13,10 @@ import {
   EyeOff
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function AuthPage() {
+  const { t } = useTranslation(['auth']);
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -34,12 +36,12 @@ export default function AuthPage() {
 
     try {
       if (!isLogin && formData.password !== formData.confirmPassword) {
-        setError("Passwords don't match");
+        setError(t('auth:register.passwordMismatch'));
         return;
       }
 
       if (formData.password.length < 6) {
-        setError("Password must be at least 6 characters");
+        setError(t('auth:register.passwordTooShort'));
         return;
       }
 
@@ -59,7 +61,7 @@ export default function AuthPage() {
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      setError(error.response?.data?.error || "An unexpected error occurred");
+      setError(error.response?.data?.error || t('auth:common.unexpectedError'));
     }
   };
 
@@ -89,7 +91,7 @@ export default function AuthPage() {
                 transition={{ delay: 0.3 }}
                 className="text-gray-600 text-sm text-center"
               >
-                {isLogin ? "Welcome back! Sign in to continue" : "Create your account to get started"}
+                {isLogin ? t('auth:login.subtitle') : t('auth:register.subtitle')}
               </motion.p>
             </div>
 
@@ -112,7 +114,7 @@ export default function AuthPage() {
               {/* Email Field */}
               <div className="space-y-1.5">
                 <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  Email
+                  {isLogin ? t('auth:login.email') : t('auth:register.email')}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -122,7 +124,7 @@ export default function AuthPage() {
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="h-12 rounded-xl w-full pl-10 pr-4 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
-                    placeholder="your@email.com"
+                    placeholder={isLogin ? t('auth:login.emailPlaceholder') : t('auth:register.emailPlaceholder')}
                     required
                   />
                 </div>
@@ -131,7 +133,7 @@ export default function AuthPage() {
               {/* Password Field */}
               <div className="space-y-1.5">
                 <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                  Password
+                  {isLogin ? t('auth:login.password') : t('auth:register.password')}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -141,7 +143,7 @@ export default function AuthPage() {
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
-                    placeholder="••••••••"
+                    placeholder={isLogin ? t('auth:login.passwordPlaceholder') : t('auth:register.passwordPlaceholder')}
                     required
                   />
                   <button 
@@ -164,7 +166,7 @@ export default function AuthPage() {
                       onClick={() => setLocation("/forgot-password")}
                       className="text-xs text-[#26A8FF] hover:text-[#0CC5BA] transition-colors font-medium"
                     >
-                      Forgot password?
+                      {t('auth:login.forgotPassword')}
                     </button>
                   </div>
                 )}
@@ -180,7 +182,7 @@ export default function AuthPage() {
                     className="space-y-1.5"
                   >
                     <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                      Confirm Password
+                      {t('auth:register.confirmPassword')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -190,7 +192,7 @@ export default function AuthPage() {
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                         className="h-12 rounded-xl w-full pl-10 pr-12 bg-white border-gray-200 focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20"
-                        placeholder="••••••••"
+                        placeholder={t('auth:register.confirmPasswordPlaceholder')}
                         required
                       />
                       <button 
@@ -217,7 +219,7 @@ export default function AuthPage() {
                 {loginMutation.isPending || registerMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <span>{isLogin ? "Sign In" : "Create Account"}</span>
+                  <span>{isLogin ? t('auth:login.loginButton') : t('auth:register.registerButton')}</span>
                 )}
               </Button>
             </form>
@@ -228,7 +230,7 @@ export default function AuthPage() {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                <span className="bg-white px-2 text-gray-500">{t('auth:common.orContinueWith')}</span>
               </div>
             </div>
 
@@ -238,7 +240,7 @@ export default function AuthPage() {
             {/* Toggle Auth Mode */}
             <div className="text-center mt-6">
               <p className="text-sm text-gray-600">
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                {isLogin ? t('auth:login.noAccount') : t('auth:register.haveAccount')}
                 {" "}
                 <button
                   type="button"
@@ -251,7 +253,7 @@ export default function AuthPage() {
                   }}
                   className="font-semibold text-[#26A8FF] hover:text-[#0CC5BA] transition-colors"
                 >
-                  {isLogin ? "Sign up" : "Sign in"}
+                  {isLogin ? t('auth:login.signUp') : t('auth:register.signIn')}
                 </button>
               </p>
             </div>
@@ -264,7 +266,7 @@ export default function AuthPage() {
             transition={{ delay: 0.4 }}
             className="text-center text-xs text-gray-600 mt-6"
           >
-            By continuing, you agree to our Terms of Service and Privacy Policy
+            {t('auth:common.termsAndPrivacy')}
           </motion.p>
         </motion.div>
       </div>
