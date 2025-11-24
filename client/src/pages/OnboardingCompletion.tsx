@@ -48,24 +48,10 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
 
   // Calculate BMR and TDEE for explanation
   const calculateBMR = (age: number, weight: number, height: number, isMale: boolean): number => {
-    if (isMale) {
-      if (age >= 18 && age <= 29) {
-        return (15.057 * weight) + (1.004 * height) + 705;
-      } else if (age >= 30 && age <= 59) {
-        return (11.472 * weight) + (8.73 * height) + 873;
-      } else if (age >= 60) {
-        return (11.711 * weight) + (5.878 * height) + 587;
-      }
-    } else {
-      if (age >= 18 && age <= 29) {
-        return (14.818 * weight) + (4.65 * height) + 486;
-      } else if (age >= 30 && age <= 59) {
-        return (8.126 * weight) + (8.45 * height) + 845;
-      } else if (age >= 60) {
-        return (9.082 * weight) + (6.588 * height) + 658;
-      }
-    }
-    return 0;
+    // Mifflin-St Jeor: BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
+    // s = +5 for males, -161 for females
+    const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+    return isMale ? baseCalories + 5 : baseCalories - 161;
   };
 
   const activityMultipliers: { [key: string]: number } = {
@@ -422,35 +408,14 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                             1. BMR (Basal Metabolic Rate)
                           </h4>
                           <p className="text-xs text-gray-600 mb-2">
-                            Using WHO/FAO/UNU equations (most accurate):
+                            Using Mifflin-St Jeor equation (most widely used):
                           </p>
-                          {isMale ? (
-                            <div className="bg-blue-50 p-3 rounded-lg text-xs">
-                              {age >= 18 && age <= 29 && (
-                                <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
-                              )}
-                              {age >= 30 && age <= 59 && (
-                                <p className="font-mono text-[10px]">BMR = (11.472 × {weight}kg) + (8.73 × {height}cm) + 873</p>
-                              )}
-                              {age >= 60 && (
-                                <p className="font-mono text-[10px]">BMR = (11.711 × {weight}kg) + (5.878 × {height}cm) + 587</p>
-                              )}
-                              <p className="mt-2 font-semibold text-blue-600">= {bmr} kcal/day</p>
-                            </div>
-                          ) : (
-                            <div className="bg-pink-50 p-3 rounded-lg text-xs">
-                              {age >= 18 && age <= 29 && (
-                                <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
-                              )}
-                              {age >= 30 && age <= 59 && (
-                                <p className="font-mono text-[10px]">BMR = (8.126 × {weight}kg) + (8.45 × {height}cm) + 845</p>
-                              )}
-                              {age >= 60 && (
-                                <p className="font-mono text-[10px]">BMR = (9.082 × {weight}kg) + (6.588 × {height}cm) + 658</p>
-                              )}
-                              <p className="mt-2 font-semibold text-pink-600">= {bmr} kcal/day</p>
-                            </div>
-                          )}
+                          <div className={`${isMale ? 'bg-blue-50' : 'bg-pink-50'} p-3 rounded-lg text-xs`}>
+                            <p className="font-mono text-[10px]">
+                              BMR = (10 × {weight}kg) + (6.25 × {height}cm) - (5 × {age}) {isMale ? '+ 5' : '- 161'}
+                            </p>
+                            <p className={`mt-2 font-semibold ${isMale ? 'text-blue-600' : 'text-pink-600'}`}>= {bmr} kcal/day</p>
+                          </div>
                         </div>
 
                         {/* TDEE Section */}
@@ -525,7 +490,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                         {/* Source Reference */}
                         <div className="pt-3 border-t border-gray-200">
                           <p className="text-[10px] text-gray-500">
-                            <strong>Source:</strong> WHO/FAO/UNU Expert Consultation on Energy and Protein Requirements (2004)
+                            <strong>Source:</strong> Mifflin-St Jeor Equation - American Dietetic Association (2005)
                           </p>
                         </div>
                       </div>

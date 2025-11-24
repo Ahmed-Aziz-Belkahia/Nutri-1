@@ -68,36 +68,9 @@ const AuthContext = React.createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [sessionRestored, setSessionRestored] = React.useState(false);
 
-  // Auto-refresh token every 20 hours (before the 24-hour expiry)
-  React.useEffect(() => {
-    const refreshInterval = setInterval(async () => {
-      try {
-        console.log('[Auth] Auto-refreshing access token...');
-        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
-        console.log('[Auth] Token auto-refreshed successfully');
-      } catch (error) {
-        console.error('[Auth] Auto-refresh failed:', error);
-      }
-    }, 20 * 60 * 60 * 1000); // 20 hours in milliseconds
-
-    // Also refresh token on mount to restore session after restart
-    const refreshOnMount = async () => {
-      try {
-        console.log('[Auth] Refreshing token on mount...');
-        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
-        console.log('[Auth] Token refreshed on mount');
-        queryClient.invalidateQueries({ queryKey: ["user"] });
-      } catch (error) {
-        console.log('[Auth] No valid refresh token found on mount');
-      }
-    };
-    refreshOnMount();
-
-    return () => clearInterval(refreshInterval);
-  }, [queryClient]);
-
-  const { data: user, isLoading } = useQuery<User | null>({
+  const { data: user, isLoading, refetch } = useQuery<User | null>({
     queryKey: ["user"],
     queryFn: async () => {
       try {
@@ -125,15 +98,85 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           };
           console.log('Transformed user data:', transformedUser);
           console.log('hasCompletedOnboarding value:', transformedUser.hasCompletedOnboarding);
+          
+          // Store session flag in localStorage
+          localStorage.setItem('nutriai_session_active', 'true');
+          localStorage.setItem('nutriai_user_id', String(transformedUser.id));
+          
           return transformedUser;
         }
         return userData;
       } catch (error) {
         console.error('Failed to fetch user from JWT endpoint:', error);
+        // Clear session flag on auth failure
+        localStorage.removeItem('nutriai_session_active');
+        localStorage.removeItem('nutriai_user_id');
         return null;
       }
     },
+    staleTime: Infinity, // User data never becomes stale (only refresh manually)
+    gcTime: Infinity, // Keep user data in cache indefinitely
+    retry: false, // Don't retry failed auth requests automatically
+    refetchOnMount: false, // Don't refetch on mount, we'll handle restoration manually
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
   });
+
+  // Session restoration on mount
+  React.useEffect(() => {
+    const restoreSession = async () => {
+      // Check if there was an active session
+      const hadActiveSession = localStorage.getItem('nutriai_session_active') === 'true';
+      
+      if (!hadActiveSession) {
+        console.log('[Auth] No previous session found');
+        setSessionRestored(true);
+        return;
+      }
+
+      console.log('[Auth] Previous session detected, attempting to restore...');
+      
+      try {
+        // First try to refresh the token
+        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        console.log('[Auth] Token refreshed successfully');
+        
+        // Then fetch user data
+        await refetch();
+        console.log('[Auth] Session restored successfully');
+      } catch (error) {
+        console.error('[Auth] Session restoration failed:', error);
+        // Clear session flags if restoration fails
+        localStorage.removeItem('nutriai_session_active');
+        localStorage.removeItem('nutriai_user_id');
+      } finally {
+        setSessionRestored(true);
+      }
+    };
+
+    restoreSession();
+  }, [refetch]);
+
+  // Auto-refresh token every 20 hours (before the 24-hour expiry)
+  React.useEffect(() => {
+    if (!user) return; // Only set up refresh if user is logged in
+
+    const refreshInterval = setInterval(async () => {
+      try {
+        console.log('[Auth] Auto-refreshing access token...');
+        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        console.log('[Auth] Token auto-refreshed successfully');
+      } catch (error) {
+        console.error('[Auth] Auto-refresh failed:', error);
+        // Clear session on refresh failure
+        localStorage.removeItem('nutriai_session_active');
+        localStorage.removeItem('nutriai_user_id');
+        queryClient.setQueryData(["user"], null);
+      }
+    }, 20 * 60 * 60 * 1000); // 20 hours in milliseconds
+
+    return () => clearInterval(refreshInterval);
+  }, [user, queryClient]);
 
   const loginMutation = useMutation<AuthResponse, Error, LoginData>({
     mutationFn: async (credentials) => {
@@ -143,8 +186,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+    onSuccess: async () => {
+      // Refetch user data to populate the session
+      await refetch();
       toast({
         title: "Login successful",
         description: "Welcome back!",
@@ -168,8 +212,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+    onSuccess: async () => {
+      // Refetch user data to populate the session
+      await refetch();
       toast({
         title: "Registration successful",
         description: "Welcome to NutriAI!",

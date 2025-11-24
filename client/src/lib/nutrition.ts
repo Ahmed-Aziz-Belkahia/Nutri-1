@@ -29,8 +29,8 @@ export const NUTRITION_SOURCES = [
 export const CALCULATION_METHODS = [
   {
     method: "Basal Metabolic Rate (BMR)",
-    formula: "WHO/FAO/UNU equations by age and gender",
-    source: "WHO Technical Report Series 935 (2004)"
+    formula: "Mifflin-St Jeor Equation",
+    source: "American Dietetic Association (2005)"
   },
   {
     method: "Total Daily Energy Expenditure (TDEE)",
@@ -44,27 +44,10 @@ export const CALCULATION_METHODS = [
   }
 ];
 
-// Calculates Base Metabolic Rate (BMR) using WHO/FAO/UNU Equations (more accurate than Mifflin-St Jeor)
+// Calculates Base Metabolic Rate (BMR) using Mifflin-St Jeor Equation (most commonly used)
 function calculateBMR(age: number, weight: number, height: number, isMale: boolean = true): number {
-  // WHO equations use weight in kg, height in cm, and return kcal/day
-  if (isMale) {
-    if (age >= 18 && age <= 29) {
-      return (15.057 * weight) + (1.004 * height) + 705;
-    } else if (age >= 30 && age <= 59) {
-      return (11.472 * weight) + (8.73 * height) + 873;
-    } else if (age >= 60) {
-      return (11.711 * weight) + (5.878 * height) + 587;
-    }
-  } else { // female
-    if (age >= 18 && age <= 29) {
-      return (14.818 * weight) + (4.65 * height) + 486;
-    } else if (age >= 30 && age <= 59) {
-      return (8.126 * weight) + (8.45 * height) + 845;
-    } else if (age >= 60) {
-      return (9.082 * weight) + (6.588 * height) + 658;
-    }
-  }
-  // Fallback to Mifflin-St Jeor if age is outside ranges
+  // Mifflin-St Jeor: BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + s
+  // where s is +5 for males and -161 for females
   const baseCalories = 10 * weight + 6.25 * height - 5 * age;
   return isMale ? baseCalories + 5 : baseCalories - 161;
 }

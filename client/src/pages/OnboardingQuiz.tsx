@@ -70,7 +70,7 @@ const calculateCalories = (data: OnboardingData) => {
     return 2000;
   }
 
-  // WHO/FAO/UNU activity multipliers
+  // Standard activity multipliers
   const activityMultipliers = {
     sedentary: 1.2,
     light: 1.375,
@@ -79,39 +79,19 @@ const calculateCalories = (data: OnboardingData) => {
     very_active: 1.9
   };
 
-  // WHO/FAO/UNU BMR formulas (age and gender-specific)
-  let bmr;
+  // Mifflin-St Jeor BMR formula (most commonly used)
   const age = data.age;
   const weight = data.weight;
   const height = data.height;
   
-  if (data.gender === 'male') {
-    if (age >= 18 && age <= 29) {
-      bmr = (15.057 * weight) + (1.004 * height) + 705;
-    } else if (age >= 30 && age <= 59) {
-      bmr = (11.472 * weight) + (8.73 * height) + 873;
-    } else if (age >= 60) {
-      bmr = (11.711 * weight) + (5.878 * height) + 587;
-    } else {
-      // Fallback for under 18
-      bmr = (15.057 * weight) + (1.004 * height) + 705;
-    }
-  } else {
-    if (age >= 18 && age <= 29) {
-      bmr = (14.818 * weight) + (4.65 * height) + 486;
-    } else if (age >= 30 && age <= 59) {
-      bmr = (8.126 * weight) + (8.45 * height) + 845;
-    } else if (age >= 60) {
-      bmr = (9.082 * weight) + (6.588 * height) + 658;
-    } else {
-      // Fallback for under 18
-      bmr = (14.818 * weight) + (4.65 * height) + 486;
-    }
-  }
+  // BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age) + s
+  // s = +5 for males, -161 for females
+  const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+  const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
 
   const tdee = bmr * (activityMultipliers[data.activityLevel as keyof typeof activityMultipliers] || 1.55);
 
-  // WHO recommended adjustments
+  // Standard calorie adjustments
   const goalAdjustments = {
     loss: -500,    // 500 kcal deficit for ~0.5kg/week loss
     maintain: 0,
@@ -172,35 +152,17 @@ export default function OnboardingQuiz() {
     mutationFn: async (data: OnboardingData) => {
       const formDataToSend = new FormData();
       
-      // Calculate nutrition values using WHO formula
+      // Calculate nutrition values using Mifflin-St Jeor formula
       const age = data.age;
       const weight = data.weight;
       const goalWeight = data.goalWeight;
       const height = data.height;
       
-      // WHO/FAO/UNU BMR calculation
-      let bmr;
-      if (data.gender === 'male') {
-        if (age >= 18 && age <= 29) {
-          bmr = (15.057 * weight) + (1.004 * height) + 705;
-        } else if (age >= 30 && age <= 59) {
-          bmr = (11.472 * weight) + (8.73 * height) + 873;
-        } else if (age >= 60) {
-          bmr = (11.711 * weight) + (5.878 * height) + 587;
-        } else {
-          bmr = (15.057 * weight) + (1.004 * height) + 705;
-        }
-      } else {
-        if (age >= 18 && age <= 29) {
-          bmr = (14.818 * weight) + (4.65 * height) + 486;
-        } else if (age >= 30 && age <= 59) {
-          bmr = (8.126 * weight) + (8.45 * height) + 845;
-        } else if (age >= 60) {
-          bmr = (9.082 * weight) + (6.588 * height) + 658;
-        } else {
-          bmr = (14.818 * weight) + (4.65 * height) + 486;
-        }
-      }
+      // Mifflin-St Jeor BMR calculation
+      // BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
+      // s = +5 for males, -161 for females
+      const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+      const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
       
       const activityMultiplier = {
         sedentary: 1.2,
@@ -212,7 +174,7 @@ export default function OnboardingQuiz() {
       
       const tdee = bmr * activityMultiplier;
       
-      // WHO recommended adjustments
+      // Standard calorie adjustments
       const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
                            data.weightGoal === 'gain' ? tdee + 300 : tdee;
       
@@ -1426,60 +1388,23 @@ export default function OnboardingQuiz() {
                                         1. BMR (Basal Metabolic Rate)
                                       </h4>
                                       <p className="text-xs text-gray-600 mb-2">
-                                        Using WHO/FAO/UNU equations (most accurate):
+                                        Using Mifflin-St Jeor equation (most widely used):
                                       </p>
                                       {(() => {
                                         const isMale = formData.gender === 'male';
                                         const age = formData.age;
                                         const weight = formData.weight;
                                         const height = formData.height;
-                                        let bmr = 0;
                                         
-                                        if (isMale) {
-                                          if (age >= 18 && age <= 29) bmr = (15.057 * weight) + (1.004 * height) + 705;
-                                          else if (age >= 30 && age <= 59) bmr = (11.472 * weight) + (8.73 * height) + 873;
-                                          else if (age >= 60) bmr = (11.711 * weight) + (5.878 * height) + 587;
-                                          else bmr = (15.057 * weight) + (1.004 * height) + 705;
-                                        } else {
-                                          if (age >= 18 && age <= 29) bmr = (14.818 * weight) + (4.65 * height) + 486;
-                                          else if (age >= 30 && age <= 59) bmr = (8.126 * weight) + (8.45 * height) + 845;
-                                          else if (age >= 60) bmr = (9.082 * weight) + (6.588 * height) + 658;
-                                          else bmr = (14.818 * weight) + (4.65 * height) + 486;
-                                        }
+                                        // Mifflin-St Jeor: BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
+                                        const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+                                        const bmr = isMale ? baseCalories + 5 : baseCalories - 161;
                                         
                                         return (
                                           <div className={`${isMale ? 'bg-blue-50' : 'bg-pink-50'} p-3 rounded-lg text-xs`}>
-                                            {isMale ? (
-                                              <>
-                                                {age >= 18 && age <= 29 && (
-                                                  <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
-                                                )}
-                                                {age >= 30 && age <= 59 && (
-                                                  <p className="font-mono text-[10px]">BMR = (11.472 × {weight}kg) + (8.73 × {height}cm) + 873</p>
-                                                )}
-                                                {age >= 60 && (
-                                                  <p className="font-mono text-[10px]">BMR = (11.711 × {weight}kg) + (5.878 × {height}cm) + 587</p>
-                                                )}
-                                                {age < 18 && (
-                                                  <p className="font-mono text-[10px]">BMR = (15.057 × {weight}kg) + (1.004 × {height}cm) + 705</p>
-                                                )}
-                                              </>
-                                            ) : (
-                                              <>
-                                                {age >= 18 && age <= 29 && (
-                                                  <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
-                                                )}
-                                                {age >= 30 && age <= 59 && (
-                                                  <p className="font-mono text-[10px]">BMR = (8.126 × {weight}kg) + (8.45 × {height}cm) + 845</p>
-                                                )}
-                                                {age >= 60 && (
-                                                  <p className="font-mono text-[10px]">BMR = (9.082 × {weight}kg) + (6.588 × {height}cm) + 658</p>
-                                                )}
-                                                {age < 18 && (
-                                                  <p className="font-mono text-[10px]">BMR = (14.818 × {weight}kg) + (4.65 × {height}cm) + 486</p>
-                                                )}
-                                              </>
-                                            )}
+                                            <p className="font-mono text-[10px]">
+                                              BMR = (10 × {weight}kg) + (6.25 × {height}cm) - (5 × {age}) {isMale ? '+ 5' : '- 161'}
+                                            </p>
                                             <p className={`mt-2 font-semibold ${isMale ? 'text-blue-600' : 'text-pink-600'}`}>
                                               = {Math.round(bmr)} kcal/day
                                             </p>
@@ -1594,7 +1519,7 @@ export default function OnboardingQuiz() {
                                     {/* Source Reference */}
                                     <div className="pt-3 border-t border-gray-200">
                                       <p className="text-[10px] text-gray-500">
-                                        <strong>Source:</strong> WHO/FAO/UNU Expert Consultation on Energy and Protein Requirements (2004)
+                                        <strong>Source:</strong> Mifflin-St Jeor Equation - American Dietetic Association (2005)
                                       </p>
                                     </div>
                                   </div>

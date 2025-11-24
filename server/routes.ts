@@ -6309,33 +6309,12 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         };
       };
 
-      // Calculate BMR using WHO/FAO/UNU equations (more accurate than Harris-Benedict)
-      // Based on age, gender, and weight in kg
+      // Calculate BMR using Mifflin-St Jeor equation (most commonly used)
+      // BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age) + s
+      // where s is +5 for males and -161 for females
       const calculateBMR = (weight: number, height: number, age: number, gender: string) => {
-        // WHO equations use weight in kg and return kcal/day
-        if (gender === 'male') {
-          if (age >= 18 && age <= 29) {
-            return (15.057 * weight) + (1.004 * height) + 705;
-          } else if (age >= 30 && age <= 59) {
-            return (11.472 * weight) + (8.73 * height) + 873;
-          } else if (age >= 60) {
-            return (11.711 * weight) + (5.878 * height) + 587;
-          }
-        } else { // female
-          if (age >= 18 && age <= 29) {
-            return (14.818 * weight) + (4.65 * height) + 486;
-          } else if (age >= 30 && age <= 59) {
-            return (8.126 * weight) + (8.45 * height) + 845;
-          } else if (age >= 60) {
-            return (9.082 * weight) + (6.588 * height) + 658;
-          }
-        }
-        // Fallback to Mifflin-St Jeor if age is outside ranges
-        if (gender === 'male') {
-          return (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        } else {
-          return (10 * weight) + (6.25 * height) - (5 * age) - 161;
-        }
+        const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+        return gender === 'male' ? baseCalories + 5 : baseCalories - 161;
       };
 
       const activityMultipliers = {
