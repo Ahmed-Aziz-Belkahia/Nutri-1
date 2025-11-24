@@ -250,5 +250,35 @@
       }
     },
     "infoCard": "Can't find what you're looking for? Contact our support team and we'll get back to you as soon as possible."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "backToSettings": "Back to Settings",
+    "items": {
+      "dailyReminder": {
+        "title": "Daily Reminder",
+        "description": "Get daily reminders to log your meals"
+      },
+      "weeklyReport": {
+        "title": "Weekly Report",
+        "description": "Receive weekly progress summary"
+      },
+      "goalUpdates": {
+        "title": "Goal Updates",
+        "description": "Get notified when you reach your goals"
+      }
+    },
+    "infoCard": "Customize your notification preferences to stay on track with your health goals. We'll only send you the updates that matter most to you."
+  },
+  "security": {
+    "title": "Security",
+    "backToSettings": "Back to Settings",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "changePasswordButton": "Change Password",
+    "setup2FA": "Setup Two-Factor Authentication",
+    "deleteAccount": "Delete Account",
+    "infoCard": "Keep your account secure by using a strong password and enabling two-factor authentication."
   }
 }

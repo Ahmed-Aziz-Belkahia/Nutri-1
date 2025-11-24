@@ -4,9 +4,11 @@ import { ChevronLeft, Bell } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function NotificationsPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation(['common']);
   const [dailyReminder, setDailyReminder] = useState(true);
   const [weeklyReport, setWeeklyReport] = useState(true);
   const [goalUpdates, setGoalUpdates] = useState(true);
@@ -56,7 +58,7 @@ export default function NotificationsPage() {
             <div className="flex items-center ml-2">
               <Bell className="h-5 w-5 text-[#0CC5BA] mr-2" />
               <h1 className="text-xl font-medium bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                Notifications
+                {t('common:notifications.title')}
               </h1>
             </div>
           </div>
@@ -75,8 +77,8 @@ export default function NotificationsPage() {
         >
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Daily Reminder</div>
-              <div className="text-sm text-gray-500">Get daily reminders to log your meals</div>
+              <div className="text-base font-medium">{t('common:notifications.items.dailyReminder.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:notifications.items.dailyReminder.description')}</div>
             </div>
             <Switch
               checked={dailyReminder}
@@ -92,8 +94,8 @@ export default function NotificationsPage() {
         >
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Weekly Report</div>
-              <div className="text-sm text-gray-500">Receive weekly progress summary</div>
+              <div className="text-base font-medium">{t('common:notifications.items.weeklyReport.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:notifications.items.weeklyReport.description')}</div>
             </div>
             <Switch
               checked={weeklyReport}
@@ -109,8 +111,8 @@ export default function NotificationsPage() {
         >
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <div className="text-base font-medium">Goal Updates</div>
-              <div className="text-sm text-gray-500">Get notified when you reach your goals</div>
+              <div className="text-base font-medium">{t('common:notifications.items.goalUpdates.title')}</div>
+              <div className="text-sm text-gray-500">{t('common:notifications.items.goalUpdates.description')}</div>
             </div>
             <Switch
               checked={goalUpdates}
@@ -128,8 +130,7 @@ export default function NotificationsPage() {
           className="mt-8 p-4 rounded-2xl bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 border border-white/20 backdrop-blur-md"
         >
           <p className="text-sm text-gray-600 leading-relaxed">
-            Customize your notification preferences to stay on track with your health goals. 
-            We'll only send you the updates that matter most to you.
+            {t('common:notifications.infoCard')}
           </p>
         </motion.div>
       </motion.div>

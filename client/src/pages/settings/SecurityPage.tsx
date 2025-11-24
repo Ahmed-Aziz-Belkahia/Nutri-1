@@ -4,9 +4,11 @@ import { ChevronLeft, Shield } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function SecurityPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation(['common']);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -61,7 +63,7 @@ export default function SecurityPage() {
             <div className="flex items-center ml-2">
               <Shield className="h-5 w-5 text-[#0CC5BA] mr-2" />
               <h1 className="text-xl font-medium bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
-                Security
+                {t('common:security.title')}
               </h1>
             </div>
           </div>
@@ -81,7 +83,7 @@ export default function SecurityPage() {
         >
           <div className="p-4 rounded-2xl bg-white/50 backdrop-blur-lg border border-white/20 shadow-sm space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-900">Current Password</label>
+              <label className="text-sm font-medium text-gray-900">{t('common:security.currentPassword')}</label>
               <Input
                 type="password"
                 value={currentPassword}
@@ -91,7 +93,7 @@ export default function SecurityPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900">New Password</label>
+              <label className="text-sm font-medium text-gray-900">{t('common:security.newPassword')}</label>
               <Input
                 type="password"
                 value={newPassword}
@@ -101,7 +103,7 @@ export default function SecurityPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900">Confirm New Password</label>
+              <label className="text-sm font-medium text-gray-900">{t('common:security.confirmNewPassword')}</label>
               <Input
                 type="password"
                 value={confirmPassword}
@@ -115,7 +117,7 @@ export default function SecurityPage() {
             type="submit" 
             className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white hover:opacity-90"
           >
-            Change Password
+            {t('common:security.changePasswordButton')}
           </Button>
         </motion.form>
 
@@ -129,7 +131,7 @@ export default function SecurityPage() {
               className="w-full bg-white/50 backdrop-blur-lg border-white/20"
               onClick={() => {/* TODO: Implement 2FA setup */}}
             >
-              Setup Two-Factor Authentication
+              {t('common:security.setup2FA')}
             </Button>
           </motion.div>
 
@@ -139,7 +141,7 @@ export default function SecurityPage() {
               className="w-full text-red-500 hover:text-red-600 bg-white/50 backdrop-blur-lg border-white/20"
               onClick={() => {/* TODO: Implement account deletion */}}
             >
-              Delete Account
+              {t('common:security.deleteAccount')}
             </Button>
           </motion.div>
         </motion.div>
@@ -152,7 +154,7 @@ export default function SecurityPage() {
           className="mt-8 p-4 rounded-2xl bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 border border-white/20 backdrop-blur-md"
         >
           <p className="text-sm text-gray-600 leading-relaxed">
-            Keep your account secure by using a strong password and enabling two-factor authentication.
+            {t('common:security.infoCard')}
           </p>
         </motion.div>
       </motion.div>

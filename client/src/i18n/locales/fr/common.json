@@ -250,5 +250,35 @@
       }
     },
     "infoCard": "Vous ne trouvez pas ce que vous cherchez? Contactez notre équipe de support et nous vous répondrons dans les plus brefs délais."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "backToSettings": "Retour aux paramètres",
+    "items": {
+      "dailyReminder": {
+        "title": "Rappel quotidien",
+        "description": "Recevez des rappels quotidiens pour enregistrer vos repas"
+      },
+      "weeklyReport": {
+        "title": "Rapport hebdomadaire",
+        "description": "Recevez un résumé hebdomadaire de vos progrès"
+      },
+      "goalUpdates": {
+        "title": "Mises à jour des objectifs",
+        "description": "Soyez averti lorsque vous atteignez vos objectifs"
+      }
+    },
+    "infoCard": "Personnalisez vos préférences de notification pour rester sur la bonne voie avec vos objectifs de santé. Nous ne vous enverrons que les mises à jour qui vous intéressent le plus."
+  },
+  "security": {
+    "title": "Sécurité",
+    "backToSettings": "Retour aux paramètres",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "changePasswordButton": "Changer le mot de passe",
+    "setup2FA": "Configurer l'authentification à deux facteurs",
+    "deleteAccount": "Supprimer le compte",
+    "infoCard": "Gardez votre compte sécurisé en utilisant un mot de passe fort et en activant l'authentification à deux facteurs."
   }
 }

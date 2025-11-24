@@ -250,5 +250,35 @@
       }
     },
     "infoCard": "¿No encuentras lo que buscas? Contacta con nuestro equipo de soporte y te responderemos lo antes posible."
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "backToSettings": "Volver a configuración",
+    "items": {
+      "dailyReminder": {
+        "title": "Recordatorio diario",
+        "description": "Recibe recordatorios diarios para registrar tus comidas"
+      },
+      "weeklyReport": {
+        "title": "Informe semanal",
+        "description": "Recibe un resumen semanal de tu progreso"
+      },
+      "goalUpdates": {
+        "title": "Actualizaciones de objetivos",
+        "description": "Recibe notificaciones cuando alcances tus objetivos"
+      }
+    },
+    "infoCard": "Personaliza tus preferencias de notificación para mantenerte en el camino con tus objetivos de salud. Solo te enviaremos las actualizaciones que más te importen."
+  },
+  "security": {
+    "title": "Seguridad",
+    "backToSettings": "Volver a configuración",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña",
+    "confirmNewPassword": "Confirmar nueva contraseña",
+    "changePasswordButton": "Cambiar contraseña",
+    "setup2FA": "Configurar autenticación de dos factores",
+    "deleteAccount": "Eliminar cuenta",
+    "infoCard": "Mantén tu cuenta segura usando una contraseña fuerte y activando la autenticación de dos factores."
   }
 }
