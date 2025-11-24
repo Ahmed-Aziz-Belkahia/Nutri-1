@@ -525,27 +525,11 @@ export async function generateMonthlyMealPlan(preferences: {
     
     console.log(`Generating batch ${batch + 1}/${batches} with ${currentBatchSize} days (days ${generatedDays + 1}-${generatedDays + currentBatchSize})`);
     
-    // Determine language for meal plan generation
-    const language = preferences.language || 'en';
-    const isPolish = language === 'pl';
-    
-    console.log(`Generating ${currentBatchSize} days of meal plan in ${isPolish ? 'Polish' : 'English'} language (batch ${batch + 1}/${batches})`);
+    console.log(`Generating ${currentBatchSize} days of meal plan in English language (batch ${batch + 1}/${batches})`);
     
     // Build the prompt for this batch
     // Include information about already generated meals to ensure variety
-    const varietyConstraints = isPolish
-      ? `
-      ZAPEWNIENIE RÓŻNORODNOŚCI Z WCZEŚNIEJ WYGENEROWANYMI DNIAMI:
-      Do tej pory stworzyłem już ${generatedDays} dni planów posiłków dla tego użytkownika.
-      Aby zapewnić pełną różnorodność przez wszystkie ${requestedDays} dni, NIGDY nie używaj koncepcji posiłków podobnych do tych wcześniej wygenerowanych:
-      
-      Poprzednie śniadania: ${usedBreakfastNames.join(', ')}
-      Poprzednie obiady: ${usedLunchNames.join(', ')}
-      Poprzednie kolacje: ${usedDinnerNames.join(', ')}
-      
-      KRYTYCZNE: Stwórz CAŁKOWICIE RÓŻNE rodzaje posiłków od tych wymienionych.
-      `
-      : `
+    const varietyConstraints = `
       ENSURING VARIETY WITH PREVIOUSLY GENERATED DAYS:
       So far, I've already created ${generatedDays} days of meal plans for this user. 
       To ensure complete variety across all ${requestedDays} days, NEVER use meal concepts similar to these previously generated meals:
@@ -557,32 +541,7 @@ export async function generateMonthlyMealPlan(preferences: {
       CRITICAL: Create COMPLETELY DIFFERENT types of meals from these.
       `;
     
-    const prompt = isPolish
-      ? `
-      Jesteś profesjonalnym dietetykiem i ekspertem w planowaniu posiłków, którego zadaniem jest stworzenie spersonalizowanego planu posiłków na dni od ${generatedDays + 1} do ${generatedDays + currentBatchSize} z ${requestedDays}-dniowego planu.
-      
-      Stwórz kompleksowy plan posiłków na DOKŁADNIE ${currentBatchSize} dni z tymi wymaganiami:
-      - Typ diety: ${preferences.dietaryType}
-      - Dzienny cel kaloryczny: ${preferences.calorieTarget} kalorii
-      - Liczba posiłków dziennie: ${preferences.mealsPerDay}
-      - Maksymalny czas gotowania na posiłek: ${preferences.maxCookingTime} minut
-      - Preferencje budżetowe: ${preferences.budgetPreference}
-      - Cele zdrowotne: ${Array.isArray(preferences.healthGoals) ? preferences.healthGoals.join(', ') : preferences.healthGoals || 'Nie określono'}
-      - Preferencje kuchni: ${Array.isArray(preferences.cuisinePreferences) ? preferences.cuisinePreferences.join(', ') : preferences.cuisinePreferences || 'Dowolne'}
-      - Poziom umiejętności gotowania: ${preferences.cookingSkillLevel || 'Średniozaawansowany'}
-      
-      WAŻNE: Twoja odpowiedź MUSI zawierać DOKŁADNIE ${currentBatchSize} dni w planie posiłków. To jest krytyczny wymóg.
-      
-      Ograniczenia i preferencje:
-      - Alergie do unikania: ${Array.isArray(preferences.allergies) ? preferences.allergies.join(', ') : preferences.allergies || 'Brak'}
-      - Wykluczone składniki: ${Array.isArray(preferences.excludedIngredients) ? preferences.excludedIngredients.join(', ') : 'Brak'}
-      - Preferowane składniki: ${Array.isArray(preferences.preferredIngredients) ? preferences.preferredIngredients.join(', ') : 'Brak'}
-      - Dostępny sprzęt kuchenny: ${Array.isArray(preferences.cookingEquipment) ? preferences.cookingEquipment.join(', ') : 'Standardowy sprzęt kuchenny'}
-      ${preferences.specialRequirements ? `- Specjalne wymagania: ${preferences.specialRequirements}` : ''}
-      
-      ABSOLUTNIE KLUCZOWE: Wszystkie nazwy posiłków, składniki, instrukcje i opisy MUSZĄ być w języku polskim. Użyj tradycyjnych polskich nazw, polskich jednostek miary, i dostosuj przepisy do polskiej kuchni gdy to możliwe.
-      `
-      : `
+    const prompt = `
       You are a professional nutritionist and meal planning expert tasked with creating a personalized meal plan for days ${generatedDays + 1} to ${generatedDays + currentBatchSize} of a ${requestedDays}-day plan.
       
       Create a comprehensive meal plan for EXACTLY ${currentBatchSize} days with these requirements:
@@ -652,8 +611,7 @@ export async function generateMonthlyMealPlan(preferences: {
         }, timeoutDuration);
       });
       
-      // Używamy już wcześniej określonej zmiennej isPolish
-      console.log(`Generating monthly meal plan batch in ${isPolish ? 'Polish' : 'English'} language`);
+      console.log(`Generating monthly meal plan batch in English language`);
       
       // Create the actual API request promise
       const requestPromise = openai.chat.completions.create({
@@ -661,7 +619,7 @@ export async function generateMonthlyMealPlan(preferences: {
         messages: [
           {
             role: "system",
-            content: `You are a nutrition and meal planning expert specializing in creating meal plans with ABSOLUTE MAXIMUM VARIETY. ${isPolish ? 'IMPORTANT: Create all meal plans, recipes, and instructions in Polish language with authentic Polish cuisine adaptations when appropriate.' : ''}
+            content: `You are a nutrition and meal planning expert specializing in creating meal plans with ABSOLUTE MAXIMUM VARIETY.
 Follow these non-negotiable rules: 
 1) Every single meal in the plan must be COMPLETELY DIFFERENT from all other meals in the entire plan - with ZERO repetition across days
 2) Each day's breakfast must be entirely different from ALL other days' breakfasts
@@ -673,8 +631,7 @@ Follow these non-negotiable rules:
 8) Create specific, descriptive meal names that highlight key ingredients, cooking methods, or flavors
 9) CRITICAL: If any two meals across different days are even somewhat similar, completely replace one with something totally different. The most essential requirement is that users MUST NOT see similar meals on different days
 10) Your response must be in valid JSON format with a specific structure
-11) IMPORTANT: Return your JSON response with a top-level key named "plan" containing the array of days
-${isPolish ? '12) Include Polish traditional dishes when appropriate and use Polish measurement units and cooking terms, but keep the JSON structure in English (use "plan" as the key name, not "plan_posiłków")' : ''}`
+11) IMPORTANT: Return your JSON response with a top-level key named "plan" containing the array of days`
           },
           { role: "user", content: prompt + "\n\nPlease respond in valid JSON format." }
         ],

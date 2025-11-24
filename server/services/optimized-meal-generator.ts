@@ -197,8 +197,6 @@ async function generateAIMealPlanFast(
   totalCost: number;
 }> {
   
-  const isPolish = preferences.language === 'pl';
-  
   try {
     // Use GPT-4o-mini for much faster generation (3-5 seconds vs 20-40 seconds)
     const controller = new AbortController();
@@ -209,7 +207,7 @@ async function generateAIMealPlanFast(
       messages: [
         {
           role: "system",
-          content: `You are a nutrition expert creating personalized meal plans. ${isPolish ? 'Twórz plany posiłków w języku polskim.' : 'Create meal plans in English.'} 
+          content: `You are a nutrition expert creating personalized meal plans. Create meal plans in English. 
 
 CRITICAL DIETARY COMPLIANCE:
 - VEGETARIAN: NO meat, poultry, fish, seafood, or animal-derived broths. Include dairy and eggs if not excluded.
@@ -345,8 +343,6 @@ async function enhanceMealsWithAI(
   }
   
   try {
-    const isPolish = preferences.language === 'pl';
-    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000); // Fast enhancement timeout
     
@@ -355,7 +351,7 @@ async function enhanceMealsWithAI(
       messages: [
         {
           role: "system",
-          content: `Enhance these meal suggestions based on user preferences. ${isPolish ? 'Odpowiadaj w języku polskim.' : 'Respond in English.'} Keep the same meal types and approximate calories, but adjust ingredients and preparation to match preferences better.`
+          content: `Enhance these meal suggestions based on user preferences. Respond in English. Keep the same meal types and approximate calories, but adjust ingredients and preparation to match preferences better.`
         },
         {
           role: "user",

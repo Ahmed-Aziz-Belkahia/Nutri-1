@@ -3309,9 +3309,6 @@ export function registerRoutes(app: Express): Server {
         .from(users)
         .where(eq(users.id, req.user!.id));
 
-      const language = userProfile[0]?.preferred_language || 'en';
-      const isPolish = language === 'pl';
-
       // Save/update user dietary preferences
       await db
         .insert(userDietaryPreferences)
@@ -3359,13 +3356,13 @@ export function registerRoutes(app: Express): Server {
         maxCookingTime: preferences.maxCookingTime || 45,
         budgetPreference: preferences.budgetPreference || 'medium',
         preferredIngredients: preferences.preferredIngredients || [],
-        language
+        language: 'en'
       }, days);
 
       res.json({
         success: true,
         mealPlan,
-        message: isPolish ? 'Plan posiłków został wygenerowany!' : 'Meal plan generated successfully!'
+        message: 'Meal plan generated successfully!'
       });
 
     } catch (error) {

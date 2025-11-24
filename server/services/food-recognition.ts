@@ -77,96 +77,96 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
       messages: [
         {
           role: "system",
-          content: "Jesteś precyzyjnym systemem analizy żywności, który ZAWSZE rozkłada produkty spożywcze na oddzielne składniki z szczegółowymi informacjami. Dodatkowo identyfikujesz rozpoznawalne przepisy i generujesz instrukcje gotowania. Odpowiadaj ze strukturalnymi danymi JSON w języku polskim."
+          content: "You are a precise food analysis system that ALWAYS breaks down food products into separate components with detailed information. Additionally, you identify recognizable recipes and generate cooking instructions. Respond with structured JSON data in English."
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `Przeanalizuj to zdjęcie jedzenia i zwróć szczegółową analizę jako obiekt JSON z dokładnie tą strukturą:
+              text: `Analyze this food image and return a detailed analysis as a JSON object with exactly this structure:
 {
-  "name": "Ogólny opis posiłku po polsku",
-  "calories": suma_kalorii_wszystkich_składników,
-  "protein": suma_białka_wszystkich_składników,
-  "carbs": suma_węglowodanów_wszystkich_składników,
-  "fat": suma_tłuszczów_wszystkich_składników,
-  "confidence": liczba_między_0_a_1,
+  "name": "General meal description in English",
+  "calories": sum_of_all_component_calories,
+  "protein": sum_of_all_component_protein,
+  "carbs": sum_of_all_component_carbs,
+  "fat": sum_of_all_component_fat,
+  "confidence": number_between_0_and_1,
   "components": [
     {
-      "name": "Nazwa konkretnego składnika",
-      "calories": kalorie_składnika,
-      "protein": gramy_białka,
-      "carbs": gramy_węglowodanów,
-      "fat": gramy_tłuszczu,
-      "servingSize": "Precyzyjny pomiar",
-      "quantity": liczba_jednostek,
+      "name": "Specific component name",
+      "calories": component_calories,
+      "protein": grams_of_protein,
+      "carbs": grams_of_carbs,
+      "fat": grams_of_fat,
+      "servingSize": "Precise measurement",
+      "quantity": number_of_units,
       "details": {
-        "type": "Kategoria żywności",
-        "preparation": "Sposób przygotowania",
-        "texture": "Opis tekstury",
-        "color": "Opis koloru",
-        "estimatedWeight": "Waga w gramach"
+        "type": "Food category",
+        "preparation": "Preparation method",
+        "texture": "Texture description",
+        "color": "Color description",
+        "estimatedWeight": "Weight in grams"
       }
     }
   ],
-  "description": "Szczegółowy opis dania (opcjonalny)",
+  "description": "Detailed dish description (optional)",
   "ingredients": [
     {
-      "name": "Składnik",
-      "quantity": liczba,
-      "unit": "jednostka miary",
-      "calories": kalorie_opcjonalne
+      "name": "Ingredient",
+      "quantity": number,
+      "unit": "unit of measurement",
+      "calories": calories_optional
     }
   ],
   "instructions": [
-    "Krok 1 przygotowania",
-    "Krok 2 przygotowania"
+    "Preparation step 1",
+    "Preparation step 2"
   ],
-  "prepTime": czas_przygotowania_w_minutach,
-  "cookTime": czas_gotowania_w_minutach,
-  "servings": liczba_porcji,
-  "cuisineType": "Typ kuchni (np. 'Polska', 'Włoska', 'Azjatycka')",
-  "mealType": "Typ posiłku ('breakfast', 'lunch', 'dinner', 'snack')",
-  "difficulty": "Poziom trudności ('easy', 'medium', 'hard')",
+  "prepTime": preparation_time_in_minutes,
+  "cookTime": cooking_time_in_minutes,
+  "servings": number_of_servings,
+  "cuisineType": "Cuisine type (e.g., 'Polish', 'Italian', 'Asian')",
+  "mealType": "Meal type ('breakfast', 'lunch', 'dinner', 'snack')",
+  "difficulty": "Difficulty level ('easy', 'medium', 'hard')",
   "tags": ["tag1", "tag2"]
 }
 
-WAŻNE ZASADY DOTYCZĄCE CZASÓW PRZYGOTOWANIA:
+IMPORTANT RULES FOR PREPARATION TIMES:
 
-**prepTime (czas przygotowania)**:
-- To TYLKO czas na przygotowanie składników (mycie, krojenie, mieszanie)
-- Nie wliczaj czasu gotowania, pieczenia, smażenia
-- Dla prostych dań (kanapki, sałatki): 5-10 minut
-- Dla średniej złożoności (pasta, omlety): 10-15 minut
-- Dla złożonych dań (dużo składników do pokrojenia): 15-25 minut
-- Dla bardzo złożonych (wiele procesów przygotowawczych): 25-40 minut
+**prepTime (preparation time)**:
+- This is ONLY time for ingredient preparation (washing, cutting, mixing)
+- Do not include cooking, baking, or frying time
+- For simple dishes (sandwiches, salads): 5-10 minutes
+- For medium complexity (pasta, omelets): 10-15 minutes
+- For complex dishes (many ingredients to chop): 15-25 minutes
+- For very complex (many preparation processes): 25-40 minutes
 
-**cookTime (czas gotowania)**:
-- To czas aktywnego gotowania/pieczenia/smażenia
-- Dla smażenia: 5-15 minut
-- Dla gotowania makaronów: 10-15 minut
-- Dla pieczenia w piekarniku: 20-45 minut
-- Dla duszenia: 20-60 minut
-- Dla grillowania: 10-30 minut
+**cookTime (cooking time)**:
+- This is active cooking/baking/frying time
+- For frying: 5-15 minutes
+- For cooking pasta: 10-15 minutes
+- For oven baking: 20-45 minutes
+- For stewing: 20-60 minutes
+- For grilling: 10-30 minutes
 
-**Przykłady realistycznych czasów**:
-- Kanapka: prepTime: 5, cookTime: 0
-- Jajecznica: prepTime: 3, cookTime: 5
-- Pasta z sosem: prepTime: 10, cookTime: 15
-- Sałatka: prepTime: 10, cookTime: 0
-- Pizza domowa: prepTime: 20, cookTime: 15
-- Kurczak pieczony: prepTime: 15, cookTime: 45
-- Zupa: prepTime: 15, cookTime: 30
+**Examples of realistic times**:
+- Sandwich: prepTime: 5, cookTime: 0
+- Scrambled eggs: prepTime: 3, cookTime: 5
+- Pasta with sauce: prepTime: 10, cookTime: 15
+- Salad: prepTime: 10, cookTime: 0
+- Homemade pizza: prepTime: 20, cookTime: 15
+- Roasted chicken: prepTime: 15, cookTime: 45
+- Soup: prepTime: 15, cookTime: 30
 
-INNE ZASADY:
-- Jeśli rozpoznajesz przepis (np. Pizza Margherita, Spaghetti Carbonara), wypełnij pola: ingredients, instructions, prepTime, cookTime, cuisineType, difficulty
-- Jeśli to proste jedzenie bez przepisu lub gotowe danie (np. kupione w sklepie), zostaw prepTime i cookTime jako null lub ustaw na 0
-- Dla gotowych/pakowanych produktów: prepTime: 0 lub null, cookTime: 0 lub null
-- ingredients powinny być bazowane na components, ale w formie składników do gotowania
-- instructions to kroki gotowania (tylko dla rozpoznawalnych przepisów)
-- Zawsze dołącz co najmniej jeden element w components
-- Bądź REALISTYCZNY z czasami - nie zawyżaj ich`
+OTHER RULES:
+- If you recognize a recipe (e.g., Margherita Pizza, Spaghetti Carbonara), fill in fields: ingredients, instructions, prepTime, cookTime, cuisineType, difficulty
+- If it's simple food without a recipe or a ready-made dish (e.g., store-bought), leave prepTime and cookTime as null or set to 0
+- For ready/packaged products: prepTime: 0 or null, cookTime: 0 or null
+- ingredients should be based on components, but in the form of cooking ingredients
+- instructions are cooking steps (only for recognizable recipes)
+- Always include at least one element in components
+- Be REALISTIC with times - don't overestimate them`
             },
             {
               type: "image_url",

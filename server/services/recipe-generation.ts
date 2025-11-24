@@ -190,17 +190,11 @@ export async function generateRecipe(
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // Determine language for recipe generation
-    const language = preferences.language || 'en';
-    const isPolish = language === 'pl';
-    
     const systemPrompt = `You are a professional chef and culinary instructor specializing in creating detailed, easy-to-follow recipes. 
-${isPolish ? 'IMPORTANT: Create the recipe in Polish language with authentic Polish cuisine adaptations when appropriate.' : ''}
 Consider these specific preferences:
 - Difficulty level: ${preferences.difficulty}
 - Time available: ${preferences.timeNeeded} minutes
 - Preferred flavor profile: ${preferences.flavor}
-- Language: ${isPolish ? 'Polish' : 'English'}
 ${preferences.mealType && preferences.mealType !== 'Any' ? `- Meal type: ${preferences.mealType}` : ''}
 ${preferences.notes ? `- Preparation notes: ${preferences.notes}` : ''}
 
@@ -212,48 +206,9 @@ For each recipe:
 5. Include equipment needed
 6. Break down complex techniques into simple steps
 7. Add cooking tips and visual indicators for doneness
-8. Include food safety reminders
-${isPolish ? '9. Use Polish measurement units, cooking terms, and typical Polish ingredients when possible' : ''}`;
+8. Include food safety reminders`;
 
-    const userPrompt = isPolish 
-      ? `
-Stwórz 2 różne pomysły na przepisy wykorzystując te składniki: ${ingredients.join(', ')}.
-Każdy przepis musi spełniać te preferencje:
-- Poziom trudności: ${preferences.difficulty}
-- Całkowity potrzebny czas: ${preferences.timeNeeded} minut
-- Profil smakowy: ${preferences.flavor}
-${preferences.mealType && preferences.mealType !== 'Any' ? `- Typ posiłku: ${preferences.mealType}` : ''}
-${preferences.notes ? `\nWAŻNE NOTATKI I INSTRUKCJE PRZYGOTOWANIA:
-${preferences.notes}` : ''}
-${customPrompt ? `\nDODATKOWE INSTRUKCJE:
-${customPrompt}` : ''}
-
-KRYTYCZNIE WAŻNE - INSTRUKCJE FORMATOWANIA:
-- Sformatuj wszystkie instrukcje jako TABLICĘ ciągów znaków, gdzie każdy ciąg to kompletny krok
-- Przykład dobrego formatu instrukcji: ["Rozgrzej piekarnik do 180°C.", "W dużej misce połącz mąkę i cukier.", "Wmieszaj mleko do uzyskania gładkiej konsystencji."]
-- NIE formatuj instrukcji jako pojedynczego ciągu znaków
-- NIE używaj zagnieżdżonych tablic ani obiektów w tablicy instrukcji
-- Utrzymuj każdy krok zwięzły i skupiony na jednym zadaniu
-
-Dla każdego kroku w instrukcjach:
-- Rozpocznij od czasownika w formie rozkazującej
-- Dołącz szczegóły dotyczące miar i czasu
-- Dodaj wizualne wskazówki dotyczące gotowości, gdy ma to zastosowanie
-- Używaj prostego języka i jasnych wskazówek
-- Używaj polskich jednostek miary (g, ml, łyżka, łyżeczka) i polskich nazw składników
-
-Odpowiedź MUSI być obiektem JSON o dokładnie takiej strukturze:
-{
-  "recipes": [
-    {
-      "name": "Nazwa Przepisu 1",
-      "description": "Krótki, ale apetyczny opis 1",
-      "ingredients": ["składnik 1 z ilością", "składnik 2 z ilością"],
-      "instructions": ["Krok 1: Rozgrzej piekarnik do 180°C.", "Krok 2: W dużej misce połącz mąkę i cukier."],
-      "nutritionInfo": {
-        "calories": 350,
-        "protein": 15,`
-      : `
+    const userPrompt = `
 Create 2 different recipe ideas using these ingredients: ${ingredients.join(', ')}.
 Each recipe must match these preferences:
 - Difficulty: ${preferences.difficulty}
