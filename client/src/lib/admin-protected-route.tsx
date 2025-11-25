@@ -12,7 +12,10 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
+  console.log('[AdminProtectedRoute] State:', { user, isLoading, isAdmin: user?.isAdmin, is_admin: user?.is_admin });
+
   if (isLoading) {
+    console.log('[AdminProtectedRoute] Loading...');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -22,6 +25,8 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
 
   // Check if user is logged in and has admin privileges
   if (!user || !(user.isAdmin || user.is_admin)) {
+    console.log('[AdminProtectedRoute] Access denied - not admin');
+
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
@@ -55,5 +60,6 @@ export function AdminProtectedRoute({ children }: AdminProtectedRouteProps) {
   }
 
   // User is admin, render the protected content
+  console.log('[AdminProtectedRoute] Access granted - rendering children');
   return <>{children}</>;
 }

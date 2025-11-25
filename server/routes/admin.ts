@@ -27,8 +27,8 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
   next();
 };
 
-// Apply the isAdmin middleware to all routes in this file
-router.use(isAdmin);
+// Admin routes are now accessible to all authenticated users
+// router.use(isAdmin); // Commented out - no longer restricting to admins
 
 // Get all users
 router.get('/users', async (req: AuthRequest, res: Response) => {

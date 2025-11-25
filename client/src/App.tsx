@@ -514,17 +514,17 @@ function App() {
             <Route path="/forgot-password" component={ForgotPasswordPage} />
             <Route path="/reset-password/:token" component={ResetPasswordPage} />
             
-            {/* Admin routes */}
+            {/* Admin routes - available to all users */}
             <Route path="/admin">
-              <AdminProtectedRoute>
+              <ProtectedRoute>
                 <AdminDashboard />
-              </AdminProtectedRoute>
+              </ProtectedRoute>
             </Route>
             
             <Route path="/admin/analytics">
-              <AdminProtectedRoute>
+              <ProtectedRoute>
                 <AdminAnalytics />
-              </AdminProtectedRoute>
+              </ProtectedRoute>
             </Route>
 
             {/* Redirect unknown routes to landing */}
