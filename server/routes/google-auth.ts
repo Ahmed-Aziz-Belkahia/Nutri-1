@@ -20,6 +20,29 @@ router.get('/google', (req: Request, res: Response, next) => {
   const userAgent = req.get('User-Agent') || '';
   const isMobileApp = platform === 'mobile' || /nutriai-app/i.test(userAgent);
   
+  // For mobile apps, return the OAuth URL so they can open it in a secure browser
+  // Google blocks OAuth in embedded webviews (Error 403: disallowed_useragent)
+  if (isMobileApp && req.query.return_url === 'true') {
+    const callbackUrl = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const state = encodeURIComponent(JSON.stringify({ platform: 'mobile' }));
+    
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${clientId}` +
+      `&redirect_uri=${encodeURIComponent(callbackUrl)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent('profile email openid')}` +
+      `&state=${state}` +
+      `&access_type=online`;
+    
+    return res.json({
+      success: true,
+      authUrl: googleAuthUrl,
+      message: 'Open this URL in Chrome Custom Tabs (Android) or SFSafariViewController (iOS)',
+      instructions: 'The mobile app should open this URL in a secure browser component, not a webview'
+    });
+  }
+  
   // Pass platform info through state parameter
   const authenticateOptions: any = {
     scope: ['profile', 'email'],
