@@ -2670,8 +2670,7 @@ export function registerRoutes(app: Express): Server {
         console.error(`Error generating weekly shopping list:`, shoppingListError);
       }
 
-      // Clear progress after successful completion
-      const { clearMealPlanProgress } = await import('./services/meal-plan-progress');
+      // Clear progress after successful completion (already imported at top level)
       clearMealPlanProgress(req.user!.id);
       console.log(`Meal plan generation completed successfully for user ${req.user!.id}`);
 
@@ -2682,9 +2681,8 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error('[Meal Plan API] Error creating meal plan:', error);
       
-      // Clear progress on error as well
+      // Clear progress on error as well (already imported at top level)
       try {
-        const { clearMealPlanProgress } = await import('./services/meal-plan-progress');
         clearMealPlanProgress(req.user!.id);
       } catch (clearError) {
         console.error('Error clearing progress after failure:', clearError);
