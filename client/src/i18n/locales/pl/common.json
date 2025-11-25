@@ -297,5 +297,29 @@
       "point3": "Komunikowania się z Tobą",
       "point4": "Analizowania trendów użytkowania"
     }
+  },
+  "mealsSection": {
+    "noMealsYet": "Brak Posiłków",
+    "addFirstMeal": "Dodaj swój pierwszy posiłek skanując, przesyłając lub wprowadzając ręcznie",
+    "scanMeal": "Skanuj Posiłek",
+    "editMeal": "Edytuj Posiłek",
+    "deleteMeal": "Usuń Posiłek",
+    "deleteModal": {
+      "title": "Usunąć Posiłek?",
+      "description": "Tej czynności nie można cofnąć",
+      "confirmQuestion": "Czy na pewno chcesz usunąć"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "Dzisiejszy Plan Posiłków",
+    "noMealPlan": "Brak planu posiłków na dzisiaj",
+    "generateMealPlan": "Wygeneruj Plan Posiłków",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "ingredientsNeeded": "Potrzebne składniki",
+    "moreIngredients": "+{{count}} więcej składników →",
+    "noIngredients": "Brak dostępnych składników",
+    "noMealForType": "Brak zaplanowanego posiłku {{type}} na dzisiaj"
   }
 }

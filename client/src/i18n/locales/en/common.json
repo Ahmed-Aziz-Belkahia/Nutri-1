@@ -466,6 +466,30 @@
     "markAsEaten": "Mark as Eaten",
     "kcal": "kcal"
   },
+  "mealsSection": {
+    "noMealsYet": "No Meals Yet",
+    "addFirstMeal": "Add your first meal by scanning, uploading, or entering manually",
+    "scanMeal": "Scan a Meal",
+    "editMeal": "Edit Meal",
+    "deleteMeal": "Delete Meal",
+    "deleteModal": {
+      "title": "Delete Meal?",
+      "description": "This action cannot be undone",
+      "confirmQuestion": "Are you sure you want to delete"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "Today's Meal Plan",
+    "noMealPlan": "No meal plan for today",
+    "generateMealPlan": "Generate Meal Plan",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "ingredientsNeeded": "Ingredients needed",
+    "moreIngredients": "+{{count}} more ingredients →",
+    "noIngredients": "No ingredients available",
+    "noMealForType": "No {{type}} meal planned for today"
+  },
   "recipesNew": {
     "title": "Recipes",
     "subtitle": "Your scanned meal collection",

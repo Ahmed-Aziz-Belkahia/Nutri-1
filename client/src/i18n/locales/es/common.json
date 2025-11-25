@@ -466,6 +466,30 @@
     "markAsEaten": "Marcar como Comido",
     "kcal": "kcal"
   },
+  "mealsSection": {
+    "noMealsYet": "Aún No Hay Comidas",
+    "addFirstMeal": "Añade tu primera comida escaneando, subiendo o ingresando manualmente",
+    "scanMeal": "Escanear una Comida",
+    "editMeal": "Editar Comida",
+    "deleteMeal": "Eliminar Comida",
+    "deleteModal": {
+      "title": "¿Eliminar Comida?",
+      "description": "Esta acción no se puede deshacer",
+      "confirmQuestion": "¿Estás seguro de que quieres eliminar"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "Plan de Comidas de Hoy",
+    "noMealPlan": "No hay plan de comidas para hoy",
+    "generateMealPlan": "Generar Plan de Comidas",
+    "breakfast": "Desayuno",
+    "lunch": "Almuerzo",
+    "dinner": "Cena",
+    "ingredientsNeeded": "Ingredientes necesarios",
+    "moreIngredients": "+{{count}} ingredientes más →",
+    "noIngredients": "No hay ingredientes disponibles",
+    "noMealForType": "No hay comida de {{type}} planificada para hoy"
+  },
   "recipesNew": {
     "title": "Recetas",
     "subtitle": "Tu colección de comidas escaneadas",

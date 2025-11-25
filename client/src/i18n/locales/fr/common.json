@@ -466,6 +466,30 @@
     "markAsEaten": "Marquer comme Mangé",
     "kcal": "kcal"
   },
+  "mealsSection": {
+    "noMealsYet": "Pas Encore de Repas",
+    "addFirstMeal": "Ajoutez votre premier repas en scannant, téléchargeant ou saisissant manuellement",
+    "scanMeal": "Scanner un Repas",
+    "editMeal": "Modifier le Repas",
+    "deleteMeal": "Supprimer le Repas",
+    "deleteModal": {
+      "title": "Supprimer le Repas?",
+      "description": "Cette action ne peut pas être annulée",
+      "confirmQuestion": "Êtes-vous sûr de vouloir supprimer"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "Plan de Repas d'Aujourd'hui",
+    "noMealPlan": "Aucun plan de repas pour aujourd'hui",
+    "generateMealPlan": "Générer un Plan de Repas",
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "ingredientsNeeded": "Ingrédients nécessaires",
+    "moreIngredients": "+{{count}} ingrédients supplémentaires →",
+    "noIngredients": "Aucun ingrédient disponible",
+    "noMealForType": "Aucun repas {{type}} prévu pour aujourd'hui"
+  },
   "recipesNew": {
     "title": "Recettes",
     "subtitle": "Votre collection de repas scannés",

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Clock, Utensils, ShoppingCart, ChevronRight, Coffee, Pizza } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Recipe {
   id: number;
@@ -33,23 +34,24 @@ interface MealPlanSectionProps {
 }
 
 export default function MealPlanSection({ mealPlan }: MealPlanSectionProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'breakfast' | 'lunch' | 'dinner'>('breakfast');
 
   if (!mealPlan || !mealPlan.meals || mealPlan.meals.length === 0) {
     return (
       <div style={{ marginBottom: '20px' }}>
         <div className="card">
-          <h2 className="text-lg font-semibold text-[#26A8FF] mb-4">Today's Meal Plan</h2>
+          <h2 className="text-lg font-semibold text-[#26A8FF] mb-4">{t('common:mealPlanSection.todaysMealPlan')}</h2>
           <div className="py-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Utensils className="w-8 h-8 text-gray-400" />
             </div>
-            <p className="text-gray-500 text-sm mb-4">No meal plan for today</p>
+            <p className="text-gray-500 text-sm mb-4">{t('common:mealPlanSection.noMealPlan')}</p>
             <button
               onClick={() => window.location.href = '/meal-planning-quiz'}
               className="px-4 py-2 bg-[#26A8FF] text-white rounded-lg text-sm font-medium hover:bg-[#1A8FE6] transition-colors"
             >
-              Generate Meal Plan
+              {t('common:mealPlanSection.generateMealPlan')}
             </button>
           </div>
         </div>
@@ -155,9 +157,9 @@ export default function MealPlanSection({ mealPlan }: MealPlanSectionProps) {
     <div style={{ marginBottom: '20px' }}>
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-[#26A8FF]">Today's Meal Plan</h2>
+          <h2 className="text-lg font-semibold text-[#26A8FF]">{t('common:mealPlanSection.todaysMealPlan')}</h2>
           <div className="flex items-center px-3 py-1.5 rounded-full bg-[#26A8FF]/10 text-[#26A8FF] text-sm font-semibold">
-            {Math.round(mealPlan.totalCalories)} kcal
+            {Math.round(mealPlan.totalCalories)} {t('common:nutrition.calShort')}
           </div>
         </div>
         
@@ -173,7 +175,7 @@ export default function MealPlanSection({ mealPlan }: MealPlanSectionProps) {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {t(`common:mealPlanSection.${tab}`)}
             </button>
           ))}
         </div>
@@ -214,7 +216,7 @@ export default function MealPlanSection({ mealPlan }: MealPlanSectionProps) {
             <div className="space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <ShoppingCart className="w-4 h-4 text-gray-500" />
-                <h4 className="text-sm font-medium text-gray-700">Ingredients needed</h4>
+                <h4 className="text-sm font-medium text-gray-700">{t('common:mealPlanSection.ingredientsNeeded')}</h4>
               </div>
               {ingredients.length > 0 ? (
                 <div className="space-y-1">
@@ -242,18 +244,18 @@ export default function MealPlanSection({ mealPlan }: MealPlanSectionProps) {
                       }}
                       className="text-xs text-[#26A8FF] hover:text-[#1A8FE6] font-medium pt-1"
                     >
-                      +{totalIngredients - 5} more ingredients →
+                      {t('common:mealPlanSection.moreIngredients', { count: totalIngredients - 5 })}
                     </button>
                   )}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 py-2">No ingredients available</p>
+                <p className="text-xs text-gray-500 py-2">{t('common:mealPlanSection.noIngredients')}</p>
               )}
             </div>
           </div>
         ) : (
           <div className="py-4 text-center">
-            <p className="text-sm text-gray-500">No {activeTab} meal planned for today</p>
+            <p className="text-sm text-gray-500">{t('common:mealPlanSection.noMealForType', { type: t(`common:mealPlanSection.${activeTab}`) })}</p>
           </div>
         )}
       </div>

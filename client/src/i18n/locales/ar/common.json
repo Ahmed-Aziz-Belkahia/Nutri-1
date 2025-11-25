@@ -466,6 +466,30 @@
     "markAsEaten": "وضع علامة كمأكولة",
     "kcal": "سعرة"
   },
+  "mealsSection": {
+    "noMealsYet": "لا توجد وجبات بعد",
+    "addFirstMeal": "أضف وجبتك الأولى عن طريق المسح أو التحميل أو الإدخال يدويًا",
+    "scanMeal": "مسح وجبة",
+    "editMeal": "تعديل الوجبة",
+    "deleteMeal": "حذف الوجبة",
+    "deleteModal": {
+      "title": "حذف الوجبة؟",
+      "description": "لا يمكن التراجع عن هذا الإجراء",
+      "confirmQuestion": "هل أنت متأكد من أنك تريد الحذف"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "خطة وجبات اليوم",
+    "noMealPlan": "لا توجد خطة وجبات لليوم",
+    "generateMealPlan": "إنشاء خطة وجبات",
+    "breakfast": "الإفطار",
+    "lunch": "الغداء",
+    "dinner": "العشاء",
+    "ingredientsNeeded": "المكونات المطلوبة",
+    "moreIngredients": "+{{count}} مكونات إضافية ←",
+    "noIngredients": "لا توجد مكونات متاحة",
+    "noMealForType": "لا توجد وجبة {{type}} مخططة لليوم"
+  },
   "recipesNew": {
     "title": "الوصفات",
     "subtitle": "مجموعة وجباتك الممسوحة ضوئيًا",

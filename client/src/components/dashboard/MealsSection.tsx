@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Drawer } from 'vaul';
 import { MoreVertical, Edit2, Trash2, AlertTriangle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface Meal {
   id: number;
@@ -26,6 +27,7 @@ interface MealsSectionProps {
 }
 
 export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: MealsSectionProps) {
+  const { t } = useTranslation();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [mealToDelete, setMealToDelete] = useState<{ id: number; name: string } | null>(null);
@@ -193,7 +195,7 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
                 className="w-full px-4 py-4 text-left text-base text-gray-700 hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors rounded-lg"
               >
                 <Edit2 className="w-5 h-5" />
-                Edit Meal
+                {t('common:mealsSection.editMeal')}
               </button>
               <button
                 onClick={() => {
@@ -205,7 +207,7 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
                 className="w-full px-4 py-4 text-left text-base text-red-600 hover:bg-red-50 active:bg-red-100 flex items-center gap-3 transition-colors rounded-lg"
               >
                 <Trash2 className="w-5 h-5" />
-                Delete Meal
+                {t('common:mealsSection.deleteMeal')}
               </button>
             </div>
           </Drawer.Content>
@@ -244,14 +246,14 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
                     className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
                   >
                     <Edit2 className="w-4 h-4" />
-                    Edit
+                    {t('common:actions.edit')}
                   </button>
                   <button
                     onClick={(e) => handleDelete(meal.id, e)}
                     className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                    Delete
+                    {t('common:actions.delete')}
                   </button>
                 </div>
               )}
@@ -376,10 +378,10 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
 
                   {/* Title */}
                   <h3 className="text-2xl font-bold text-center mb-2">
-                    Delete Meal?
+                    {t('common:mealsSection.deleteModal.title')}
                   </h3>
                   <p className="text-white/90 text-center text-sm">
-                    This action cannot be undone
+                    {t('common:mealsSection.deleteModal.description')}
                   </p>
                 </div>
 
@@ -387,7 +389,7 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
                 <div className="px-6 py-6">
                   <div className="bg-gray-50 rounded-2xl p-4 mb-6">
                     <p className="text-gray-600 text-sm text-center">
-                      Are you sure you want to delete
+                      {t('common:mealsSection.deleteModal.confirmQuestion')}
                     </p>
                     <p className="text-gray-900 font-semibold text-center mt-1 text-base">
                       "{mealToDelete?.name}"
@@ -403,13 +405,13 @@ export default function MealsSection({ foodLogs, isLoading, onDeleteMeal }: Meal
                       }}
                       className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all text-base"
                     >
-                      Cancel
+                      {t('common:actions.cancel')}
                     </button>
                     <button
                       onClick={confirmDelete}
                       className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 active:scale-95 transition-all shadow-lg shadow-red-500/30 text-base"
                     >
-                      Delete
+                      {t('common:actions.delete')}
                     </button>
                   </div>
                 </div>
