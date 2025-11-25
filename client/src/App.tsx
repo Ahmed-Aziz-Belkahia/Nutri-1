@@ -493,6 +493,19 @@ function App() {
               </ProtectedRoute>
             </Route>
 
+            {/* Admin routes - available to all authenticated users */}
+            <Route path="/admin">
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            </Route>
+            
+            <Route path="/admin/analytics">
+              <ProtectedRoute>
+                <AdminAnalytics />
+              </ProtectedRoute>
+            </Route>
+
             {/* Redirect authenticated users */}
             <Route path="/">
               <NavigationRedirect to={user?.hasCompletedOnboarding === false ? "/onboarding" : "/dashboard"} />
@@ -513,19 +526,6 @@ function App() {
             <Route path="/email-verified" component={EmailVerifiedPage} />
             <Route path="/forgot-password" component={ForgotPasswordPage} />
             <Route path="/reset-password/:token" component={ResetPasswordPage} />
-            
-            {/* Admin routes - available to all users */}
-            <Route path="/admin">
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            </Route>
-            
-            <Route path="/admin/analytics">
-              <ProtectedRoute>
-                <AdminAnalytics />
-              </ProtectedRoute>
-            </Route>
 
             {/* Redirect unknown routes to landing */}
             <Route>

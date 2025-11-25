@@ -179,9 +179,10 @@ router.get('/progress/:userId', isAdmin, async (req: Request, res: Response) => 
 });
 
 // ==================== ANALYTICS ROUTES ====================
+// These routes are accessible to all authenticated users
 
 // Get user statistics
-router.get('/analytics/users', isAdmin, async (req: AuthRequest, res: Response) => {
+router.get('/analytics/users', async (req: AuthRequest, res: Response) => {
   try {
     const allUsers = await db.select().from(users);
     
@@ -224,7 +225,7 @@ router.get('/analytics/users', isAdmin, async (req: AuthRequest, res: Response) 
 });
 
 // Get token usage statistics
-router.get('/analytics/tokens', isAdmin, async (req: AuthRequest, res: Response) => {
+router.get('/analytics/tokens', async (req: AuthRequest, res: Response) => {
   try {
     const range = req.query.range as string || '30d';
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
@@ -307,7 +308,7 @@ router.get('/analytics/tokens', isAdmin, async (req: AuthRequest, res: Response)
 });
 
 // Get API statistics
-router.get('/analytics/api', isAdmin, async (req: AuthRequest, res: Response) => {
+router.get('/analytics/api', async (req: AuthRequest, res: Response) => {
   try {
     const range = req.query.range as string || '30d';
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
@@ -385,7 +386,7 @@ router.get('/analytics/api', isAdmin, async (req: AuthRequest, res: Response) =>
 });
 
 // Get activity data over time
-router.get('/analytics/activity', isAdmin, async (req: AuthRequest, res: Response) => {
+router.get('/analytics/activity', async (req: AuthRequest, res: Response) => {
   try {
     const range = req.query.range as string || '30d';
     const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
