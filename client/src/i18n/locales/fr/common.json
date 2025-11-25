@@ -1858,7 +1858,9 @@
       "eatenCalories": "Calories Consommées",
       "eatenProtein": "Protéines Consommées",
       "eatenCarbs": "Glucides Consommés",
-      "eatenFat": "Lipides Consommés"
+      "eatenFat": "Lipides Consommés",
+      "remaining": "{{amount}} {{unit}} restants",
+      "targetReached": "Objectif atteint!"
     },
     "nutrition": {
       "calShort": "cal",

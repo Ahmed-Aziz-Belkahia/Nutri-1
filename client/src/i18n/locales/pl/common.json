@@ -335,7 +335,9 @@
     "eatenCalories": "Spożyte Kalorie",
     "eatenProtein": "Spożyte Białko",
     "eatenCarbs": "Spożyte Węglowodany",
-    "eatenFat": "Spożyty Tłuszcz"
+    "eatenFat": "Spożyty Tłuszcz",
+    "remaining": "Pozostało {{amount}} {{unit}}",
+    "targetReached": "Osiągnięto cel!"
   },
   "nutrition": {
     "calShort": "kcal",

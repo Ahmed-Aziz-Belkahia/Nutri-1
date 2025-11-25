@@ -222,7 +222,7 @@ export default function MacroCard({
             </div>
             <div className="inline-flex items-center px-3 py-1 rounded-full mt-2" style={{ backgroundColor: '#eeeeee' }}>
               <span className="text-xs font-medium" style={{ color: '#1f1f1e' }}>
-                {remaining > 0 ? `${remaining} ${currentMacro.unit} left` : 'Target reached!'}
+                {remaining > 0 ? t('common:macroCard.remaining', { amount: remaining, unit: currentMacro.unit }) : t('common:macroCard.targetReached')}
               </span>
             </div>
           </div>

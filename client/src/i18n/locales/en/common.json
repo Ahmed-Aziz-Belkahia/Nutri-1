@@ -1883,7 +1883,9 @@
     "eatenCalories": "Eaten Calories",
     "eatenProtein": "Eaten Protein",
     "eatenCarbs": "Eaten Carbs",
-    "eatenFat": "Eaten Fat"
+    "eatenFat": "Eaten Fat",
+    "remaining": "{{amount}} {{unit}} left",
+    "targetReached": "Target reached!"
   },
   "nutrition": {
     "calShort": "cal",
