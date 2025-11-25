@@ -212,11 +212,11 @@ export async function analyzeFoodText(foodDescription: string, userId?: number):
 }
 
 // Nutritional analysis
-export async function analyzeNutrition(foodItems: Array<{, userId?: number 
+export async function analyzeNutrition(foodItems: Array<{
   name: string;
   quantity?: number;
   unit?: string;
-}>): Promise<{
+}>, userId?: number): Promise<{
   calories: number;
   protein: number;
   carbs: number;
