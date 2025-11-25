@@ -5,6 +5,18 @@ interface GoogleAuthButtonProps {
   className?: string;
 }
 
+// Check if running in Android WebView
+function isAndroidWebView(): boolean {
+  const ua = navigator.userAgent.toLowerCase();
+  return /wv/.test(ua) || (/android/.test(ua) && /version\/\d+\.\d+/.test(ua) && /chrome/.test(ua));
+}
+
+// Check if Android bridge is available
+function hasAndroidBridge(): boolean {
+  return typeof (window as any).Android !== 'undefined' && 
+         typeof (window as any).Android.openOAuthInBrowser === 'function';
+}
+
 export function GoogleAuthButton({ 
   mode = 'login', 
   className = '' 
@@ -23,10 +35,39 @@ export function GoogleAuthButton({
     return () => window.removeEventListener('message', handleMessage);
   }, []);
   
-  const handleGoogleAuth = () => {
+  const handleGoogleAuth = async () => {
     // Detect platform
     const isCapacitor = 'Capacitor' in window;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const inAndroidWebView = isAndroidWebView();
+    const androidBridge = hasAndroidBridge();
+    
+    // Android WebView - use Chrome Custom Tabs via bridge
+    if (inAndroidWebView && androidBridge) {
+      try {
+        // Fetch OAuth URL from backend
+        const response = await fetch('/api/auth/google?platform=mobile&return_url=true', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.authUrl) {
+          // Call Android bridge to open in Chrome Custom Tabs
+          (window as any).Android.openOAuthInBrowser(data.authUrl);
+          return;
+        }
+      } catch (error) {
+        console.error('Failed to fetch OAuth URL:', error);
+        // Fallback to regular flow (will be intercepted by WebView)
+      }
+    }
+    
+    // Android WebView without bridge - let WebView intercept the URL
+    if (inAndroidWebView) {
+      // The MainActivity should intercept this URL and open it in Chrome Custom Tabs
+      window.location.href = '/api/auth/google?platform=mobile';
+      return;
+    }
     
     if (isCapacitor) {
       // Running in Capacitor app - use in-app browser
