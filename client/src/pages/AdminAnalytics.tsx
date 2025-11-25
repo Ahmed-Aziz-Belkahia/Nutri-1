@@ -117,10 +117,44 @@ export default function AdminAnalytics() {
         fetch(`/api/admin/analytics/activity?range=${timeRange}`, { credentials: 'include' })
       ]);
 
-      if (usersRes.ok) setUserStats(await usersRes.json());
-      if (tokensRes.ok) setTokenStats(await tokensRes.json());
-      if (apiRes.ok) setAPIStats(await apiRes.json());
-      if (activityRes.ok) setActivityData(await activityRes.json());
+      console.log('Analytics API responses:', {
+        users: usersRes.status,
+        tokens: tokensRes.status,
+        api: apiRes.status,
+        activity: activityRes.status
+      });
+
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        console.log('User stats:', data);
+        setUserStats(data);
+      } else {
+        console.error('Users API error:', await usersRes.text());
+      }
+      
+      if (tokensRes.ok) {
+        const data = await tokensRes.json();
+        console.log('Token stats:', data);
+        setTokenStats(data);
+      } else {
+        console.error('Tokens API error:', await tokensRes.text());
+      }
+      
+      if (apiRes.ok) {
+        const data = await apiRes.json();
+        console.log('API stats:', data);
+        setAPIStats(data);
+      } else {
+        console.error('API stats error:', await apiRes.text());
+      }
+      
+      if (activityRes.ok) {
+        const data = await activityRes.json();
+        console.log('Activity data:', data);
+        setActivityData(data);
+      } else {
+        console.error('Activity API error:', await activityRes.text());
+      }
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -153,6 +187,8 @@ export default function AdminAnalytics() {
       </div>
     );
   }
+
+  console.log('Rendering with data:', { userStats, tokenStats, apiStats, activityData });
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
