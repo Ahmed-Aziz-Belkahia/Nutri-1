@@ -1870,6 +1870,25 @@
       }
     }
   },
+  "profileHeader": {
+    "welcomeBack": "Welcome back",
+    "defaultUser": "User"
+  },
+  "groceryList": {
+    "viewMore": "View more ({{count}} remaining)",
+    "generating": "Generating grocery list...",
+    "noItems": "No items in your grocery list"
+  },
+  "macroCard": {
+    "eatenCalories": "Eaten Calories",
+    "eatenProtein": "Eaten Protein",
+    "eatenCarbs": "Eaten Carbs",
+    "eatenFat": "Eaten Fat"
+  },
+  "nutrition": {
+    "calShort": "cal",
+    "gramsShort": "gr"
+  },
   "progress": {
     "title": "Progress",
     "weightMetrics": {

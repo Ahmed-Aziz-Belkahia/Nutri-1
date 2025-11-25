@@ -1845,6 +1845,25 @@
         "description": "لقد أنشأنا خطة التغذية الشخصية الخاصة بك. لنبدأ تحولك!"
       }
     },
+    "profileHeader": {
+      "welcomeBack": "مرحباً بعودتك",
+      "defaultUser": "المستخدم"
+    },
+    "groceryList": {
+      "viewMore": "عرض المزيد ({{count}} متبقية)",
+      "generating": "جاري إنشاء قائمة البقالة...",
+      "noItems": "لا توجد عناصر في قائمة البقالة الخاصة بك"
+    },
+    "macroCard": {
+      "eatenCalories": "السعرات المستهلكة",
+      "eatenProtein": "البروتين المستهلك",
+      "eatenCarbs": "الكربوهيدرات المستهلكة",
+      "eatenFat": "الدهون المستهلكة"
+    },
+    "nutrition": {
+      "calShort": "سعرة",
+      "gramsShort": "جم"
+    },
     "progress": {
       "weightMetrics": {
         "title": "مقاييس الوزن",

@@ -321,5 +321,24 @@
     "moreIngredients": "+{{count}} więcej składników →",
     "noIngredients": "Brak dostępnych składników",
     "noMealForType": "Brak zaplanowanego posiłku {{type}} na dzisiaj"
+  },
+  "profileHeader": {
+    "welcomeBack": "Witaj ponownie",
+    "defaultUser": "Użytkownik"
+  },
+  "groceryList": {
+    "viewMore": "Zobacz więcej (pozostało {{count}})",
+    "generating": "Generowanie listy zakupów...",
+    "noItems": "Brak produktów na liście zakupów"
+  },
+  "macroCard": {
+    "eatenCalories": "Spożyte Kalorie",
+    "eatenProtein": "Spożyte Białko",
+    "eatenCarbs": "Spożyte Węglowodany",
+    "eatenFat": "Spożyty Tłuszcz"
+  },
+  "nutrition": {
+    "calShort": "kcal",
+    "gramsShort": "g"
   }
 }

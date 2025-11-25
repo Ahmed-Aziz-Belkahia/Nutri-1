@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface GroceryItem {
   id: number;
@@ -17,6 +18,7 @@ interface GroceryListProps {
 }
 
 export default function GroceryList({ groceryList, mealPlan, onToggleItem }: GroceryListProps) {
+  const { t } = useTranslation();
   const [displayCount, setDisplayCount] = useState(5);
 
   return (
@@ -76,13 +78,13 @@ export default function GroceryList({ groceryList, mealPlan, onToggleItem }: Gro
                 onClick={() => setDisplayCount(prev => prev + 5)}
                 className="w-full mt-3 py-2 text-sm font-medium text-[#26A8FF] hover:text-[#1A8FE6] transition-colors"
               >
-                View more ({groceryList.length - displayCount} remaining)
+                {t('common:groceryList.viewMore', { count: groceryList.length - displayCount })}
               </button>
             )}
           </>
         ) : (
           <div className="text-sm text-gray-500 py-4 text-center">
-            {mealPlan ? "Generating grocery list..." : "No items in your grocery list"}
+            {mealPlan ? t('common:groceryList.generating') : t('common:groceryList.noItems')}
           </div>
         )}
       </div>

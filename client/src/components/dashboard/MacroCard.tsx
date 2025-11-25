@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 interface DailyTotals {
   calories: number;
@@ -32,6 +33,7 @@ export default function MacroCard({
   onDotClick,
   userProfile
 }: MacroCardProps) {
+  const { t } = useTranslation();
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
@@ -80,10 +82,10 @@ export default function MacroCard({
   const macroData = [
     {
       id: 'calories',
-      title: 'Eaten Calories',
+      title: t('common:macroCard.eatenCalories'),
       current: Math.round(dailyTotals.calories),
       target: targetCalories,
-      unit: 'cal',
+      unit: t('common:nutrition.calShort'),
       backgroundColors: {
         light: 'rgba(212, 238, 255, 0.6)',
         medium: 'rgba(197, 232, 255, 0.6)',
@@ -99,10 +101,10 @@ export default function MacroCard({
     },
     {
       id: 'protein',
-      title: 'Eaten Protein',
+      title: t('common:macroCard.eatenProtein'),
       current: Math.round(dailyTotals.protein),
       target: targetProtein,
-      unit: 'gr',
+      unit: t('common:nutrition.gramsShort'),
       backgroundColors: {
         light: 'rgba(255, 227, 192, 0.6)',
         medium: 'rgba(251, 190, 115, 0.6)',
@@ -118,10 +120,10 @@ export default function MacroCard({
     },
     {
       id: 'carbs',
-      title: 'Eaten Carbs',
+      title: t('common:macroCard.eatenCarbs'),
       current: Math.round(dailyTotals.carbs),
       target: targetCarbs,
-      unit: 'gr',
+      unit: t('common:nutrition.gramsShort'),
       backgroundColors: {
         light: 'rgba(223, 255, 220, 0.6)',
         medium: 'rgba(150, 255, 142, 0.6)',
@@ -137,10 +139,10 @@ export default function MacroCard({
     },
     {
       id: 'fat',
-      title: 'Eaten Fat',
+      title: t('common:macroCard.eatenFat'),
       current: Math.round(dailyTotals.fat),
       target: targetFat,
-      unit: 'gr',
+      unit: t('common:nutrition.gramsShort'),
       backgroundColors: {
         light: 'rgba(255, 244, 244, 0.6)',
         medium: 'rgba(255, 213, 213, 0.6)',

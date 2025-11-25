@@ -1845,6 +1845,25 @@
         "description": "Hemos creado tu plan nutricional personalizado. ¡Comencemos tu transformación!"
       }
     },
+    "profileHeader": {
+      "welcomeBack": "Bienvenido de nuevo",
+      "defaultUser": "Usuario"
+    },
+    "groceryList": {
+      "viewMore": "Ver más ({{count}} restantes)",
+      "generating": "Generando lista de compras...",
+      "noItems": "No hay artículos en tu lista de compras"
+    },
+    "macroCard": {
+      "eatenCalories": "Calorías Consumidas",
+      "eatenProtein": "Proteína Consumida",
+      "eatenCarbs": "Carbohidratos Consumidos",
+      "eatenFat": "Grasas Consumidas"
+    },
+    "nutrition": {
+      "calShort": "cal",
+      "gramsShort": "g"
+    },
     "progress": {
       "weightMetrics": {
         "title": "Métricas de peso",

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface User {
   profileImage?: string;
   name?: string;
@@ -11,8 +13,9 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps) {
+  const { t } = useTranslation();
   // Extract username from email (first half before @)
-  const displayName = user?.name || user?.username || (user?.email ? user.email.split('@')[0] : 'User');
+  const displayName = user?.name || user?.username || (user?.email ? user.email.split('@')[0] : t('common:profileHeader.defaultUser'));
   
   return (
     <header className="header">
@@ -35,7 +38,7 @@ export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps)
         )}
       </div>
       <div className="profile-info">
-        <p className="profile-greeting">Welcome back</p>
+        <p className="profile-greeting">{t('common:profileHeader.welcomeBack')}</p>
         <p className="profile-name">{displayName}</p>
       </div>
       <button 

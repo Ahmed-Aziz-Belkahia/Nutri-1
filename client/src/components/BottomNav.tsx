@@ -9,6 +9,7 @@ import {
   IoStatsChart
 } from "react-icons/io5";
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface NavItem {
   path: string;
@@ -18,32 +19,33 @@ interface NavItem {
   testId?: string;
 }
 
-const navItems: NavItem[] = [
-  {
-    path: "/dashboard",
-    label: "Home",
-    icon: IoHomeOutline,
-    activeIcon: IoHome,
-    testId: "home-nav"
-  },
-  {
-    path: "/recipes",
-    label: "Recipes",
-    icon: IoReaderOutline,
-    activeIcon: IoReader,
-    testId: "recipes-nav"
-  },
-  {
-    path: "/progress",
-    label: "Progress",
-    icon: IoStatsChartOutline,
-    activeIcon: IoStatsChart,
-    testId: "progress-nav"
-  }
-];
-
 export default function BottomNav() {
+  const { t } = useTranslation();
   const [location] = useLocation();
+
+  const navItems: NavItem[] = [
+    {
+      path: "/dashboard",
+      label: t('common:navigation.dashboard'),
+      icon: IoHomeOutline,
+      activeIcon: IoHome,
+      testId: "home-nav"
+    },
+    {
+      path: "/recipes",
+      label: t('common:navigation.recipes'),
+      icon: IoReaderOutline,
+      activeIcon: IoReader,
+      testId: "recipes-nav"
+    },
+    {
+      path: "/progress",
+      label: t('common:navigation.progress'),
+      icon: IoStatsChartOutline,
+      activeIcon: IoStatsChart,
+      testId: "progress-nav"
+    }
+  ];
 
   const isActive = (path: string) => {
     if (path === "/progress") {
