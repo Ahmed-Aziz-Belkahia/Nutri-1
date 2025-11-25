@@ -14,13 +14,24 @@ const router = Router();
  * Initiate Google OAuth flow
  * GET /api/auth/google
  */
-router.get(
-  '/google',
-  passport.authenticate('google', {
+router.get('/google', (req: Request, res: Response, next) => {
+  // Check if request is from mobile app
+  const platform = req.query.platform as string;
+  const userAgent = req.get('User-Agent') || '';
+  const isMobileApp = platform === 'mobile' || /nutriai-app/i.test(userAgent);
+  
+  // Pass platform info through state parameter
+  const authenticateOptions: any = {
     scope: ['profile', 'email'],
     session: false,
-  })
-);
+  };
+  
+  if (isMobileApp) {
+    authenticateOptions.state = JSON.stringify({ platform: 'mobile' });
+  }
+  
+  passport.authenticate('google', authenticateOptions)(req, res, next);
+});
 
 /**
  * Google OAuth callback
@@ -63,7 +74,87 @@ router.get(
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       });
 
-      // Redirect based on onboarding status
+      // Detect if request came from mobile app
+      const userAgent = req.get('User-Agent') || '';
+      let isMobileApp = /nutriai-app/i.test(userAgent) || req.query.platform === 'mobile';
+      
+      // Also check state parameter
+      if (req.query.state) {
+        try {
+          const state = JSON.parse(req.query.state as string);
+          if (state.platform === 'mobile') {
+            isMobileApp = true;
+          }
+        } catch (e) {
+          // Ignore invalid state
+        }
+      }
+      
+      if (isMobileApp) {
+        // For mobile apps, use custom deep link
+        const deepLink = user.hasCompletedOnboarding 
+          ? 'nutriai://auth/success?onboarding=false'
+          : 'nutriai://auth/success?onboarding=true';
+        
+        // Also include tokens in the deep link (will be picked up by the app)
+        const linkWithTokens = `${deepLink}&access=${encodeURIComponent(accessToken)}&refresh=${encodeURIComponent(refreshToken)}`;
+        
+        return res.redirect(linkWithTokens);
+      }
+
+      // For web browsers
+      // Check if this was opened in a popup
+      const isPopup = req.query.popup === 'true';
+      
+      if (isPopup) {
+        // Send HTML that closes the popup and notifies parent window
+        return res.send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Authentication Successful</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #0CC5BA 0%, #0891b2 100%);
+                color: white;
+              }
+              .container {
+                text-align: center;
+                padding: 2rem;
+              }
+              .checkmark {
+                font-size: 48px;
+                margin-bottom: 1rem;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="checkmark">✓</div>
+              <h2>Authentication Successful!</h2>
+              <p>This window will close automatically...</p>
+            </div>
+            <script>
+              // Notify parent window and close
+              if (window.opener) {
+                window.opener.postMessage({ type: 'AUTH_SUCCESS' }, '*');
+              }
+              setTimeout(() => {
+                window.close();
+              }, 1500);
+            </script>
+          </body>
+          </html>
+        `);
+      }
+      
+      // Normal redirect flow
       if (!user.hasCompletedOnboarding) {
         return res.redirect('/onboarding');
       }
@@ -71,6 +162,15 @@ router.get(
       return res.redirect('/dashboard');
     } catch (error) {
       console.error('OAuth callback error:', error);
+      
+      // Check if mobile app
+      const userAgent = req.get('User-Agent') || '';
+      const isMobileApp = /nutriai-app/i.test(userAgent) || req.query.platform === 'mobile';
+      
+      if (isMobileApp) {
+        return res.redirect('nutriai://auth/error?message=callback_failed');
+      }
+      
       return res.redirect('/login?error=callback_failed');
     }
   }

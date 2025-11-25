@@ -10,10 +10,79 @@ export function GoogleAuthButton({
   className = '' 
 }: GoogleAuthButtonProps) {
   
+  React.useEffect(() => {
+    // Listen for messages from OAuth popup
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'AUTH_SUCCESS') {
+        // Authentication succeeded, reload the page to update user state
+        window.location.reload();
+      }
+    };
+    
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+  
   const handleGoogleAuth = () => {
-    // Just redirect - let the browser handle it properly
-    // Modern mobile browsers and PWAs support this correctly
-    window.location.href = '/api/auth/google';
+    // Detect platform
+    const isCapacitor = 'Capacitor' in window;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isCapacitor) {
+      // Running in Capacitor app - use in-app browser
+      // @ts-ignore - Capacitor global
+      const { Browser } = window.Capacitor?.Plugins || {};
+      if (Browser) {
+        // Open OAuth in in-app browser with mobile flag
+        const authUrl = `${window.location.origin}/api/auth/google?platform=mobile`;
+        Browser.open({ 
+          url: authUrl,
+          presentationStyle: 'popover',
+          toolbarColor: '#0CC5BA'
+        }).then(() => {
+          // When browser closes, check if auth succeeded
+          // The app should handle the deep link callback
+          window.location.reload();
+        });
+        return;
+      }
+    }
+    
+    if (isMobile) {
+      // Mobile web browser - open in same window
+      // Add platform flag so server knows to handle mobile differently
+      window.location.href = '/api/auth/google?platform=mobile';
+    } else {
+      // Desktop - try popup first, fallback to redirect
+      const width = 500;
+      const height = 600;
+      const left = (window.screen.width - width) / 2;
+      const top = (window.screen.height - height) / 2;
+      
+      const popup = window.open(
+        '/api/auth/google?popup=true',
+        'google-auth',
+        `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no`
+      );
+      
+      // If popup was blocked, use redirect
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        window.location.href = '/api/auth/google';
+      } else {
+        // Monitor popup for completion
+        const checkPopup = setInterval(() => {
+          try {
+            if (popup.closed) {
+              clearInterval(checkPopup);
+              // Reload to check authentication status
+              window.location.reload();
+            }
+          } catch (e) {
+            // Ignore cross-origin errors
+          }
+        }, 500);
+      }
+    }
   };
 
   const buttonText = mode === 'login' 
