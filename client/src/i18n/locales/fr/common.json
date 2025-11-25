@@ -1860,7 +1860,9 @@
       "eatenCarbs": "Glucides Consommés",
       "eatenFat": "Lipides Consommés",
       "remaining": "{{amount}} {{unit}} restants",
-      "targetReached": "Objectif atteint!"
+      "targetReached": "Objectif atteint!",
+      "of": "sur {{target}} {{unit}}",
+      "view": "Voir {{macro}}"
     },
     "nutrition": {
       "calShort": "cal",

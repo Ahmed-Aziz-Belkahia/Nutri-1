@@ -1860,7 +1860,9 @@
       "eatenCarbs": "الكربوهيدرات المستهلكة",
       "eatenFat": "الدهون المستهلكة",
       "remaining": "تبقى {{amount}} {{unit}}",
-      "targetReached": "تم الوصول إلى الهدف!"
+      "targetReached": "تم الوصول إلى الهدف!",
+      "of": "من {{target}} {{unit}}",
+      "view": "عرض {{macro}}"
     },
     "nutrition": {
       "calShort": "سعرة",

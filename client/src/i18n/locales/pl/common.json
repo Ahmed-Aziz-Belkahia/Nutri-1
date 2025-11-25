@@ -337,7 +337,9 @@
     "eatenCarbs": "Spożyte Węglowodany",
     "eatenFat": "Spożyty Tłuszcz",
     "remaining": "Pozostało {{amount}} {{unit}}",
-    "targetReached": "Osiągnięto cel!"
+    "targetReached": "Osiągnięto cel!",
+    "of": "z {{target}} {{unit}}",
+    "view": "Zobacz {{macro}}"
   },
   "nutrition": {
     "calShort": "kcal",

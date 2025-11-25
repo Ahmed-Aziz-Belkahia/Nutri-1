@@ -1885,7 +1885,9 @@
     "eatenCarbs": "Eaten Carbs",
     "eatenFat": "Eaten Fat",
     "remaining": "{{amount}} {{unit}} left",
-    "targetReached": "Target reached!"
+    "targetReached": "Target reached!",
+    "of": "of {{target}} {{unit}}",
+    "view": "View {{macro}}"
   },
   "nutrition": {
     "calShort": "cal",

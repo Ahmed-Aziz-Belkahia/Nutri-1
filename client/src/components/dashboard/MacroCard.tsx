@@ -217,7 +217,7 @@ export default function MacroCard({
                 {currentMacro.current} {currentMacro.unit}
               </span>
               <span className="text-sm" style={{ color: secondaryTextColor }}>
-                of {currentMacro.target} {currentMacro.unit}
+                {t('common:macroCard.of', { target: currentMacro.target, unit: currentMacro.unit })}
               </span>
             </div>
             <div className="inline-flex items-center px-3 py-1 rounded-full mt-2" style={{ backgroundColor: '#eeeeee' }}>
@@ -259,7 +259,7 @@ export default function MacroCard({
                 : currentMacro.percentage >= 75 ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'
             }}
             onClick={() => onDotClick(index)}
-            aria-label={`View ${macro.title}`}
+            aria-label={t('common:macroCard.view', { macro: macro.title })}
           />
         ))}
       </div>
