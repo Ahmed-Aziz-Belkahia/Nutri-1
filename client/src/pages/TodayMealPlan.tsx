@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Clock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,7 @@ interface MealPlanProps {
 }
 
 export default function TodayMealPlan({ meals }: MealPlanProps) {
+  const { t } = useTranslation(['common']);
   const [completedMeals, setCompletedMeals] = useState<number>(0);
 
   const container = {
@@ -61,10 +63,10 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
           className="mb-8 text-center"
         >
           <h1 className="text-3xl font-black bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent tracking-tight mb-2">
-            Today's Nutrition Plan
+            {t('common:todayMealPlan.title')}
           </h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Your personalized meal plan to meet your daily nutrition goals
+            {t('common:todayMealPlan.description')}
           </p>
         </motion.div>
 
@@ -80,7 +82,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
               <div className="absolute inset-0 bg-white/40 backdrop-blur-sm" />
               <div className="text-center relative z-10">
                 <div className="text-2xl font-bold text-[#0CC5BA]">{totalCarbs}g</div>
-                <div className="text-sm text-gray-700 font-medium">Carbs</div>
+                <div className="text-sm text-gray-700 font-medium">{t('common:enhancedDashboard.carbs')}</div>
               </div>
             </div>
           </div>
@@ -89,7 +91,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
               <div className="absolute inset-0 bg-white/40 backdrop-blur-sm" />
               <div className="text-center relative z-10">
                 <div className="text-2xl font-bold text-[#3B82F6]">{totalProtein}g</div>
-                <div className="text-sm text-gray-700 font-medium">Protein</div>
+                <div className="text-sm text-gray-700 font-medium">{t('common:enhancedDashboard.protein')}</div>
               </div>
             </div>
           </div>
@@ -98,7 +100,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
               <div className="absolute inset-0 bg-white/40 backdrop-blur-sm" />
               <div className="text-center relative z-10">
                 <div className="text-2xl font-bold text-[#F59E0B]">{totalFat}g</div>
-                <div className="text-sm text-gray-700 font-medium">Fat</div>
+                <div className="text-sm text-gray-700 font-medium">{t('common:enhancedDashboard.fat')}</div>
               </div>
             </div>
           </div>
@@ -113,7 +115,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
             className="text-2xl font-bold text-gray-900 flex items-center gap-2"
           >
             <div className="h-6 w-1.5 bg-gradient-to-b from-[#0CC5BA] to-[#0C9CCC] rounded-full" />
-            Today's Meal Plan
+            {t('common:todayMealPlan.todaysMealPlan')}
           </motion.h2>
           
           <motion.div 
@@ -139,7 +141,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
                       </div>
                       {meal.isCompleted ? (
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-green-600 font-medium">Completed</span>
+                          <span className="text-sm text-green-600 font-medium">{t('common:todayMealPlan.completed')}</span>
                           <div className="bg-green-100 rounded-full p-1.5">
                             <Check className="w-4 h-4 text-green-600" />
                           </div>
@@ -151,7 +153,7 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
                           className="bg-white border-[#0CC5BA] text-[#0CC5BA] hover:bg-[#0CC5BA]/10 hover:text-[#0CC5BA]"
                           onClick={() => setCompletedMeals(prev => prev + 1)}
                         >
-                          Mark as Eaten
+                          {t('common:todayMealPlan.markAsEaten')}
                         </Button>
                       )}
                     </div>
@@ -162,19 +164,19 @@ export default function TodayMealPlan({ meals }: MealPlanProps) {
                     <div className="grid grid-cols-4 gap-4">
                       <div className="bg-gray-50 rounded-lg p-3 text-center shadow-sm">
                         <div className="font-semibold text-lg text-gray-900">{meal.nutritionInfo.calories}</div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">kcal</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">{t('common:todayMealPlan.kcal')}</div>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center shadow-sm">
                         <div className="font-semibold text-lg text-[#3B82F6]">{meal.nutritionInfo.protein}g</div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">Protein</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">{t('common:enhancedDashboard.protein')}</div>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center shadow-sm">
                         <div className="font-semibold text-lg text-[#0CC5BA]">{meal.nutritionInfo.carbs}g</div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">Carbs</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">{t('common:enhancedDashboard.carbs')}</div>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center shadow-sm">
                         <div className="font-semibold text-lg text-[#F59E0B]">{meal.nutritionInfo.fat}g</div>
-                        <div className="text-xs text-gray-500 uppercase tracking-wide">Fat</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-wide">{t('common:enhancedDashboard.fat')}</div>
                       </div>
                     </div>
                   </div>

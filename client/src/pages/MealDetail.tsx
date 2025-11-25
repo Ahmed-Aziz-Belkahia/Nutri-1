@@ -18,6 +18,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface FoodComponent {
   name: string;
@@ -49,6 +50,7 @@ interface MealData {
 }
 
 export default function MealDetail() {
+  const { t } = useTranslation(['common']);
   const [location, navigate] = useLocation();
   const mealId = location.split('/').pop();
   const { toast } = useToast();
@@ -186,13 +188,13 @@ export default function MealDetail() {
       setIsEditing(false);
       toast({
         title: "Success",
-        description: "Meal updated successfully!",
+        description: t('common:mealDetail.toast.saveSuccess'),
       });
     } catch (err) {
       console.error('Error updating meal:', err);
       toast({
         title: "Error",
-        description: "Failed to update meal",
+        description: t('common:mealDetail.toast.saveError'),
         variant: "destructive",
       });
     } finally {
@@ -217,7 +219,7 @@ export default function MealDetail() {
 
       toast({
         title: "Success",
-        description: "Meal deleted successfully",
+        description: t('common:mealDetail.toast.deleteSuccess'),
       });
       
       // Navigate back to dashboard
@@ -226,7 +228,7 @@ export default function MealDetail() {
       console.error('Error deleting meal:', err);
       toast({
         title: "Error",
-        description: "Failed to delete meal",
+        description: t('common:mealDetail.toast.deleteError'),
         variant: "destructive",
       });
     } finally {
@@ -367,20 +369,20 @@ export default function MealDetail() {
       <div className="min-h-screen gradient-bg flex items-center justify-center">
         <div className="text-center px-4">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Meal</h2>
-          <p className="text-gray-600 mb-6">{error || 'Something went wrong'}</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('common:mealDetail.error.title')}</h2>
+          <p className="text-gray-600 mb-6">{error || t('common:mealDetail.error.description')}</p>
           <div className="space-y-2">
             <button
               onClick={fetchMealDetails}
               className="px-6 py-3 bg-[#26A8FF] text-white rounded-lg hover:bg-[#1A8FE6] transition-colors"
             >
-              Try Again
+              {t('common:mealDetail.error.tryAgain')}
             </button>
             <button
               onClick={() => window.history.back()}
               className="block w-full px-6 py-3 text-gray-600 hover:text-gray-900 transition-colors"
             >
-              Go Back
+              {t('common:mealDetail.error.goBack')}
             </button>
           </div>
         </div>
@@ -484,12 +486,12 @@ export default function MealDetail() {
           ) : isEditing ? (
             <>
               <Save className="w-4 h-4" />
-              <span className="text-sm font-medium">Save</span>
+              <span className="text-sm font-medium">{t('common:mealDetail.buttons.save')}</span>
             </>
           ) : (
             <>
               <Edit3 className="w-4 h-4" />
-              <span className="text-sm font-medium">Edit</span>
+              <span className="text-sm font-medium">{t('common:mealDetail.buttons.edit')}</span>
             </>
           )}
         </button>
@@ -605,7 +607,7 @@ export default function MealDetail() {
                     min="0"
                   />
                 ) : (
-                  <p className="font-semibold text-gray-900">{Math.round(displayData.calories || 0)} kcal</p>
+                  <p className="font-semibold text-gray-900">{Math.round(displayData.calories || 0)} {t('common:mealDetail.nutrition.kcal')}</p>
                 )}
               </div>
             </div>
@@ -634,7 +636,7 @@ export default function MealDetail() {
                 {adjustedNutrition(displayData.protein)}g
               </div>
             )}
-            <div className="text-sm text-gray-600">Protein</div>
+            <div className="text-sm text-gray-600">{t('common:mealDetail.nutrition.protein')}</div>
           </motion.div>
           
           <motion.div 
@@ -655,7 +657,7 @@ export default function MealDetail() {
                 {adjustedNutrition(displayData.carbs)}g
               </div>
             )}
-            <div className="text-sm text-gray-600">Carbs</div>
+            <div className="text-sm text-gray-600">{t('common:mealDetail.nutrition.carbs')}</div>
           </motion.div>
           
           <motion.div 
@@ -676,14 +678,14 @@ export default function MealDetail() {
                 {adjustedNutrition(displayData.fat)}g
               </div>
             )}
-            <div className="text-sm text-gray-600">Fat</div>
+            <div className="text-sm text-gray-600">{t('common:mealDetail.nutrition.fat')}</div>
           </motion.div>
         </div>
 
         {!isEditing && (
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Adjust Servings</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('common:mealDetail.servings.title')}</h3>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setServingMultiplier(Math.max(0.5, servingMultiplier - 0.5))}
@@ -709,7 +711,7 @@ export default function MealDetail() {
           {/* Ingredients Section */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Ingredients</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t('common:mealDetail.ingredients.title')}</h3>
               {isEditing && (
                 <button
                   onClick={addIngredient}
@@ -752,7 +754,7 @@ export default function MealDetail() {
                           value={component.quantity || ''}
                           onChange={(e) => updateIngredient(index, 'quantity', parseFloat(e.target.value) || 0)}
                           className="w-20 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
-                          placeholder="Qty"
+                          placeholder={t('common:mealDetail.ingredients.placeholder.quantity')}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <input
@@ -760,7 +762,7 @@ export default function MealDetail() {
                           value={component.unit || ''}
                           onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
                           className="w-24 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
-                          placeholder="Unit"
+                          placeholder={t('common:mealDetail.ingredients.placeholder.unit')}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <input
@@ -768,7 +770,7 @@ export default function MealDetail() {
                           value={component.name}
                           onChange={(e) => updateIngredient(index, 'name', e.target.value)}
                           className="flex-1 px-2 py-1 border border-gray-200 rounded focus:border-[#26A8FF] focus:outline-none"
-                          placeholder="Ingredient name"
+                          placeholder={t('common:mealDetail.ingredients.placeholder.name')}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <button
@@ -792,7 +794,7 @@ export default function MealDetail() {
                   </motion.div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-8">No ingredients available</p>
+                <p className="text-gray-500 text-center py-8">{t('common:mealDetail.ingredients.empty')}</p>
               )}
             </div>
           </div>
@@ -800,14 +802,14 @@ export default function MealDetail() {
           {/* Instructions Section */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Instructions</h3>
+              <h3 className="text-xl font-bold text-gray-900">{t('common:mealDetail.instructions.title')}</h3>
               {isEditing && (
                 <button
                   onClick={addInstruction}
                   className="flex items-center gap-2 px-3 py-1 bg-[#26A8FF] text-white rounded-lg hover:bg-[#1A8FE6] transition-colors text-sm"
                 >
                   <Plus className="w-4 h-4" />
-                  Add
+                  {t('common:mealDetail.instructions.add')}
                 </button>
               )}
             </div>
@@ -843,7 +845,7 @@ export default function MealDetail() {
                           value={step}
                           onChange={(e) => updateInstruction(index, e.target.value)}
                           className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:border-[#26A8FF] focus:outline-none resize-none"
-                          placeholder="Enter instruction..."
+                          placeholder={t('common:mealDetail.instructions.placeholder')}
                           rows={2}
                         />
                         <button
@@ -863,7 +865,7 @@ export default function MealDetail() {
                   </motion.div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-8">No instructions available</p>
+                <p className="text-gray-500 text-center py-8">{t('common:mealDetail.instructions.empty')}</p>
               )}
             </div>
           </div>
@@ -899,9 +901,9 @@ export default function MealDetail() {
                       <AlertCircle className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1">Delete Meal?</h3>
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">{t('common:mealDetail.deleteModal.title')}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        This action cannot be undone. The meal will be permanently removed from your log.
+                        {t('common:mealDetail.deleteModal.description')}
                       </p>
                     </div>
                   </div>
@@ -925,7 +927,7 @@ export default function MealDetail() {
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{meal?.name}</p>
-                        <p className="text-sm text-gray-500">{meal?.calories || 0} calories</p>
+                        <p className="text-sm text-gray-500">{meal?.calories || 0} {t('common:mealDetail.deleteModal.calories')}</p>
                       </div>
                     </div>
                   </div>
@@ -941,12 +943,12 @@ export default function MealDetail() {
                       {isDeleting ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Deleting...</span>
+                          <span>{t('common:mealDetail.deleteModal.deleting')}</span>
                         </>
                       ) : (
                         <>
                           <Trash2 className="w-4 h-4" />
-                          <span>Delete Meal</span>
+                          <span>{t('common:mealDetail.deleteModal.confirm')}</span>
                         </>
                       )}
                     </motion.button>
@@ -956,7 +958,7 @@ export default function MealDetail() {
                       disabled={isDeleting}
                       className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl h-12 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Cancel
+                      {t('common:mealDetail.deleteModal.cancel')}
                     </motion.button>
                   </div>
                 </div>

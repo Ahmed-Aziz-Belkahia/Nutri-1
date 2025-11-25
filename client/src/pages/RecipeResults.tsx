@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { X, ChevronRight, Loader2, Heart, ChefHat, Camera, Sparkles, Clock } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import { useToast } from "@/hooks/use-toast";
 
 
@@ -41,6 +42,7 @@ interface AnalysisData {
 }
 
 export default function RecipeResults() {
+  const { t } = useTranslation(['common']);
   const [location, setLocation] = useLocation();
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,8 +55,8 @@ export default function RecipeResults() {
     if (!analysisData?.ingredients || analysisData.ingredients.length === 0) {
       toast({
         variant: "destructive",
-        title: "Cannot Generate More",
-        description: "No ingredient information available. Please scan new ingredients."
+        title: t('common:recipeResults.toast.cannotGenerate'),
+        description: t('common:recipeResults.toast.noIngredients')
       });
       return;
     }
@@ -135,7 +137,7 @@ export default function RecipeResults() {
       
       toast({
         title: "Success!",
-        description: `Generated ${transformedRecipes.length} new recipes!`
+        description: t('common:recipeResults.toast.generated', { count: transformedRecipes.length })
       });
       
     } catch (error) {
@@ -239,7 +241,7 @@ export default function RecipeResults() {
       toast({
         variant: "destructive",
         title: "Recipe Generation Failed",
-        description: "Could not generate recipes from the scanned ingredients. Please try again."
+        description: t('common:recipeResults.toast.generateError')
       });
     } finally {
       setIsLoading(false);
@@ -556,7 +558,7 @@ export default function RecipeResults() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to load recipe data. Please try scanning again."
+        description: t('common:recipeResults.toast.loadError')
       });
     }
   }, [location, toast]);
@@ -572,10 +574,10 @@ export default function RecipeResults() {
         </div>
         <div className="text-center space-y-1">
           <p className="text-lg font-bold text-gray-900">
-            Processing ingredients...
+            {t('common:recipeResults.loading.title')}
           </p>
           <p className="text-sm text-gray-600">
-            AI is crafting your perfect recipes
+            {t('common:recipeResults.loading.subtitle')}
           </p>
         </div>
       </div>
@@ -590,17 +592,17 @@ export default function RecipeResults() {
             <X className="w-8 h-8 text-red-500" />
           </div>
           <h2 className="text-xl font-bold text-gray-900">
-            {error || "No recipes found"}
+            {error || t('common:recipeResults.error.title')}
           </h2>
           <p className="text-gray-600 text-sm">
             {error
-              ? "An error occurred while processing ingredients. Please try again."
-              : "We couldn't find recipes matching your ingredients. Try scanning different ingredients."}
+              ? t('common:recipeResults.error.generic')
+              : t('common:recipeResults.error.noMatch')}
           </p>
         </div>
         <Link href="/recipes">
           <Button className="bg-[#26A8FF] hover:bg-[#1A8FE8] text-white px-6 py-3 rounded-xl font-semibold shadow-sm">
-            Try Again
+            {t('common:recipeResults.tryAgain')}
           </Button>
         </Link>
       </div>
@@ -622,7 +624,7 @@ export default function RecipeResults() {
             </Button>
             
             <h1 className="text-xl font-bold text-gray-900">
-              Recipe Suggestions
+              {t('common:recipeResults.header')}
             </h1>
             
             <div className="w-9 h-9"></div>
@@ -652,7 +654,7 @@ export default function RecipeResults() {
                     </span>
                     <span className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
                       <Clock className="w-3.5 h-3.5 mr-1.5" />
-                      {((recipe.prepTime || 0) + (recipe.cookingTime || 0)) || 30} min
+                      {((recipe.prepTime || 0) + (recipe.cookingTime || 0)) || 30} {t('common:recipeResults.min')}
                     </span>
                   </div>
                 </div>
@@ -661,25 +663,25 @@ export default function RecipeResults() {
                 <div className="grid grid-cols-4 gap-3 mb-4">
                   {[
                     { 
-                      label: 'Cal', 
+                      label: t('common:recipeResults.nutrition.cal'), 
                       value: recipe.nutritionalInfo.calories || 0,
                       bgColor: 'bg-blue-50',
                       textColor: 'text-blue-600'
                     },
                     { 
-                      label: 'Protein', 
+                      label: t('common:recipeResults.nutrition.protein'), 
                       value: `${recipe.nutritionalInfo.protein || 0}g`,
                       bgColor: 'bg-[#F8F8F8]',
                       textColor: 'text-gray-900'
                     },
                     { 
-                      label: 'Carbs', 
+                      label: t('common:recipeResults.nutrition.carbs'), 
                       value: `${recipe.nutritionalInfo.carbs || 0}g`,
                       bgColor: 'bg-[#F8F8F8]',
                       textColor: 'text-gray-900'
                     },
                     { 
-                      label: 'Fat', 
+                      label: t('common:recipeResults.nutrition.fat'), 
                       value: `${recipe.nutritionalInfo.fat || 0}g`,
                       bgColor: 'bg-[#F8F8F8]',
                       textColor: 'text-gray-900'
@@ -699,7 +701,7 @@ export default function RecipeResults() {
                 {/* Ingredients Section */}
                 <div className="mb-4">
                   <h4 className="text-sm font-bold text-gray-700 mb-2">
-                    Ingredients
+                    {t('common:recipeResults.ingredients')}
                   </h4>
                   <div className="bg-[#F8F8F8] rounded-xl p-3">
                     <div className="flex flex-wrap gap-2">
@@ -710,7 +712,7 @@ export default function RecipeResults() {
                       ))}
                       {recipe.ingredients.length > 5 && (
                         <span className="inline-flex items-center px-3 py-1.5 bg-[#26A8FF] text-white rounded-lg text-xs font-semibold">
-                          +{recipe.ingredients.length - 5} more
+                          +{recipe.ingredients.length - 5} {t('common:recipeResults.more')}
                         </span>
                       )}
                     </div>
@@ -774,14 +776,14 @@ export default function RecipeResults() {
                       toast({
                         variant: "destructive",
                         title: "Error",
-                        description: "Failed to save recipe. Please try again."
+                        description: t('common:recipeResults.toast.saveError')
                       });
                     }
                   }}
                   className="w-full py-3 bg-[#26A8FF] hover:bg-[#1A8FE8] text-white rounded-xl font-semibold text-base shadow-sm transition-all duration-200"
                 >
                   <span className="flex items-center justify-center gap-2">
-                    View Full Recipe
+                    {t('common:recipeResults.viewFullRecipe')}
                     <ChevronRight className="w-4 h-4" />
                   </span>
                 </Button>
@@ -800,10 +802,10 @@ export default function RecipeResults() {
                 </div>
                 
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Want More Recipe Ideas?
+                  {t('common:recipeResults.generateMore.title')}
                 </h3>
                 <p className="text-gray-600 text-sm mb-6">
-                  Generate additional recipes using the same ingredients
+                  {t('common:recipeResults.generateMore.subtitle')}
                 </p>
                 
                 <Button
@@ -814,12 +816,12 @@ export default function RecipeResults() {
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Generating...
+                      {t('common:recipeResults.generateMore.generating')}
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">
                       <Sparkles className="h-5 w-5" />
-                      Generate More Recipes
+                      {t('common:recipeResults.generateMore.button')}
                     </div>
                   )}
                 </Button>
@@ -838,7 +840,7 @@ export default function RecipeResults() {
           >
             <div className="flex items-center justify-center gap-2">
               <Heart className="w-5 h-5 fill-white" />
-              <span>View All Recipes ({analysisData.recipes.recipeSuggestions.length})</span>
+              <span>{t('common:recipeResults.viewAll', { count: analysisData.recipes.recipeSuggestions.length })}</span>
             </div>
           </Button>
         </div>

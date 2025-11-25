@@ -3,77 +3,80 @@ import { motion } from "framer-motion";
 import { ChevronLeft, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from 'react-i18next';
 
-const questions = [
+const getQuestions = (t: any) => [
   {
     id: "meal-type",
-    title: "What type of meal would you like to create?",
-    description: "Choose the category that best fits your recipe",
+    title: t('common:createRecipe.questions.mealType.title'),
+    description: t('common:createRecipe.questions.mealType.description'),
     options: [
-      { value: "breakfast", label: "Breakfast" },
-      { value: "lunch", label: "Lunch" },
-      { value: "dinner", label: "Dinner" },
-      { value: "snack", label: "Snack" },
-      { value: "dessert", label: "Dessert" }
+      { value: "breakfast", label: t('common:createRecipe.questions.mealType.options.breakfast') },
+      { value: "lunch", label: t('common:createRecipe.questions.mealType.options.lunch') },
+      { value: "dinner", label: t('common:createRecipe.questions.mealType.options.dinner') },
+      { value: "snack", label: t('common:createRecipe.questions.mealType.options.snack') },
+      { value: "dessert", label: t('common:createRecipe.questions.mealType.options.dessert') }
     ]
   },
   {
     id: "difficulty",
-    title: "Preferred Recipe Difficulty",
-    description: "We'll personalize recipe suggestions accordingly",
+    title: t('common:createRecipe.questions.difficulty.title'),
+    description: t('common:createRecipe.questions.difficulty.description'),
     options: [
-      { value: "easy", label: "Easy Recipes", description: "Simple, quick-to-make dishes" },
-      { value: "medium", label: "Medium Difficulty", description: "Balanced complexity and effort" },
-      { value: "hard", label: "Challenging", description: "Complex recipes for skilled cooks" }
+      { value: "easy", label: t('common:createRecipe.questions.difficulty.options.easy.label'), description: t('common:createRecipe.questions.difficulty.options.easy.description') },
+      { value: "medium", label: t('common:createRecipe.questions.difficulty.options.medium.label'), description: t('common:createRecipe.questions.difficulty.options.medium.description') },
+      { value: "hard", label: t('common:createRecipe.questions.difficulty.options.hard.label'), description: t('common:createRecipe.questions.difficulty.options.hard.description') }
     ]
   },
   {
     id: "diet-preference",
-    title: "What dietary preferences should be considered?",
-    description: "Select any specific dietary requirements",
+    title: t('common:createRecipe.questions.dietPreference.title'),
+    description: t('common:createRecipe.questions.dietPreference.description'),
     options: [
-      { value: "vegetarian", label: "Vegetarian" },
-      { value: "vegan", label: "Vegan" },
-      { value: "gluten-free", label: "Gluten-Free" },
-      { value: "dairy-free", label: "Dairy-Free" },
-      { value: "none", label: "No Restrictions" }
+      { value: "vegetarian", label: t('common:createRecipe.questions.dietPreference.options.vegetarian') },
+      { value: "vegan", label: t('common:createRecipe.questions.dietPreference.options.vegan') },
+      { value: "gluten-free", label: t('common:createRecipe.questions.dietPreference.options.glutenFree') },
+      { value: "dairy-free", label: t('common:createRecipe.questions.dietPreference.options.dairyFree') },
+      { value: "none", label: t('common:createRecipe.questions.dietPreference.options.none') }
     ]
   },
   {
     id: "cooking-time",
-    title: "How much time do you have for cooking?",
-    description: "Choose your preferred preparation time",
+    title: t('common:createRecipe.questions.cookingTime.title'),
+    description: t('common:createRecipe.questions.cookingTime.description'),
     options: [
-      { value: "quick", label: "Quick (15-30 mins)" },
-      { value: "medium", label: "Medium (30-60 mins)" },
-      { value: "long", label: "Long (60+ mins)" }
+      { value: "quick", label: t('common:createRecipe.questions.cookingTime.options.quick') },
+      { value: "medium", label: t('common:createRecipe.questions.cookingTime.options.medium') },
+      { value: "long", label: t('common:createRecipe.questions.cookingTime.options.long') }
     ]
   },
   {
     id: "skill-level",
-    title: "What's your cooking skill level?",
-    description: "Be honest! This helps us suggest appropriate recipes",
+    title: t('common:createRecipe.questions.skillLevel.title'),
+    description: t('common:createRecipe.questions.skillLevel.description'),
     options: [
-      { value: "beginner", label: "Beginner" },
-      { value: "intermediate", label: "Intermediate" },
-      { value: "advanced", label: "Advanced" }
+      { value: "beginner", label: t('common:createRecipe.questions.skillLevel.options.beginner') },
+      { value: "intermediate", label: t('common:createRecipe.questions.skillLevel.options.intermediate') },
+      { value: "advanced", label: t('common:createRecipe.questions.skillLevel.options.advanced') }
     ]
   },
   {
     id: "main-ingredient",
-    title: "What's your preferred main ingredient?",
-    description: "Choose the primary ingredient you'd like to cook with",
+    title: t('common:createRecipe.questions.mainIngredient.title'),
+    description: t('common:createRecipe.questions.mainIngredient.description'),
     options: [
-      { value: "chicken", label: "Chicken" },
-      { value: "fish", label: "Fish" },
-      { value: "beef", label: "Beef" },
-      { value: "vegetables", label: "Vegetables" },
-      { value: "grains", label: "Grains" }
+      { value: "chicken", label: t('common:createRecipe.questions.mainIngredient.options.chicken') },
+      { value: "fish", label: t('common:createRecipe.questions.mainIngredient.options.fish') },
+      { value: "beef", label: t('common:createRecipe.questions.mainIngredient.options.beef') },
+      { value: "vegetables", label: t('common:createRecipe.questions.mainIngredient.options.vegetables') },
+      { value: "grains", label: t('common:createRecipe.questions.mainIngredient.options.grains') }
     ]
   }
 ];
 
 export default function CreateRecipe() {
+  const { t } = useTranslation(['common']);
+  const questions = getQuestions(t);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -88,8 +91,8 @@ export default function CreateRecipe() {
       setCurrentQuestion(prev => prev + 1);
     } else {
       toast({
-        title: "Quiz completed!",
-        description: "Generating personalized recipe suggestions...",
+        title: t('common:createRecipe.toast.quizCompleted'),
+        description: t('common:createRecipe.toast.generatingRecipes'),
         duration: 3000,
       });
       window.opener?.postMessage({ type: 'QUIZ_COMPLETED', answers }, '*');
@@ -115,7 +118,7 @@ export default function CreateRecipe() {
           onClick={handleBack}
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Back
+          {t('common:createRecipe.back')}
         </Button>
 
         <motion.div
@@ -174,7 +177,7 @@ export default function CreateRecipe() {
           </div>
 
           <div className="text-sm text-gray-400 text-center mt-16">
-            {currentQuestion + 1} of {questions.length}
+            {currentQuestion + 1} {t('common:createRecipe.of')} {questions.length}
           </div>
         </motion.div>
       </div>

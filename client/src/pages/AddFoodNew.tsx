@@ -12,6 +12,7 @@ import Webcam from 'react-webcam';
 import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3 } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText, analyzeFoodImage } from '@/lib/vision';
+import { useTranslation } from 'react-i18next';
 
 // Utility function to convert image to WebP format for optimization
 const convertToWebP = async (base64Image: string, quality: number = 0.8): Promise<string> => {
@@ -67,6 +68,7 @@ interface FoodAnalysisResult {
 }
 
 export default function AddFoodNew() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const navigate = (delta: number) => {
     if (delta === -1) {
@@ -432,7 +434,7 @@ export default function AddFoodNew() {
                 <div className="absolute inset-0 border-4 border-transparent border-t-[#26A8FF] rounded-full animate-spin" />
                 <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-[#26A8FF]" />
               </div>
-              <p className="text-white/80 text-sm font-medium">Initializing camera...</p>
+              <p className="text-white/80 text-sm font-medium">{t('common:addFood.camera.initializing')}</p>
             </div>
           </div>
         )}
@@ -448,7 +450,7 @@ export default function AddFoodNew() {
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center backdrop-blur-sm border border-red-500/20">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
-              <h3 className="text-white text-xl font-bold mb-2">Camera Access Required</h3>
+              <h3 className="text-white text-xl font-bold mb-2">{t('common:addFood.camera.accessRequired')}</h3>
               <p className="text-white/60 text-sm mb-8">{cameraError}</p>
               <div className="space-y-3">
                 <Button
@@ -456,14 +458,14 @@ export default function AddFoodNew() {
                   className="w-full bg-[#26A8FF] hover:bg-[#1A8FE6] text-white rounded-full h-12 font-semibold shadow-lg"
                 >
                   <Camera className="mr-2 h-5 w-5" />
-                  Enable Camera
+                  {t('common:addFood.camera.enableCamera')}
                 </Button>
                 <Button
                   onClick={() => setActiveTab('manual')}
                   variant="ghost"
                   className="w-full text-white/80 hover:text-white hover:bg-white/10 rounded-full h-12"
                 >
-                  Use Manual Entry Instead
+                  {t('common:addFood.camera.useManualEntry')}
                 </Button>
               </div>
             </motion.div>
@@ -485,7 +487,7 @@ export default function AddFoodNew() {
           >
             {/* Hint Text */}
             <p className="text-white/80 text-sm font-medium mb-4">
-              {isAnalyzing ? "Analyzing your meal..." : "Tap to capture your meal"}
+              {isAnalyzing ? t('common:addFood.camera.analyzing') : t('common:addFood.camera.captureHint')}
             </p>
             
             {/* Capture Button */}
@@ -552,8 +554,8 @@ export default function AddFoodNew() {
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-6"
               >
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose from Gallery</h2>
-                <p className="text-gray-600">Select food images to analyze</p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('common:addFood.gallery.title')}</h2>
+                <p className="text-gray-600">{t('common:addFood.gallery.subtitle')}</p>
               </motion.div>
 
               {/* Gallery Grid */}
@@ -566,16 +568,16 @@ export default function AddFoodNew() {
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#26A8FF]/10 to-[#1A8FE6]/10 flex items-center justify-center mb-6">
                     <ImageIcon className="w-16 h-16 text-[#26A8FF]" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Images Loaded</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('common:addFood.gallery.noImages')}</h3>
                   <p className="text-gray-500 text-center mb-8 max-w-md">
-                    Load images from your device to select and analyze food photos
+                    {t('common:addFood.gallery.noImagesDescription')}
                   </p>
                   <Button
                     onClick={() => galleryInputRef.current?.click()}
                     className="bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] hover:from-[#1A8FE6] hover:to-[#0D7FD6] text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-lg"
                   >
                     <ImageIcon className="w-5 h-5 mr-2" />
-                    Load Images
+                    {t('common:addFood.gallery.loadImages')}
                   </Button>
                 </motion.div>
               ) : (
@@ -592,7 +594,7 @@ export default function AddFoodNew() {
                       className="w-full py-6 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#26A8FF] hover:bg-[#26A8FF]/5 transition-all"
                     >
                       <ImageIcon className="w-5 h-5 mr-2" />
-                      Load More Images
+                      {t('common:addFood.gallery.loadMore')}
                     </Button>
                   </motion.div>
 
@@ -615,7 +617,7 @@ export default function AddFoodNew() {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-                          <span className="text-white font-semibold text-sm">Select</span>
+                          <span className="text-white font-semibold text-sm">{t('common:addFood.gallery.selectButton')}</span>
                         </div>
                       </motion.div>
                     ))}
@@ -660,8 +662,8 @@ export default function AddFoodNew() {
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">AI-Powered Analysis</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">Just describe what you ate</p>
+                      <h3 className="text-lg font-bold text-gray-900">{t('common:addFood.aiAnalysis.title')}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{t('common:addFood.aiAnalysis.subtitle')}</p>
                     </div>
                   </div>
                 </div>
@@ -678,13 +680,13 @@ export default function AddFoodNew() {
                             <FormControl>
                               <div className="relative">
                                 <textarea
-                                  placeholder="e.g., Two scrambled eggs with spinach, whole wheat toast with avocado, and a banana"
+                                  placeholder={t('common:addFood.aiAnalysis.placeholder')}
                                   {...field}
                                   rows={5}
                                   className="w-full rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
                                 />
                                 <div className="absolute bottom-3 right-3 text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-                                  Be specific for best results
+                                  {t('common:addFood.aiAnalysis.hint')}
                                 </div>
                               </div>
                             </FormControl>
@@ -701,12 +703,12 @@ export default function AddFoodNew() {
                         {isAnalyzing ? (
                           <>
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Analyzing with AI...
+                            {t('common:addFood.aiAnalysis.analyzing')}
                           </>
                         ) : (
                           <>
                             <Sparkles className="mr-2 h-5 w-5" />
-                            Analyze & Add to Log
+                            {t('common:addFood.aiAnalysis.analyzeButton')}
                           </>
                         )}
                       </Button>
@@ -719,7 +721,7 @@ export default function AddFoodNew() {
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                 <div className="px-3 py-1.5 bg-gray-100 rounded-full">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Or Enter Manually</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('common:addFood.manualEntry.orLabel')}</span>
                 </div>
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
               </div>
@@ -738,8 +740,8 @@ export default function AddFoodNew() {
                       <Edit3 className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">Manual Entry</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">Enter nutrition facts directly</p>
+                      <h3 className="text-lg font-bold text-gray-900">{t('common:addFood.manualEntry.title')}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{t('common:addFood.manualEntry.subtitle')}</p>
                     </div>
                   </div>
                 </div>
@@ -754,10 +756,10 @@ export default function AddFoodNew() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-bold text-gray-700 mb-2 block">Food Name</FormLabel>
+                            <FormLabel className="text-sm font-bold text-gray-700 mb-2 block">{t('common:addFood.manualEntry.foodName')}</FormLabel>
                             <FormControl>
                               <Input 
-                                placeholder="e.g., Greek Yogurt, Grilled Chicken" 
+                                placeholder={t('common:addFood.manualEntry.foodNamePlaceholder')} 
                                 {...field} 
                                 className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all text-base" 
                               />
@@ -769,25 +771,25 @@ export default function AddFoodNew() {
                       
                       {/* Nutrition Grid */}
                       <div className="space-y-4">
-                        <p className="text-sm font-bold text-gray-700">Nutrition Information</p>
+                        <p className="text-sm font-bold text-gray-700">{t('common:addFood.manualEntry.nutritionInfo')}</p>
                         <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
                             name="calories"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Calories</FormLabel>
+                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.calories')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input 
                                       type="number" 
                                       step="1" 
                                       min="0" 
-                                      placeholder="0"
+                                      placeholder={t('common:addFood.manualEntry.placeholder')}
                                       {...field} 
                                       className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-10 text-base" 
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">kcal</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.kcal')}</span>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -800,18 +802,18 @@ export default function AddFoodNew() {
                             name="protein"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Protein</FormLabel>
+                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.protein')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input 
                                       type="number" 
                                       step="0.1" 
                                       min="0" 
-                                      placeholder="0"
+                                      placeholder={t('common:addFood.manualEntry.placeholder')}
                                       {...field} 
                                       className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -824,18 +826,18 @@ export default function AddFoodNew() {
                             name="carbs"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Carbs</FormLabel>
+                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.carbs')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input 
                                       type="number" 
                                       step="0.1" 
                                       min="0" 
-                                      placeholder="0"
+                                      placeholder={t('common:addFood.manualEntry.placeholder')}
                                       {...field} 
                                       className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -848,18 +850,18 @@ export default function AddFoodNew() {
                             name="fat"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Fat</FormLabel>
+                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.fat')}</FormLabel>
                                 <FormControl>
                                   <div className="relative">
                                     <Input 
                                       type="number" 
                                       step="0.1" 
                                       min="0" 
-                                      placeholder="0"
+                                      placeholder={t('common:addFood.manualEntry.placeholder')}
                                       {...field} 
                                       className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
                                     />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">g</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -877,10 +879,10 @@ export default function AddFoodNew() {
                         {isAnalyzing ? (
                           <>
                             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Saving...
+                            {t('common:addFood.manualEntry.saving')}
                           </>
                         ) : (
-                          'Add to Food Log'
+                          t('common:addFood.manualEntry.addButton')
                         )}
                       </Button>
                     </form>
@@ -930,8 +932,8 @@ export default function AddFoodNew() {
           {activeTab !== "photo" && (
             <div className="space-y-4">
               <div>
-                <h1 className="text-2xl font-extrabold text-gray-900">Add Food</h1>
-                <p className="text-sm text-gray-500 mt-1">Log your meals effortlessly</p>
+                <h1 className="text-2xl font-extrabold text-gray-900">{t('common:addFood.title')}</h1>
+                <p className="text-sm text-gray-500 mt-1">{t('common:addFood.subtitle')}</p>
               </div>
             </div>
           )}
@@ -953,7 +955,7 @@ export default function AddFoodNew() {
             >
               <div className="flex items-center justify-center gap-2">
                 <Camera className="w-4 h-4" />
-                <span>Photo</span>
+                <span>{t('common:addFood.tabs.photo')}</span>
               </div>
             </motion.button>
 
@@ -970,7 +972,7 @@ export default function AddFoodNew() {
             >
               <div className="flex items-center justify-center gap-2">
                 <ImageIcon className="w-4 h-4" />
-                <span>Gallery</span>
+                <span>{t('common:addFood.tabs.gallery')}</span>
               </div>
             </motion.button>
 
@@ -987,7 +989,7 @@ export default function AddFoodNew() {
             >
               <div className="flex items-center justify-center gap-2">
                 <Edit3 className="w-4 h-4" />
-                <span>Manual</span>
+                <span>{t('common:addFood.tabs.manual')}</span>
               </div>
             </motion.button>
           </div>
@@ -1084,7 +1086,7 @@ export default function AddFoodNew() {
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 mb-1">Suggestion</p>
+                        <p className="text-sm font-semibold text-gray-900 mb-1">{t('common:addFood.error.suggestion')}</p>
                         <p className="text-sm text-gray-700 leading-relaxed">{errorSuggestion}</p>
                       </div>
                     </div>
@@ -1097,7 +1099,7 @@ export default function AddFoodNew() {
                       onClick={() => setErrorModalOpen(false)}
                       className="w-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-2xl h-12 font-semibold shadow-lg hover:shadow-xl transition-all"
                     >
-                      Try Again
+                      {t('common:addFood.error.tryAgain')}
                     </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
@@ -1107,7 +1109,7 @@ export default function AddFoodNew() {
                       }}
                       className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl h-12 font-semibold transition-all"
                     >
-                      Switch to Manual Entry
+                      {t('common:addFood.error.switchToManual')}
                     </motion.button>
                   </div>
                 </div>

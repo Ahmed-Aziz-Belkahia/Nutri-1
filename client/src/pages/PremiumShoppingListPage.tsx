@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import PremiumShoppingList from '@/components/PremiumShoppingList';
 import { Home, Search, Calendar, User, Book } from 'lucide-react';
 import PullToRefresh from '@/components/PullToRefresh';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 
 const PremiumShoppingListPage = () => {
+  const { t } = useTranslation(['common']);
   const [activeTab, setActiveTab] = useState('shopping');
   
   // Pull to refresh setup
@@ -33,14 +35,14 @@ const PremiumShoppingListPage = () => {
           <Link href="/">
             <a className="flex flex-col items-center py-3 px-5 relative">
               <Home className="h-6 w-6 text-gray-500" />
-              <span className="text-xs text-gray-500 mt-1">Home</span>
+              <span className="text-xs text-gray-500 mt-1">{t('common:premiumShoppingListPage.nav.home')}</span>
             </a>
           </Link>
           
           <Link href="/recipes">
             <a className="flex flex-col items-center py-3 px-5 relative">
               <Book className="h-6 w-6 text-gray-500" />
-              <span className="text-xs text-gray-500 mt-1">Recipes</span>
+              <span className="text-xs text-gray-500 mt-1">{t('common:premiumShoppingListPage.nav.recipes')}</span>
             </a>
           </Link>
           
@@ -53,7 +55,7 @@ const PremiumShoppingListPage = () => {
                   <Search className="h-5 w-5" />
                 </div>
               </div>
-              <span className="text-xs font-medium text-teal-600 mt-1">Shopping</span>
+              <span className="text-xs font-medium text-teal-600 mt-1">{t('common:premiumShoppingListPage.nav.shopping')}</span>
               
               {/* Active indicator line */}
               <motion.div 
@@ -66,14 +68,14 @@ const PremiumShoppingListPage = () => {
           <Link href="/calendar">
             <a className="flex flex-col items-center py-3 px-5 relative">
               <Calendar className="h-6 w-6 text-gray-500" />
-              <span className="text-xs text-gray-500 mt-1">Calendar</span>
+              <span className="text-xs text-gray-500 mt-1">{t('common:premiumShoppingListPage.nav.calendar')}</span>
             </a>
           </Link>
           
           <Link href="/profile">
             <a className="flex flex-col items-center py-3 px-5 relative">
               <User className="h-6 w-6 text-gray-500" />
-              <span className="text-xs text-gray-500 mt-1">Profile</span>
+              <span className="text-xs text-gray-500 mt-1">{t('common:premiumShoppingListPage.nav.profile')}</span>
             </a>
           </Link>
         </div>

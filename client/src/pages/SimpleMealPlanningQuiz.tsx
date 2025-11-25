@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { 
@@ -31,84 +32,85 @@ interface MealPlanPreferencesForm {
   excludedIngredients: string;
 }
 
-const questions = [
+const getQuestions = (t: any) => [
   {
     id: "dietaryType",
-    title: "What diet do you follow?",
-    description: "Choose your eating style",
+    title: t('common:simpleMealQuiz.questions.dietaryType.title'),
+    description: t('common:simpleMealQuiz.questions.dietaryType.description'),
     type: "select",
     options: [
-      { value: "omnivore", label: "Omnivore" },
-      { value: "vegetarian", label: "Vegetarian" },
-      { value: "vegan", label: "Vegan" },
-      { value: "pescetarian", label: "Pescetarian" }
+      { value: "omnivore", label: t('common:simpleMealQuiz.questions.dietaryType.options.omnivore') },
+      { value: "vegetarian", label: t('common:simpleMealQuiz.questions.dietaryType.options.vegetarian') },
+      { value: "vegan", label: t('common:simpleMealQuiz.questions.dietaryType.options.vegan') },
+      { value: "pescetarian", label: t('common:simpleMealQuiz.questions.dietaryType.options.pescetarian') }
     ],
     icon: <Utensils className="w-6 h-6 text-white" />,
     gradient: "from-green-500 to-emerald-500"
   },
   {
     id: "calorieTarget",
-    title: "Daily calorie goal?",
-    description: "Enter your target calories",
+    title: t('common:simpleMealQuiz.questions.calorieTarget.title'),
+    description: t('common:simpleMealQuiz.questions.calorieTarget.description'),
     type: "number",
-    placeholder: "2000",
+    placeholder: t('common:simpleMealQuiz.questions.calorieTarget.placeholder'),
     icon: <Flame className="w-6 h-6 text-white" />,
     gradient: "from-orange-500 to-red-500"
   },
   {
     id: "mealsPerDay",
-    title: "Meals per day?",
-    description: "Including snacks",
+    title: t('common:simpleMealQuiz.questions.mealsPerDay.title'),
+    description: t('common:simpleMealQuiz.questions.mealsPerDay.description'),
     type: "select",
     options: [
-      { value: 1, label: "1 meal" },
-      { value: 2, label: "2 meals" },
-      { value: 3, label: "3 meals" },
-      { value: 4, label: "4 meals" },
-      { value: 5, label: "5 meals" }
+      { value: 1, label: t('common:simpleMealQuiz.questions.mealsPerDay.options.1meal') },
+      { value: 2, label: t('common:simpleMealQuiz.questions.mealsPerDay.options.2meals') },
+      { value: 3, label: t('common:simpleMealQuiz.questions.mealsPerDay.options.3meals') },
+      { value: 4, label: t('common:simpleMealQuiz.questions.mealsPerDay.options.4meals') },
+      { value: 5, label: t('common:simpleMealQuiz.questions.mealsPerDay.options.5meals') }
     ],
     icon: <Clock className="w-6 h-6 text-white" />,
     gradient: "from-purple-500 to-indigo-500"
   },
   {
     id: "allergies",
-    title: "Allergies & intolerances",
-    description: "Separate with commas",
+    title: t('common:simpleMealQuiz.questions.allergies.title'),
+    description: t('common:simpleMealQuiz.questions.allergies.description'),
     type: "text",
-    placeholder: "e.g. gluten, nuts, lactose",
+    placeholder: t('common:simpleMealQuiz.questions.allergies.placeholder'),
     icon: <AlertTriangle className="w-6 h-6 text-white" />,
     gradient: "from-yellow-500 to-orange-500"
   },
   {
     id: "cuisinePreferences",
-    title: "Favorite cuisines",
-    description: "Separate with commas",
+    title: t('common:simpleMealQuiz.questions.cuisinePreferences.title'),
+    description: t('common:simpleMealQuiz.questions.cuisinePreferences.description'),
     type: "text",
-    placeholder: "e.g. Italian, Asian, Mexican",
+    placeholder: t('common:simpleMealQuiz.questions.cuisinePreferences.placeholder'),
     icon: <Globe className="w-6 h-6 text-white" />,
     gradient: "from-cyan-500 to-blue-500"
   },
   {
     id: "preferredIngredients",
-    title: "Favorite ingredients",
-    description: "Separate with commas",
+    title: t('common:simpleMealQuiz.questions.preferredIngredients.title'),
+    description: t('common:simpleMealQuiz.questions.preferredIngredients.description'),
     type: "text",
-    placeholder: "e.g. chicken, broccoli, rice",
+    placeholder: t('common:simpleMealQuiz.questions.preferredIngredients.placeholder'),
     icon: <Leaf className="w-6 h-6 text-white" />,
     gradient: "from-green-500 to-emerald-500"
   },
   {
     id: "excludedIngredients",
-    title: "Ingredients to avoid",
-    description: "Separate with commas",
+    title: t('common:simpleMealQuiz.questions.excludedIngredients.title'),
+    description: t('common:simpleMealQuiz.questions.excludedIngredients.description'),
     type: "text",
-    placeholder: "e.g. mushrooms, olives, peppers",
+    placeholder: t('common:simpleMealQuiz.questions.excludedIngredients.placeholder'),
     icon: <X className="w-6 h-6 text-white" />,
     gradient: "from-red-500 to-pink-500"
   }
 ];
 
 export default function SimpleMealPlanningQuiz() {
+  const { t } = useTranslation(['common']);
   const [currentStep, setCurrentStep] = useState(0);
   const [isGeneratingMealPlan, setIsGeneratingMealPlan] = useState(false);
   const [mealPlanDays, setMealPlanDays] = useState<number>(7); // Track days for progress
@@ -129,6 +131,7 @@ export default function SimpleMealPlanningQuiz() {
     }
   });
 
+  const questions = getQuestions(t);
   const formValues = watch();
   const currentQuestion = questions[currentStep];
   const isLastStep = currentStep === questions.length - 1;
@@ -373,7 +376,7 @@ export default function SimpleMealPlanningQuiz() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
           >
-            {Math.round(((currentStep + 1) / questions.length) * 100)}% complete
+            {t('common:simpleMealQuiz.progress.question')} {currentStep + 1} {t('common:simpleMealQuiz.progress.of')} {questions.length}
           </motion.p>
         </div>
 
@@ -432,15 +435,15 @@ export default function SimpleMealPlanningQuiz() {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              {t('common:simpleMealQuiz.actions.back')}
             </Button>
 
             <Button
               onClick={handleNext}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] hover:from-[#0CC5BA]/90 hover:to-[#0091ff]/90"
+              className="flex items-center gap-2 bg-gradient-to-r from-[#0CC5BA] to-[#0091ff] hover:opacity-90"
             >
-              {isLastStep ? "Create Plan" : "Next"}
-              {!isLastStep && <ArrowRight className="w-4 h-4" />}
+              {isLastStep ? t('common:simpleMealQuiz.actions.generatePlan') : t('common:simpleMealQuiz.actions.next')}
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </motion.div>
         </div>

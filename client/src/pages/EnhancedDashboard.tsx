@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Zap, Target, Activity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -36,6 +37,7 @@ const formatNumber = (value: number | string | null | undefined): string => {
 };
 
 export default function EnhancedDashboard() {
+  const { t } = useTranslation(['common']);
   const [selectedDate] = useState<Date>(new Date());
   const { foodLogs, isLoadingLogs } = useFoodLog(selectedDate);
   const { data: profile } = useUserProfile();
@@ -93,7 +95,7 @@ export default function EnhancedDashboard() {
           variants={itemVariants}
           className="mb-8 mt-4"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">Daily Progress</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">{t('common:enhancedDashboard.dailyProgress')}</h1>
           <p className="text-gray-500">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
         </motion.div>
 
@@ -113,14 +115,14 @@ export default function EnhancedDashboard() {
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center shadow-sm">
                     <Zap className="w-4 h-4 text-white" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800">Calorie Intake</h3>
+                  <h3 className="text-lg font-bold text-gray-800">{t('common:enhancedDashboard.calorieIntake')}</h3>
                 </div>
                 <div className="flex items-baseline">
                   <div className="text-3xl font-bold bg-gradient-to-br from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">
                     {formatNumber(todayTotals.calories)}
                   </div>
                   <div className="text-sm text-gray-500 ml-2">
-                    of {formatNumber(calorieGoal)} goal
+                    {t('common:enhancedDashboard.ofGoal', { goal: formatNumber(calorieGoal) })}
                   </div>
                 </div>
               </div>
@@ -172,7 +174,7 @@ export default function EnhancedDashboard() {
               {/* Carbs Progress */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Carbs</span>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.carbs')}</span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-base font-medium text-gray-800">
                       {formatNumber(todayTotals.carbs)}g
@@ -191,7 +193,7 @@ export default function EnhancedDashboard() {
               {/* Protein Progress */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Protein</span>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.protein')}</span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-base font-medium text-gray-800">
                       {formatNumber(todayTotals.protein)}g
@@ -210,7 +212,7 @@ export default function EnhancedDashboard() {
               {/* Fat Progress */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Fat</span>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.fat')}</span>
                   <div className="flex items-baseline gap-1">
                     <span className="text-base font-medium text-gray-800">
                       {formatNumber(todayTotals.fat)}g
@@ -239,20 +241,20 @@ export default function EnhancedDashboard() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-sm">
                 <Activity className="w-4 h-4 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-gray-800">Activity Stats</h3>
+              <h3 className="text-lg font-bold text-gray-800">{t('common:enhancedDashboard.activityStats')}</h3>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl">
-                <div className="text-sm text-gray-500 mb-1">Steps Today</div>
+                <div className="text-sm text-gray-500 mb-1">{t('common:enhancedDashboard.stepsToday')}</div>
                 <div className="text-2xl font-bold text-gray-800">7,842</div>
-                <div className="text-xs text-green-500 mt-1">+12% from yesterday</div>
+                <div className="text-xs text-green-500 mt-1">{t('common:enhancedDashboard.fromYesterday', { percent: 12 })}</div>
               </div>
               
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl">
-                <div className="text-sm text-gray-500 mb-1">Active Minutes</div>
+                <div className="text-sm text-gray-500 mb-1">{t('common:enhancedDashboard.activeMinutes')}</div>
                 <div className="text-2xl font-bold text-gray-800">42</div>
-                <div className="text-xs text-gray-400 mt-1">Goal: 60 minutes</div>
+                <div className="text-xs text-gray-400 mt-1">{t('common:enhancedDashboard.goalMinutes', { minutes: 60 })}</div>
               </div>
             </div>
           </Card>
@@ -261,8 +263,8 @@ export default function EnhancedDashboard() {
         {/* Today's Meals */}
         <motion.div variants={itemVariants} className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Today's Meal Plan</h3>
-            <div className="text-sm text-blue-500 font-medium">View All</div>
+            <h3 className="text-lg font-bold text-gray-800">{t('common:enhancedDashboard.todaysMealPlan')}</h3>
+            <div className="text-sm text-blue-500 font-medium">{t('common:enhancedDashboard.viewAll')}</div>
           </div>
           <TodaysMealPlans />
         </motion.div>
@@ -274,13 +276,13 @@ export default function EnhancedDashboard() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-sm">
                 <Target className="w-4 h-4 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-gray-800">Weekly Goal Progress</h3>
+              <h3 className="text-lg font-bold text-gray-800">{t('common:enhancedDashboard.weeklyGoalProgress')}</h3>
             </div>
             
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Weight Loss</span>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.weightLoss')}</span>
                   <div className="text-sm font-medium text-gray-800">0.5 kg / 1.0 kg</div>
                 </div>
                 <Progress value={50} className="h-2 bg-orange-100 [&>[data-progress]]:bg-orange-500" />
@@ -288,15 +290,15 @@ export default function EnhancedDashboard() {
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Workout Consistency</span>
-                  <div className="text-sm font-medium text-gray-800">4 / 5 days</div>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.workoutConsistency')}</span>
+                  <div className="text-sm font-medium text-gray-800">{t('common:enhancedDashboard.workoutDays', { done: 4, total: 5 })}</div>
                 </div>
                 <Progress value={80} className="h-2 bg-green-100 [&>[data-progress]]:bg-green-500" />
               </div>
               
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Water Intake</span>
+                  <span className="text-sm text-gray-600">{t('common:enhancedDashboard.waterIntake')}</span>
                   <div className="text-sm font-medium text-gray-800">2.1L / 2.5L</div>
                 </div>
                 <Progress value={84} className="h-2 bg-blue-100 [&>[data-progress]]:bg-blue-500" />

@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import CalendarSelector from "@/components/dashboard/CalendarSelector";
 import MacroCard from "@/components/dashboard/MacroCard";
@@ -66,6 +67,7 @@ function getLast3MonthsPlus7Days() {
 }
 
 export default function DashboardNew() {
+  const { t } = useTranslation(['common']);
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { addFood } = useFoodLog();
@@ -146,20 +148,20 @@ export default function DashboardNew() {
 
       try {
         setIsProcessingManualFood(true);
-        setProcessingStep("Preparing your meal entry...");
+        setProcessingStep(t('common:dashboardNew.processing.preparing'));
         
         const foodData = JSON.parse(pendingData);
         console.log('[DASHBOARD] Processing pending manual food:', foodData);
 
         // Simulate progress steps
-        setTimeout(() => setProcessingStep("Adding to your food log..."), 500);
-        setTimeout(() => setProcessingStep("Updating nutrition totals..."), 1000);
+        setTimeout(() => setProcessingStep(t('common:dashboardNew.processing.adding')), 500);
+        setTimeout(() => setProcessingStep(t('common:dashboardNew.processing.updating')), 1000);
 
         // Add the food to the log
         const result = await addFood(foodData);
         console.log('[DASHBOARD] Food added successfully:', result);
 
-        setProcessingStep("Complete!");
+        setProcessingStep(t('common:dashboardNew.processing.complete'));
         setProcessingComplete(true);
 
         // Clear the pending data immediately
@@ -195,8 +197,8 @@ export default function DashboardNew() {
         console.log('[DASHBOARD] Queries refreshed, showing success message');
 
         toast({
-          title: "Success",
-          description: `Added ${foodData.name} to your log`,
+          title: t('common:dashboardNew.success.title'),
+          description: t('common:dashboardNew.success.addedFood', { name: foodData.name }),
         });
 
         // Hide the processing screen after showing success
@@ -210,8 +212,8 @@ export default function DashboardNew() {
         
         toast({
           variant: "destructive",
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to add food",
+          title: t('common:dashboardNew.error.title'),
+          description: error instanceof Error ? error.message : t('common:dashboardNew.error.failedToAdd'),
         });
 
         localStorage.removeItem('pendingManualFood');
@@ -327,7 +329,7 @@ export default function DashboardNew() {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-white mb-4"
             >
-              {processingComplete ? "Added!" : "Processing..."}
+              {processingComplete ? t('common:dashboardNew.processing.added') : t('common:dashboardNew.processing.processing')}
             </motion.h2>
 
             <motion.p

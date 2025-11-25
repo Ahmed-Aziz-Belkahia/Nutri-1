@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
+import { useTranslation } from 'react-i18next';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useFoodLog } from "../hooks/use-food-log";
@@ -45,6 +46,7 @@ const formatNumber = (value: number | string | null | undefined): string => {
 };
 
 export default function DetailedNutrition() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const [location] = useLocation();
   
@@ -170,7 +172,7 @@ export default function DetailedNutrition() {
             <ChevronLeft className="h-6 w-6" />
           </Button>
           <h1 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">
-            Detailed Nutrition
+            {t('common:detailedNutrition.title')}
           </h1>
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" size="icon">
@@ -193,7 +195,7 @@ export default function DetailedNutrition() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {t(`common:detailedNutrition.tabs.${tab}`)}
             </button>
           ))}
         </div>
@@ -220,7 +222,7 @@ export default function DetailedNutrition() {
                         {formatNumber(todayTotals.calories)}
                       </div>
                       <div className="text-sm text-gray-500">
-                        of {formatNumber(calorieGoal)} goal
+                        {t('common:detailedNutrition.of')} {formatNumber(calorieGoal)} {t('common:detailedNutrition.goal')}
                       </div>
                     </div>
                   </div>
@@ -274,10 +276,10 @@ export default function DetailedNutrition() {
                       {formatNumber(todayTotals.carbs)}g
                     </div>
                     <div className="text-xs text-gray-500 text-center">
-                      Carbs
+                      {t('common:enhancedDashboard.macros.carbs')}
                     </div>
                     <div className="text-xs text-gray-400 text-center">
-                      Goal: {formatNumber(carbsGoal)}g
+                      {t('common:detailedNutrition.goal')}: {formatNumber(carbsGoal)}g
                     </div>
                   </div>
 
@@ -293,10 +295,10 @@ export default function DetailedNutrition() {
                       {formatNumber(todayTotals.protein)}g
                     </div>
                     <div className="text-xs text-gray-500 text-center">
-                      Protein
+                      {t('common:enhancedDashboard.macros.protein')}
                     </div>
                     <div className="text-xs text-gray-400 text-center">
-                      Goal: {formatNumber(proteinGoal)}g
+                      {t('common:detailedNutrition.goal')}: {formatNumber(proteinGoal)}g
                     </div>
                   </div>
 
@@ -312,10 +314,10 @@ export default function DetailedNutrition() {
                       {formatNumber(todayTotals.fat)}g
                     </div>
                     <div className="text-xs text-gray-500 text-center">
-                      Fat
+                      {t('common:enhancedDashboard.macros.fat')}
                     </div>
                     <div className="text-xs text-gray-400 text-center">
-                      Goal: {formatNumber(fatGoal)}g
+                      {t('common:detailedNutrition.goal')}: {formatNumber(fatGoal)}g
                     </div>
                   </div>
                 </div>
@@ -325,20 +327,20 @@ export default function DetailedNutrition() {
             {/* Daily Insights Card */}
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none overflow-hidden bg-white shadow-sm">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Daily Insights</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-4">{t('common:detailedNutrition.dailyInsights.title')}</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-xl">
-                    <div className="font-medium text-green-700">Good job! Protein goal reached.</div>
+                    <div className="font-medium text-green-700">{t('common:detailedNutrition.dailyInsights.proteinReached')}</div>
                     <div className="text-green-700">✓</div>
                   </div>
                   
                   <div className="flex justify-between items-center p-3 bg-amber-50 rounded-xl">
-                    <div className="font-medium text-amber-700">Fat is getting close to limit.</div>
+                    <div className="font-medium text-amber-700">{t('common:detailedNutrition.dailyInsights.fatCloseToLimit')}</div>
                     <div className="text-amber-700">!</div>
                   </div>
                   
                   <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-                    <div className="font-medium text-blue-700">You're 250 calories under budget.</div>
+                    <div className="font-medium text-blue-700">{t('common:detailedNutrition.dailyInsights.caloriesUnderBudget')}</div>
                     <div className="text-blue-700">i</div>
                   </div>
                 </div>
@@ -348,7 +350,7 @@ export default function DetailedNutrition() {
             {/* Calorie Trends Card */}
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none overflow-hidden bg-white shadow-sm">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Weekly Calorie Trends</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-4">{t('common:detailedNutrition.weeklyCalorieTrends')}</h3>
                 <div className="h-40">
                   <div className="flex h-full items-end justify-between">
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
@@ -384,7 +386,7 @@ export default function DetailedNutrition() {
             animate="show"
             className="space-y-6"
           >
-            <div className="text-lg font-bold text-gray-800 mb-2">Nutrition by Meal</div>
+            <div className="text-lg font-bold text-gray-800 mb-2">{t('common:detailedNutrition.nutritionByMeal')}</div>
             
             {mealsBreakdown.map((meal, index) => (
               <motion.div 
@@ -399,21 +401,21 @@ export default function DetailedNutrition() {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900">{meal.name}</h3>
-                      <span className="text-sm text-gray-500">{meal.calories} kcal</span>
+                      <span className="text-sm text-gray-500">{meal.calories} {t('common:analytics.units.kcal')}</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4 mt-2">
                     <div>
-                      <div className="text-sm text-gray-500">Carbs</div>
+                      <div className="text-sm text-gray-500">{t('common:enhancedDashboard.macros.carbs')}</div>
                       <div className="font-medium text-gray-800">{meal.carbs}g</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">Protein</div>
+                      <div className="text-sm text-gray-500">{t('common:enhancedDashboard.macros.protein')}</div>
                       <div className="font-medium text-gray-800">{meal.protein}g</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500">Fat</div>
+                      <div className="text-sm text-gray-500">{t('common:enhancedDashboard.macros.fat')}</div>
                       <div className="font-medium text-gray-800">{meal.fat}g</div>
                     </div>
                   </div>
@@ -449,11 +451,11 @@ export default function DetailedNutrition() {
             animate="show"
             className="space-y-6"
           >
-            <div className="text-lg font-bold text-gray-800 mb-2">Micronutrients</div>
+            <div className="text-lg font-bold text-gray-800 mb-2">{t('common:detailedNutrition.micronutrientsTab.title')}</div>
             
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none bg-white shadow-sm">
-                <h3 className="text-base font-medium text-gray-800 mb-4">Essential Nutrients</h3>
+                <h3 className="text-base font-medium text-gray-800 mb-4">{t('common:detailedNutrition.micronutrientsTab.essentialNutrients')}</h3>
                 <div className="space-y-4">
                   {micronutrients.map((nutrient, index) => {
                     const percentage = Math.min(Math.round((nutrient.current / nutrient.goal) * 100), 100);
@@ -483,10 +485,10 @@ export default function DetailedNutrition() {
 
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none bg-white shadow-sm">
-                <h3 className="text-base font-medium text-gray-800 mb-4">Additional Info</h3>
+                <h3 className="text-base font-medium text-gray-800 mb-4">{t('common:detailedNutrition.micronutrientsTab.additionalInfo')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Water</div>
+                    <div className="text-sm text-gray-600">{t('common:detailedNutrition.micronutrientsTab.other.water')}</div>
                     <div className="text-lg font-medium text-blue-700">1.8 / 2.5 L</div>
                     <div className="mt-1 h-1.5 w-full rounded-full overflow-hidden bg-blue-100">
                       <div className="h-full bg-blue-500" style={{ width: '72%' }} />
@@ -494,7 +496,7 @@ export default function DetailedNutrition() {
                   </div>
                   
                   <div className="p-3 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Fiber</div>
+                    <div className="text-sm text-gray-600">{t('common:detailedNutrition.micronutrientsTab.other.fiber')}</div>
                     <div className="text-lg font-medium text-purple-700">22 / 30 g</div>
                     <div className="mt-1 h-1.5 w-full rounded-full overflow-hidden bg-purple-100">
                       <div className="h-full bg-purple-500" style={{ width: '73%' }} />
@@ -502,7 +504,7 @@ export default function DetailedNutrition() {
                   </div>
                   
                   <div className="p-3 bg-green-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Sugar</div>
+                    <div className="text-sm text-gray-600">{t('common:detailedNutrition.micronutrientsTab.other.sugar')}</div>
                     <div className="text-lg font-medium text-green-700">18 / 25 g</div>
                     <div className="mt-1 h-1.5 w-full rounded-full overflow-hidden bg-green-100">
                       <div className="h-full bg-green-500" style={{ width: '72%' }} />
@@ -510,7 +512,7 @@ export default function DetailedNutrition() {
                   </div>
                   
                   <div className="p-3 bg-amber-50 rounded-lg">
-                    <div className="text-sm text-gray-600">Sodium</div>
+                    <div className="text-sm text-gray-600">{t('common:detailedNutrition.micronutrientsTab.other.sodium')}</div>
                     <div className="text-lg font-medium text-amber-700">1.8 / 2.3 g</div>
                     <div className="mt-1 h-1.5 w-full rounded-full overflow-hidden bg-amber-100">
                       <div className="h-full bg-amber-500" style={{ width: '78%' }} />
@@ -531,11 +533,11 @@ export default function DetailedNutrition() {
             animate="show"
             className="space-y-6"
           >
-            <div className="text-lg font-bold text-gray-800 mb-2">Nutrient Timing</div>
+            <div className="text-lg font-bold text-gray-800 mb-2">{t('common:detailedNutrition.timingTab.title')}</div>
             
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none bg-white shadow-sm">
-                <h3 className="text-base font-medium text-gray-800 mb-4">Calorie Distribution Over Day</h3>
+                <h3 className="text-base font-medium text-gray-800 mb-4">{t('common:detailedNutrition.timingTab.calorieDistribution')}</h3>
                 <div className="h-48">
                   <div className="flex h-full items-end justify-between">
                     {nutrientTiming.map((timeslot, i) => {
@@ -557,25 +559,25 @@ export default function DetailedNutrition() {
 
             <motion.div variants={itemVariants}>
               <Card className="p-5 rounded-3xl border-none bg-white shadow-sm">
-                <h3 className="text-base font-medium text-gray-800 mb-4">Nutrient Timing Details</h3>
+                <h3 className="text-base font-medium text-gray-800 mb-4">{t('common:detailedNutrition.timingTab.timingDetails')}</h3>
                 <div className="space-y-4">
                   {nutrientTiming.map((timeslot) => (
                     <div key={timeslot.time} className="p-3 border border-gray-100 rounded-xl hover:border-[#0CC5BA]/30 transition-colors">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium text-gray-800">{timeslot.time}</span>
-                        <span className="text-sm text-gray-500">{timeslot.calories} kcal</span>
+                        <span className="text-sm text-gray-500">{timeslot.calories} {t('common:analytics.units.kcal')}</span>
                       </div>
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <div className="text-gray-500">Carbs</div>
+                          <div className="text-gray-500">{t('common:enhancedDashboard.macros.carbs')}</div>
                           <div className="font-medium text-gray-700">{timeslot.carbs}g</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">Protein</div>
+                          <div className="text-gray-500">{t('common:enhancedDashboard.macros.protein')}</div>
                           <div className="font-medium text-gray-700">{timeslot.protein}g</div>
                         </div>
                         <div>
-                          <div className="text-gray-500">Fat</div>
+                          <div className="text-gray-500">{t('common:enhancedDashboard.macros.fat')}</div>
                           <div className="font-medium text-gray-700">{timeslot.fat}g</div>
                         </div>
                       </div>
@@ -591,7 +593,7 @@ export default function DetailedNutrition() {
                 className="bg-[#0CC5BA] hover:bg-[#0CC5BA]/90 text-white rounded-full px-6 py-2"
                 onClick={() => setLocation("/simple-nutrition?date=" + format(selectedDate, 'yyyy-MM-dd'))}
               >
-                Switch to Simple View
+                {t('common:detailedNutrition.actions.switchToSimple')}
               </Button>
             </motion.div>
           </motion.div>

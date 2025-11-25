@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays } from "date-fns";
+import { useTranslation } from "react-i18next";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import { Button } from "@/components/ui/button";
 import { 
@@ -49,6 +50,7 @@ interface MealPlansResponse {
 }
 
 export default function MealPlanView() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
@@ -118,13 +120,12 @@ export default function MealPlanView() {
   const avgDailyCalories = Math.round(totalWeekCalories / weekPlans.length);
 
   const getMealTypeLabel = (mealType: string) => {
-    const labels: Record<string, string> = {
-      breakfast: "Breakfast",
-      lunch: "Lunch",
-      dinner: "Dinner",
-      snack: "Snack",
-    };
-    return labels[mealType.toLowerCase()] || mealType;
+    const key = mealType.toLowerCase();
+    const validKeys = ['breakfast', 'lunch', 'dinner', 'snack'];
+    if (validKeys.includes(key)) {
+      return t(`common:mealPlanView.mealTypes.${key}`);
+    }
+    return mealType;
   };
 
   return (
@@ -141,19 +142,19 @@ export default function MealPlanView() {
             <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
               <Flame className="w-6 h-6 text-white" />
             </div>
-            <p className="text-gray-500 text-xs font-medium mb-1">Avg Daily</p>
+            <p className="text-gray-500 text-xs font-medium mb-1">{t('common:mealPlanView.summary.avgDaily')}</p>
             <p className="text-gray-900 text-xl font-bold">{avgDailyCalories}</p>
-            <p className="text-gray-400 text-xs">calories</p>
+            <p className="text-gray-400 text-xs">{t('common:mealPlanView.summary.calories')}</p>
           </div>
           <div className="text-center">
             <div className="w-12 h-12 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
               <ChefHat className="w-6 h-6 text-white" />
             </div>
-            <p className="text-gray-500 text-xs font-medium mb-1">Total Meals</p>
+            <p className="text-gray-500 text-xs font-medium mb-1">{t('common:mealPlanView.summary.totalMeals')}</p>
             <p className="text-gray-900 text-xl font-bold">
               {weekPlans.reduce((sum: number, day: any) => sum + (day.meals?.length || 0), 0)}
             </p>
-            <p className="text-gray-400 text-xs">this week</p>
+            <p className="text-gray-400 text-xs">{t('common:mealPlanView.summary.thisWeek')}</p>
           </div>
         </div>
       </motion.div>
@@ -193,9 +194,9 @@ export default function MealPlanView() {
                     </p>
                     <div className="flex items-center space-x-2 text-gray-500 text-sm mt-0.5">
                       <Flame className="w-3.5 h-3.5" />
-                      <span className="font-medium">{day.totalCalories} cal</span>
+                      <span className="font-medium">{day.totalCalories} {t('common:mealPlanView.cal')}</span>
                       <span>•</span>
-                      <span>{dayMeals.length} meals</span>
+                      <span>{dayMeals.length} {t('common:mealPlanView.meals')}</span>
                     </div>
                   </div>
                 </div>
@@ -253,7 +254,7 @@ export default function MealPlanView() {
                                 </p>
                                 {nutrition && (
                                   <div className="flex items-center space-x-2 mt-1.5 text-[11px] text-gray-500 font-medium">
-                                    <span>{nutrition.calories} cal</span>
+                                    <span>{nutrition.calories} {t('common:mealPlanView.cal')}</span>
                                     <span>•</span>
                                     <span>P {nutrition.protein}g</span>
                                     <span>C {nutrition.carbs}g</span>
@@ -284,7 +285,7 @@ export default function MealPlanView() {
                                   {meal.recipe?.prepTime && (
                                     <div className="flex items-center space-x-2 text-gray-500 text-xs font-medium">
                                       <Clock className="w-3.5 h-3.5" />
-                                      <span>{meal.recipe.prepTime} min prep time</span>
+                                      <span>{meal.recipe.prepTime} {t('common:mealPlanView.mealDetails.prepTime')}</span>
                                     </div>
                                   )}
 
@@ -292,7 +293,7 @@ export default function MealPlanView() {
                                   {meal.recipe?.ingredients && meal.recipe.ingredients.length > 0 && (
                                     <div>
                                       <h4 className="text-gray-900 font-bold text-xs uppercase tracking-wider mb-2">
-                                        Ingredients
+                                        {t('common:mealPlanView.mealDetails.ingredients')}
                                       </h4>
                                       <ul className="space-y-1.5">
                                         {meal.recipe.ingredients.map((ingredient: any, idx: number) => (
@@ -316,7 +317,7 @@ export default function MealPlanView() {
                                   {meal.recipe?.instructions && meal.recipe.instructions.length > 0 && (
                                     <div>
                                       <h4 className="text-gray-900 font-bold text-xs uppercase tracking-wider mb-2">
-                                        Instructions
+                                        {t('common:mealPlanView.mealDetails.instructions')}
                                       </h4>
                                       <ol className="space-y-2">
                                         {meal.recipe.instructions.map((step: any, idx: number) => (
@@ -360,14 +361,14 @@ export default function MealPlanView() {
           className="w-full bg-white/90 backdrop-blur-sm hover:bg-white text-gray-900 border-0 py-6 text-base font-semibold rounded-3xl shadow-md"
         >
           <ShoppingBag className="w-5 h-5 mr-2" />
-          View Shopping List
+          {t('common:mealPlanView.actions.viewShoppingList')}
         </Button>
         <Button
           onClick={() => setLocation("/recipes?tab=meal-plan")}
           className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 text-white py-6 text-base font-semibold rounded-3xl shadow-lg"
         >
           <Sparkles className="w-5 h-5 mr-2" />
-          Start My Week
+          {t('common:mealPlanView.actions.startMyWeek')}
         </Button>
       </motion.div>
     </BaseLayout>

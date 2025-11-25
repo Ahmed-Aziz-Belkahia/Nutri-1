@@ -1,4 +1,5 @@
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Camera, Calendar, Plus } from "lucide-react";
@@ -35,6 +36,7 @@ interface FoodLogsResponse {
 }
 
 export default function AllMeals() {
+  const { t } = useTranslation(['common']);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -86,15 +88,15 @@ export default function AllMeals() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/food-logs"] });
       toast({
-        title: "Success",
-        description: "Food log created successfully",
+        title: t('common:allMeals.success.created'),
+        description: t('common:allMeals.success.created'),
       });
     },
     onError: (error) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create food log",
+        title: t('common:allMeals.error.createFailed'),
+        description: error instanceof Error ? error.message : t('common:allMeals.error.createFailed'),
       });
     },
   });
@@ -134,7 +136,7 @@ export default function AllMeals() {
             animate={{ opacity: 1, y: 0 }}
             className="text-2xl font-bold mb-6 bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent"
           >
-            Loading meals...
+            {t('common:allMeals.loading')}
           </motion.h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
@@ -164,12 +166,12 @@ export default function AllMeals() {
             animate={{ opacity: 1, y: 0 }}
             className="text-2xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent"
           >
-            Meal Gallery
+            {t('common:allMeals.title')}
           </motion.h1>
           <Link href="/add-food">
             <Button className="bg-[#0CC5BA] hover:bg-[#0CC5BA]/90" onClick={() => createFoodLogMutation.mutate({name: "test", analysis: {}})}> {/* Added onClick handler */}
               <Plus className="h-4 w-4 mr-2" />
-              Add Meal
+              {t('common:allMeals.addMeal')}
             </Button>
           </Link>
         </div>
@@ -181,8 +183,8 @@ export default function AllMeals() {
             className="text-center py-12"
           >
             <Camera className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-gray-600">No meals logged yet.</p>
-            <p className="text-sm text-gray-500 mt-2">Start adding meals to see them here!</p>
+            <p className="text-gray-600">{t('common:allMeals.noMeals')}</p>
+            <p className="text-sm text-gray-500 mt-2">{t('common:allMeals.noMealsDesc')}</p>
           </motion.div>
         ) : (
           <>
@@ -258,22 +260,22 @@ export default function AllMeals() {
                 transition={{ delay: 0.3 }}
               >
                 <Card className="mt-8 p-6 border-t-4 border-t-[#0CC5BA]">
-                  <h2 className="text-lg font-semibold mb-4">Nutrition Summary</h2>
+                  <h2 className="text-lg font-semibold mb-4">{t('common:enhancedDashboard.dailyProgress')}</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                     <div className="p-4 bg-[#0CC5BA]/5 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Calories</p>
+                      <p className="text-sm text-gray-500">{t('common:enhancedDashboard.calorieIntake')}</p>
                       <p className="text-2xl font-semibold text-[#0CC5BA]">{data.totals.calories}</p>
                     </div>
                     <div className="p-4 bg-[#0CC5BA]/5 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Protein</p>
+                      <p className="text-sm text-gray-500">{t('common:enhancedDashboard.protein')}</p>
                       <p className="text-2xl font-semibold text-[#0CC5BA]">{data.totals.protein}g</p>
                     </div>
                     <div className="p-4 bg-[#0CC5BA]/5 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Carbs</p>
+                      <p className="text-sm text-gray-500">{t('common:enhancedDashboard.carbs')}</p>
                       <p className="text-2xl font-semibold text-[#0CC5BA]">{data.totals.carbs}g</p>
                     </div>
                     <div className="p-4 bg-[#0CC5BA]/5 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Fat</p>
+                      <p className="text-sm text-gray-500">{t('common:enhancedDashboard.fat')}</p>
                       <p className="text-2xl font-semibold text-[#0CC5BA]">{data.totals.fat}g</p>
                     </div>
                   </div>

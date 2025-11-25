@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import BaseLayout from "@/components/layouts/BaseLayout";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
@@ -31,6 +32,7 @@ interface FoodLog {
 }
 
 export default function RecipesNew() {
+  const { t } = useTranslation(['common']);
   const { user } = useAuth();
   const [location, navigate] = useLocation();
   
@@ -80,9 +82,9 @@ export default function RecipesNew() {
         <div className="py-4">
           {/* Title */}
           <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Recipes</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('common:recipesNew.title')}</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Your scanned meal collection
+              {t('common:recipesNew.subtitle')}
             </p>
           </div>
 
@@ -97,7 +99,7 @@ export default function RecipesNew() {
               }`}
             >
               <Book className="w-4 h-4" />
-              <span>Recipes</span>
+              <span>{t('common:recipesNew.tabs.recipes')}</span>
             </button>
             <button
               onClick={() => handleTabChange('meal-plan')}
@@ -108,7 +110,7 @@ export default function RecipesNew() {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              <span>Meal Plan</span>
+              <span>{t('common:recipesNew.tabs.mealPlan')}</span>
             </button>
           </div>
         </div>
@@ -165,7 +167,7 @@ export default function RecipesNew() {
                     marginBottom: '8px',
                     lineHeight: '1.3'
                   }}>
-                    AI-Powered Recipe Creator
+                    {t('common:recipesNew.aiCreator.title')}
                   </h2>
                   
                   {/* Description */}
@@ -177,7 +179,7 @@ export default function RecipesNew() {
                     maxWidth: '320px',
                     margin: '0 auto 20px'
                   }}>
-                    Scan your ingredients and get instant personalized recipes
+                    {t('common:recipesNew.aiCreator.description')}
                   </p>
                   
                   {/* CTA Button */}
@@ -208,7 +210,7 @@ export default function RecipesNew() {
                     }}
                   >
                     <Camera style={{ width: '20px', height: '20px' }} />
-                    <span>Scan Ingredients</span>
+                    <span>{t('common:recipesNew.aiCreator.scanButton')}</span>
                   </button>
                   
                   {/* Feature Pills */}
@@ -232,7 +234,7 @@ export default function RecipesNew() {
                       fontWeight: '500'
                     }}>
                       <Sparkles style={{ width: '14px', height: '14px' }} />
-                      <span>AI Powered</span>
+                      <span>{t('common:recipesNew.aiCreator.features.aiPowered')}</span>
                     </div>
                     <div style={{
                       display: 'inline-flex',
@@ -246,7 +248,7 @@ export default function RecipesNew() {
                       fontWeight: '500'
                     }}>
                       <Clock style={{ width: '14px', height: '14px' }} />
-                      <span>Instant</span>
+                      <span>{t('common:recipesNew.aiCreator.features.instant')}</span>
                     </div>
                     <div style={{
                       display: 'inline-flex',
@@ -260,7 +262,7 @@ export default function RecipesNew() {
                       fontWeight: '500'
                     }}>
                       <ChefHat style={{ width: '14px', height: '14px' }} />
-                      <span>Custom</span>
+                      <span>{t('common:recipesNew.aiCreator.features.custom')}</span>
                     </div>
                   </div>
                 </div>
@@ -271,8 +273,8 @@ export default function RecipesNew() {
             {todaysRecipes.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900">Today's Scans</h2>
-                  <span className="text-xs text-gray-500">Last 24 hours</span>
+                  <h2 className="text-lg font-bold text-gray-900">{t('common:recipesNew.todaysScans')}</h2>
+                  <span className="text-xs text-gray-500">{t('common:recipesNew.last24Hours')}</span>
                 </div>
                 <MealsSection 
                   foodLogs={todaysRecipes} 

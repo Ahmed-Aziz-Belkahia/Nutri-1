@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { format, addDays, isToday } from "date-fns";
 import { 
   ArrowLeft, 
@@ -316,6 +318,7 @@ function getPolishPrice(ingredient: string): number {
 }
 
 export default function ImprovedShoppingList() {
+  const { t } = useTranslation();
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -645,11 +648,12 @@ export default function ImprovedShoppingList() {
             size="icon"
             onClick={() => setLocation("/meal-plan")}
             className="text-white hover:bg-white/20"
+            aria-label={t('common:shoppingList.backButton')}
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-white">Shopping List</h1>
+            <h1 className="text-xl font-semibold text-white">{t('common:shoppingList.title')}</h1>
             <div className="flex items-center justify-center space-x-2 mt-1">
               <Button 
                 variant="ghost" 
@@ -661,7 +665,7 @@ export default function ImprovedShoppingList() {
               </Button>
               
               <span className="text-sm font-medium text-white px-2 py-1 bg-white/20 rounded-full">
-                Weekly Shopping List
+                {t('common:shoppingList.weeklyTitle')}
               </span>
               
               <Button 
@@ -698,13 +702,13 @@ export default function ImprovedShoppingList() {
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 mb-4 bg-white/80 backdrop-blur-sm shadow-sm">
             <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              All Items
+              {t('common:shoppingList.tabs.all')}
             </TabsTrigger>
             <TabsTrigger value="pending" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              To Buy
+              {t('common:shoppingList.tabs.toBuy')}
             </TabsTrigger>
             <TabsTrigger value="purchased" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              Purchased
+              {t('common:shoppingList.tabs.purchased')}
             </TabsTrigger>
           </TabsList>
           
@@ -712,14 +716,14 @@ export default function ImprovedShoppingList() {
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0CC5BA]"></div>
-                <p className="mt-4 text-gray-500">Loading your shopping list...</p>
+                <p className="mt-4 text-gray-500">{t('common:shoppingList.loading')}</p>
               </div>
             </Card>
           ) : error ? (
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">{(error as Error).message || "Failed to load shopping list"}</p>
+                <p className="text-lg">{(error as Error).message || t('common:shoppingList.error')}</p>
                 <Button 
                   className="mt-6 bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white"
                   onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/shopping-list", selectedDateString] })}
@@ -732,8 +736,8 @@ export default function ImprovedShoppingList() {
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">No items in your shopping list for this day.</p>
-                <p className="text-sm mt-2">Try selecting a different date or add meals to your meal plan.</p>
+                <p className="text-lg">{t('common:shoppingList.empty.noItems')}</p>
+                <p className="text-sm mt-2">{t('common:shoppingList.empty.noItemsDescription')}</p>
                 
                 {hasMealPlanForDate && mealPlanId && (
                   <Button
@@ -747,7 +751,7 @@ export default function ImprovedShoppingList() {
                         Generating...
                       </>
                     ) : (
-                      <>Generate Shopping List</>
+                      <>{t('common:shoppingList.empty.generateButton')}</>
                     )}
                   </Button>
                 )}
@@ -757,7 +761,7 @@ export default function ImprovedShoppingList() {
             <>
               <div className="mb-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm p-3">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800">Group by:</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t('common:shoppingList.grouping.label')}:</h3>
                   <div className="flex items-center space-x-2">
                     <Button 
                       variant={groupBy === 'meal' ? 'default' : 'outline'} 
@@ -765,7 +769,7 @@ export default function ImprovedShoppingList() {
                       onClick={() => setGroupBy('meal')}
                       className={groupBy === 'meal' ? 'bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white' : ''}
                     >
-                      <Utensils className="w-4 h-4 mr-1" /> Meal
+                      <Utensils className="w-4 h-4 mr-1" /> {t('common:shoppingList.grouping.byMeal')}
                     </Button>
                     <Button 
                       variant={groupBy === 'category' ? 'default' : 'outline'} 
@@ -773,7 +777,7 @@ export default function ImprovedShoppingList() {
                       onClick={() => setGroupBy('category')}
                       className={groupBy === 'category' ? 'bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white' : ''}
                     >
-                      <Layers className="w-4 h-4 mr-1" /> Category
+                      <Layers className="w-4 h-4 mr-1" /> {t('common:shoppingList.grouping.byCategory')}
                     </Button>
                   </div>
                 </div>
@@ -781,7 +785,7 @@ export default function ImprovedShoppingList() {
                 {/* Location-based pricing selector */}
                 <div className="border-t border-gray-100 pt-2 mt-2">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-medium text-gray-800">Pricing:</h3>
+                    <h3 className="text-base font-medium text-gray-800">{t('common:shoppingList.pricing.selectLocation')}:</h3>
                     
                     <div className="flex items-center gap-2">
                       {selectedLocation && locationsData?.locations.find((loc: any) => loc.id === selectedLocation) && (
@@ -818,7 +822,7 @@ export default function ImprovedShoppingList() {
               <Dialog open={showLocationSelector} onOpenChange={setShowLocationSelector}>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Choose a store for pricing</DialogTitle>
+                    <DialogTitle>{t('common:shoppingList.pricing.locationTitle')}</DialogTitle>
                   </DialogHeader>
                   
                   {locationsData?.locations ? (
@@ -978,7 +982,7 @@ export default function ImprovedShoppingList() {
                                 </div>
                                 {item.recipeName && (
                                   <div className="mt-1 text-xs text-gray-400 truncate">
-                                    For: {item.recipeName}
+                                    {t('common:shoppingList.items.forRecipe', { recipe: item.recipeName })}
                                   </div>
                                 )}
                               </div>
@@ -1222,7 +1226,7 @@ export default function ImprovedShoppingList() {
                 </div>
               )}
               {detailItem?.recipeName && (
-                <div className="mt-1 text-sm text-gray-500">For: {detailItem.recipeName}</div>
+                <div className="mt-1 text-sm text-gray-500">{t('common:shoppingList.items.forRecipe', { recipe: detailItem.recipeName })}</div>
               )}
             </DialogDescription>
           </DialogHeader>
@@ -1273,11 +1277,11 @@ export default function ImprovedShoppingList() {
             {/* Details */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm text-gray-500">Quantity</div>
+                <div className="text-sm text-gray-500">{t('common:shoppingList.itemDetails.quantity')}</div>
                 <div className="text-lg font-medium">{detailItem?.quantity} {detailItem?.unit}</div>
               </div>
               <div className="bg-gray-50 p-3 rounded-lg">
-                <div className="text-sm text-gray-500">Category</div>
+                <div className="text-sm text-gray-500">{t('common:shoppingList.itemDetails.category')}</div>
                 <div className="text-lg font-medium capitalize">{detailItem?.category}</div>
               </div>
             </div>
@@ -1295,10 +1299,10 @@ export default function ImprovedShoppingList() {
                 {detailItem?.isPurchased ? (
                   <>
                     <Check className="h-4 w-4 mr-2" />
-                    Purchased
+                    {t('common:shoppingList.items.purchased')}
                   </>
                 ) : (
-                  'Mark as Purchased'
+                  t('common:shoppingList.items.markPurchased')
                 )}
               </Button>
             </div>
@@ -1335,7 +1339,7 @@ export default function ImprovedShoppingList() {
             
             {/* Ingredients list */}
             <div className="overflow-auto max-h-48">
-              <h3 className="font-medium mb-2">Ingredients:</h3>
+              <h3 className="font-medium mb-2">{t('common:shoppingList.recipeDetails.ingredients')}:</h3>
               <div className="divide-y divide-gray-100">
                 {selectedRecipe?.ingredients.map(item => (
                   <div key={item.id} className="py-2 flex items-center">
@@ -1347,9 +1351,9 @@ export default function ImprovedShoppingList() {
                       <div className="text-xs text-gray-500">{item.quantity} {item.unit}</div>
                     </div>
                     {item.isPurchased ? (
-                      <span className="text-xs text-white bg-green-500 px-2 py-0.5 rounded-full">Purchased</span>
+                      <span className="text-xs text-white bg-green-500 px-2 py-0.5 rounded-full">{t('common:shoppingList.items.purchased')}</span>
                     ) : (
-                      <span className="text-xs text-white bg-blue-500 px-2 py-0.5 rounded-full">To Buy</span>
+                      <span className="text-xs text-white bg-blue-500 px-2 py-0.5 rounded-full">{t('common:shoppingList.items.toBuy')}</span>
                     )}
                   </div>
                 ))}
@@ -1362,7 +1366,7 @@ export default function ImprovedShoppingList() {
               variant="outline"
               onClick={() => setShowRecipeModal(false)}
             >
-              Close
+              {t('common:shoppingList.recipeDetails.close')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1372,7 +1376,7 @@ export default function ImprovedShoppingList() {
       <Sheet open={showBatchActionSheet} onOpenChange={setShowBatchActionSheet}>
         <SheetContent side="bottom" className="h-auto rounded-t-xl pb-8">
           <SheetHeader className="text-left">
-            <SheetTitle>Selected Items ({selectedItems.length})</SheetTitle>
+            <SheetTitle>{t('common:shoppingList.batchActions.itemsSelected', { count: selectedItems.length })}</SheetTitle>
           </SheetHeader>
           
           <div className="grid gap-4 py-4">
@@ -1383,7 +1387,7 @@ export default function ImprovedShoppingList() {
                 onClick={resetSelection}
                 className="text-gray-500"
               >
-                <X className="h-4 w-4 mr-1" /> Clear selection
+                <X className="h-4 w-4 mr-1" /> {t('common:shoppingList.batchActions.clearSelection')}
               </Button>
               
               <div className="space-x-2">
@@ -1395,12 +1399,12 @@ export default function ImprovedShoppingList() {
                   {batchTogglePurchaseMutation.isPending ? (
                     <>
                       <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>
-                      Processing...
+                      {t('common:shoppingList.batchActions.processing')}
                     </>
                   ) : (
                     <>
                       <ShoppingCart className="h-4 w-4 mr-1" />
-                      Mark {selectedItems.length} items as purchased
+                      {t('common:shoppingList.batchActions.markItemsAsPurchased', { count: selectedItems.length })}
                     </>
                   )}
                 </Button>

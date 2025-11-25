@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useFoodLog } from "../hooks/use-food-log";
 import { useUserProfile } from "../hooks/use-user-profile";
 import { format } from "date-fns";
+import { useTranslation } from 'react-i18next';
 import { 
   ChevronLeft, 
   Calendar,
@@ -22,6 +23,7 @@ const formatNumber = (value: number | string | null | undefined): string => {
 };
 
 export default function SimpleNutritionDetail() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const [location] = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
@@ -208,10 +210,10 @@ export default function SimpleNutritionDetail() {
               {formatNumber(todayTotals.carbs)}g
             </div>
             <div className="text-xs text-gray-500 text-center">
-              Carbs
+              {t('common:enhancedDashboard.macros.carbs')}
             </div>
             <div className="text-xs text-gray-400 text-center">
-              Goal: {formatNumber(carbsGoal)}g
+              {t('common:detailedNutrition.goal')}: {formatNumber(carbsGoal)}g
             </div>
           </div>
 
@@ -227,10 +229,10 @@ export default function SimpleNutritionDetail() {
               {formatNumber(todayTotals.protein)}g
             </div>
             <div className="text-xs text-gray-500 text-center">
-              Protein
+              {t('common:enhancedDashboard.macros.protein')}
             </div>
             <div className="text-xs text-gray-400 text-center">
-              Goal: {formatNumber(proteinGoal)}g
+              {t('common:detailedNutrition.goal')}: {formatNumber(proteinGoal)}g
             </div>
           </div>
 
@@ -246,7 +248,7 @@ export default function SimpleNutritionDetail() {
               {formatNumber(todayTotals.fat)}g
             </div>
             <div className="text-xs text-gray-500 text-center">
-              Fat
+              {t('common:enhancedDashboard.macros.fat')}
             </div>
             <div className="text-xs text-gray-400 text-center">
               Goal: {formatNumber(fatGoal)}g
@@ -256,7 +258,7 @@ export default function SimpleNutritionDetail() {
 
         {/* Daily Insights Card */}
         <div className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Daily Insights</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4">{t('common:detailedNutrition.dailyInsights.title')}</h3>
           <div className="space-y-3">
             {insights.map((insight, index) => (
               <div 
@@ -286,7 +288,7 @@ export default function SimpleNutritionDetail() {
 
         {/* Weekly Calorie Trends */}
         <div>
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Weekly Calorie Trends</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-4">{t('common:detailedNutrition.weeklyCalorieTrends')}</h3>
           <div className="h-40">
             <div className="flex h-full items-end justify-between">
               {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {

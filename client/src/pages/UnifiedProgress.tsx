@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Camera, Upload, Activity, Scale, TrendingUp, Info, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,7 @@ import { WeightTrendChart } from "@/components/progress/WeightTrendChart";
 import { SourcesDisclaimer } from "@/components/progress/SourcesDisclaimer";
 
 export default function UnifiedProgress() {
+  const { t } = useTranslation(['common']);
   const { toast } = useToast();
   const { photos, uploadPhoto } = useProgressPhotos();
   const { analyzeBody, updateProfileWithBodyFat, isLoading: isAnalysisLoading } = useBodyAnalysis();
@@ -110,23 +112,23 @@ export default function UnifiedProgress() {
               <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(to bottom right, #C51A1B, #A01517)' }}>
                 <Scale className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold">Weight Stats</h2>
+              <h2 className="text-xl font-bold">{t('common:unifiedProgress.weightStats.title')}</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">Current Weight</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.current')}</p>
                 <p className="text-2xl font-bold">{currentWeight ? `${currentWeight.toFixed(1)} kg` : '—'}</p>
               </div>
               <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">Goal Weight</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.goal')}</p>
                 <p className="text-2xl font-bold">{goalWeight ? `${goalWeight.toFixed(1)} kg` : '—'}</p>
               </div>
               <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">Progress</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.progress')}</p>
                 <p className="text-2xl font-bold">{weightChange !== 0 ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)} kg` : '—'}</p>
               </div>
               <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">Remaining</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.remaining')}</p>
                 <p className="text-2xl font-bold">{remainingWeight !== 0 ? `${Math.abs(remainingWeight).toFixed(1)} kg` : '—'}</p>
               </div>
             </div>
@@ -154,7 +156,7 @@ export default function UnifiedProgress() {
                 <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(to bottom right, #75C5A3, #5BA889)' }}>
                   <Camera className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold">Progress Photos</h2>
+                <h2 className="text-xl font-bold">{t('common:unifiedProgress.progressPhotos.title')}</h2>
               </div>
               <Button
                 onClick={() => fileInputRef.current?.click()}
@@ -217,8 +219,8 @@ export default function UnifiedProgress() {
             ) : (
               <div className="p-8 text-center">
                 <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">No Photos Yet</p>
-                <p className="text-sm text-gray-500 mt-1">Upload your first progress photo</p>
+                <p className="text-gray-600">{t('common:unifiedProgress.progressPhotos.noPhotos')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('common:unifiedProgress.progressPhotos.uploadFirst')}</p>
               </div>
             )}
           </div>
@@ -243,17 +245,17 @@ export default function UnifiedProgress() {
               <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(to bottom right, #75C5A3, #5BA889)' }}>
                 <Activity className="h-5 w-5 text-white" />
               </div>
-              <h2 className="text-xl font-bold">Body Analysis</h2>
+              <h2 className="text-xl font-bold">{t('common:unifiedProgress.bodyAnalysis.title')}</h2>
             </div>
 
             {userProfile?.bodyFatPercentage ? (
               <div className="grid grid-cols-2 gap-3">
                 <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                  <p className="text-sm text-gray-600 mb-1">Body Fat</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyFat')}</p>
                   <p className="text-2xl font-bold">{userProfile.bodyFatPercentage}%</p>
                 </div>
                 <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                  <p className="text-sm text-gray-600 mb-1">Body Type</p>
+                  <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyType')}</p>
                   <p className="text-2xl font-bold capitalize">{userProfile.bodyType || '—'}</p>
                 </div>
               </div>
@@ -268,12 +270,12 @@ export default function UnifiedProgress() {
               {isAnalysisLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing...
+                  {t('common:unifiedProgress.bodyAnalysis.analyzing')}
                 </>
               ) : (
                 <>
                   <Activity className="h-4 w-4 mr-2" />
-                  Analyze Latest Photo
+                  {t('common:unifiedProgress.bodyAnalysis.analyzeLatest')}
                 </>
               )}
             </Button>
@@ -281,7 +283,7 @@ export default function UnifiedProgress() {
             {(!photos || photos.length === 0) && (
               <div className="flex items-start gap-2 p-3 rounded-2xl bg-amber-50 border border-amber-200">
                 <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-800">Upload a progress photo to enable body analysis</p>
+                <p className="text-sm text-amber-800">{t('common:unifiedProgress.bodyAnalysis.uploadPrompt')}</p>
               </div>
             )}
           </div>

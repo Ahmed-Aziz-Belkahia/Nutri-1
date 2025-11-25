@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -84,6 +85,7 @@ const getQueryFn = (options?: { on401?: 'returnNull' }) => {
 };
 
 export default function AdminDashboard() {
+  const { t } = useTranslation(['common']);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
@@ -168,14 +170,14 @@ export default function AdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
-        title: "Success",
-        description: "User admin status updated successfully",
+        title: t('common:adminDashboard.toast.success'),
+        description: t('common:adminDashboard.toast.adminUpdated'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: `Failed to update user: ${error.message}`,
+        title: t('common:adminDashboard.toast.error'),
+        description: `${t('common:adminDashboard.toast.updateFailed')} ${error.message}`,
         variant: "destructive",
       });
     },
@@ -190,8 +192,8 @@ export default function AdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
-        title: "Success",
-        description: "User deleted successfully",
+        title: t('common:adminDashboard.toast.success'),
+        description: t('common:adminDashboard.toast.userDeleted'),
       });
       if (selectedUserId) {
         setSelectedUserId(null);
@@ -200,8 +202,8 @@ export default function AdminDashboard() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: `Failed to delete user: ${error.message}`,
+        title: t('common:adminDashboard.toast.error'),
+        description: `${t('common:adminDashboard.toast.deleteFailed')} ${error.message}`,
         variant: "destructive",
       });
     },
@@ -237,16 +239,16 @@ export default function AdminDashboard() {
     return (
       <div className="w-full px-6 lg:px-12 py-8">
         <h1 className="text-3xl font-bold mb-8 flex items-center">
-          <Shield className="mr-2" /> Admin Dashboard
+          <Shield className="mr-2" /> {t('common:adminDashboard.title')}
         </h1>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Error loading admin data. Please make sure you have admin privileges.</p>
+          <p>{t('common:adminDashboard.error.loadingData')}</p>
           <Button
             variant="link"
             className="p-0 mt-2 text-red-700"
             onClick={() => setLocation("/")}
           >
-            Return to Homepage
+            {t('common:adminDashboard.error.returnHome')}
           </Button>
         </div>
       </div>
@@ -257,7 +259,7 @@ export default function AdminDashboard() {
     return (
       <div className="w-full px-6 lg:px-12 py-8">
         <h1 className="text-3xl font-bold mb-8 flex items-center">
-          <Shield className="mr-2" /> Admin Dashboard
+          <Shield className="mr-2" /> {t('common:adminDashboard.title')}
         </h1>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -274,16 +276,16 @@ export default function AdminDashboard() {
       return (
         <div className="w-full px-6 lg:px-12 py-8">
           <h1 className="text-3xl font-bold mb-8 flex items-center">
-            <Shield className="mr-2" /> Admin Dashboard
+            <Shield className="mr-2" /> {t('common:adminDashboard.title')}
           </h1>
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <p>User not found.</p>
+            <p>{t('common:adminDashboard.error.userNotFound')}</p>
             <Button
               variant="link"
               className="p-0 mt-2 text-red-700"
               onClick={handleBackToUsers}
             >
-              Back to Users
+              {t('common:adminDashboard.backToUsers')}
             </Button>
           </div>
         </div>
@@ -294,10 +296,10 @@ export default function AdminDashboard() {
       <div className="w-full px-6 lg:px-12 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold flex items-center">
-            <Shield className="mr-2" /> Admin Dashboard
+            <Shield className="mr-2" /> {t('common:adminDashboard.title')}
           </h1>
           <Button variant="outline" onClick={handleBackToUsers}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Users
+            <ArrowLeft className="mr-2 h-4 w-4" /> {t('common:adminDashboard.backToUsers')}
           </Button>
         </div>
 
@@ -305,9 +307,9 @@ export default function AdminDashboard() {
           <CardHeader>
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle className="text-2xl">User Profile</CardTitle>
+                <CardTitle className="text-2xl">{t('common:adminDashboard.userProfile.title')}</CardTitle>
                 <CardDescription>
-                  User ID: {selectedUser.id}
+                  {t('common:adminDashboard.userProfile.userId')} {selectedUser.id}
                 </CardDescription>
               </div>
               <div className="flex gap-2">
@@ -316,27 +318,26 @@ export default function AdminDashboard() {
                   size="sm"
                   onClick={() => handleToggleAdmin(selectedUser.id, selectedUser.isAdmin)}
                 >
-                  {selectedUser.isAdmin ? "Remove Admin" : "Make Admin"}
+                  {selectedUser.isAdmin ? t('common:adminDashboard.userProfile.removeAdmin') : t('common:adminDashboard.userProfile.makeAdmin')}
                 </Button>
                 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="sm">
-                      <Trash2 className="h-4 w-4 mr-1" /> Delete
+                      <Trash2 className="h-4 w-4 mr-1" /> {t('common:adminDashboard.userProfile.delete')}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogTitle>{t('common:adminDashboard.deleteDialog.title')}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the
-                        user account and all associated data.
+                        {t('common:adminDashboard.deleteDialog.description')}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t('common:adminDashboard.deleteDialog.cancel')}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => handleDeleteUser(selectedUser.id)}>
-                        Delete
+                        {t('common:adminDashboard.deleteDialog.delete')}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -347,32 +348,32 @@ export default function AdminDashboard() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h3 className="font-medium text-gray-500">Email</h3>
+                <h3 className="font-medium text-gray-500">{t('common:adminDashboard.userProfile.email')}</h3>
                 <p>{selectedUser.email}</p>
               </div>
               <div>
-                <h3 className="font-medium text-gray-500">Status</h3>
+                <h3 className="font-medium text-gray-500">{t('common:adminDashboard.userProfile.status')}</h3>
                 <div className="flex mt-1">
                   {selectedUser.isAdmin && (
-                    <Badge className="mr-2 bg-blue-500">Admin</Badge>
+                    <Badge className="mr-2 bg-blue-500">{t('common:adminDashboard.userProfile.admin')}</Badge>
                   )}
                   {selectedUser.hasCompletedOnboarding ? (
-                    <Badge className="bg-green-500">Onboarded</Badge>
+                    <Badge className="bg-green-500">{t('common:adminDashboard.userProfile.onboarded')}</Badge>
                   ) : (
-                    <Badge variant="outline">Not Onboarded</Badge>
+                    <Badge variant="outline">{t('common:adminDashboard.userProfile.notOnboarded')}</Badge>
                   )}
                 </div>
               </div>
               <div>
-                <h3 className="font-medium text-gray-500">Last Active</h3>
+                <h3 className="font-medium text-gray-500">{t('common:adminDashboard.userProfile.lastActive')}</h3>
                 <p>
                   {selectedUser.lastActivityDate
                     ? formatDate(selectedUser.lastActivityDate)
-                    : "Never"}
+                    : t('common:adminDashboard.userProfile.never')}
                 </p>
               </div>
               <div>
-                <h3 className="font-medium text-gray-500">Language</h3>
+                <h3 className="font-medium text-gray-500">{t('common:adminDashboard.userProfile.language')}</h3>
                 <p>{selectedUser.preferred_language || "English"}</p>
               </div>
             </div>
@@ -381,9 +382,9 @@ export default function AdminDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="userDetail">Profile Data</TabsTrigger>
-            <TabsTrigger value="userFoodLogs">Food Logs</TabsTrigger>
-            <TabsTrigger value="userRecipes">Recipes</TabsTrigger>
+            <TabsTrigger value="userDetail">{t('common:adminDashboard.tabs.profileData')}</TabsTrigger>
+            <TabsTrigger value="userFoodLogs">{t('common:adminDashboard.tabs.userFoodLogs')}</TabsTrigger>
+            <TabsTrigger value="userRecipes">{t('common:adminDashboard.tabs.userRecipes')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="userDetail">
@@ -393,32 +394,32 @@ export default function AdminDashboard() {
               </div>
             ) : userProgressError ? (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                <p>Error loading user progress data.</p>
+                <p>{t('common:adminDashboard.error.loadingProgress')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Nutrition Preferences */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Nutrition Preferences</CardTitle>
+                    <CardTitle>{t('common:adminDashboard.nutrition.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {userProgress?.nutrition ? (
                       <div className="space-y-4">
                         <div>
-                          <h3 className="font-medium text-gray-500">Dietary Type</h3>
-                          <p>{userProgress.nutrition.dietaryType || "Not set"}</p>
+                          <h3 className="font-medium text-gray-500">{t('common:adminDashboard.nutrition.dietaryType')}</h3>
+                          <p>{userProgress.nutrition.dietaryType || t('common:adminDashboard.nutrition.notSet')}</p>
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-500">Daily Calorie Target</h3>
-                          <p>{userProgress.nutrition.calorieTarget || "Not set"} kcal</p>
+                          <h3 className="font-medium text-gray-500">{t('common:adminDashboard.nutrition.calorieTarget')}</h3>
+                          <p>{userProgress.nutrition.calorieTarget || t('common:adminDashboard.nutrition.notSet')} {t('common:adminDashboard.nutrition.kcal')}</p>
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-500">Meals Per Day</h3>
-                          <p>{userProgress.nutrition.mealsPerDay || "Not set"}</p>
+                          <h3 className="font-medium text-gray-500">{t('common:adminDashboard.nutrition.mealsPerDay')}</h3>
+                          <p>{userProgress.nutrition.mealsPerDay || t('common:adminDashboard.nutrition.notSet')}</p>
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-500">Allergies</h3>
+                          <h3 className="font-medium text-gray-500">{t('common:adminDashboard.nutrition.allergies')}</h3>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {userProgress.nutrition.allergies && userProgress.nutrition.allergies.length > 0 ? (
                               userProgress.nutrition.allergies.map((allergy: string, i: number) => (
@@ -427,13 +428,13 @@ export default function AdminDashboard() {
                                 </Badge>
                               ))
                             ) : (
-                              <p className="text-gray-400">No allergies recorded</p>
+                              <p className="text-gray-400">{t('common:adminDashboard.nutrition.noAllergies')}</p>
                             )}
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-gray-400">No nutrition preferences recorded</p>
+                      <p className="text-gray-400">{t('common:adminDashboard.nutrition.noPreferences')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -441,7 +442,7 @@ export default function AdminDashboard() {
                 {/* Weight History */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Weight History</CardTitle>
+                    <CardTitle>{t('common:adminDashboard.weight.title')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     {userProgress?.weights && userProgress.weights.length > 0 ? (
@@ -449,8 +450,8 @@ export default function AdminDashboard() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHead>Date</TableHead>
-                              <TableHead>Weight</TableHead>
+                              <TableHead>{t('common:adminDashboard.weight.date')}</TableHead>
+                              <TableHead>{t('common:adminDashboard.weight.weight')}</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -464,7 +465,7 @@ export default function AdminDashboard() {
                         </Table>
                       </div>
                     ) : (
-                      <p className="text-gray-400">No weight history recorded</p>
+                      <p className="text-gray-400">{t('common:adminDashboard.weight.noHistory')}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -589,9 +590,9 @@ export default function AdminDashboard() {
         <TabsContent value="users">
           <Card>
             <CardHeader>
-              <CardTitle>All Users</CardTitle>
+              <CardTitle>{t('common:adminDashboard.users.title')}</CardTitle>
               <CardDescription>
-                Manage users and their admin privileges
+                {t('common:adminDashboard.users.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -599,11 +600,11 @@ export default function AdminDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Last Active</TableHead>
-                      <TableHead>Actions</TableHead>
+                      <TableHead>{t('common:adminDashboard.users.tableHeaders.id')}</TableHead>
+                      <TableHead>{t('common:adminDashboard.users.tableHeaders.email')}</TableHead>
+                      <TableHead>{t('common:adminDashboard.users.tableHeaders.status')}</TableHead>
+                      <TableHead>{t('common:adminDashboard.users.tableHeaders.lastActive')}</TableHead>
+                      <TableHead>{t('common:adminDashboard.users.tableHeaders.actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -614,19 +615,19 @@ export default function AdminDashboard() {
                         <TableCell>
                           <div className="flex">
                             {user.isAdmin && (
-                              <Badge className="mr-2 bg-blue-500">Admin</Badge>
+                              <Badge className="mr-2 bg-blue-500">{t('common:adminDashboard.userProfile.admin')}</Badge>
                             )}
                             {user.hasCompletedOnboarding ? (
-                              <Badge className="bg-green-500">Onboarded</Badge>
+                              <Badge className="bg-green-500">{t('common:adminDashboard.userProfile.onboarded')}</Badge>
                             ) : (
-                              <Badge variant="outline">Not Onboarded</Badge>
+                              <Badge variant="outline">{t('common:adminDashboard.userProfile.notOnboarded')}</Badge>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
                           {user.lastActivityDate
                             ? formatDate(user.lastActivityDate)
-                            : "Never"}
+                            : t('common:adminDashboard.userProfile.never')}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
@@ -635,7 +636,7 @@ export default function AdminDashboard() {
                               size="sm"
                               onClick={() => handleUserSelect(user.id)}
                             >
-                              <Edit className="h-4 w-4 mr-1" /> View
+                              <Edit className="h-4 w-4 mr-1" /> {t('common:adminDashboard.userProfile.view')}
                             </Button>
                             <Button
                               variant={user.isAdmin ? "destructive" : "outline"}
@@ -644,11 +645,11 @@ export default function AdminDashboard() {
                             >
                               {user.isAdmin ? (
                                 <>
-                                  <Shield className="h-4 w-4 mr-1" /> Remove Admin
+                                  <Shield className="h-4 w-4 mr-1" /> {t('common:adminDashboard.userProfile.removeAdmin')}
                                 </>
                               ) : (
                                 <>
-                                  <UserCheck className="h-4 w-4 mr-1" /> Make Admin
+                                  <UserCheck className="h-4 w-4 mr-1" /> {t('common:adminDashboard.userProfile.makeAdmin')}
                                 </>
                               )}
                             </Button>
@@ -667,9 +668,9 @@ export default function AdminDashboard() {
         <TabsContent value="foodLogs">
           <Card>
             <CardHeader>
-              <CardTitle>Food Logs</CardTitle>
+              <CardTitle>{t('common:adminDashboard.foodLogs.title')}</CardTitle>
               <CardDescription>
-                View all food logs across users
+                {t('common:adminDashboard.foodLogs.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -679,18 +680,18 @@ export default function AdminDashboard() {
                 </div>
               ) : foodLogsError ? (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  <p>Error loading food logs.</p>
+                  <p>{t('common:adminDashboard.error.loadingFoodLogs')}</p>
                 </div>
               ) : foodLogs && foodLogs.length > 0 ? (
                 <div className="rounded-md border max-h-[500px] overflow-y-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Food</TableHead>
-                        <TableHead>Meal Type</TableHead>
-                        <TableHead>Calories</TableHead>
-                        <TableHead>Date</TableHead>
+                        <TableHead>{t('common:adminDashboard.foodLogs.tableHeaders.userId')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.foodLogs.tableHeaders.food')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.foodLogs.tableHeaders.mealType')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.foodLogs.tableHeaders.calories')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.foodLogs.tableHeaders.date')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -718,7 +719,7 @@ export default function AdminDashboard() {
                   </Table>
                 </div>
               ) : (
-                <p className="text-center text-gray-400 py-12">No food logs recorded</p>
+                <p className="text-center text-gray-400 py-12">{t('common:adminDashboard.foodLogs.noLogs')}</p>
               )}
             </CardContent>
           </Card>
@@ -728,9 +729,9 @@ export default function AdminDashboard() {
         <TabsContent value="recipes">
           <Card>
             <CardHeader>
-              <CardTitle>Recipes</CardTitle>
+              <CardTitle>{t('common:adminDashboard.recipes.title')}</CardTitle>
               <CardDescription>
-                View all recipes across users
+                {t('common:adminDashboard.recipes.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -740,18 +741,18 @@ export default function AdminDashboard() {
                 </div>
               ) : recipesError ? (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  <p>Error loading recipes.</p>
+                  <p>{t('common:adminDashboard.error.loadingRecipes')}</p>
                 </div>
               ) : recipes && recipes.length > 0 ? (
                 <div className="rounded-md border max-h-[500px] overflow-y-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Recipe Name</TableHead>
+                        <TableHead>{t('common:adminDashboard.recipes.tableHeaders.userId')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.recipes.tableHeaders.name')}</TableHead>
                         <TableHead>Type</TableHead>
-                        <TableHead>Calories</TableHead>
-                        <TableHead>Created</TableHead>
+                        <TableHead>{t('common:adminDashboard.recipes.tableHeaders.calories')}</TableHead>
+                        <TableHead>{t('common:adminDashboard.recipes.tableHeaders.date')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -783,7 +784,7 @@ export default function AdminDashboard() {
                   </Table>
                 </div>
               ) : (
-                <p className="text-center text-gray-400 py-12">No recipes found</p>
+                <p className="text-center text-gray-400 py-12">{t('common:adminDashboard.recipes.noRecipes')}</p>
               )}
             </CardContent>
           </Card>

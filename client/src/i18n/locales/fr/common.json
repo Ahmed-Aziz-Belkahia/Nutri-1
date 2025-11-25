@@ -341,5 +341,1535 @@
     "loginSuccess": "Connexion réussie",
     "loginSuccessDesc": "Vous avez été connecté avec succès",
     "loginFailed": "Échec de la connexion"
+  },
+  "overview": {
+    "welcomeBack": "Bienvenue",
+    "userPlaceholder": "Utilisateur",
+    "stats": {
+      "calories": "Calories",
+      "protein": "Protéines",
+      "weight": "Poids"
+    },
+    "searchPlaceholder": "Rechercher des aliments, repas, recettes...",
+    "quickAdd": {
+      "title": "Ajout rapide",
+      "viewAll": "Tout voir",
+      "items": {
+        "fruit": "Fruit",
+        "meal": "Repas",
+        "fastFood": "Fast-food",
+        "snack": "Collation",
+        "drink": "Boisson"
+      }
+    },
+    "todaysLog": {
+      "title": "Journal d'aujourd'hui",
+      "addFood": "Ajouter un aliment",
+      "noMealsTitle": "Aucun repas enregistré aujourd'hui",
+      "noMealsDesc": "Ajoutez votre premier repas pour commencer à suivre votre nutrition",
+      "startLogging": "Commencer l'enregistrement"
+    }
+  },
+  "circularButtonDemo": {
+    "backToDashboard": "Retour au tableau de bord",
+    "title": "Démo de bouton",
+    "heading": "Bouton circulaire blanc simple",
+    "description": "Ceci est une démonstration du bouton circulaire blanc simple sans bordure colorée.",
+    "smallButtonAlert": "Petit bouton cliqué!",
+    "mediumButtonAlert": "Bouton moyen cliqué!",
+    "largeButtonAlert": "Grand bouton cliqué!",
+    "smallSize": "Petite taille",
+    "mediumSize": "Taille moyenne (par défaut)",
+    "largeSize": "Grande taille"
+  },
+  "tealButtonDemo": {
+    "backToDashboard": "Retour au tableau de bord",
+    "title": "Démo de bouton sarcelle",
+    "heading": "Bouton circulaire sarcelle",
+    "description": "Ceci est une démonstration du bouton circulaire avec une bordure sarcelle.",
+    "smallButtonAlert": "Petit bouton cliqué!",
+    "mediumButtonAlert": "Bouton moyen cliqué!",
+    "largeButtonAlert": "Grand bouton cliqué!",
+    "smallSize": "Petite taille",
+    "mediumSize": "Taille moyenne (par défaut)",
+    "largeSize": "Grande taille"
+  },
+  "dashboardNew": {
+    "processing": {
+      "preparing": "Préparation de votre entrée de repas...",
+      "adding": "Ajout à votre journal alimentaire...",
+      "updating": "Mise à jour des totaux nutritionnels...",
+      "complete": "Terminé!",
+      "added": "Ajouté!",
+      "processing": "Traitement..."
+    },
+    "success": {
+      "title": "Succès",
+      "addedFood": "{{name}} ajouté à votre journal"
+    },
+    "error": {
+      "title": "Erreur",
+      "failedToAdd": "Échec de l'ajout de l'aliment"
+    }
+  },
+  "enhancedDashboard": {
+    "dailyProgress": "Progrès quotidien",
+    "calorieIntake": "Apport calorique",
+    "ofGoal": "sur {{goal}} objectif",
+    "carbs": "Glucides",
+    "protein": "Protéines",
+    "fat": "Lipides",
+    "activityStats": "Statistiques d'activité",
+    "stepsToday": "Pas aujourd'hui",
+    "fromYesterday": "+{{percent}}% par rapport à hier",
+    "activeMinutes": "Minutes actives",
+    "goalMinutes": "Objectif: {{minutes}} minutes",
+    "todaysMealPlan": "Plan de repas d'aujourd'hui",
+    "viewAll": "Tout voir",
+    "weeklyGoalProgress": "Progrès de l'objectif hebdomadaire",
+    "weightLoss": "Perte de poids",
+    "workoutConsistency": "Régularité des entraînements",
+    "workoutDays": "{{done}} / {{total}} jours",
+    "waterIntake": "Consommation d'eau"
+  },
+  "cameraPage": {
+    "success": {
+      "title": "Succès",
+      "description": "Photo de progrès téléchargée avec succès!"
+    },
+    "error": {
+      "title": "Erreur",
+      "description": "Échec du téléchargement de la photo. Veuillez réessayer."
+    }
+  },
+  "allMeals": {
+    "title": "Galerie de repas",
+    "addMeal": "Ajouter un repas",
+    "loading": "Chargement des repas...",
+    "noMeals": "Aucun repas enregistré pour le moment.",
+    "noMealsDesc": "Commencez à ajouter des repas pour les voir ici!",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce repas?",
+    "success": {
+      "created": "Journal alimentaire créé avec succès",
+      "deleted": "Repas supprimé avec succès"
+    },
+    "error": {
+      "createFailed": "Échec de la création du journal alimentaire",
+      "deleteFailed": "Échec de la suppression du repas"
+    }
+  },
+  "todayMealPlan": {
+    "title": "Plan de Nutrition du Jour",
+    "description": "Votre plan de repas personnalisé pour atteindre vos objectifs nutritionnels quotidiens",
+    "todaysMealPlan": "Plan de Repas d'Aujourd'hui",
+    "completed": "Terminé",
+    "markAsEaten": "Marquer comme Mangé",
+    "kcal": "kcal"
+  },
+  "recipesNew": {
+    "title": "Recettes",
+    "subtitle": "Votre collection de repas scannés",
+    "tabs": {
+      "recipes": "Recettes",
+      "mealPlan": "Plan de Repas"
+    },
+    "aiCreator": {
+      "title": "Créateur de Recettes IA",
+      "description": "Scannez vos ingrédients et obtenez des recettes personnalisées instantanées",
+      "scanButton": "Scanner les Ingrédients",
+      "features": {
+        "aiPowered": "Propulsé par l'IA",
+        "instant": "Instantané",
+        "custom": "Personnalisé"
+      }
+    },
+    "todaysScans": "Scans d'Aujourd'hui",
+    "last24Hours": "Dernières 24 heures"
+  },
+  "unifiedProgress": {
+    "weightStats": {
+      "title": "Statistiques de Poids",
+      "current": "Poids Actuel",
+      "goal": "Poids Cible",
+      "progress": "Progrès",
+      "remaining": "Restant"
+    },
+    "progressPhotos": {
+      "title": "Photos de Progression",
+      "noPhotos": "Aucune Photo Encore",
+      "uploadFirst": "Téléchargez votre première photo de progression"
+    },
+    "bodyAnalysis": {
+      "title": "Analyse Corporelle",
+      "bodyFat": "Graisse Corporelle",
+      "bodyType": "Type de Corps",
+      "analyzing": "Analyse en cours...",
+      "analyzeLatest": "Analyser la Dernière Photo",
+      "uploadPrompt": "Téléchargez une photo de progression pour activer l'analyse corporelle"
+    }
+  },
+  "mealPlanView": {
+    "loading": "Chargement de votre plan de repas...",
+    "noMealPlan": "Aucun plan de repas trouvé",
+    "createPlan": "Créer un Plan de Repas",
+    "summary": {
+      "avgDaily": "Moy. Quotidienne",
+      "calories": "calories",
+      "totalMeals": "Total des Repas",
+      "thisWeek": "cette semaine"
+    },
+    "mealTypes": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "snack": "Collation"
+    },
+    "mealDetails": {
+      "prepTime": "min de préparation",
+      "ingredients": "Ingrédients",
+      "instructions": "Instructions"
+    },
+    "actions": {
+      "viewShoppingList": "Voir la Liste de Courses",
+      "startMyWeek": "Commencer Ma Semaine"
+    },
+    "meals": "repas",
+    "cal": "cal"
+  },
+  "profileNew": {
+    "title": "Profil",
+    "signIn": "Se Connecter",
+    "pleaseSignIn": "Veuillez Vous Connecter",
+    "needLogin": "Vous devez être connecté pour voir votre profil",
+    "level": "Niveau",
+    "cm": "cm",
+    "kg": "kg",
+    "kcal": "kcal",
+    "years": "ans",
+    "sections": {
+      "bodyMetrics": "Métriques Corporelles",
+      "goalsActivity": "Objectifs & Activité",
+      "nutritionGoals": "Objectifs Nutritionnels",
+      "languagePreferences": "Langue & Préférences"
+    },
+    "metrics": {
+      "height": "Taille",
+      "currentWeight": "Poids Actuel",
+      "age": "Âge",
+      "gender": "Genre",
+      "male": "Masculin",
+      "female": "Féminin"
+    },
+    "goals": {
+      "weightGoal": "Objectif de Poids",
+      "goalWeight": "Poids Cible",
+      "activityLevel": "Niveau d'Activité",
+      "dailyCalorieGoal": "Objectif Calorique Quotidien",
+      "proteinGoal": "Objectif Protéines",
+      "carbsGoal": "Objectif Glucides",
+      "fatGoal": "Objectif Lipides"
+    },
+    "macros": {
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides"
+    },
+    "account": {
+      "privacyPolicy": "Politique de Confidentialité",
+      "viewPrivacy": "Voir notre politique de confidentialité",
+      "deleteAccount": "Supprimer le Compte",
+      "deletePermanent": "Supprimer définitivement votre compte",
+      "signOut": "Se Déconnecter"
+    },
+    "dialogs": {
+      "editMetrics": "Modifier les Métriques Corporelles",
+      "editGoals": "Modifier les Objectifs & Activité",
+      "editNutrition": "Modifier les Objectifs Nutritionnels",
+      "save": "Enregistrer les Modifications",
+      "cancel": "Annuler"
+    },
+    "toast": {
+      "success": "Succès",
+      "profileUpdated": "Photo de profil mise à jour avec succès",
+      "metricsUpdated": "Métriques corporelles mises à jour avec succès",
+      "goalsUpdated": "Objectifs mis à jour avec succès",
+      "nutritionUpdated": "Objectifs nutritionnels mis à jour avec succès",
+      "error": "Erreur",
+      "updateFailed": "Échec de la mise à jour de la photo de profil",
+      "deleteFailed": "Échec de la suppression du compte. Veuillez réessayer."
+    }
+  },
+  "analytics": {
+    "title": "Analyses",
+    "height": "Taille",
+    "currentWeight": "Poids Actuel",
+    "calorieGoal": "Objectif Calorique",
+    "updateReminder": "N'oubliez pas de mettre à jour au moins une fois par semaine pour ajuster votre plan",
+    "bodyFat": {
+      "title": "Pourcentage de Graisse Corporelle",
+      "estimated": "Graisse corporelle estimée",
+      "basedOnBMI": "Basé sur le calcul de l'IMC",
+      "categories": {
+        "essential": "Graisse Essentielle",
+        "athletic": "Athlétique",
+        "fitness": "Fitness",
+        "average": "Moyenne",
+        "obese": "Obèse"
+      }
+    },
+    "bmi": {
+      "title": "Votre IMC",
+      "yourBMIis": "Votre IMC est",
+      "healthy": "Sain",
+      "categories": {
+        "underweight": "Insuffisance pondérale",
+        "overweight": "Surpoids",
+        "obese": "Obèse"
+      }
+    },
+    "goalProgress": {
+      "title": "Progression de l'Objectif",
+      "goalAchieved": "Objectif atteint",
+      "periods": {
+        "90days": "90 Jours",
+        "6months": "6 Mois",
+        "1year": "1 An",
+        "allTime": "Tout le temps"
+      }
+    },
+    "nutrition": {
+      "title": "Nutrition",
+      "totalCalories": "Calories totales",
+      "dailyAvg": "Moy. quotidienne",
+      "periods": {
+        "thisWeek": "Cette semaine",
+        "lastWeek": "Semaine dernière",
+        "2weeksAgo": "Il y a 2 sem.",
+        "3weeksAgo": "Il y a 3 sem."
+      }
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "update": "Mettre à jour",
+      "updateHeight": "Mettre à Jour la Taille",
+      "updateWeight": "Mettez à jour votre poids"
+    },
+    "units": {
+      "cm": "cm",
+      "kg": "kg",
+      "kcal": "kcal"
+    }
+  },
+  "detailedNutrition": {
+    "title": "Nutrition Détaillée",
+    "of": "de",
+    "goal": "objectif",
+    "tabs": {
+      "overview": "Aperçu",
+      "meals": "Repas",
+      "micronutrients": "Micronutriments",
+      "timing": "Horaires"
+    },
+    "dailyInsights": {
+      "title": "Aperçus Quotidiens",
+      "proteinReached": "Bien joué ! Objectif de protéines atteint.",
+      "fatCloseToLimit": "Les graisses approchent de la limite.",
+      "caloriesUnderBudget": "Vous avez 250 calories en dessous du budget."
+    },
+    "weeklyCalorieTrends": "Tendances Caloriques Hebdomadaires",
+    "nutritionByMeal": "Nutrition par Repas",
+    "mealTypes": {
+      "breakfast": "Petit-déjeuner",
+      "lunch": "Déjeuner",
+      "dinner": "Dîner",
+      "snacks": "Collations"
+    },
+    "micronutrientsTab": {
+      "title": "Micronutriments",
+      "essentialNutrients": "Nutriments Essentiels",
+      "additionalInfo": "Infos Supplémentaires",
+      "vitamins": {
+        "vitaminA": "Vitamine A",
+        "vitaminC": "Vitamine C",
+        "vitaminD": "Vitamine D"
+      },
+      "minerals": {
+        "calcium": "Calcium",
+        "iron": "Fer",
+        "potassium": "Potassium"
+      },
+      "other": {
+        "water": "Eau",
+        "fiber": "Fibres",
+        "sugar": "Sucre",
+        "sodium": "Sodium"
+      }
+    },
+    "timingTab": {
+      "title": "Horaires des Nutriments",
+      "calorieDistribution": "Distribution Calorique de la Journée",
+      "timingDetails": "Détails des Horaires"
+    },
+    "actions": {
+      "switchToSimple": "Passer à la Vue Simple"
+    }
+  },
+  "foodDatabase": {
+    "greeting": "Bonjour",
+    "nav": {
+      "home": "Accueil",
+      "recipes": "Recettes"
+    },
+    "createRecipe": {
+      "title": "Créez Votre Propre Recette",
+      "description": "Collectez vos recettes préférées"
+    },
+    "top100": {
+      "title": "TOP 100",
+      "seeAll": "Voir tout"
+    },
+    "recipes": {
+      "greenSalad": {
+        "name": "Salade Verte",
+        "description": "Laitue romaine fraîche\nStyle grec classique"
+      },
+      "thaiSalad": {
+        "name": "Salade thaï",
+        "description": "Salade de papaye verte\nÉpices thaï authentiques"
+      },
+      "chickenSalad": {
+        "name": "Salade de poulet",
+        "description": "Poitrine de poulet grillée\nJeunes pousses croquantes"
+      },
+      "tunaSalad": {
+        "name": "Salade de thon",
+        "description": "Thon frais\nStyle méditerranéen"
+      }
+    }
+  },
+  "simpleMealQuiz": {
+    "questions": {
+      "dietaryType": {
+        "title": "Quel régime suivez-vous ?",
+        "description": "Choisissez votre style alimentaire",
+        "options": {
+          "omnivore": "Omnivore",
+          "vegetarian": "Végétarien",
+          "vegan": "Végan",
+          "pescetarian": "Pescetarien"
+        }
+      },
+      "calorieTarget": {
+        "title": "Objectif calorique quotidien ?",
+        "description": "Entrez vos calories cibles",
+        "placeholder": "2000"
+      },
+      "mealsPerDay": {
+        "title": "Repas par jour ?",
+        "description": "Incluant les collations",
+        "options": {
+          "1meal": "1 repas",
+          "2meals": "2 repas",
+          "3meals": "3 repas",
+          "4meals": "4 repas",
+          "5meals": "5 repas"
+        }
+      },
+      "allergies": {
+        "title": "Allergies & intolérances",
+        "description": "Séparez par des virgules",
+        "placeholder": "ex: gluten, noix, lactose"
+      },
+      "cuisinePreferences": {
+        "title": "Cuisines préférées",
+        "description": "Séparez par des virgules",
+        "placeholder": "ex: italienne, asiatique, mexicaine"
+      },
+      "preferredIngredients": {
+        "title": "Ingrédients préférés",
+        "description": "Séparez par des virgules",
+        "placeholder": "ex: poulet, brocoli, riz"
+      },
+      "excludedIngredients": {
+        "title": "Ingrédients à éviter",
+        "description": "Séparez par des virgules",
+        "placeholder": "ex: champignons, olives"
+      }
+    },
+    "actions": {
+      "back": "Retour",
+      "next": "Suivant",
+      "generatePlan": "Générer le Plan",
+      "cancel": "Annuler"
+    },
+    "progress": {
+      "question": "Question",
+      "of": "sur"
+    },
+    "toast": {
+      "errorGenerating": "Échec de génération du plan",
+      "pleaseTryAgain": "Veuillez réessayer plus tard",
+      "missingDietaryType": "Veuillez sélectionner votre type de régime",
+      "missingCalories": "Veuillez entrer votre objectif calorique",
+      "missingMeals": "Veuillez sélectionner les repas par jour"
+    }
+  },
+  "visionBoard": {
+    "step": "ÉTAPE",
+    "of": "SUR",
+    "title": "Votre Chemin vers Votre Objectif",
+    "loading": "Chargement du tableau de vision...",
+    "failed": "Échec du chargement du tableau de vision.",
+    "goToDashboard": "Aller au Tableau de Bord",
+    "profileIncomplete": "Profil incomplet",
+    "completeOnboarding": "Terminez d'abord le processus de configuration.",
+    "sections": {
+      "personalInfo": "Informations Personnelles",
+      "macros": "Macros Quotidiens",
+      "bmrTdee": "BMR & TDEE",
+      "timeline": "Chronologie",
+      "motivation": "Motivation"
+    },
+    "labels": {
+      "calories": "Calories",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides"
+    },
+    "buttons": {
+      "continue": "Commencer!"
+    }
+  },
+  "recipeSuggestions": {
+    "greeting": "Bonjour",
+    "nav": {
+      "home": "Accueil",
+      "recipes": "Recettes"
+    },
+    "createRecipe": {
+      "title": "Créez votre recette",
+      "description": "Scannez vos ingrédients et nous suggérerons des repas sains"
+    },
+    "suggestedRecipes": "Recettes suggérées",
+    "top100": "TOP 100",
+    "viewAll": "Tout voir",
+    "recipes": {
+      "mediterraneanSalad": {
+        "name": "Salade méditerranéenne",
+        "description": "Légumes frais avec huile d'olive et fromage feta"
+      },
+      "berrySmoothieBowl": {
+        "name": "Bol de smoothie aux baies",
+        "description": "Baies mélangées, banane et granola"
+      },
+      "avocadoToast": {
+        "name": "Toast à l'avocat",
+        "description": "Pain complet avec avocat écrasé et œuf"
+      },
+      "vegetableStirFry": {
+        "name": "Sauté de légumes",
+        "description": "Légumes mélangés avec tofu en sauce légère"
+      },
+      "freshGardenSalad": {
+        "name": "Salade fraîche du jardin",
+        "description": "Salade légère avec des légumes verts feuillus"
+      },
+      "vegetableMedley": {
+        "name": "Mélange de légumes",
+        "description": "Légumes de saison rôtis aux herbes"
+      }
+    },
+    "camera": {
+      "analyzing": "Analyse en cours...",
+      "tapToCapture": "Appuyez pour capturer"
+    },
+    "toast": {
+      "analysisComplete": "Analyse terminée",
+      "recipesFound": "Nous avons trouvé des recettes basées sur vos ingrédients !",
+      "error": "Erreur",
+      "failedToAnalyze": "Échec de l'analyse de l'image"
+    }
+  },
+  "mealAnalysis": {
+    "steps": {
+      "detecting": "Détection des aliments...",
+      "analyzing": "Analyse des ingrédients...",
+      "calculating": "Calcul de la nutrition...",
+      "finalizing": "Finalisation des détails..."
+    },
+    "messages": {
+      "scanningFood": "Scan de votre nourriture...",
+      "identifyingIngredients": "Identification des ingrédients...",
+      "crunchingNumbers": "Calcul des chiffres...",
+      "almostDone": "Presque terminé...",
+      "allSet": "Tout est prêt !",
+      "somethingWrong": "Oups, quelque chose s'est mal passé",
+      "processing": "Traitement en cours...",
+      "analyzedSuccessfully": "Votre repas a été analysé avec succès",
+      "pleaseTryAgain": "Veuillez réessayer",
+      "aiWorking": "Notre IA fait sa magie"
+    },
+    "success": {
+      "perfect": "Parfait !",
+      "addedToLog": "Votre repas a été ajouté à votre journal"
+    },
+    "error": {
+      "unableToAnalyze": "Impossible d'analyser votre repas. Redirection en cours..."
+    }
+  },
+  "createRecipe": {
+    "back": "Retour",
+    "of": "de",
+    "questions": {
+      "mealType": {
+        "title": "Quel type de repas souhaitez-vous créer ?",
+        "description": "Choisissez la catégorie qui correspond le mieux à votre recette",
+        "options": {
+          "breakfast": "Petit-déjeuner",
+          "lunch": "Déjeuner",
+          "dinner": "Dîner",
+          "snack": "Collation",
+          "dessert": "Dessert"
+        }
+      },
+      "difficulty": {
+        "title": "Difficulté de recette préférée",
+        "description": "Nous personnaliserons les suggestions de recettes en conséquence",
+        "options": {
+          "easy": {
+            "label": "Recettes faciles",
+            "description": "Plats simples et rapides à préparer"
+          },
+          "medium": {
+            "label": "Difficulté moyenne",
+            "description": "Complexité et effort équilibrés"
+          },
+          "hard": {
+            "label": "Défi",
+            "description": "Recettes complexes pour cuisiniers expérimentés"
+          }
+        }
+      },
+      "dietPreference": {
+        "title": "Quelles préférences alimentaires faut-il considérer ?",
+        "description": "Sélectionnez les exigences alimentaires spécifiques",
+        "options": {
+          "vegetarian": "Végétarien",
+          "vegan": "Végétalien",
+          "glutenFree": "Sans gluten",
+          "dairyFree": "Sans produits laitiers",
+          "none": "Aucune restriction"
+        }
+      },
+      "cookingTime": {
+        "title": "Combien de temps avez-vous pour cuisiner ?",
+        "description": "Choisissez votre temps de préparation préféré",
+        "options": {
+          "quick": "Rapide (15-30 min)",
+          "medium": "Moyen (30-60 min)",
+          "long": "Long (60+ min)"
+        }
+      },
+      "skillLevel": {
+        "title": "Quel est votre niveau de compétence en cuisine ?",
+        "description": "Soyez honnête ! Cela nous aide à suggérer des recettes appropriées",
+        "options": {
+          "beginner": "Débutant",
+          "intermediate": "Intermédiaire",
+          "advanced": "Avancé"
+        }
+      },
+      "mainIngredient": {
+        "title": "Quel est votre ingrédient principal préféré ?",
+        "description": "Choisissez l'ingrédient principal avec lequel vous souhaitez cuisiner",
+        "options": {
+          "chicken": "Poulet",
+          "fish": "Poisson",
+          "beef": "Bœuf",
+          "vegetables": "Légumes",
+          "grains": "Céréales"
+        }
+      }
+    },
+    "toast": {
+      "quizCompleted": "Quiz terminé !",
+      "generatingRecipes": "Génération de suggestions de recettes personnalisées..."
+    }
+  },
+  "simpleNutritionDetail": {
+    "tabs": {
+      "overview": "Vue d'ensemble",
+      "meals": "Repas"
+    },
+    "switchToDetailed": "Passer à la vue détaillée"
+  },
+  "premiumShoppingListPage": {
+    "nav": {
+      "home": "Accueil",
+      "recipes": "Recettes",
+      "shopping": "Courses",
+      "calendar": "Calendrier",
+      "profile": "Profil"
+    }
+  },
+  "foodDetail": {
+    "loading": "Chargement...",
+    "error": "Échec du chargement des détails de l'aliment"
+  },
+  "recipesNew": {
+    "title": "Recettes",
+    "subtitle": "Recettes générées par IA à partir de vos ingrédients",
+    "tabs": {
+      "recipes": "Recettes",
+      "mealPlan": "Plan de repas"
+    },
+    "aiCreator": {
+      "title": "Créateur de recettes IA",
+      "description": "Scannez vos ingrédients et laissez l'IA créer des recettes personnalisées instantanément",
+      "scanButton": "Scanner les ingrédients",
+      "features": {
+        "aiPowered": "Propulsé par IA",
+        "instant": "Instantané",
+        "custom": "Personnalisé"
+      }
+    },
+    "todaysScans": "Scans d'aujourd'hui",
+    "last24Hours": "Dernières 24 heures"
+  },
+  "mealDetail": {
+    "loading": "Chargement du repas...",
+    "error": {
+      "title": "Échec du chargement du repas",
+      "description": "Une erreur s'est produite lors du chargement de ce repas. Veuillez réessayer.",
+      "tryAgain": "Réessayer",
+      "goBack": "Retour"
+    },
+    "nutrition": {
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides",
+      "kcal": "kcal"
+    },
+    "servings": {
+      "title": "Ajuster les portions",
+      "multiplier": "{{multiplier}}×"
+    },
+    "ingredients": {
+      "title": "Ingrédients",
+      "add": "Ajouter",
+      "empty": "Aucun ingrédient disponible",
+      "placeholder": {
+        "name": "Nom de l'ingrédient",
+        "quantity": "Qté",
+        "unit": "Unité",
+        "calories": "Cal"
+      }
+    },
+    "instructions": {
+      "title": "Instructions",
+      "add": "Ajouter",
+      "empty": "Aucune instruction disponible",
+      "step": "Étape {{number}}",
+      "placeholder": "Entrer l'instruction"
+    },
+    "buttons": {
+      "edit": "Modifier",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer"
+    },
+    "deleteModal": {
+      "title": "Supprimer le repas ?",
+      "description": "Cette action ne peut pas être annulée. Le repas sera définitivement supprimé de votre journal.",
+      "calories": "calories",
+      "confirm": "Supprimer le repas",
+      "cancel": "Annuler",
+      "deleting": "Suppression..."
+    },
+    "toast": {
+      "saveSuccess": "Repas mis à jour avec succès !",
+      "saveError": "Échec de la mise à jour du repas",
+      "deleteSuccess": "Repas supprimé avec succès !",
+      "deleteError": "Échec de la suppression du repas"
+    }
+  },
+  "recipeResults": {
+    "loading": {
+      "title": "Traitement des ingrédients...",
+      "subtitle": "L'IA crée vos recettes parfaites"
+    },
+    "error": {
+      "title": "Aucune recette trouvée",
+      "generic": "Une erreur s'est produite lors du traitement des ingrédients. Veuillez réessayer.",
+      "noMatch": "Nous n'avons pas trouvé de recettes correspondant à vos ingrédients. Essayez de scanner d'autres ingrédients."
+    },
+    "header": "Suggestions de recettes",
+    "tryAgain": "Réessayer",
+    "difficulty": "{{level}}",
+    "min": "min",
+    "nutrition": {
+      "cal": "Cal",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides"
+    },
+    "ingredients": "Ingrédients",
+    "more": "plus",
+    "viewFullRecipe": "Voir la recette complète",
+    "generateMore": {
+      "title": "Vous voulez plus d'idées de recettes?",
+      "subtitle": "Générez des recettes supplémentaires avec les mêmes ingrédients",
+      "button": "Générer plus de recettes",
+      "generating": "Génération..."
+    },
+    "viewAll": "Voir toutes les recettes ({{count}})",
+    "toast": {
+      "cannotGenerate": "Impossible de générer",
+      "noIngredients": "Aucune information sur les ingrédients disponible. Veuillez scanner de nouveaux ingrédients.",
+      "generated": "{{count}} nouvelles recettes générées!",
+      "generateError": "Impossible de générer plus de recettes. Veuillez réessayer.",
+      "saveError": "Échec de l'enregistrement de la recette. Veuillez réessayer.",
+      "loadError": "Échec du chargement des données de la recette. Veuillez scanner à nouveau."
+    }
+  },
+  "recipeDetail": {
+    "notFound": "Recette introuvable",
+    "stats": {
+      "time": "Temps",
+      "servings": "Portions",
+      "calories": "Calories",
+      "min": "min"
+    },
+    "tabs": {
+      "ingredients": "Ingrédients",
+      "instructions": "Instructions",
+      "nutrition": "Nutrition"
+    },
+    "ingredients": {
+      "title": "Ingrédients",
+      "checked": "cochés"
+    },
+    "instructions": {
+      "title": "Instructions",
+      "stepOf": "Étape {{current}} sur {{total}}",
+      "nextStep": "Étape suivante"
+    },
+    "nutrition": {
+      "title": "Informations nutritionnelles",
+      "caloriesPerServing": "Calories par portion",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides",
+      "fiber": "Fibres",
+      "sugar": "Sucre",
+      "sodium": "Sodium"
+    },
+    "startCooking": "Commencer à cuisiner"
+  },
+  "ingredientsAnalysis": {
+    "steps": {
+      "detecting": "Détection des ingrédients...",
+      "analyzing": "Analyse des combinaisons...",
+      "generating": "Création des recettes...",
+      "finalizing": "Ajout des instructions..."
+    },
+    "messages": {
+      "scanning": "Scan des ingrédients...",
+      "findingCombinations": "Recherche de combinaisons parfaites...",
+      "creatingRecipes": "Création de vos recettes...",
+      "addingTouches": "Ajout des touches finales...",
+      "recipesReady": "Recettes prêtes !",
+      "somethingWrong": "Oups, quelque chose s'est mal passé",
+      "processing": "Traitement en cours..."
+    },
+    "confirmation": {
+      "title": "Ingrédients détectés",
+      "add": "Ajouter",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "ingredientName": "Nom de l'ingrédient",
+      "quantity": "Quantité",
+      "unit": "Unité",
+      "difficultyTitle": "Difficulté de la recette",
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile",
+      "continueButton": "Continuer vers les recettes",
+      "goBack": "Retour"
+    },
+    "errors": {
+      "failedToAnalyze": "Échec de l'analyse des ingrédients",
+      "tryAgain": "Échec de l'analyse des ingrédients. Veuillez réessayer.",
+      "analysisError": "Erreur d'analyse",
+      "invalidResult": "Résultat d'analyse invalide : Données d'ingrédients manquantes",
+      "noIngredients": "Aucun ingrédient",
+      "addOneIngredient": "Veuillez ajouter au moins un ingrédient pour générer des recettes.",
+      "failedToGenerate": "Échec de la génération des recettes",
+      "generationError": "Erreur de génération"
+    }
+  },
+  "onboardingCompletion": {
+    "stepNumber": "8",
+    "title": "PHOTO DE PROFIL",
+    "subtitle": "Ajouter une photo de profil (optionnel)",
+    "uploadText": "Télécharger une photo",
+    "profileImageDescription": "Votre photo de profil sera affichée dans votre profil et dans l'application. Vous pourrez la changer plus tard.",
+    "calorieNeedTitle": "Votre besoin calorique quotidien",
+    "calorieNeedSubtitle": "Vous pouvez ajuster la valeur selon vos besoins",
+    "yourRequirement": "Votre besoin quotidien",
+    "perDay": "par jour",
+    "timelineTitle": "Calendrier pour atteindre votre objectif",
+    "timelineSubtitle": "Au rythme actuel",
+    "atCurrentPace": "À un rythme de 0,5 kg par semaine:",
+    "assuming": "En supposant",
+    "weeklyLoss": "0,5 kg par semaine:",
+    "currentWeight": "poids actuel",
+    "toGoal": "pour atteindre l'objectif",
+    "goal": "objectif",
+    "weeks": "semaines",
+    "macros": {
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides"
+    },
+    "formulaTitle": "Comment nous avons calculé vos besoins quotidiens",
+    "bmrTitle": "TMB (Taux Métabolique de Base)",
+    "bmrDescription": "Utilisant l'équation de Mifflin-St Jeor (la plus utilisée):",
+    "tdeeTitle": "TDEE (Dépense Énergétique Totale Quotidienne)",
+    "tdeeDescription": "TMB × facteur d'activité:",
+    "goalAdjustmentTitle": "Ajusté pour votre objectif",
+    "activityLevels": {
+      "sedentary": "mode de vie sédentaire",
+      "light": "activité légère",
+      "moderate": "activité modérée",
+      "active": "mode de vie actif",
+      "veryActive": "très actif"
+    },
+    "goalText": {
+      "lose": "Perte de poids",
+      "gain": "Prise de poids",
+      "maintain": "Maintien du poids"
+    },
+    "lossDescription": "Déficit de 500 kcal/jour = ~0,5 kg de perte par semaine",
+    "gainDescription": "Surplus de 300 kcal/jour pour une prise de masse saine",
+    "maintainDescription": "Équilibre énergétique pour le maintien du poids",
+    "sourceLabel": "Source:",
+    "sourceText": "Équation de Mifflin-St Jeor - Association Diététique Américaine (2005)",
+    "goalDeficit": "Pour la perte de poids, un déficit de 500 kcal est recommandé",
+    "goalSurplus": "Pour la prise de poids, un surplus de 500 kcal est recommandé",
+    "completeButton": "Terminer la configuration",
+    "toast": {
+      "profileUploaded": "Photo de profil téléchargée!",
+      "photoSaved": "Votre photo a été enregistrée avec succès.",
+      "uploadFailed": "Échec du téléchargement",
+      "tryAgain": "Veuillez réessayer de télécharger votre photo.",
+      "profileCompleted": "Profil complété!",
+      "planReady": "Votre plan nutritionnel personnalisé est prêt.",
+      "configError": "Erreur de configuration"
+    }
+  },
+  "recipeScanner": {
+    "title": "Scanner les ingrédients",
+    "subtitle": "Obtenez des suggestions de recettes alimentées par l'IA",
+    "tabs": {
+      "photo": "Photo",
+      "gallery": "Galerie",
+      "manual": "Manuel"
+    },
+    "camera": {
+      "initializing": "Initialisation de la caméra...",
+      "accessRequired": "Accès à la caméra requis",
+      "retry": "Réessayer l'accès à la caméra",
+      "switchToGallery": "Utiliser la galerie à la place",
+      "analyzing": "Analyse en cours...",
+      "tapToCapture": "Appuyez pour capturer"
+    },
+    "gallery": {
+      "title": "Choisir des images",
+      "subtitle": "Téléchargez des photos de vos ingrédients",
+      "uploadButton": "Télécharger depuis la galerie",
+      "select": "Sélectionner",
+      "selectImage": "Sélectionner l'image",
+      "empty": "Aucune image téléchargée pour le moment"
+    },
+    "manual": {
+      "title": "Générateur de recettes IA",
+      "subtitle": "Listez vos ingrédients",
+      "placeholder": "par ex., blanc de poulet, tomates, ail, pâtes, huile d'olive, basilic",
+      "hint": "Séparez par des virgules pour de meilleurs résultats",
+      "generating": "Génération des recettes...",
+      "generateButton": "Générer des recettes",
+      "howItWorks": {
+        "title": "Comment ça marche",
+        "step1": "Listez tous vos ingrédients disponibles",
+        "step2": "Notre IA créera des recettes personnalisées en utilisant ce que vous avez",
+        "step3": "Obtenez plusieurs options de recettes avec des instructions de cuisson"
+      }
+    },
+    "errors": {
+      "analysisError": "Erreur d'analyse",
+      "failedToAnalyze": "Échec de l'analyse des ingrédients",
+      "tryDifferent": "Essayez une autre image ou la saisie manuelle",
+      "unsupportedImage": "Image non prise en charge",
+      "unsupportedFormat": "Format d'image non pris en charge.",
+      "useCorrectFormat": "Veuillez utiliser des images JPEG, PNG, GIF ou WEBP. Essayez de prendre une nouvelle photo ou de passer à la saisie manuelle",
+      "aiProcessingError": "Erreur de traitement IA",
+      "serverError": "Erreur serveur lors de l'analyse de l'image.",
+      "tryBetterLighting": "Notre IA a eu des difficultés avec cette image. Essayez avec un meilleur éclairage ou une vue plus claire des ingrédients.",
+      "enterIngredients": "Veuillez entrer vos ingrédients",
+      "failedToGenerate": "Échec de la génération des recettes",
+      "beMoreSpecific": "Échec de la génération des recettes. Essayez d'être plus précis ou utilisez la saisie manuelle.",
+      "suggestion": "Suggestion",
+      "tryAgain": "Réessayer",
+      "switchToManual": "Passer à la saisie manuelle"
+    }
+  },
+  "enhancedShoppingList": {
+    "title": "Liste de courses",
+    "weeklyLabel": "Liste de courses hebdomadaire",
+    "loading": "Chargement de votre liste de courses...",
+    "error": "Échec du chargement de la liste de courses",
+    "tryAgain": "Réessayer",
+    "empty": {
+      "title": "Aucun article dans votre liste de courses",
+      "subtitle": "Ajoutez des repas à votre plan de repas pour générer votre liste de courses",
+      "generateButton": "Générer la liste de courses"
+    },
+    "tabs": {
+      "all": "Tous les articles",
+      "pending": "À acheter",
+      "purchased": "Acheté"
+    },
+    "groupBy": {
+      "label": "Grouper par :",
+      "mealType": "Type de repas",
+      "category": "Catégorie"
+    },
+    "item": {
+      "for": "Pour :",
+      "markPurchased": "Marquer comme acheté",
+      "markNotPurchased": "Marquer comme non acheté"
+    }
+  },
+  "addFood": {
+    "title": "Ajouter un Aliment",
+    "subtitle": "Enregistrez vos repas sans effort",
+    "tabs": {
+      "photo": "Photo",
+      "gallery": "Galerie",
+      "manual": "Manuel"
+    },
+    "camera": {
+      "initializing": "Initialisation de la caméra...",
+      "accessRequired": "Accès à la Caméra Requis",
+      "enableCamera": "Activer la Caméra",
+      "useManualEntry": "Utiliser la Saisie Manuelle à la Place",
+      "captureHint": "Appuyez pour capturer votre repas",
+      "analyzing": "Analyse de votre repas..."
+    },
+    "gallery": {
+      "title": "Choisir dans la Galerie",
+      "subtitle": "Sélectionnez des images d'aliments à analyser",
+      "noImages": "Aucune Image Chargée",
+      "noImagesDescription": "Chargez des images depuis votre appareil pour sélectionner et analyser des photos d'aliments",
+      "loadImages": "Charger des Images",
+      "loadMore": "Charger Plus d'Images",
+      "selectButton": "Sélectionner"
+    },
+    "aiAnalysis": {
+      "title": "Analyse IA",
+      "subtitle": "Décrivez simplement ce que vous avez mangé",
+      "placeholder": "ex : Deux œufs brouillés avec épinards, pain complet avec avocat et une banane",
+      "hint": "Soyez précis pour de meilleurs résultats",
+      "analyzeButton": "Analyser et Ajouter au Journal",
+      "analyzing": "Analyse avec l'IA..."
+    },
+    "manualEntry": {
+      "title": "Saisie Manuelle",
+      "subtitle": "Entrez directement les valeurs nutritionnelles",
+      "orLabel": "Ou Entrer Manuellement",
+      "foodName": "Nom de l'Aliment",
+      "foodNamePlaceholder": "ex : Yaourt Grec, Poulet Grillé",
+      "nutritionInfo": "Informations Nutritionnelles",
+      "calories": "Calories",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides",
+      "placeholder": "0",
+      "kcal": "kcal",
+      "grams": "g",
+      "addButton": "Ajouter au Journal",
+      "saving": "Enregistrement..."
+    },
+    "error": {
+      "suggestion": "Suggestion",
+      "tryAgain": "Réessayer",
+      "switchToManual": "Passer à la Saisie Manuelle"
+    }
+  },
+  "cookingMode": {
+    "loading": "Chargement...",
+    "step": "Étape",
+    "of": "sur",
+    "complete": "terminé",
+    "elapsed": "écoulé",
+    "importantStep": "Étape Importante",
+    "activeTimers": "Minuteurs Actifs",
+    "ingredients": "Ingrédients",
+    "addTimer": "Ajouter un Minuteur",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "completeButton": "Terminer",
+    "exitTitle": "Quitter le Mode Cuisson ?",
+    "exitMessage": "Votre progression sera perdue si vous quittez maintenant.",
+    "cancel": "Annuler",
+    "exit": "Quitter",
+    "completion": {
+      "title": "🎉 Félicitations !",
+      "subtitle": "Vous avez terminé avec succès :",
+      "time": "Temps",
+      "calories": "Calories",
+      "servings": "Portions",
+      "cookAgain": "Cuisiner à Nouveau",
+      "backToRecipe": "← Retour à la Recette"
+    },
+    "startTimerButton": "Démarrer le minuteur {time}",
+    "customTimerPrompt": "Entrez la durée du minuteur (minutes) :",
+    "customTimerLabel": "Personnalisé - {minutes} min"
+  },
+  "adminDashboard": {
+    "title": "Tableau de Bord Admin",
+    "loading": "Chargement...",
+    "backToUsers": "Retour aux Utilisateurs",
+    "error": {
+      "loadingData": "Erreur lors du chargement des données. Veuillez réessayer.",
+      "userNotFound": "Utilisateur introuvable",
+      "loadingProgress": "Erreur lors du chargement des progrès de l'utilisateur.",
+      "loadingFoodLogs": "Erreur lors du chargement des journaux alimentaires.",
+      "loadingRecipes": "Erreur lors du chargement des recettes.",
+      "returnHome": "Retour à l'Accueil"
+    },
+    "tabs": {
+      "users": "Utilisateurs",
+      "foodLogs": "Journaux Alimentaires",
+      "recipes": "Recettes",
+      "profileData": "Données du Profil",
+      "userFoodLogs": "Journaux Alimentaires",
+      "userRecipes": "Recettes"
+    },
+    "userProfile": {
+      "title": "Profil Utilisateur",
+      "userId": "ID Utilisateur",
+      "email": "Email",
+      "status": "Statut",
+      "lastActive": "Dernière Activité",
+      "language": "Langue",
+      "never": "Jamais",
+      "removeAdmin": "Retirer Admin",
+      "makeAdmin": "Rendre Admin",
+      "delete": "Supprimer l'Utilisateur",
+      "view": "Voir les Détails",
+      "admin": "Admin",
+      "onboarded": "Intégré",
+      "notOnboarded": "Non Intégré"
+    },
+    "deleteDialog": {
+      "title": "Êtes-vous absolument sûr ?",
+      "description": "Cette action ne peut pas être annulée. Le compte de cet utilisateur sera définitivement supprimé de nos serveurs.",
+      "cancel": "Annuler",
+      "delete": "Supprimer"
+    },
+    "toast": {
+      "success": "Succès",
+      "adminUpdated": "Statut admin mis à jour avec succès",
+      "userDeleted": "Utilisateur supprimé avec succès",
+      "error": "Erreur",
+      "updateFailed": "Échec de la mise à jour du statut admin",
+      "deleteFailed": "Échec de la suppression de l'utilisateur"
+    },
+    "nutrition": {
+      "title": "Préférences Nutritionnelles",
+      "dietaryType": "Type de Régime",
+      "calorieTarget": "Objectif Calorique",
+      "kcal": "kcal",
+      "mealsPerDay": "Repas par Jour",
+      "allergies": "Allergies",
+      "notSet": "Non défini",
+      "noAllergies": "Aucune allergie",
+      "noPreferences": "Aucune préférence nutritionnelle définie encore"
+    },
+    "weight": {
+      "title": "Historique du Poids",
+      "date": "Date",
+      "weight": "Poids (kg)",
+      "noHistory": "Aucun historique de poids"
+    },
+    "users": {
+      "title": "Tous les Utilisateurs",
+      "description": "Voir et gérer tous les comptes utilisateurs",
+      "tableHeaders": {
+        "id": "ID",
+        "email": "Email",
+        "status": "Statut",
+        "lastActive": "Dernière Activité",
+        "actions": "Actions"
+      }
+    },
+    "foodLogs": {
+      "title": "Journaux Alimentaires",
+      "description": "Voir toutes les entrées de journaux alimentaires des utilisateurs",
+      "tableHeaders": {
+        "userId": "ID Utilisateur",
+        "food": "Aliment",
+        "mealType": "Type de Repas",
+        "calories": "Calories",
+        "date": "Date"
+      },
+      "noLogs": "Aucun journal alimentaire trouvé"
+    },
+    "recipes": {
+      "title": "Recettes",
+      "description": "Voir toutes les recettes des utilisateurs",
+      "tableHeaders": {
+        "userId": "ID Utilisateur",
+        "name": "Nom de la Recette",
+        "calories": "Calories",
+        "date": "Date"
+      },
+      "noRecipes": "Aucune recette trouvée"
+    }
+  },
+  "emotionalLandingPage": {
+    "header": {
+      "appName": "NutriAI",
+      "navTransformation": "Parcours de transformation",
+      "navBodyWisdom": "Sagesse du corps",
+      "navStories": "Histoires de succès",
+      "login": "Connexion",
+      "startJourney": "Commencez votre parcours"
+    },
+    "hero": {
+      "badge": "Découvrez le véritable potentiel de votre corps",
+      "headline1": "Et si votre corps savait déjà",
+      "headline2": "ce dont il a besoin ?",
+      "subheadline": "NutriAI ne se contente pas de créer des plans de repas. Il déverrouille la sagesse naturelle de votre corps grâce à la nutrition assistée par l'IA.",
+      "ctaButton": "Commencez votre transformation",
+      "scrollIndicator": "Découvrez plus"
+    },
+    "testimonials": {
+      "maria": {
+        "quote": "Je ne savais pas que manger pouvait être aussi bon. Mon énergie a complètement changé.",
+        "name": "Maria",
+        "achievement": "a perdu 24 kg en 6 mois"
+      },
+      "pavel": {
+        "quote": "Ce n'est pas juste un autre régime. C'est enfin comprendre ce dont mon corps a besoin.",
+        "name": "Pavel",
+        "achievement": "a atteint son poids idéal en 90 jours"
+      },
+      "sophia": {
+        "quote": "Pour la première fois, je me sens maître de mon parcours nutritionnel.",
+        "name": "Sophia",
+        "achievement": "amélioration de la définition musculaire et de l'énergie"
+      }
+    },
+    "transformation": {
+      "title1": "Votre transformation commence par",
+      "title2": "la découverte de soi",
+      "subtitle": "Ce voyage révèle la sagesse cachée que votre corps détient, en attente d'être libérée.",
+      "features": {
+        "bodyIntelligence": {
+          "title": "Cartographie de l'intelligence corporelle",
+          "description": "Découvrez comment votre corps traite de manière unique les nutriments et l'énergie grâce à notre analyse IA."
+        },
+        "nutritionalDNA": {
+          "title": "Découverte de l'ADN nutritionnel",
+          "description": "Découvrez l'équilibre parfait des nutriments qui fait prospérer votre corps."
+        },
+        "transformationTimeline": {
+          "title": "Chronologie de transformation",
+          "description": "Visualisez votre parcours avec des jalons qui célèbrent les progrès à chaque étape."
+        }
+      },
+      "ctaButton": "Commencez votre parcours de découverte de soi"
+    },
+    "bodyWisdom": {
+      "title1": "Votre corps parle",
+      "title2": "un langage unique",
+      "subtitle": "Nous décodons ce qu'il vous dit pour créer une nutrition qui répond aux besoins spécifiques de votre corps.",
+      "features": {
+        "energyFlow": {
+          "title": "Analyse du flux d'énergie",
+          "description": "Découvrez le rythme énergétique naturel de votre corps et optimisez votre nutrition en conséquence."
+        },
+        "tastePersonality": {
+          "title": "Cartographie de la personnalité gustative",
+          "description": "Vos préférences de saveurs uniques nous guident pour créer une nutrition durable que vous apprécierez réellement."
+        },
+        "adaptiveProgress": {
+          "title": "Suivi des progrès adaptatif",
+          "description": "Votre corps change, et votre plan aussi. Nous évoluons avec votre transformation."
+        }
+      },
+      "visualization": {
+        "energyLevel": "Niveau d'énergie",
+        "morningBurst": "Énergie matinale 🌅",
+        "tasteProfile": "Profil gustatif",
+        "richSavory": "Riche et savoureux 🍲"
+      }
+    },
+    "finalCTA": {
+      "title1": "Votre plan nutritionnel",
+      "title2": "personnalisé",
+      "title3": "vous attend",
+      "subtitle": "Il ne s'agit pas seulement de ce que vous mangez. Il s'agit de découvrir une version de vous-même que vous ne soupçonniez pas — vibrante, énergi que et en harmonie avec votre corps.",
+      "ctaButton": "Commencez votre transformation",
+      "socialProof": "Rejoignez les milliers de personnes qui ont découvert la sagesse de leur corps grâce à NutriAI"
+    }
+  },
+  "shoppingList": {
+    "title": "Liste de courses",
+    "weeklyTitle": "Liste de courses hebdomadaire",
+    "backButton": "Retour",
+    "noDate": "Aucune date sélectionnée",
+    "cartIcon": "Panier",
+    "tabs": {
+      "all": "Tous les articles",
+      "toBuy": "À acheter",
+      "purchased": "Acheté"
+    },
+    "grouping": {
+      "label": "Grouper les articles",
+      "byMeal": "par repas",
+      "byCategory": "par catégorie"
+    },
+    "pricing": {
+      "selectLocation": "Sélectionner l'emplacement",
+      "locationTitle": "Sélectionnez votre emplacement",
+      "searchPlaceholder": "Rechercher des emplacements...",
+      "currentLocation": "Emplacement actuel",
+      "totalPrice": "Total",
+      "itemPrice": "{{price}} {{currency}}",
+      "noPrice": "Prix non disponible"
+    },
+    "items": {
+      "selectItem": "Sélectionner l'article {{name}}",
+      "purchased": "Acheté",
+      "pending": "Article en attente",
+      "toBuy": "À acheter",
+      "quantity": "{{amount}} {{unit}}",
+      "forRecipe": "Pour : {{recipe}}",
+      "viewDetails": "Voir les détails de l'article",
+      "markPurchased": "Marquer comme acheté",
+      "markPending": "Marquer comme en attente"
+    },
+    "itemDetails": {
+      "title": "Détails de l'article",
+      "ingredient": "Ingrédient",
+      "category": "Catégorie",
+      "quantity": "Quantité",
+      "forRecipes": "Pour les recettes",
+      "close": "Fermer"
+    },
+    "recipeDetails": {
+      "title": "Détails de la recette",
+      "ingredients": "Ingrédients",
+      "servings": "{{count}} portions",
+      "close": "Fermer"
+    },
+    "batchActions": {
+      "title": "Actions groupées",
+      "selectAll": "Tout sélectionner",
+      "deselectAll": "Tout désélectionner",
+      "markAllPurchased": "Tout marquer comme acheté",
+      "itemsSelected": "{{count}} articles sélectionnés",
+      "noItemsSelected": "Aucun article sélectionné",
+      "clearSelection": "Effacer la sélection",
+      "markItemsAsPurchased": "Marquer {{count}} articles comme achetés",
+      "processing": "Traitement...",
+      "close": "Fermer"
+    },
+    "empty": {
+      "noItems": "Aucun article dans votre liste de courses",
+      "noItemsDescription": "Ajoutez des repas à votre plan de repas pour générer une liste de courses",
+      "generateButton": "Générer la liste de courses",
+      "noPendingItems": "Aucun article à acheter",
+      "noPurchasedItems": "Aucun article acheté"
+    },
+    "loading": "Chargement de la liste de courses...",
+    "error": "Échec du chargement de la liste de courses"
+  },
+  "onboardingQuiz": {
+    "navigation": {
+      "back": "Retour",
+      "next": "Suivant",
+      "complete": "Terminer",
+      "saving": "Enregistrement..."
+    },
+    "steps": {
+      "goal": {
+        "title": "Quel est votre objectif principal?",
+        "subtitle": "Choisissez ce qui compte le plus pour vous",
+        "options": {
+          "weightLoss": {
+            "label": "Perte de poids",
+            "desc": "Atteindre votre poids idéal"
+          },
+          "muscleGain": {
+            "label": "Gagner du muscle",
+            "desc": "Gagner en force et en masse"
+          },
+          "healthImprove": {
+            "label": "Améliorer la santé",
+            "desc": "Se sentir mieux dans l'ensemble"
+          },
+          "other": {
+            "label": "Autre",
+            "desc": "Objectif personnalisé"
+          }
+        },
+        "customGoalLabel": "Veuillez préciser votre objectif",
+        "customGoalPlaceholder": "Entrez votre objectif personnalisé..."
+      },
+      "gender": {
+        "title": "Choisissez votre sexe",
+        "subtitle": "Cela nous aide à mieux adapter votre plan",
+        "male": "Homme",
+        "female": "Femme"
+      },
+      "age": {
+        "title": "Quel âge avez-vous?",
+        "subtitle": "Nous en avons besoin pour calculer les calories",
+        "label": "Âge",
+        "years": "ans"
+      },
+      "height": {
+        "title": "Quelle est votre taille?",
+        "subtitle": "Entrez la taille en centimètres",
+        "label": "Taille (cm)"
+      },
+      "weight": {
+        "title": "Combien pesez-vous?",
+        "subtitle": "Poids actuel en kilogrammes",
+        "label": "Poids (kg)"
+      },
+      "goalWeight": {
+        "title": "Quel est votre poids objectif?",
+        "subtitle": "Quel poids visez-vous?",
+        "label": "Poids objectif (kg)"
+      },
+      "activityLevel": {
+        "title": "Quel est votre niveau d'activité?",
+        "subtitle": "À quelle fréquence faites-vous de l'exercice?",
+        "sedentary": "Sédentaire",
+        "sedentaryDesc": "Peu ou pas d'exercice",
+        "light": "Léger",
+        "lightDesc": "Exercice 1-3 jours/semaine",
+        "moderate": "Modéré",
+        "moderateDesc": "Exercice 3-5 jours/semaine",
+        "active": "Actif",
+        "activeDesc": "Exercice 6-7 jours/semaine",
+        "veryActive": "Très actif",
+        "veryActiveDesc": "Travail physique ou entraînement deux fois/jour"
+      },
+      "profilePicture": {
+        "title": "Ajouter une photo de profil",
+        "subtitle": "Ajoutez votre photo (optionnel)",
+        "uploadButton": "Télécharger une photo",
+        "takePhoto": "Prendre une photo",
+        "skipButton": "Passer pour l'instant"
+      },
+      "visionBoard": {
+        "title": "Votre tableau de vision",
+        "subtitle": "Votre plan personnalisé",
+        "currentWeight": "Actuel",
+        "goalWeightLabel": "Objectif",
+        "timeline": {
+          "title": "Votre parcours de réussite",
+          "weeks": "semaines",
+          "months": "mois",
+          "weeklyProgress": "Progression hebdomadaire",
+          "perWeek": "kg/semaine"
+        },
+        "summary": {
+          "title": "Votre plan personnalisé",
+          "subtitle": "En fonction de votre profil, voici ce que nous recommandons",
+          "dailyCalories": "Calories quotidiennes",
+          "kcal": "kcal",
+          "macros": "Macronutriments",
+          "protein": "Protéines",
+          "carbs": "Glucides",
+          "fats": "Lipides",
+          "grams": "g",
+          "mealPlan": "Plan de repas",
+          "meals": "{{count}} repas/jour",
+          "showFormula": "Comment nous avons calculé cela",
+          "hideFormula": "Masquer le calcul",
+          "formulaTitle": "Formule de calcul des calories",
+          "formulaSubtitle": "Nous utilisons l'équation de Mifflin-St Jeor",
+          "bmr": "MB (Métabolisme de base)",
+          "tdee": "DET (Dépense énergétique totale)",
+          "adjustment": "Ajustement de l'objectif",
+          "finalCalories": "Calories quotidiennes finales"
+        }
+      },
+      "completion": {
+        "title": "Félicitations!",
+        "subtitle": "Votre profil est prêt!",
+        "message": "Votre voyage commence maintenant",
+        "description": "Nous avons créé votre plan nutritionnel personnalisé. Commençons votre transformation!"
+      }
+    },
+    "progress": {
+      "weightMetrics": {
+        "title": "Métriques de poids",
+        "subtitle": "Poids actuel et cible",
+        "current": "Actuel",
+        "goal": "Objectif",
+        "kg": "kg"
+      },
+      "bodyMetrics": {
+        "title": "Métriques corporelles",
+        "subtitle": "IMC et calculs",
+        "bmi": "IMC",
+        "height": "Taille",
+        "cm": "cm"
+      },
+      "bodyComposition": {
+        "title": "Composition corporelle",
+        "subtitle": "Votre analyse corporelle détaillée",
+        "bmi": "IMC",
+        "weight": "Poids",
+        "height": "Taille"
+      },
+      "photos": {
+        "title": "Photos de progression",
+        "subtitle": "Suivi visuel de votre parcours",
+        "viewAll": "Voir toutes les photos",
+        "takePhoto": "Prendre une photo",
+        "uploadPhoto": "Télécharger une photo",
+        "changePhoto": "Changer la photo du jour",
+        "deleteConfirm": "Supprimer la photo",
+        "deleteMessage": "Êtes-vous sûr de vouloir supprimer cette photo de progression? Cette action ne peut pas être annulée.",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "noPhotos": "Aucune photo pour le moment",
+        "noPhotosDescription": "Commencez votre voyage visuel",
+        "gallery": "Galerie de photos de progression",
+        "close": "Fermer"
+      },
+      "weightLog": {
+        "addWeight": "Ajouter un poids",
+        "updateWeight": "Mettre à jour le poids",
+        "deleteWeight": "Supprimer le poids",
+        "noEntries": "Aucune entrée"
+      },
+      "heightLog": {
+        "addHeight": "Ajouter une taille",
+        "updateHeight": "Mettre à jour la taille",
+        "noEntries": "Aucune entrée"
+      }
+    }
   }
 }

@@ -1,9 +1,11 @@
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { useProgressPhotos } from "@/hooks/use-progress-photos";
 import { useToast } from "@/hooks/use-toast";
 import SimpleCameraCapture from "@/components/SimpleCameraCapture";
 
 export default function CameraPage() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const { uploadPhoto } = useProgressPhotos();
   const { toast } = useToast();
@@ -20,8 +22,8 @@ export default function CameraPage() {
       await uploadPhoto(photoDataUrl, 'progress-now');
       
       toast({
-        title: "Success",
-        description: "Progress photo uploaded successfully!",
+        title: t('common:cameraPage.success.title'),
+        description: t('common:cameraPage.success.description'),
       });
       
       // Navigate back to progress page
@@ -29,8 +31,8 @@ export default function CameraPage() {
     } catch (error) {
       console.error('Failed to upload photo:', error);
       toast({
-        title: "Error",
-        description: "Failed to upload photo. Please try again.",
+        title: t('common:cameraPage.error.title'),
+        description: t('common:cameraPage.error.description'),
         variant: "destructive",
       });
     }

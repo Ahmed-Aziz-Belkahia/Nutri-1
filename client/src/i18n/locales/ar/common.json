@@ -341,5 +341,1535 @@
     "loginSuccess": "تم تسجيل الدخول بنجاح",
     "loginSuccessDesc": "تم تسجيل دخولك بنجاح",
     "loginFailed": "فشل تسجيل الدخول"
+  },
+  "overview": {
+    "welcomeBack": "مرحباً بعودتك",
+    "userPlaceholder": "مستخدم",
+    "stats": {
+      "calories": "السعرات",
+      "protein": "البروتين",
+      "weight": "الوزن"
+    },
+    "searchPlaceholder": "ابحث عن الأطعمة، الوجبات، الوصفات...",
+    "quickAdd": {
+      "title": "إضافة سريعة",
+      "viewAll": "عرض الكل",
+      "items": {
+        "fruit": "فواكه",
+        "meal": "وجبة",
+        "fastFood": "وجبات سريعة",
+        "snack": "وجبة خفيفة",
+        "drink": "مشروب"
+      }
+    },
+    "todaysLog": {
+      "title": "سجل اليوم",
+      "addFood": "إضافة طعام",
+      "noMealsTitle": "لم يتم تسجيل وجبات اليوم",
+      "noMealsDesc": "أضف وجبتك الأولى لبدء تتبع تغذيتك",
+      "startLogging": "ابدأ التسجيل"
+    }
+  },
+  "circularButtonDemo": {
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "title": "عرض الزر",
+    "heading": "زر دائري أبيض بسيط",
+    "description": "هذا عرض توضيحي للزر الدائري الأبيض البسيط بدون حدود ملونة.",
+    "smallButtonAlert": "تم النقر على الزر الصغير!",
+    "mediumButtonAlert": "تم النقر على الزر المتوسط!",
+    "largeButtonAlert": "تم النقر على الزر الكبير!",
+    "smallSize": "حجم صغير",
+    "mediumSize": "حجم متوسط (افتراضي)",
+    "largeSize": "حجم كبير"
+  },
+  "tealButtonDemo": {
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "title": "عرض الزر الفيروزي",
+    "heading": "زر دائري فيروزي",
+    "description": "هذا عرض توضيحي للزر الدائري بحدود فيروزية.",
+    "smallButtonAlert": "تم النقر على الزر الصغير!",
+    "mediumButtonAlert": "تم النقر على الزر المتوسط!",
+    "largeButtonAlert": "تم النقر على الزر الكبير!",
+    "smallSize": "حجم صغير",
+    "mediumSize": "حجم متوسط (افتراضي)",
+    "largeSize": "حجم كبير"
+  },
+  "dashboardNew": {
+    "processing": {
+      "preparing": "جاري تحضير إدخال وجبتك...",
+      "adding": "جاري الإضافة إلى سجل الطعام...",
+      "updating": "جاري تحديث إجمالي التغذية...",
+      "complete": "اكتمل!",
+      "added": "تمت الإضافة!",
+      "processing": "جاري المعالجة..."
+    },
+    "success": {
+      "title": "نجاح",
+      "addedFood": "تمت إضافة {{name}} إلى سجلك"
+    },
+    "error": {
+      "title": "خطأ",
+      "failedToAdd": "فشل إضافة الطعام"
+    }
+  },
+  "enhancedDashboard": {
+    "dailyProgress": "التقدم اليومي",
+    "calorieIntake": "استهلاك السعرات",
+    "ofGoal": "من {{goal}} هدف",
+    "carbs": "كربوهيدرات",
+    "protein": "بروتين",
+    "fat": "دهون",
+    "activityStats": "إحصائيات النشاط",
+    "stepsToday": "خطوات اليوم",
+    "fromYesterday": "+{{percent}}% من الأمس",
+    "activeMinutes": "دقائق النشاط",
+    "goalMinutes": "الهدف: {{minutes}} دقيقة",
+    "todaysMealPlan": "خطة وجبات اليوم",
+    "viewAll": "عرض الكل",
+    "weeklyGoalProgress": "تقدم الهدف الأسبوعي",
+    "weightLoss": "فقدان الوزن",
+    "workoutConsistency": "انتظام التمارين",
+    "workoutDays": "{{done}} / {{total}} أيام",
+    "waterIntake": "استهلاك الماء"
+  },
+  "cameraPage": {
+    "success": {
+      "title": "نجاح",
+      "description": "تم تحميل صورة التقدم بنجاح!"
+    },
+    "error": {
+      "title": "خطأ",
+      "description": "فشل تحميل الصورة. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "allMeals": {
+    "title": "معرض الوجبات",
+    "addMeal": "إضافة وجبة",
+    "loading": "جاري تحميل الوجبات...",
+    "noMeals": "لم يتم تسجيل وجبات بعد.",
+    "noMealsDesc": "ابدأ بإضافة الوجبات لرؤيتها هنا!",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه الوجبة؟",
+    "success": {
+      "created": "تم إنشاء سجل الطعام بنجاح",
+      "deleted": "تم حذف الوجبة بنجاح"
+    },
+    "error": {
+      "createFailed": "فشل إنشاء سجل الطعام",
+      "deleteFailed": "فشل حذف الوجبة"
+    }
+  },
+  "todayMealPlan": {
+    "title": "خطة التغذية لليوم",
+    "description": "خطة وجباتك المخصصة لتحقيق أهدافك الغذائية اليومية",
+    "todaysMealPlan": "خطة وجبات اليوم",
+    "completed": "اكتملت",
+    "markAsEaten": "وضع علامة كمأكولة",
+    "kcal": "سعرة"
+  },
+  "recipesNew": {
+    "title": "الوصفات",
+    "subtitle": "مجموعة وجباتك الممسوحة ضوئيًا",
+    "tabs": {
+      "recipes": "الوصفات",
+      "mealPlan": "خطة الوجبات"
+    },
+    "aiCreator": {
+      "title": "منشئ الوصفات بالذكاء الاصطناعي",
+      "description": "امسح مكوناتك واحصل على وصفات مخصصة فورية",
+      "scanButton": "مسح المكونات",
+      "features": {
+        "aiPowered": "مدعوم بالذكاء الاصطناعي",
+        "instant": "فوري",
+        "custom": "مخصص"
+      }
+    },
+    "todaysScans": "مسوحات اليوم",
+    "last24Hours": "آخر 24 ساعة"
+  },
+  "unifiedProgress": {
+    "weightStats": {
+      "title": "إحصائيات الوزن",
+      "current": "الوزن الحالي",
+      "goal": "الوزن المستهدف",
+      "progress": "التقدم",
+      "remaining": "المتبقي"
+    },
+    "progressPhotos": {
+      "title": "صور التقدم",
+      "noPhotos": "لا توجد صور بعد",
+      "uploadFirst": "قم بتحميل صورة التقدم الأولى"
+    },
+    "bodyAnalysis": {
+      "title": "تحليل الجسم",
+      "bodyFat": "دهون الجسم",
+      "bodyType": "نوع الجسم",
+      "analyzing": "جاري التحليل...",
+      "analyzeLatest": "تحليل أحدث صورة",
+      "uploadPrompt": "قم بتحميل صورة التقدم لتفعيل تحليل الجسم"
+    }
+  },
+  "mealPlanView": {
+    "loading": "جاري تحميل خطة وجباتك...",
+    "noMealPlan": "لم يتم العثور على خطة وجبات",
+    "createPlan": "إنشاء خطة وجبات",
+    "summary": {
+      "avgDaily": "متوسط يومي",
+      "calories": "سعرات",
+      "totalMeals": "إجمالي الوجبات",
+      "thisWeek": "هذا الأسبوع"
+    },
+    "mealTypes": {
+      "breakfast": "الإفطار",
+      "lunch": "الغداء",
+      "dinner": "العشاء",
+      "snack": "وجبة خفيفة"
+    },
+    "mealDetails": {
+      "prepTime": "دقيقة وقت التحضير",
+      "ingredients": "المكونات",
+      "instructions": "التعليمات"
+    },
+    "actions": {
+      "viewShoppingList": "عرض قائمة التسوق",
+      "startMyWeek": "ابدأ أسبوعي"
+    },
+    "meals": "وجبات",
+    "cal": "سعرة"
+  },
+  "profileNew": {
+    "title": "الملف الشخصي",
+    "signIn": "تسجيل الدخول",
+    "pleaseSignIn": "يرجى تسجيل الدخول",
+    "needLogin": "يجب أن تكون مسجلاً لعرض ملفك الشخصي",
+    "level": "المستوى",
+    "cm": "سم",
+    "kg": "كجم",
+    "kcal": "سعرة",
+    "years": "سنة",
+    "sections": {
+      "bodyMetrics": "قياسات الجسم",
+      "goalsActivity": "الأهداف والنشاط",
+      "nutritionGoals": "أهداف التغذية",
+      "languagePreferences": "اللغة والتفضيلات"
+    },
+    "metrics": {
+      "height": "الطول",
+      "currentWeight": "الوزن الحالي",
+      "age": "العمر",
+      "gender": "الجنس",
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "goals": {
+      "weightGoal": "هدف الوزن",
+      "goalWeight": "الوزن المستهدف",
+      "activityLevel": "مستوى النشاط",
+      "dailyCalorieGoal": "هدف السعرات اليومي",
+      "proteinGoal": "هدف البروتين",
+      "carbsGoal": "هدف الكربوهيدرات",
+      "fatGoal": "هدف الدهون"
+    },
+    "macros": {
+      "protein": "بروتين",
+      "carbs": "كربوهيدرات",
+      "fat": "دهون"
+    },
+    "account": {
+      "privacyPolicy": "سياسة الخصوصية",
+      "viewPrivacy": "عرض سياسة الخصوصية",
+      "deleteAccount": "حذف الحساب",
+      "deletePermanent": "حذف حسابك نهائيًا",
+      "signOut": "تسجيل الخروج"
+    },
+    "dialogs": {
+      "editMetrics": "تعديل قياسات الجسم",
+      "editGoals": "تعديل الأهداف والنشاط",
+      "editNutrition": "تعديل أهداف التغذية",
+      "save": "حفظ التغييرات",
+      "cancel": "إلغاء"
+    },
+    "toast": {
+      "success": "نجاح",
+      "profileUpdated": "تم تحديث صورة الملف الشخصي بنجاح",
+      "metricsUpdated": "تم تحديث قياسات الجسم بنجاح",
+      "goalsUpdated": "تم تحديث الأهداف بنجاح",
+      "nutritionUpdated": "تم تحديث أهداف التغذية بنجاح",
+      "error": "خطأ",
+      "updateFailed": "فشل تحديث صورة الملف الشخصي",
+      "deleteFailed": "فشل حذف الحساب. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "height": "الطول",
+    "currentWeight": "الوزن الحالي",
+    "calorieGoal": "هدف السعرات",
+    "updateReminder": "تذكر بتحديث هذا مرة واحدة على الأقل في الأسبوع حتى نتمكن من تعديل خطتك",
+    "bodyFat": {
+      "title": "نسبة دهون الجسم",
+      "estimated": "دهون الجسم المقدرة",
+      "basedOnBMI": "بناءً على حساب مؤشر كتلة الجسم",
+      "categories": {
+        "essential": "دهون أساسية",
+        "athletic": "رياضي",
+        "fitness": "لياقة",
+        "average": "متوسط",
+        "obese": "سمنة"
+      }
+    },
+    "bmi": {
+      "title": "مزشر كتلة الجسم",
+      "yourBMIis": "مؤشر كتلة جسمك هو",
+      "healthy": "صحي",
+      "categories": {
+        "underweight": "نقص في الوزن",
+        "overweight": "زيادة في الوزن",
+        "obese": "سمنة"
+      }
+    },
+    "goalProgress": {
+      "title": "تقدم الهدف",
+      "goalAchieved": "تحقق الهدف",
+      "periods": {
+        "90days": "90 يومًا",
+        "6months": "6 أشهر",
+        "1year": "سنة واحدة",
+        "allTime": "كل الوقت"
+      }
+    },
+    "nutrition": {
+      "title": "التغذية",
+      "totalCalories": "إجمالي السعرات",
+      "dailyAvg": "متوسط يومي",
+      "periods": {
+        "thisWeek": "هذا الأسبوع",
+        "lastWeek": "الأسبوع الماضي",
+        "2weeksAgo": "قبل أسبوعين",
+        "3weeksAgo": "قبل 3 أسابيع"
+      }
+    },
+    "actions": {
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "update": "تحديث",
+      "updateHeight": "تحديث الطول",
+      "updateWeight": "حدّث وزنك"
+    },
+    "units": {
+      "cm": "سم",
+      "kg": "كجم",
+      "kcal": "سعرة"
+    }
+  },
+  "detailedNutrition": {
+    "title": "تغذية تفصيلية",
+    "of": "من",
+    "goal": "هدف",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "meals": "الوجبات",
+      "micronutrients": "عناصر دقيقة",
+      "timing": "التوقيت"
+    },
+    "dailyInsights": {
+      "title": "رؤى يومية",
+      "proteinReached": "أحسنت! تحقق هدف البروتين.",
+      "fatCloseToLimit": "الدهون تقترب من الحد.",
+      "caloriesUnderBudget": "لديك 250 سعرة دون الميزانية."
+    },
+    "weeklyCalorieTrends": "اتجاهات السعرات الأسبوعية",
+    "nutritionByMeal": "التغذية حسب الوجبة",
+    "mealTypes": {
+      "breakfast": "إفطار",
+      "lunch": "غداء",
+      "dinner": "عشاء",
+      "snacks": "وجبات خفيفة"
+    },
+    "micronutrientsTab": {
+      "title": "عناصر دقيقة",
+      "essentialNutrients": "عناصر أساسية",
+      "additionalInfo": "معلومات إضافية",
+      "vitamins": {
+        "vitaminA": "فيتامين A",
+        "vitaminC": "فيتامين C",
+        "vitaminD": "فيتامين D"
+      },
+      "minerals": {
+        "calcium": "كالسيوم",
+        "iron": "حديد",
+        "potassium": "بوتاسيوم"
+      },
+      "other": {
+        "water": "ماء",
+        "fiber": "ألياف",
+        "sugar": "سكر",
+        "sodium": "صوديوم"
+      }
+    },
+    "timingTab": {
+      "title": "توقيت العناصر",
+      "calorieDistribution": "توزيع السعرات خلال اليوم",
+      "timingDetails": "تفاصيل التوقيت"
+    },
+    "actions": {
+      "switchToSimple": "التبديل إلى عرض بسيط"
+    }
+  },
+  "foodDatabase": {
+    "greeting": "مرحبًا، صباح الخير",
+    "nav": {
+      "home": "الرئيسية",
+      "recipes": "الوصفات"
+    },
+    "createRecipe": {
+      "title": "أنشئ وصفتك الخاصة",
+      "description": "اجمع وصفاتك المفضلة"
+    },
+    "top100": {
+      "title": "أفضل 100",
+      "seeAll": "عرض الكل"
+    },
+    "recipes": {
+      "greenSalad": {
+        "name": "سلطة خضراء",
+        "description": "خس رومي طازج\nنمط يوناني كلاسيكي"
+      },
+      "thaiSalad": {
+        "name": "سلطة تايلندية",
+        "description": "سلطة بابايا خضراء\nبهارات تايلندية أصيلة"
+      },
+      "chickenSalad": {
+        "name": "سلطة دجاج",
+        "description": "صدر دجاج مشوي\nخضروات مختلطة طازجة"
+      },
+      "tunaSalad": {
+        "name": "سلطة تونة",
+        "description": "تونة طازجة\nنمط متوسطي"
+      }
+    }
+  },
+  "simpleMealQuiz": {
+    "questions": {
+      "dietaryType": {
+        "title": "ما النظام الغذائي الذي تتبعه؟",
+        "description": "اختر نمط أكلك",
+        "options": {
+          "omnivore": "آكل لكل شيء",
+          "vegetarian": "نباتي",
+          "vegan": "نباتي صرف",
+          "pescetarian": "سمكي"
+        }
+      },
+      "calorieTarget": {
+        "title": "هدف السعرات اليومي؟",
+        "description": "أدخل سعراتك المستهدفة",
+        "placeholder": "2000"
+      },
+      "mealsPerDay": {
+        "title": "عدد الوجبات في اليوم؟",
+        "description": "بما في ذلك الوجبات الخفيفة",
+        "options": {
+          "1meal": "وجبة واحدة",
+          "2meals": "وجبتان",
+          "3meals": "3 وجبات",
+          "4meals": "4 وجبات",
+          "5meals": "5 وجبات"
+        }
+      },
+      "allergies": {
+        "title": "الحساسية وعدم التحمل",
+        "description": "افصل بفواصل",
+        "placeholder": "مثل: غلوتين، مكسرات، لاكتوز"
+      },
+      "cuisinePreferences": {
+        "title": "المطابخ المفضلة",
+        "description": "افصل بفواصل",
+        "placeholder": "مثل: إيطالي، آسيوي، مكسيكي"
+      },
+      "preferredIngredients": {
+        "title": "المكونات المفضلة",
+        "description": "افصل بفواصل",
+        "placeholder": "مثل: دجاج، بروكلي، أرز"
+      },
+      "excludedIngredients": {
+        "title": "مكونات تتجنبها",
+        "description": "افصل بفواصل",
+        "placeholder": "مثل: فطر، زيتون"
+      }
+    },
+    "actions": {
+      "back": "رجوع",
+      "next": "التالي",
+      "generatePlan": "إنشاء خطة",
+      "cancel": "إلغاء"
+    },
+    "progress": {
+      "question": "سؤال",
+      "of": "من"
+    },
+    "toast": {
+      "errorGenerating": "فشل في إنشاء خطة الوجبات",
+      "pleaseTryAgain": "يرجى المحاولة لاحقًا",
+      "missingDietaryType": "يرجى اختيار نوع النظام الغذائي",
+      "missingCalories": "يرجى إدخال هدف السعرات",
+      "missingMeals": "يرجى اختيار عدد الوجبات"
+    }
+  },
+  "visionBoard": {
+    "step": "خطوة",
+    "of": "من",
+    "title": "طريقك إلى هدفك",
+    "loading": "تحميل لوحة الرؤية...",
+    "failed": "فشل في تحميل لوحة الرؤية.",
+    "goToDashboard": "الذهاب إلى لوحة التحكم",
+    "profileIncomplete": "الملف الشخصي غير مكتمل",
+    "completeOnboarding": "قم بعملية الإعداد أولاً.",
+    "sections": {
+      "personalInfo": "معلومات شخصية",
+      "macros": "الماكروز اليومية",
+      "bmrTdee": "BMR و TDEE",
+      "timeline": "الجدول الزمني",
+      "motivation": "التحفيز"
+    },
+    "labels": {
+      "calories": "سعرات",
+      "protein": "بروتين",
+      "carbs": "كربوهيدرات",
+      "fat": "دهون"
+    },
+    "buttons": {
+      "continue": "ابدأ!"
+    }
+  },
+  "recipeSuggestions": {
+    "greeting": "مرحبًا، صباح الخير",
+    "nav": {
+      "home": "الرئيسية",
+      "recipes": "الوصفات"
+    },
+    "createRecipe": {
+      "title": "أنشئ وصفتك",
+      "description": "امسح مكوناتك وسنقترح وجبات صحية"
+    },
+    "suggestedRecipes": "الوصفات المقترحة",
+    "top100": "أفضل 100",
+    "viewAll": "عرض الكل",
+    "recipes": {
+      "mediterraneanSalad": {
+        "name": "سلطة البحر الأبيض المتوسط",
+        "description": "خضروات طازجة مع زيت الزيتون وجبنة الفيتا"
+      },
+      "berrySmoothieBowl": {
+        "name": "بول السموذي بالتوت",
+        "description": "توت مشكل، موز، وغرانولا"
+      },
+      "avocadoToast": {
+        "name": "توست الأفوكادو",
+        "description": "خبز كامل الحبوب مع أفوكادو مهروس وبيض"
+      },
+      "vegetableStirFry": {
+        "name": "خضروات مقلية",
+        "description": "خضروات مشكلة مع التوفو في صلصة خفيفة"
+      },
+      "freshGardenSalad": {
+        "name": "سلطة حديقة طازجة",
+        "description": "سلطة خفيفة مع الخضروات الورقية والخضروات"
+      },
+      "vegetableMedley": {
+        "name": "مزيج الخضروات",
+        "description": "خضروات موسمية محمصة مع الأعشاب"
+      }
+    },
+    "camera": {
+      "analyzing": "جاري التحليل...",
+      "tapToCapture": "اضغط للالتقاط"
+    },
+    "toast": {
+      "analysisComplete": "اكتمل التحليل",
+      "recipesFound": "لقد وجدنا وصفات بناءً على مكوناتك!",
+      "error": "خطأ",
+      "failedToAnalyze": "فشل تحليل الصورة"
+    }
+  },
+  "mealAnalysis": {
+    "steps": {
+      "detecting": "كشف عناصر الطعام...",
+      "analyzing": "تحليل المكونات...",
+      "calculating": "حساب التغذية...",
+      "finalizing": "إنهاء التفاصيل..."
+    },
+    "messages": {
+      "scanningFood": "مسح طعامك...",
+      "identifyingIngredients": "تحديد المكونات...",
+      "crunchingNumbers": "معالجة الأرقام...",
+      "almostDone": "تقريبا انتهينا...",
+      "allSet": "كل شيء جاهز!",
+      "somethingWrong": "عذرًا، حدث خطأ ما",
+      "processing": "جاري المعالجة...",
+      "analyzedSuccessfully": "تم تحليل وجبتك بنجاح",
+      "pleaseTryAgain": "يرجى المحاولة مرة أخرى",
+      "aiWorking": "الذكاء الاصطناعي يعمل بسحره"
+    },
+    "success": {
+      "perfect": "ممتاز!",
+      "addedToLog": "تمت إضافة وجبتك إلى سجلك"
+    },
+    "error": {
+      "unableToAnalyze": "غير قادر على تحليل وجبتك. إعادة التوجيه..."
+    }
+  },
+  "createRecipe": {
+    "back": "رجوع",
+    "of": "من",
+    "questions": {
+      "mealType": {
+        "title": "ما نوع الوجبة التي تريد إنشاءها؟",
+        "description": "اختر الفئة التي تناسب وصفتك",
+        "options": {
+          "breakfast": "فطور",
+          "lunch": "غداء",
+          "dinner": "عشاء",
+          "snack": "وجبة خفيفة",
+          "dessert": "حلوى"
+        }
+      },
+      "difficulty": {
+        "title": "صعوبة الوصفة المفضلة",
+        "description": "سنقوم بتخصيص اقتراحات الوصفات وفقًا لذلك",
+        "options": {
+          "easy": {
+            "label": "وصفات سهلة",
+            "description": "أطباق بسيطة وسريعة التحضير"
+          },
+          "medium": {
+            "label": "صعوبة متوسطة",
+            "description": "تعقيد وجهد متوازن"
+          },
+          "hard": {
+            "label": "تحدي",
+            "description": "وصفات معقدة للطهاة المهرة"
+          }
+        }
+      },
+      "dietPreference": {
+        "title": "ما التفضيلات الغذائية التي يجب مراعاتها؟",
+        "description": "حدد أي متطلبات غذائية محددة",
+        "options": {
+          "vegetarian": "نباتي",
+          "vegan": "نباتي صارم",
+          "glutenFree": "خالٍ من الغلوتين",
+          "dairyFree": "خالٍ من الألبان",
+          "none": "بدون قيود"
+        }
+      },
+      "cookingTime": {
+        "title": "كم من الوقت لديك للطهي؟",
+        "description": "اختر وقت التحضير المفضل",
+        "options": {
+          "quick": "سريع (15-30 دقيقة)",
+          "medium": "متوسط (30-60 دقيقة)",
+          "long": "طويل (60+ دقيقة)"
+        }
+      },
+      "skillLevel": {
+        "title": "ما مستوى مهاراتك في الطهي؟",
+        "description": "كن صريحًا! هذا يساعدنا في اقتراح وصفات مناسبة",
+        "options": {
+          "beginner": "مبتدئ",
+          "intermediate": "متوسط",
+          "advanced": "متقدم"
+        }
+      },
+      "mainIngredient": {
+        "title": "ما هو المكون الرئيسي المفضل لديك؟",
+        "description": "اختر المكون الأساسي الذي تريد الطهي به",
+        "options": {
+          "chicken": "دجاج",
+          "fish": "سمك",
+          "beef": "لحم بقر",
+          "vegetables": "خضروات",
+          "grains": "حبوب"
+        }
+      }
+    },
+    "toast": {
+      "quizCompleted": "اكتمل الاستبيان!",
+      "generatingRecipes": "جاري إنشاء اقتراحات وصفات مخصصة..."
+    }
+  },
+  "simpleNutritionDetail": {
+    "tabs": {
+      "overview": "نظرة عامة",
+      "meals": "الوجبات"
+    },
+    "switchToDetailed": "التبديل إلى العرض التفصيلي"
+  },
+  "premiumShoppingListPage": {
+    "nav": {
+      "home": "الرئيسية",
+      "recipes": "الوصفات",
+      "shopping": "التسوق",
+      "calendar": "التقويم",
+      "profile": "الملف الشخصي"
+    }
+  },
+  "foodDetail": {
+    "loading": "جاري التحميل...",
+    "error": "فشل تحميل تفاصيل الطعام"
+  },
+  "recipesNew": {
+    "title": "الوصفات",
+    "subtitle": "وصفات مدعومة بالذكاء الاصطناعي من مكوناتك",
+    "tabs": {
+      "recipes": "الوصفات",
+      "mealPlan": "خطة الوجبات"
+    },
+    "aiCreator": {
+      "title": "منشئ الوصفات بالذكاء الاصطناعي",
+      "description": "امسح مكوناتك ودع الذكاء الاصطناعي ينشئ وصفات مخصصة فوراً",
+      "scanButton": "مسح المكونات",
+      "features": {
+        "aiPowered": "مدعوم بالذكاء الاصطناعي",
+        "instant": "فوري",
+        "custom": "مخصص"
+      }
+    },
+    "todaysScans": "مسح اليوم",
+    "last24Hours": "آخر 24 ساعة"
+  },
+  "mealDetail": {
+    "loading": "جاري تحميل الوجبة...",
+    "error": {
+      "title": "فشل تحميل الوجبة",
+      "description": "حدث خطأ أثناء تحميل هذه الوجبة. يرجى المحاولة مرة أخرى.",
+      "tryAgain": "حاول مرة أخرى",
+      "goBack": "العودة"
+    },
+    "nutrition": {
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون",
+      "kcal": "سعرة"
+    },
+    "servings": {
+      "title": "تعديل الحصص",
+      "multiplier": "{{multiplier}}×"
+    },
+    "ingredients": {
+      "title": "المكونات",
+      "add": "إضافة",
+      "empty": "لا توجد مكونات متاحة",
+      "placeholder": {
+        "name": "اسم المكون",
+        "quantity": "الكمية",
+        "unit": "الوحدة",
+        "calories": "سعرة"
+      }
+    },
+    "instructions": {
+      "title": "التعليمات",
+      "add": "إضافة",
+      "empty": "لا توجد تعليمات متاحة",
+      "step": "الخطوة {{number}}",
+      "placeholder": "أدخل التعليمات"
+    },
+    "buttons": {
+      "edit": "تعديل",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
+    "deleteModal": {
+      "title": "حذف الوجبة؟",
+      "description": "لا يمكن التراجع عن هذا الإجراء. سيتم إزالة الوجبة نهائياً من سجلك.",
+      "calories": "سعرة",
+      "confirm": "حذف الوجبة",
+      "cancel": "إلغاء",
+      "deleting": "جاري الحذف..."
+    },
+    "toast": {
+      "saveSuccess": "تم تحديث الوجبة بنجاح!",
+      "saveError": "فشل تحديث الوجبة",
+      "deleteSuccess": "تم حذف الوجبة بنجاح!",
+      "deleteError": "فشل حذف الوجبة"
+    }
+  },
+  "recipeResults": {
+    "loading": {
+      "title": "معالجة المكونات...",
+      "subtitle": "الذكاء الاصطناعي يصنع وصفاتك المثالية"
+    },
+    "error": {
+      "title": "لم يتم العثور على وصفات",
+      "generic": "حدث خطأ أثناء معالجة المكونات. يرجى المحاولة مرة أخرى.",
+      "noMatch": "لم نتمكن من العثور على وصفات تطابق مكوناتك. حاول مسح مكونات مختلفة."
+    },
+    "header": "اقتراحات الوصفات",
+    "tryAgain": "حاول مرة أخرى",
+    "difficulty": "{{level}}",
+    "min": "دقيقة",
+    "nutrition": {
+      "cal": "سعرة",
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون"
+    },
+    "ingredients": "المكونات",
+    "more": "المزيد",
+    "viewFullRecipe": "عرض الوصفة الكاملة",
+    "generateMore": {
+      "title": "تريد المزيد من أفكار الوصفات؟",
+      "subtitle": "إنشاء وصفات إضافية باستخدام نفس المكونات",
+      "button": "إنشاء المزيد من الوصفات",
+      "generating": "جاري الإنشاء..."
+    },
+    "viewAll": "عرض جميع الوصفات ({{count}})",
+    "toast": {
+      "cannotGenerate": "لا يمكن الإنشاء",
+      "noIngredients": "لا تتوفر معلومات عن المكونات. يرجى مسح مكونات جديدة.",
+      "generated": "تم إنشاء {{count}} وصفة جديدة!",
+      "generateError": "لا يمكن إنشاء المزيد من الوصفات. يرجى المحاولة مرة أخرى.",
+      "saveError": "فشل حفظ الوصفة. يرجى المحاولة مرة أخرى.",
+      "loadError": "فشل تحميل بيانات الوصفة. يرجى المسح مرة أخرى."
+    }
+  },
+  "recipeDetail": {
+    "notFound": "الوصفة غير موجودة",
+    "stats": {
+      "time": "الوقت",
+      "servings": "الحصص",
+      "calories": "السعرات",
+      "min": "دقيقة"
+    },
+    "tabs": {
+      "ingredients": "المكونات",
+      "instructions": "التعليمات",
+      "nutrition": "القيم الغذائية"
+    },
+    "ingredients": {
+      "title": "المكونات",
+      "checked": "تم التحديد"
+    },
+    "instructions": {
+      "title": "التعليمات",
+      "stepOf": "الخطوة {{current}} من {{total}}",
+      "nextStep": "الخطوة التالية"
+    },
+    "nutrition": {
+      "title": "معلومات التغذية",
+      "caloriesPerServing": "السعرات لكل حصة",
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون",
+      "fiber": "الألياف",
+      "sugar": "السكر",
+      "sodium": "الصوديوم"
+    },
+    "startCooking": "ابدأ الطهي"
+  },
+  "ingredientsAnalysis": {
+    "steps": {
+      "detecting": "اكتشاف المكونات...",
+      "analyzing": "تحليل التركيبات...",
+      "generating": "إنشاء الوصفات...",
+      "finalizing": "إضافة التعليمات..."
+    },
+    "messages": {
+      "scanning": "مسح المكونات...",
+      "findingCombinations": "إيجاد تركيبات مثالية...",
+      "creatingRecipes": "إنشاء وصفاتك...",
+      "addingTouches": "إضافة اللمسات النهائية...",
+      "recipesReady": "الوصفات جاهزة!",
+      "somethingWrong": "عفوًا، حدث خطأ ما",
+      "processing": "جاري المعالجة..."
+    },
+    "confirmation": {
+      "title": "المكونات المكتشفة",
+      "add": "إضافة",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "ingredientName": "اسم المكون",
+      "quantity": "الكمية",
+      "unit": "الوحدة",
+      "difficultyTitle": "صعوبة الوصفة",
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب",
+      "continueButton": "متابعة إلى الوصفات",
+      "goBack": "العودة"
+    },
+    "errors": {
+      "failedToAnalyze": "فشل تحليل المكونات",
+      "tryAgain": "فشل تحليل المكونات. يرجى المحاولة مرة أخرى.",
+      "analysisError": "خطأ في التحليل",
+      "invalidResult": "نتيجة تحليل غير صالحة: بيانات المكونات مفقودة",
+      "noIngredients": "لا توجد مكونات",
+      "addOneIngredient": "يرجى إضافة مكون واحد على الأقل لإنشاء الوصفات.",
+      "failedToGenerate": "فشل إنشاء الوصفات",
+      "generationError": "خطأ في الإنشاء"
+    }
+  },
+  "onboardingCompletion": {
+    "stepNumber": "8",
+    "title": "صورة الملف الشخصي",
+    "subtitle": "أضف صورة الملف الشخصي (اختياري)",
+    "uploadText": "تحميل الصورة",
+    "profileImageDescription": "سيتم عرض صورة ملفك الشخصي في ملفك الشخصي وفي التطبيق. يمكنك تغييرها لاحقًا.",
+    "calorieNeedTitle": "احتياجك اليومي من السعرات الحرارية",
+    "calorieNeedSubtitle": "يمكنك تعديل القيمة وفقًا لاحتياجاتك",
+    "yourRequirement": "احتياجك اليومي",
+    "perDay": "في اليوم",
+    "timelineTitle": "الجدول الزمني لتحقيق الهدف",
+    "timelineSubtitle": "بالوتيرة الحالية",
+    "atCurrentPace": "بوتيرة 0.5 كجم في الأسبوع:",
+    "assuming": "بافتراض",
+    "weeklyLoss": "0.5 كجم أسبوعيًا:",
+    "currentWeight": "الوزن الحالي",
+    "toGoal": "للوصول إلى الهدف",
+    "goal": "الهدف",
+    "weeks": "أسابيع",
+    "macros": {
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون"
+    },
+    "formulaTitle": "كيف حسبنا احتياجاتك اليومية",
+    "bmrTitle": "معدل الأيض الأساسي (BMR)",
+    "bmrDescription": "باستخدام معادلة ميفلين-سانت جيور (الأكثر استخدامًا):",
+    "tdeeTitle": "إجمالي إنفاق الطاقة اليومي (TDEE)",
+    "tdeeDescription": "معدل الأيض الأساسي × عامل النشاط:",
+    "goalAdjustmentTitle": "معدل لهدفك",
+    "activityLevels": {
+      "sedentary": "نمط حياة خامل",
+      "light": "نشاط خفيف",
+      "moderate": "نشاط معتدل",
+      "active": "نمط حياة نشط",
+      "veryActive": "نشط جدًا"
+    },
+    "goalText": {
+      "lose": "فقدان الوزن",
+      "gain": "زيادة الوزن",
+      "maintain": "الحفاظ على الوزن"
+    },
+    "lossDescription": "عجز 500 سعرة حرارية/يوم = ~0.5 كجم فقدان في الأسبوع",
+    "gainDescription": "فائض 300 سعرة حرارية/يوم لزيادة الكتلة الصحية",
+    "maintainDescription": "توازن الطاقة للحفاظ على الوزن",
+    "sourceLabel": "المصدر:",
+    "sourceText": "معادلة ميفلين-سانت جيور - الجمعية الأمريكية للتغذية (2005)",
+    "goalDeficit": "لفقدان الوزن، يوصى بعجز 500 سعرة حرارية",
+    "goalSurplus": "لزيادة الوزن، يوصى بفائض 500 سعرة حرارية",
+    "completeButton": "إكمال الإعداد",
+    "toast": {
+      "profileUploaded": "تم تحميل صورة الملف الشخصي!",
+      "photoSaved": "تم حفظ صورتك بنجاح.",
+      "uploadFailed": "فشل التحميل",
+      "tryAgain": "يرجى محاولة تحميل صورتك مرة أخرى.",
+      "profileCompleted": "اكتمل الملف الشخصي!",
+      "planReady": "خطة التغذية الشخصية الخاصة بك جاهزة.",
+      "configError": "خطأ في التكوين"
+    }
+  },
+  "recipeScanner": {
+    "title": "مسح المكونات",
+    "subtitle": "احصل على اقتراحات وصفات مدعومة بالذكاء الاصطناعي",
+    "tabs": {
+      "photo": "صورة",
+      "gallery": "المعرض",
+      "manual": "يدوي"
+    },
+    "camera": {
+      "initializing": "جاري تهيئة الكاميرا...",
+      "accessRequired": "مطلوب الوصول إلى الكاميرا",
+      "retry": "إعادة محاولة الوصول إلى الكاميرا",
+      "switchToGallery": "استخدام المعرض بدلاً من ذلك",
+      "analyzing": "جاري التحليل...",
+      "tapToCapture": "اضغط للالتقاط"
+    },
+    "gallery": {
+      "title": "اختر الصور",
+      "subtitle": "قم بتحميل صور مكوناتك",
+      "uploadButton": "التحميل من المعرض",
+      "select": "اختر",
+      "selectImage": "اختر الصورة",
+      "empty": "لم يتم تحميل أي صور بعد"
+    },
+    "manual": {
+      "title": "مولد الوصفات بالذكاء الاصطناعي",
+      "subtitle": "اذكر مكوناتك",
+      "placeholder": "مثال: صدر دجاج، طماطم، ثوم، معكرونة، زيت زيتون، ريحان",
+      "hint": "افصل بفواصل للحصول على أفضل النتائج",
+      "generating": "جاري إنشاء الوصفات...",
+      "generateButton": "إنشاء الوصفات",
+      "howItWorks": {
+        "title": "كيف يعمل",
+        "step1": "اذكر جميع المكونات المتاحة لديك",
+        "step2": "سيقوم الذكاء الاصطناعي لدينا بإنشاء وصفات مخصصة باستخدام ما لديك",
+        "step3": "احصل على خيارات وصفات متعددة مع تعليمات الطهي"
+      }
+    },
+    "errors": {
+      "analysisError": "خطأ في التحليل",
+      "failedToAnalyze": "فشل تحليل المكونات",
+      "tryDifferent": "جرب صورة مختلفة أو الإدخال اليدوي",
+      "unsupportedImage": "صورة غير مدعومة",
+      "unsupportedFormat": "تنسيق صورة غير مدعوم.",
+      "useCorrectFormat": "يرجى استخدام صور JPEG أو PNG أو GIF أو WEBP. جرب التقاط صورة جديدة أو التبديل إلى الإدخال اليدوي",
+      "aiProcessingError": "خطأ في معالجة الذكاء الاصطناعي",
+      "serverError": "خطأ في الخادم أثناء تحليل الصورة.",
+      "tryBetterLighting": "واجه الذكاء الاصطناعي لدينا مشكلة مع هذه الصورة. جرب إضاءة أفضل أو عرض أوضح للمكونات.",
+      "enterIngredients": "يرجى إدخال مكوناتك",
+      "failedToGenerate": "فشل إنشاء الوصفات",
+      "beMoreSpecific": "فشل إنشاء الوصفات. حاول أن تكون أكثر تحديدًا أو استخدم الإدخال اليدوي.",
+      "suggestion": "اقتراح",
+      "tryAgain": "حاول مرة أخرى",
+      "switchToManual": "التبديل إلى الإدخال اليدوي"
+    }
+  },
+  "enhancedShoppingList": {
+    "title": "قائمة التسوق",
+    "weeklyLabel": "قائمة التسوق الأسبوعية",
+    "loading": "جارٍ تحميل قائمة التسوق...",
+    "error": "فشل تحميل قائمة التسوق",
+    "tryAgain": "حاول مرة أخرى",
+    "empty": {
+      "title": "لا توجد عناصر في قائمة التسوق",
+      "subtitle": "أضف وجبات إلى خطة وجباتك لإنشاء قائمة التسوق",
+      "generateButton": "إنشاء قائمة التسوق"
+    },
+    "tabs": {
+      "all": "جميع العناصر",
+      "pending": "للشراء",
+      "purchased": "تم الشراء"
+    },
+    "groupBy": {
+      "label": "تجميع حسب:",
+      "mealType": "نوع الوجبة",
+      "category": "الفئة"
+    },
+    "item": {
+      "for": "لـ:",
+      "markPurchased": "تحديد كمشترى",
+      "markNotPurchased": "تحديد كغير مشترى"
+    }
+  },
+  "addFood": {
+    "title": "إضافة طعام",
+    "subtitle": "سجّل وجباتك بسهولة",
+    "tabs": {
+      "photo": "صورة",
+      "gallery": "المعرض",
+      "manual": "يدوي"
+    },
+    "camera": {
+      "initializing": "جاري تهيئة الكاميرا...",
+      "accessRequired": "يتطلب الوصول إلى الكاميرا",
+      "enableCamera": "تفعيل الكاميرا",
+      "useManualEntry": "استخدام الإدخال اليدوي بدلاً من ذلك",
+      "captureHint": "انقر للتقاط وجبتك",
+      "analyzing": "جاري تحليل وجبتك..."
+    },
+    "gallery": {
+      "title": "اختر من المعرض",
+      "subtitle": "اختر صور الطعام للتحليل",
+      "noImages": "لا توجد صور محملة",
+      "noImagesDescription": "قم بتحميل الصور من جهازك لتحديد وتحليل صور الطعام",
+      "loadImages": "تحميل الصور",
+      "loadMore": "تحميل المزيد من الصور",
+      "selectButton": "تحديد"
+    },
+    "aiAnalysis": {
+      "title": "التحليل بالذكاء الاصطناعي",
+      "subtitle": "فقط صف ما أكلته",
+      "placeholder": "مثال: بيضتان مخفوقتان مع السبانخ، خبز قمح كامل مع الأفوكادو، وموزة",
+      "hint": "كن محددًا للحصول على أفضل النتائج",
+      "analyzeButton": "تحليل وإضافة إلى السجل",
+      "analyzing": "جاري التحليل بالذكاء الاصطناعي..."
+    },
+    "manualEntry": {
+      "title": "إدخال يدوي",
+      "subtitle": "أدخل حقائق التغذية مباشرة",
+      "orLabel": "أو أدخل يدويًا",
+      "foodName": "اسم الطعام",
+      "foodNamePlaceholder": "مثال: زبادي يوناني، دجاج مشوي",
+      "nutritionInfo": "معلومات التغذية",
+      "calories": "السعرات",
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون",
+      "placeholder": "0",
+      "kcal": "سعرة",
+      "grams": "جم",
+      "addButton": "إضافة إلى سجل الطعام",
+      "saving": "جاري الحفظ..."
+    },
+    "error": {
+      "suggestion": "اقتراح",
+      "tryAgain": "حاول مرة أخرى",
+      "switchToManual": "التبديل إلى الإدخال اليدوي"
+    }
+  },
+  "cookingMode": {
+    "loading": "جاري التحميل...",
+    "step": "خطوة",
+    "of": "من",
+    "complete": "مكتمل",
+    "elapsed": "منقضي",
+    "importantStep": "خطوة مهمة",
+    "activeTimers": "المؤقتات النشطة",
+    "ingredients": "المكونات",
+    "addTimer": "إضافة مؤقت",
+    "previous": "السابق",
+    "next": "التالي",
+    "completeButton": "إكمال",
+    "exitTitle": "الخروج من وضع الطهي؟",
+    "exitMessage": "سيتم فقدان تقدمك إذا خرجت الآن.",
+    "cancel": "إلغاء",
+    "exit": "خروج",
+    "completion": {
+      "title": "🎉 تهانينا!",
+      "subtitle": "لقد أكملت بنجاح:",
+      "time": "الوقت",
+      "calories": "السعرات",
+      "servings": "الحصص",
+      "cookAgain": "طهي مرة أخرى",
+      "backToRecipe": "← العودة للوصفة"
+    },
+    "startTimerButton": "بدء مؤقت {time}",
+    "customTimerPrompt": "أدخل مدة المؤقت (بالدقائق):",
+    "customTimerLabel": "مخصص - {minutes} دقيقة"
+  },
+  "adminDashboard": {
+    "title": "لوحة تحكم المسؤول",
+    "loading": "جاري التحميل...",
+    "backToUsers": "العودة إلى المستخدمين",
+    "error": {
+      "loadingData": "خطأ في تحميل البيانات. يرجى المحاولة مرة أخرى.",
+      "userNotFound": "المستخدم غير موجود",
+      "loadingProgress": "خطأ في تحميل تقدم المستخدم.",
+      "loadingFoodLogs": "خطأ في تحميل سجلات الطعام.",
+      "loadingRecipes": "خطأ في تحميل الوصفات.",
+      "returnHome": "العودة إلى الصفحة الرئيسية"
+    },
+    "tabs": {
+      "users": "المستخدمون",
+      "foodLogs": "سجلات الطعام",
+      "recipes": "الوصفات",
+      "profileData": "بيانات الملف الشخصي",
+      "userFoodLogs": "سجلات الطعام",
+      "userRecipes": "الوصفات"
+    },
+    "userProfile": {
+      "title": "ملف المستخدم",
+      "userId": "معرف المستخدم",
+      "email": "البريد الإلكتروني",
+      "status": "الحالة",
+      "lastActive": "آخر نشاط",
+      "language": "اللغة",
+      "never": "أبدًا",
+      "removeAdmin": "إزالة المسؤول",
+      "makeAdmin": "جعل مسؤولاً",
+      "delete": "حذف المستخدم",
+      "view": "عرض التفاصيل",
+      "admin": "مسؤول",
+      "onboarded": "مكتمل",
+      "notOnboarded": "غير مكتمل"
+    },
+    "deleteDialog": {
+      "title": "هل أنت متأكد تمامًا؟",
+      "description": "هذا الإجراء لا يمكن التراجع عنه. سيتم حذف حساب هذا المستخدم نهائيًا من خوادمنا.",
+      "cancel": "إلغاء",
+      "delete": "حذف"
+    },
+    "toast": {
+      "success": "نجاح",
+      "adminUpdated": "تم تحديث حالة المسؤول بنجاح",
+      "userDeleted": "تم حذف المستخدم بنجاح",
+      "error": "خطأ",
+      "updateFailed": "فشل تحديث حالة المسؤول",
+      "deleteFailed": "فشل حذف المستخدم"
+    },
+    "nutrition": {
+      "title": "تفضيلات التغذية",
+      "dietaryType": "نوع النظام الغذائي",
+      "calorieTarget": "هدف السعرات",
+      "kcal": "سعرة حرارية",
+      "mealsPerDay": "وجبات في اليوم",
+      "allergies": "الحساسية",
+      "notSet": "غير محدد",
+      "noAllergies": "لا توجد حساسية",
+      "noPreferences": "لم يتم تعيين تفضيلات التغذية بعد"
+    },
+    "weight": {
+      "title": "سجل الوزن",
+      "date": "التاريخ",
+      "weight": "الوزن (كجم)",
+      "noHistory": "لا يوجد سجل للوزن"
+    },
+    "users": {
+      "title": "جميع المستخدمين",
+      "description": "عرض وإدارة جميع حسابات المستخدمين",
+      "tableHeaders": {
+        "id": "المعرف",
+        "email": "البريد الإلكتروني",
+        "status": "الحالة",
+        "lastActive": "آخر نشاط",
+        "actions": "الإجراءات"
+      }
+    },
+    "foodLogs": {
+      "title": "سجلات الطعام",
+      "description": "عرض جميع إدخالات سجلات الطعام عبر المستخدمين",
+      "tableHeaders": {
+        "userId": "معرف المستخدم",
+        "food": "الطعام",
+        "mealType": "نوع الوجبة",
+        "calories": "السعرات",
+        "date": "التاريخ"
+      },
+      "noLogs": "لم يتم العثور على سجلات طعام"
+    },
+    "recipes": {
+      "title": "الوصفات",
+      "description": "عرض جميع الوصفات عبر المستخدمين",
+      "tableHeaders": {
+        "userId": "معرف المستخدم",
+        "name": "اسم الوصفة",
+        "calories": "السعرات",
+        "date": "التاريخ"
+      },
+      "noRecipes": "لم يتم العثور على وصفات"
+    }
+  },
+  "emotionalLandingPage": {
+    "header": {
+      "appName": "NutriAI",
+      "navTransformation": "رحلة التحول",
+      "navBodyWisdom": "حكمة الجسم",
+      "navStories": "قصص النجاح",
+      "login": "تسجيل الدخول",
+      "startJourney": "ابدأ رحلتك"
+    },
+    "hero": {
+      "badge": "اكتشف إمكانات جسمك الحقيقية",
+      "headline1": "ماذا لو كان جسمك يعرف بالفعل",
+      "headline2": "ما يحتاجه؟",
+      "subheadline": "لا يقتصر NutriAI على إنشاء خطط الوجبات. إنه يفتح حكمة جسمك الطبيعية من خلال التغذية المدعومة بالذكاء الاصطناعي.",
+      "ctaButton": "ابدأ تحولك",
+      "scrollIndicator": "اكتشف المزيد"
+    },
+    "testimonials": {
+      "maria": {
+        "quote": "لم أكن أعلم أن الأكل يمكن أن يكون بهذا الشعور الرائع. لقد تحولت طاقتي بالكامل.",
+        "name": "ماريا",
+        "achievement": "فقدت 24 كجم في 6 أشهر"
+      },
+      "pavel": {
+        "quote": "هذا ليس مجرد نظام غذائي آخر. هذا أخيراً فهم لما يحتاجه جسمي.",
+        "name": "بافيل",
+        "achievement": "حقق الوزن المثالي في 90 يوماً"
+      },
+      "sophia": {
+        "quote": "لأول مرة، أشعر بالسيطرة على رحلة التغذية الخاصة بي.",
+        "name": "صوفيا",
+        "achievement": "تحسين تحديد العضلات والطاقة"
+      }
+    },
+    "transformation": {
+      "title1": "يبدأ تحولك مع",
+      "title2": "اكتشاف الذات",
+      "subtitle": "تكشف هذه الرحلة الحكمة الخفية التي يحملها جسمك، في انتظار إطلاقها.",
+      "features": {
+        "bodyIntelligence": {
+          "title": "رسم خريطة ذكاء الجسم",
+          "description": "اكتشف كيف يعالج جسمك العناصر الغذائية والطاقة بشكل فريد من خلال تحليل الذكاء الاصطناعي لدينا."
+        },
+        "nutritionalDNA": {
+          "title": "اكتشاف الحمض النووي الغذائي",
+          "description": "اكتشف التوازن المثالي للعناصر الغذائية التي تجعل جسمك يزدهر."
+        },
+        "transformationTimeline": {
+          "title": "الجدول الزمني للتحول",
+          "description": "تصور رحلتك بمعالم تحتفل بالتقدم في كل خطوة."
+        }
+      },
+      "ctaButton": "ابدأ رحلة اكتشاف ذاتك"
+    },
+    "bodyWisdom": {
+      "title1": "يتحدث جسمك",
+      "title2": "لغة فريدة",
+      "subtitle": "نفك شفرة ما يخبرك به لإنشاء تغذية تستجيب لاحتياجات جسمك المحددة.",
+      "features": {
+        "energyFlow": {
+          "title": "تحليل تدفق الطاقة",
+          "description": "اكتشف إيقاع الطاقة الطبيعي لجسمك وحسّن تغذيتك وفقاً لذلك."
+        },
+        "tastePersonality": {
+          "title": "رسم خريطة شخصية التذوق",
+          "description": "تساعدنا تفضيلات النكهة الفريدة لديك في إنشاء تغذية مستدامة ستستمتع بها بالفعل."
+        },
+        "adaptiveProgress": {
+          "title": "تتبع التقدم التكيفي",
+          "description": "يتغير جسمك، وكذلك خطتك. نتطور مع تحولك."
+        }
+      },
+      "visualization": {
+        "energyLevel": "مستوى الطاقة",
+        "morningBurst": "انفجار الصباح 🌅",
+        "tasteProfile": "ملف التذوق",
+        "richSavory": "غني ولذيذ 🍲"
+      }
+    },
+    "finalCTA": {
+      "title1": "مخطط التغذية",
+      "title2": "المخصص لك",
+      "title3": "في انتظارك",
+      "subtitle": "هذا ليس فقط عما تأكله. إنه يتعلق باكتشاف نسخة من نفسك لم تكن تعلم بوجودها - نابضة بالحياة، ممتلئة بالطاقة، ومتناغمة مع جسمك.",
+      "ctaButton": "ابدأ تحولك",
+      "socialProof": "انضم إلى الآلاف الذين اكتشفوا حكمة أجسامهم من خلال NutriAI"
+    }
+  },
+  "shoppingList": {
+    "title": "قائمة التسوق",
+    "weeklyTitle": "قائمة التسوق الأسبوعية",
+    "backButton": "رجوع",
+    "noDate": "لم يتم تحديد التاريخ",
+    "cartIcon": "عربة التسوق",
+    "tabs": {
+      "all": "كل العناصر",
+      "toBuy": "للشراء",
+      "purchased": "تم الشراء"
+    },
+    "grouping": {
+      "label": "تجميع العناصر",
+      "byMeal": "حسب الوجبة",
+      "byCategory": "حسب الفئة"
+    },
+    "pricing": {
+      "selectLocation": "اختر الموقع",
+      "locationTitle": "اختر موقعك",
+      "searchPlaceholder": "البحث عن المواقع...",
+      "currentLocation": "الموقع الحالي",
+      "totalPrice": "الإجمالي",
+      "itemPrice": "{{price}} {{currency}}",
+      "noPrice": "السعر غير متوفر"
+    },
+    "items": {
+      "selectItem": "اختر عنصر {{name}}",
+      "purchased": "تم الشراء",
+      "pending": "عنصر قيد الانتظار",
+      "toBuy": "للشراء",
+      "quantity": "{{amount}} {{unit}}",
+      "forRecipe": "لـ: {{recipe}}",
+      "viewDetails": "عرض تفاصيل العنصر",
+      "markPurchased": "وضع علامة كمشتراة",
+      "markPending": "وضع علامة كقيد الانتظار"
+    },
+    "itemDetails": {
+      "title": "تفاصيل العنصر",
+      "ingredient": "المكون",
+      "category": "الفئة",
+      "quantity": "الكمية",
+      "forRecipes": "للوصفات",
+      "close": "إغلاق"
+    },
+    "recipeDetails": {
+      "title": "تفاصيل الوصفة",
+      "ingredients": "المكونات",
+      "servings": "{{count}} حصص",
+      "close": "إغلاق"
+    },
+    "batchActions": {
+      "title": "إجراءات مجمعة",
+      "selectAll": "اختر الكل",
+      "deselectAll": "إلغاء تحديد الكل",
+      "markAllPurchased": "وضع علامة على الكل كمشتراة",
+      "itemsSelected": "{{count}} عناصر محددة",
+      "noItemsSelected": "لم يتم تحديد عناصر",
+      "clearSelection": "مسح التحديد",
+      "markItemsAsPurchased": "وضع علامة على {{count}} عناصر كمشتراة",
+      "processing": "جارٍ المعالجة...",
+      "close": "إغلاق"
+    },
+    "empty": {
+      "noItems": "لا توجد عناصر في قائمة التسوق الخاصة بك",
+      "noItemsDescription": "أضف وجبات إلى خطة وجباتك لإنشاء قائمة تسوق",
+      "generateButton": "إنشاء قائمة تسوق",
+      "noPendingItems": "لا توجد عناصر للشراء",
+      "noPurchasedItems": "لا توجد عناصر مشتراة"
+    },
+    "loading": "جارٍ تحميل قائمة التسوق...",
+    "error": "فشل تحميل قائمة التسوق"
+  },
+  "onboardingQuiz": {
+    "navigation": {
+      "back": "رجوع",
+      "next": "التالي",
+      "complete": "إكمال",
+      "saving": "جارٍ الحفظ..."
+    },
+    "steps": {
+      "goal": {
+        "title": "ما هو هدفك الرئيسي؟",
+        "subtitle": "اختر ما يهمك أكثر",
+        "options": {
+          "weightLoss": {
+            "label": "فقدان الوزن",
+            "desc": "الوصول إلى وزنك المثالي"
+          },
+          "muscleGain": {
+            "label": "بناء العضلات",
+            "desc": "اكتساب القوة والكتلة"
+          },
+          "healthImprove": {
+            "label": "تحسين الصحة",
+            "desc": "الشعور بتحسن بشكل عام"
+          },
+          "other": {
+            "label": "أخرى",
+            "desc": "هدف مخصص"
+          }
+        },
+        "customGoalLabel": "يرجى تحديد هدفك",
+        "customGoalPlaceholder": "أدخل هدفك المخصص..."
+      },
+      "gender": {
+        "title": "اختر جنسك",
+        "subtitle": "يساعدنا هذا في تخصيص خطتك بشكل أفضل",
+        "male": "ذكر",
+        "female": "أنثى"
+      },
+      "age": {
+        "title": "كم عمرك؟",
+        "subtitle": "نحتاج هذا لحساب السعرات الحرارية",
+        "label": "العمر",
+        "years": "سنوات"
+      },
+      "height": {
+        "title": "ما هو طولك؟",
+        "subtitle": "أدخل الطول بالسنتيمترات",
+        "label": "الطول (سم)"
+      },
+      "weight": {
+        "title": "كم وزنك؟",
+        "subtitle": "الوزن الحالي بالكيلوغرامات",
+        "label": "الوزن (كجم)"
+      },
+      "goalWeight": {
+        "title": "ما هو وزنك المستهدف؟",
+        "subtitle": "ما الوزن الذي تهدف إليه؟",
+        "label": "الوزن المستهدف (كجم)"
+      },
+      "activityLevel": {
+        "title": "ما هو مستوى نشاطك؟",
+        "subtitle": "كم مرة تمارس الرياضة؟",
+        "sedentary": "خامل",
+        "sedentaryDesc": "قليل أو لا توجد تمارين",
+        "light": "خفيف",
+        "lightDesc": "تمارين 1-3 أيام/أسبوع",
+        "moderate": "معتدل",
+        "moderateDesc": "تمارين 3-5 أيام/أسبوع",
+        "active": "نشط",
+        "activeDesc": "تمارين 6-7 أيام/أسبوع",
+        "veryActive": "نشط جداً",
+        "veryActiveDesc": "عمل بدني أو تدريب مرتين/يوم"
+      },
+      "profilePicture": {
+        "title": "أضف صورة الملف الشخصي",
+        "subtitle": "أضف صورتك (اختياري)",
+        "uploadButton": "تحميل صورة",
+        "takePhoto": "التقاط صورة",
+        "skipButton": "تخطي الآن"
+      },
+      "visionBoard": {
+        "title": "لوحة رؤيتك",
+        "subtitle": "خطتك الشخصية",
+        "currentWeight": "الحالي",
+        "goalWeightLabel": "الهدف",
+        "timeline": {
+          "title": "رحلة نجاحك",
+          "weeks": "أسابيع",
+          "months": "أشهر",
+          "weeklyProgress": "التقدم الأسبوعي",
+          "perWeek": "كجم/أسبوع"
+        },
+        "summary": {
+          "title": "خطتك الشخصية",
+          "subtitle": "بناءً على ملفك الشخصي، إليك ما نوصي به",
+          "dailyCalories": "السعرات الحرارية اليومية",
+          "kcal": "سعرة",
+          "macros": "المغذيات الكبيرة",
+          "protein": "البروتين",
+          "carbs": "الكربوهيدرات",
+          "fats": "الدهون",
+          "grams": "جم",
+          "mealPlan": "خطة الوجبات",
+          "meals": "{{count}} وجبات/يوم",
+          "showFormula": "كيف حسبنا هذا",
+          "hideFormula": "إخفاء الحساب",
+          "formulaTitle": "صيغة حساب السعرات الحرارية",
+          "formulaSubtitle": "نستخدم معادلة ميفلين-سانت جيور",
+          "bmr": "معدل الأيض الأساسي",
+          "tdee": "إجمالي الطاقة اليومية المصروفة",
+          "adjustment": "تعديل الهدف",
+          "finalCalories": "السعرات الحرارية اليومية النهائية"
+        }
+      },
+      "completion": {
+        "title": "تهانينا!",
+        "subtitle": "ملفك الشخصي جاهز!",
+        "message": "رحلتك تبدأ الآن",
+        "description": "لقد أنشأنا خطة التغذية الشخصية الخاصة بك. لنبدأ تحولك!"
+      }
+    },
+    "progress": {
+      "weightMetrics": {
+        "title": "مقاييس الوزن",
+        "subtitle": "الوزن الحالي والمستهدف",
+        "current": "الحالي",
+        "goal": "الهدف",
+        "kg": "كجم"
+      },
+      "bodyMetrics": {
+        "title": "مقاييس الجسم",
+        "subtitle": "مؤشر كتلة الجسم والحسابات",
+        "bmi": "مؤشر كتلة الجسم",
+        "height": "الطول",
+        "cm": "سم"
+      },
+      "bodyComposition": {
+        "title": "تكوين الجسم",
+        "subtitle": "تحليل جسمك التفصيلي",
+        "bmi": "مؤشر كتلة الجسم",
+        "weight": "الوزن",
+        "height": "الطول"
+      },
+      "photos": {
+        "title": "صور التقدم",
+        "subtitle": "تتبع بصري لرحلتك",
+        "viewAll": "عرض جميع الصور",
+        "takePhoto": "التقاط صورة",
+        "uploadPhoto": "رفع صورة",
+        "changePhoto": "تغيير صورة اليوم",
+        "deleteConfirm": "حذف الصورة",
+        "deleteMessage": "هل أنت متأكد من حذف صورة التقدم هذه؟ لا يمكن التراجع عن هذا الإجراء.",
+        "cancel": "إلغاء",
+        "delete": "حذف",
+        "noPhotos": "لا توجد صور بعد",
+        "noPhotosDescription": "ابدأ رحلتك البصرية",
+        "gallery": "معرض صور التقدم",
+        "close": "إغلاق"
+      },
+      "weightLog": {
+        "addWeight": "إضافة وزن",
+        "updateWeight": "تحديث الوزن",
+        "deleteWeight": "حذف الوزن",
+        "noEntries": "لا توجد إدخالات"
+      },
+      "heightLog": {
+        "addHeight": "إضافة طول",
+        "updateHeight": "تحديث الطول",
+        "noEntries": "لا توجد إدخالات"
+      }
+    }
   }
 }

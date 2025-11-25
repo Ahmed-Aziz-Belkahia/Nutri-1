@@ -1,9 +1,11 @@
 import React from 'react';
 import { useLocation } from 'wouter';
 import { ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import CircularButtonWhite from '@/components/CircularButtonWhite';
 
 export default function CircularButtonDemo() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
 
   return (
@@ -16,7 +18,7 @@ export default function CircularButtonDemo() {
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h1 className="ml-4 text-xl font-semibold">Button Demo</h1>
+        <h1 className="ml-4 text-xl font-semibold">{t('common:circularButtonDemo.title')}</h1>
       </div>
 
       {/* Content */}
@@ -24,9 +26,9 @@ export default function CircularButtonDemo() {
         <div className="max-w-md mx-auto space-y-12">
           {/* Explanation */}
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-6">
-            <h2 className="text-lg font-medium mb-4">Simple White Circular Button</h2>
+            <h2 className="text-lg font-medium mb-4">{t('common:circularButtonDemo.heading')}</h2>
             <p className="text-gray-300 mb-4">
-              This is a demonstration of the simple white circular button without any colored border.
+              {t('common:circularButtonDemo.description')}
             </p>
           </div>
 
@@ -36,27 +38,27 @@ export default function CircularButtonDemo() {
             <div className="text-center">
               <CircularButtonWhite 
                 size="sm" 
-                onClick={() => alert('Small button clicked!')} 
+                onClick={() => alert(t('common:circularButtonDemo.smallButtonAlert'))} 
               />
-              <p className="mt-3 text-sm text-gray-400">Small Size</p>
+              <p className="mt-3 text-sm text-gray-400">{t('common:circularButtonDemo.smallSize')}</p>
             </div>
 
             {/* Medium Button */}
             <div className="text-center">
               <CircularButtonWhite 
                 size="md" 
-                onClick={() => alert('Medium button clicked!')} 
+                onClick={() => alert(t('common:circularButtonDemo.mediumButtonAlert'))} 
               />
-              <p className="mt-3 text-sm text-gray-400">Medium Size (Default)</p>
+              <p className="mt-3 text-sm text-gray-400">{t('common:circularButtonDemo.mediumSize')}</p>
             </div>
 
             {/* Large Button */}
             <div className="text-center">
               <CircularButtonWhite 
                 size="lg" 
-                onClick={() => alert('Large button clicked!')} 
+                onClick={() => alert(t('common:circularButtonDemo.largeButtonAlert'))} 
               />
-              <p className="mt-3 text-sm text-gray-400">Large Size</p>
+              <p className="mt-3 text-sm text-gray-400">{t('common:circularButtonDemo.largeSize')}</p>
             </div>
           </div>
         </div>

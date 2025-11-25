@@ -12,6 +12,7 @@ import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 type User = { id: number; email: string; profile?: HookUserProfile };
 
 export default function Analytics() {
+  const { t } = useTranslation(['common']);
   const { user, updateProfile } = useUser();
   const [isUpdatingWeight, setIsUpdatingWeight] = useState(false);
   const [isUpdatingGoal, setIsUpdatingGoal] = useState(false);
@@ -93,7 +94,7 @@ export default function Analytics() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">📏</span>
-            <span className="text-lg">Height {height} cm</span>
+            <span className="text-lg">{t('common:analytics.height')} {height} {t('common:analytics.units.cm')}</span>
           </div>
           {isUpdatingHeight ? (
             <div className="space-y-2">
@@ -107,10 +108,10 @@ export default function Analytics() {
               />
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingHeight(false)}>
-                  Cancel
+                  {t('common:analytics.actions.cancel')}
                 </Button>
                 <Button className="flex-1" onClick={handleUpdateHeight}>
-                  Save
+                  {t('common:analytics.actions.save')}
                 </Button>
               </div>
             </div>
@@ -120,22 +121,22 @@ export default function Analytics() {
               className="w-full border-2 hover:bg-gray-50"
               onClick={() => setIsUpdatingHeight(true)}
             >
-              Update Height
+              {t('common:analytics.actions.updateHeight')}
             </Button>
           )}
         </Card>
 
         {/* Body Fat Percentage Card */}
         <Card className="p-4">
-          <h2 className="text-lg mb-4">Body Fat Percentage</h2>
+          <h2 className="text-lg mb-4">{t('common:analytics.bodyFat.title')}</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-2xl font-medium">{bodyFatPercentage}%</div>
-                <div className="text-sm text-gray-500">Estimated body fat</div>
+                <div className="text-sm text-gray-500">{t('common:analytics.bodyFat.estimated')}</div>
                 <div className="inline-flex items-center gap-1 mt-1">
                   <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <span className="text-sm">Based on BMI calculation</span>
+                  <span className="text-sm">{t('common:analytics.bodyFat.basedOnBMI')}</span>
                 </div>
               </div>
             </div>
@@ -148,11 +149,11 @@ export default function Analytics() {
             </div>
 
             <div className="flex justify-between text-xs text-gray-500">
-              <span>Essential Fat</span>
-              <span>Athletic</span>
-              <span>Fitness</span>
-              <span>Average</span>
-              <span>Obese</span>
+              <span>{t('common:analytics.bodyFat.categories.essential')}</span>
+              <span>{t('common:analytics.bodyFat.categories.athletic')}</span>
+              <span>{t('common:analytics.bodyFat.categories.fitness')}</span>
+              <span>{t('common:analytics.bodyFat.categories.average')}</span>
+              <span>{t('common:analytics.bodyFat.categories.obese')}</span>
             </div>
           </div>
         </Card>
@@ -161,7 +162,7 @@ export default function Analytics() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-amber-500 text-xl">🏆</span>
-            <span className="text-lg">Calorie Goal {user?.profile?.goals?.calories ?? 2000} kcal</span>
+            <span className="text-lg">{t('common:analytics.calorieGoal')} {user?.profile?.goals?.calories ?? 2000} {t('common:analytics.units.kcal')}</span>
           </div>
           {isUpdatingGoal ? (
             <div className="space-y-2">
@@ -173,10 +174,10 @@ export default function Analytics() {
               />
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingGoal(false)}>
-                  Cancel
+                  {t('common:analytics.actions.cancel')}
                 </Button>
                 <Button className="flex-1" onClick={handleUpdateGoalWeight}>
-                  Save
+                  {t('common:analytics.actions.save')}
                 </Button>
               </div>
             </div>
@@ -186,7 +187,7 @@ export default function Analytics() {
               className="w-full border-2 hover:bg-gray-50"
               onClick={() => setIsUpdatingGoal(true)}
             >
-              Update
+              {t('common:analytics.actions.update')}
             </Button>
           )}
         </Card>
@@ -195,10 +196,10 @@ export default function Analytics() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xl">⚖️</span>
-            <span className="text-lg">Current Weight {currentWeight} kg</span>
+            <span className="text-lg">{t('common:analytics.currentWeight')} {currentWeight} {t('common:analytics.units.kg')}</span>
           </div>
           <div className="text-sm text-gray-500 mb-3">
-            Remember to update this at least once a week so we can adjust your plan
+            {t('common:analytics.updateReminder')}
           </div>
           {isUpdatingWeight ? (
             <div className="space-y-2">
@@ -210,10 +211,10 @@ export default function Analytics() {
               />
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={() => setIsUpdatingWeight(false)}>
-                  Cancel
+                  {t('common:analytics.actions.cancel')}
                 </Button>
                 <Button className="flex-1 bg-black text-white hover:bg-black/90" onClick={handleUpdateWeight}>
-                  Save
+                  {t('common:analytics.actions.save')}
                 </Button>
               </div>
             </div>
@@ -223,22 +224,22 @@ export default function Analytics() {
               className="w-full bg-black text-white hover:bg-black/90"
               onClick={() => setIsUpdatingWeight(true)}
             >
-              Update your weight
+              {t('common:analytics.actions.updateWeight')}
             </Button>
           )}
         </Card>
 
         {/* BMI Section */}
         <Card className="p-4">
-          <h2 className="text-lg mb-4">Your BMI</h2>
+          <h2 className="text-lg mb-4">{t('common:analytics.bmi.title')}</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <div>
                 <div className="text-2xl font-medium">{bmi}</div>
-                <div className="text-sm text-gray-500">Your BMI is</div>
+                <div className="text-sm text-gray-500">{t('common:analytics.bmi.yourBMIis')}</div>
                 <div className="inline-flex items-center gap-1 mt-1">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-sm">Healthy</span>
+                  <span className="text-sm">{t('common:analytics.bmi.healthy')}</span>
                 </div>
               </div>
               <Button variant="ghost" size="sm" className="text-gray-500">
@@ -254,10 +255,10 @@ export default function Analytics() {
             </div>
 
             <div className="flex justify-between text-xs text-gray-500">
-              <span>Underweight</span>
-              <span className="text-green-500">Healthy</span>
-              <span>Overweight</span>
-              <span className="text-right">Obese</span>
+              <span>{t('common:analytics.bmi.categories.underweight')}</span>
+              <span className="text-green-500">{t('common:analytics.bmi.healthy')}</span>
+              <span>{t('common:analytics.bmi.categories.overweight')}</span>
+              <span className="text-right">{t('common:analytics.bmi.categories.obese')}</span>
             </div>
             
             {/* BMI Source Information */}
@@ -345,10 +346,10 @@ export default function Analytics() {
         {/* Goal Progress */}
         <Card className="p-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg">Goal Progress</h2>
+            <h2 className="text-lg">{t('common:analytics.goalProgress.title')}</h2>
             <div className="flex items-center gap-1">
               <span className="text-sm">{0}%</span>
-              <span className="text-sm text-gray-500">Goal achieved</span>
+              <span className="text-sm text-gray-500">{t('common:analytics.goalProgress.goalAchieved')}</span>
             </div>
           </div>
 
@@ -365,7 +366,10 @@ export default function Analytics() {
                 }`}
                 onClick={() => setSelectedPeriod(period as "90 Days" | "6 Months" | "1 Year" | "All time")}
               >
-                {period}
+                {period === "90 Days" ? t('common:analytics.goalProgress.periods.90days') :
+                 period === "6 Months" ? t('common:analytics.goalProgress.periods.6months') :
+                 period === "1 Year" ? t('common:analytics.goalProgress.periods.1year') :
+                 t('common:analytics.goalProgress.periods.allTime')}
               </Button>
             ))}
           </div>
@@ -375,7 +379,7 @@ export default function Analytics() {
         </Card>
         {/* Nutrition Section */}
         <section className="space-y-4">
-          <h2 className="text-lg font-medium">Nutrition</h2>
+          <h2 className="text-lg font-medium">{t('common:analytics.nutrition.title')}</h2>
 
           {/* Time Period Selector */}
           <div className="flex gap-2 mb-4 bg-gray-100 p-1 rounded-lg">
@@ -390,7 +394,10 @@ export default function Analytics() {
                 }`}
                 onClick={() => setSelectedNutritionPeriod(period as "This week" | "Last week" | "2 wks. ago" | "3 wks. ago")}
               >
-                {period}
+                {period === "This week" ? t('common:analytics.nutrition.periods.thisWeek') :
+                 period === "Last week" ? t('common:analytics.nutrition.periods.lastWeek') :
+                 period === "2 wks. ago" ? t('common:analytics.nutrition.periods.2weeksAgo') :
+                 t('common:analytics.nutrition.periods.3weeksAgo')}
               </Button>
             ))}
           </div>
@@ -400,11 +407,11 @@ export default function Analytics() {
               <div className="flex justify-between">
                 <div>
                   <div className="text-2xl font-medium">1463</div>
-                  <div className="text-sm text-gray-500">Total calories</div>
+                  <div className="text-sm text-gray-500">{t('common:analytics.nutrition.totalCalories')}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-medium">1463</div>
-                  <div className="text-sm text-gray-500">Daily avg.</div>
+                  <div className="text-sm text-gray-500">{t('common:analytics.nutrition.dailyAvg')}</div>
                 </div>
               </div>
 

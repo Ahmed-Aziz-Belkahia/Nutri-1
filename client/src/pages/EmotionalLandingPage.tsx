@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import { 
   Check, ArrowRight, Camera, Sparkles, Zap, 
   Activity, Brain, ChevronRight, Star, 
@@ -12,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 
 export default function EmotionalLandingPage() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [activeBubble, setActiveBubble] = useState(0);
@@ -27,23 +29,23 @@ export default function EmotionalLandingPage() {
   const transformationBubbles = [
     {
       id: 1,
-      quote: "I never knew eating could feel this good. My energy has completely transformed.",
-      name: "Maria",
-      achievement: "lost 24kg in 6 months",
+      quote: t('common:emotionalLandingPage.testimonials.maria.quote'),
+      name: t('common:emotionalLandingPage.testimonials.maria.name'),
+      achievement: t('common:emotionalLandingPage.testimonials.maria.achievement'),
       position: "bottom-[20%] left-[10%]",
     },
     {
       id: 2,
-      quote: "This isn't just another diet. This is finally understanding what my body needs.",
-      name: "Pavel",
-      achievement: "achieved ideal weight in 90 days",
+      quote: t('common:emotionalLandingPage.testimonials.pavel.quote'),
+      name: t('common:emotionalLandingPage.testimonials.pavel.name'),
+      achievement: t('common:emotionalLandingPage.testimonials.pavel.achievement'),
       position: "bottom-[30%] right-[15%]",
     },
     {
       id: 3,
-      quote: "For the first time, I feel in control of my nutrition journey.",
-      name: "Sophia",
-      achievement: "improved muscle definition and energy",
+      quote: t('common:emotionalLandingPage.testimonials.sophia.quote'),
+      name: t('common:emotionalLandingPage.testimonials.sophia.name'),
+      achievement: t('common:emotionalLandingPage.testimonials.sophia.achievement'),
       position: "top-[25%] left-[20%]",
     }
   ];
@@ -112,14 +114,14 @@ export default function EmotionalLandingPage() {
             <div className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-[#00BCD6]" />
               <span className="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF]">
-                NutriAI
+                {t('common:emotionalLandingPage.header.appName')}
               </span>
             </div>
             
             <div className="hidden md:flex items-center gap-8">
-              <a href="#transformation" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Transformation Journey</a>
-              <a href="#body-wisdom" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Body Wisdom</a>
-              <a href="#stories" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">Success Stories</a>
+              <a href="#transformation" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">{t('common:emotionalLandingPage.header.navTransformation')}</a>
+              <a href="#body-wisdom" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">{t('common:emotionalLandingPage.header.navBodyWisdom')}</a>
+              <a href="#stories" className="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors">{t('common:emotionalLandingPage.header.navStories')}</a>
             </div>
             
             <div className="flex items-center gap-4">
@@ -128,14 +130,14 @@ export default function EmotionalLandingPage() {
                 className="hidden md:flex text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 onClick={() => setLocation("/auth?tab=signin")}
               >
-                Log In
+                {t('common:emotionalLandingPage.header.login')}
               </Button>
               
               <Button
                 className="bg-gradient-to-r from-[#00BCD6] to-[#A541FF] hover:opacity-90 text-white font-medium rounded-full"
                 onClick={() => setLocation("/auth?tab=signup")}
               >
-                Start Your Journey
+                {t('common:emotionalLandingPage.header.startJourney')}
               </Button>
             </div>
           </nav>
@@ -159,7 +161,7 @@ export default function EmotionalLandingPage() {
               >
                 <span className="flex items-center">
                   <Sparkles className="h-3.5 w-3.5 mr-2" />
-                  Discover Your Body's True Potential
+                  {t('common:emotionalLandingPage.hero.badge')}
                 </span>
               </motion.div>
               
@@ -168,9 +170,9 @@ export default function EmotionalLandingPage() {
                 variants={fadeInUp}
                 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.1] mb-3 md:mb-4 text-gray-900"
               >
-                What if your body already 
+                {t('common:emotionalLandingPage.hero.headline1')} 
                 <span className="block bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF] bg-[length:200%_auto] animate-gradient">
-                  knows what it needs?
+                  {t('common:emotionalLandingPage.hero.headline2')}
                 </span>
               </motion.h1>
               
@@ -178,8 +180,7 @@ export default function EmotionalLandingPage() {
                 variants={fadeInUp}
                 className="text-base md:text-lg lg:text-xl text-gray-600 mb-5 md:mb-6 leading-relaxed max-w-2xl mx-auto"
               >
-                NutriAI doesn't just create meal plans. 
-                It unlocks your body's natural wisdom through AI-powered nutrition.
+                {t('common:emotionalLandingPage.hero.subheadline')}
               </motion.p>
               
               {/* CTA Pulse Button */}
@@ -204,7 +205,7 @@ export default function EmotionalLandingPage() {
                     className="relative bg-gradient-to-r from-[#00BCD6] to-[#A541FF] hover:opacity-90 text-white font-semibold rounded-full py-4 md:py-6 px-6 md:px-8 text-base md:text-lg shadow-lg shadow-purple-500/20"
                     onClick={() => setLocation("/auth?tab=signup")}
                   >
-                    Begin Your Transformation
+                    {t('common:emotionalLandingPage.hero.ctaButton')}
                     <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                   </Button>
                 </div>
@@ -248,7 +249,7 @@ export default function EmotionalLandingPage() {
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <div className="text-gray-500 text-sm mb-2">Discover More</div>
+          <div className="text-gray-500 text-sm mb-2">{t('common:emotionalLandingPage.hero.scrollIndicator')}</div>
           <div className="w-8 h-8 rounded-full flex items-center justify-center border border-gray-300 bg-white/50">
             <ChevronRight className="h-4 w-4 text-gray-500 rotate-90" />
           </div>
@@ -266,13 +267,13 @@ export default function EmotionalLandingPage() {
               transition={{ duration: 0.8 }}
               className="text-4xl font-black mb-6 text-gray-900"
             >
-              Your Transformation Begins With
+              {t('common:emotionalLandingPage.transformation.title1')}
               <span className="block bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF]">
-                Self-Discovery
+                {t('common:emotionalLandingPage.transformation.title2')}
               </span>
             </motion.h2>
             <p className="text-xl text-gray-600">
-              This journey reveals the hidden wisdom your body holds, waiting to be unlocked.
+              {t('common:emotionalLandingPage.transformation.subtitle')}
             </p>
           </div>
           
@@ -280,20 +281,20 @@ export default function EmotionalLandingPage() {
             {[
               {
                 icon: <Brain className="h-12 w-12 text-[#00BCD6]" />,
-                title: "Body Intelligence Mapping",
-                description: "Discover how your body uniquely processes nutrients and energy through our AI analysis.",
+                title: t('common:emotionalLandingPage.transformation.features.bodyIntelligence.title'),
+                description: t('common:emotionalLandingPage.transformation.features.bodyIntelligence.description'),
                 delay: 0.2
               },
               {
                 icon: <Flame className="h-12 w-12 text-[#A541FF]" />,
-                title: "Nutritional DNA Discovery",
-                description: "Uncover the perfect balance of nutrients that makes your body thrive.",
+                title: t('common:emotionalLandingPage.transformation.features.nutritionalDNA.title'),
+                description: t('common:emotionalLandingPage.transformation.features.nutritionalDNA.description'),
                 delay: 0.4
               },
               {
                 icon: <RefreshCw className="h-12 w-12 text-[#F59E0B]" />,
-                title: "Transformation Timeline",
-                description: "Visualize your journey with milestones that celebrate progress at every step.",
+                title: t('common:emotionalLandingPage.transformation.features.transformationTimeline.title'),
+                description: t('common:emotionalLandingPage.transformation.features.transformationTimeline.description'),
                 delay: 0.6
               }
             ].map((item, i) => (
@@ -318,7 +319,7 @@ export default function EmotionalLandingPage() {
               className="bg-gradient-to-r from-[#00BCD6] to-[#A541FF] hover:opacity-90 text-white border-none rounded-full py-6 px-8 text-lg font-semibold shadow-lg transition-all duration-300"
               onClick={() => setLocation("/auth?tab=signup")}
             >
-              Start Your Self-Discovery Journey
+              {t('common:emotionalLandingPage.transformation.ctaButton')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -335,31 +336,31 @@ export default function EmotionalLandingPage() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-4xl font-black mb-6 text-gray-900">
-                Your Body Speaks A
+                {t('common:emotionalLandingPage.bodyWisdom.title1')}
                 <span className="block bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF]">
-                  Unique Language
+                  {t('common:emotionalLandingPage.bodyWisdom.title2')}
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                We decode what it's telling you to create nutrition that responds to your body's specific needs.
+                {t('common:emotionalLandingPage.bodyWisdom.subtitle')}
               </p>
               
               <div className="space-y-6">
                 {[
                   {
                     icon: <Activity className="h-6 w-6 text-[#00BCD6]" />,
-                    title: "Energy Flow Analysis",
-                    description: "Discover your body's natural energy rhythm and optimize your nutrition accordingly."
+                    title: t('common:emotionalLandingPage.bodyWisdom.features.energyFlow.title'),
+                    description: t('common:emotionalLandingPage.bodyWisdom.features.energyFlow.description')
                   },
                   {
                     icon: <Coffee className="h-6 w-6 text-[#A541FF]" />,
-                    title: "Taste Personality Mapping",
-                    description: "Your unique flavor preferences guide us to create sustainable nutrition you'll actually enjoy."
+                    title: t('common:emotionalLandingPage.bodyWisdom.features.tastePersonality.title'),
+                    description: t('common:emotionalLandingPage.bodyWisdom.features.tastePersonality.description')
                   },
                   {
                     icon: <Dumbbell className="h-6 w-6 text-[#F59E0B]" />,
-                    title: "Adaptive Progress Tracking",
-                    description: "Your body changes, and so does your plan. We evolve with your transformation."
+                    title: t('common:emotionalLandingPage.bodyWisdom.features.adaptiveProgress.title'),
+                    description: t('common:emotionalLandingPage.bodyWisdom.features.adaptiveProgress.description')
                   }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-4">
@@ -438,8 +439,8 @@ export default function EmotionalLandingPage() {
                   transition={{ delay: 1.2 }}
                   className="absolute top-[20%] left-[10%] bg-white backdrop-blur-md border border-gray-100 rounded-lg px-3 py-2 shadow-md"
                 >
-                  <div className="text-[#00BCD6] font-bold">Energy Level</div>
-                  <div className="text-gray-600 text-xs">Morning Burst 🌅</div>
+                  <div className="text-[#00BCD6] font-bold">{t('common:emotionalLandingPage.bodyWisdom.visualization.energyLevel')}</div>
+                  <div className="text-gray-600 text-xs">{t('common:emotionalLandingPage.bodyWisdom.visualization.morningBurst')}</div>
                 </motion.div>
                 
                 <motion.div
@@ -448,8 +449,8 @@ export default function EmotionalLandingPage() {
                   transition={{ delay: 1.5 }}
                   className="absolute bottom-[20%] right-[15%] bg-white backdrop-blur-md border border-gray-100 rounded-lg px-3 py-2 shadow-md"
                 >
-                  <div className="text-[#A541FF] font-bold">Taste Profile</div>
-                  <div className="text-gray-600 text-xs">Rich & Savory 🍲</div>
+                  <div className="text-[#A541FF] font-bold">{t('common:emotionalLandingPage.bodyWisdom.visualization.tasteProfile')}</div>
+                  <div className="text-gray-600 text-xs">{t('common:emotionalLandingPage.bodyWisdom.visualization.richSavory')}</div>
                 </motion.div>
               </div>
             </motion.div>
@@ -506,11 +507,11 @@ export default function EmotionalLandingPage() {
               transition={{ duration: 0.8 }}
               className="text-4xl md:text-5xl font-black mb-6 text-gray-900"
             >
-              Your Personalized
+              {t('common:emotionalLandingPage.finalCTA.title1')}
               <span className="block bg-clip-text text-transparent bg-gradient-to-r from-[#00BCD6] to-[#A541FF]">
-                Nutrition Blueprint
+                {t('common:emotionalLandingPage.finalCTA.title2')}
               </span>
-              Is Waiting
+              {t('common:emotionalLandingPage.finalCTA.title3')}
             </motion.h2>
             
             <motion.p
@@ -519,8 +520,7 @@ export default function EmotionalLandingPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl text-gray-600 mb-8"
             >
-              This isn't just about what you eat. It's about discovering a version of yourself
-              you didn't know existed — vibrant, energized, and in harmony with your body.
+              {t('common:emotionalLandingPage.finalCTA.subtitle')}
             </motion.p>
             
             <motion.div
@@ -533,7 +533,7 @@ export default function EmotionalLandingPage() {
                 className="bg-gradient-to-r from-[#00BCD6] to-[#A541FF] hover:opacity-90 text-white font-bold rounded-full py-8 px-10 text-xl shadow-xl shadow-[#00BCD6]/10 transition-all duration-300"
                 onClick={() => setLocation("/auth?tab=signup")}
               >
-                Begin Your Transformation
+                {t('common:emotionalLandingPage.finalCTA.ctaButton')}
                 <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </motion.div>
@@ -544,7 +544,7 @@ export default function EmotionalLandingPage() {
               transition={{ duration: 1, delay: 0.6 }}
               className="text-sm text-gray-500"
             >
-              Join thousands who have discovered their body's wisdom through NutriAI
+              {t('common:emotionalLandingPage.finalCTA.socialProof')}
             </motion.div>
           </div>
         </div>

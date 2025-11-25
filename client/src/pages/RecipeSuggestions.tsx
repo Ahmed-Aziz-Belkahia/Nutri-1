@@ -6,41 +6,39 @@ import { motion } from "framer-motion";
 import Webcam from "react-webcam";
 import { useLocation, Link } from "wouter";
 import Navigation from "@/components/Navigation";
-import { useToast } from "@/hooks/use-toast"; 
+import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from 'react-i18next'; 
 
 // Common recipes data - This would normally come from an API
 const commonRecipes = [
   {
     id: 1,
-    name: "Mediterranean Salad",
-    description: "Fresh vegetables with olive oil and feta cheese",
+    nameKey: "mediterraneanSalad",
     emoji: "🥗",
     bgColor: "bg-green-50"
   },
   {
     id: 2,
-    name: "Berry Smoothie Bowl",
-    description: "Mixed berries, banana, and granola topping",
+    nameKey: "berrySmoothieBowl",
     emoji: "🍓",
     bgColor: "bg-purple-50"
   },
   {
     id: 3,
-    name: "Avocado Toast",
-    description: "Whole grain bread with mashed avocado and egg",
+    nameKey: "avocadoToast",
     emoji: "🥑",
     bgColor: "bg-[#E8F8F7]"
   },
   {
     id: 4,
-    name: "Vegetable Stir Fry",
-    description: "Mixed vegetables with tofu in light sauce",
+    nameKey: "vegetableStirFry",
     emoji: "🥘",
     bgColor: "bg-amber-50"
   }
 ];
 
 export default function RecipeSuggestions() {
+  const { t } = useTranslation(['common']);
   const [showCamera, setShowCamera] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestedRecipes, setSuggestedRecipes] = useState<typeof commonRecipes>([]);
@@ -65,15 +63,13 @@ export default function RecipeSuggestions() {
       const newRecipes = [
         {
           id: 101,
-          name: "Fresh Garden Salad",
-          description: "Light salad with leafy greens and vegetables",
+          nameKey: "freshGardenSalad",
           emoji: "🥗",
           bgColor: "bg-green-50"
         },
         {
           id: 102,
-          name: "Vegetable Medley",
-          description: "Roasted seasonal vegetables with herbs",
+          nameKey: "vegetableMedley",
           emoji: "🥦",
           bgColor: "bg-[#E8F8F7]"
         }
@@ -83,16 +79,16 @@ export default function RecipeSuggestions() {
       
       // Success notification
       toast({
-        title: "Analysis Complete",
-        description: "We've found recipes based on your ingredients!",
+        title: t('common:recipeSuggestions.toast.analysisComplete'),
+        description: t('common:recipeSuggestions.toast.recipesFound'),
       });
       
     } catch (error) {
       console.error('Error analyzing image:', error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to analyze image",
+        title: t('common:recipeSuggestions.toast.error'),
+        description: t('common:recipeSuggestions.toast.failedToAnalyze'),
       });
     } finally {
       setIsAnalyzing(false);
@@ -204,7 +200,7 @@ export default function RecipeSuggestions() {
                 animate={{ opacity: 1, y: 0 }}
                 className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-white/90"
               >
-                {isAnalyzing ? 'Analyzing...' : 'Tap to capture'}
+                {isAnalyzing ? t('common:recipeSuggestions.camera.analyzing') : t('common:recipeSuggestions.camera.tapToCapture')}
               </motion.div>
             </motion.button>
           </motion.div>
@@ -228,7 +224,7 @@ export default function RecipeSuggestions() {
                 animate={{ x: 0, opacity: 1 }}
                 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
               >
-                Hi, Good morning
+                {t('common:recipeSuggestions.greeting')}
               </motion.h1>
               <motion.div 
                 initial={{ x: -20, opacity: 0 }}
@@ -242,7 +238,7 @@ export default function RecipeSuggestions() {
                       ? 'font-semibold text-gray-900' 
                       : 'text-gray-400 hover:text-gray-600 hover:translate-x-0.5'
                   }`}>
-                    Home
+                    {t('common:recipeSuggestions.nav.home')}
                   </span>
                 </Link>
                 <Link href="/recipes">
@@ -251,7 +247,7 @@ export default function RecipeSuggestions() {
                       ? 'font-semibold text-gray-900' 
                       : 'text-gray-400 hover:text-gray-600 hover:translate-x-0.5'
                   }`}>
-                    Recipes
+                    {t('common:recipeSuggestions.nav.recipes')}
                   </span>
                 </Link>
               </motion.div>
@@ -272,10 +268,10 @@ export default function RecipeSuggestions() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-medium mb-0.5 group-hover:text-[#0CC5BA] transition-colors">
-                    Create Your Recipe
+                    {t('common:recipeSuggestions.createRecipe.title')}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Scan your ingredients and we'll suggest healthy meals
+                    {t('common:recipeSuggestions.createRecipe.description')}
                   </p>
                 </div>
                 <motion.div
@@ -295,14 +291,14 @@ export default function RecipeSuggestions() {
           >
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-base font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                {suggestedRecipes.length > 0 ? 'Suggested Recipes' : 'TOP 100'}
+                {suggestedRecipes.length > 0 ? t('common:recipeSuggestions.suggestedRecipes') : t('common:recipeSuggestions.top100')}
               </h2>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="text-[#0CC5BA] hover:text-[#0AB3A9] -mr-2 group"
               >
-                View all 
+                {t('common:recipeSuggestions.viewAll')}
                 <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
               </Button>
             </div>
@@ -324,10 +320,10 @@ export default function RecipeSuggestions() {
                     </div>
                     <div className="p-2.5">
                       <h3 className="font-medium text-sm leading-snug group-hover:text-[#0CC5BA] transition-colors">
-                        {recipe.name}
+                        {t(`common:recipeSuggestions.recipes.${recipe.nameKey}.name`)}
                       </h3>
                       <p className="text-xs text-gray-500 whitespace-pre-line mt-0.5 leading-relaxed">
-                        {recipe.description}
+                        {t(`common:recipeSuggestions.recipes.${recipe.nameKey}.description`)}
                       </p>
                     </div>
                   </Card>

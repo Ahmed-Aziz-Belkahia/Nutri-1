@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from 'react-i18next';
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,6 +39,7 @@ const textAnalysisSchema = z.object({
 });
 
 export default function RecipeScanner() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const navigate = (delta: number) => {
     if (delta === -1) {
@@ -211,19 +213,19 @@ export default function RecipeScanner() {
   const handleAnalysisError = (error: unknown) => {
     console.error('Analysis Error:', error);
     
-    let errorTitle = "Analysis Error";
-    let errorMessage = "Failed to analyze ingredients";
-    let suggestion = "Try a different image or manual entry";
+    let errorTitle = t('common:recipeScanner.errors.analysisError');
+    let errorMessage = t('common:recipeScanner.errors.failedToAnalyze');
+    let suggestion = t('common:recipeScanner.errors.tryDifferent');
     
     if (error instanceof Error) {
       if (error.message.includes('Invalid image format') || error.message.includes('unsupported image')) {
-        errorTitle = "Unsupported Image";
-        errorMessage = "Unsupported image format.";
-        suggestion = "Please use JPEG, PNG, GIF, or WEBP images. Try taking a new photo or switching to manual entry";
+        errorTitle = t('common:recipeScanner.errors.unsupportedImage');
+        errorMessage = t('common:recipeScanner.errors.unsupportedFormat');
+        suggestion = t('common:recipeScanner.errors.useCorrectFormat');
       } else if (error.message.includes('HTTP error! status: 500')) {
-        errorTitle = "AI Processing Error";
-        errorMessage = "Server error analyzing image.";
-        suggestion = "Our AI had trouble with this image. Try with better lighting or a clearer view of the ingredients.";
+        errorTitle = t('common:recipeScanner.errors.aiProcessingError');
+        errorMessage = t('common:recipeScanner.errors.serverError');
+        suggestion = t('common:recipeScanner.errors.tryBetterLighting');
       } else {
         errorMessage = error.message;
       }
@@ -242,7 +244,7 @@ export default function RecipeScanner() {
       setIsAnalyzing(true);
       
       if (!values.ingredients || values.ingredients.trim() === '') {
-        throw new Error('Please enter your ingredients');
+        throw new Error(t('common:recipeScanner.errors.enterIngredients'));
       }
       
       // Parse ingredients from text (comma-separated)
@@ -263,7 +265,7 @@ export default function RecipeScanner() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate recipes');
+        throw new Error(t('common:recipeScanner.errors.failedToGenerate'));
       }
 
       const result = await response.json();
@@ -277,10 +279,10 @@ export default function RecipeScanner() {
       
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t('common:recipeScanner.errors.analysisError'),
         description: error instanceof Error 
           ? error.message 
-          : "Failed to generate recipes. Try being more specific or use manual entry."
+          : t('common:recipeScanner.errors.beMoreSpecific')
       });
     } finally {
       setIsAnalyzing(false);
@@ -324,7 +326,7 @@ export default function RecipeScanner() {
                 <div className="absolute inset-0 border-4 border-transparent border-t-[#26A8FF] rounded-full animate-spin" />
                 <Camera className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-[#26A8FF]" />
               </div>
-              <p className="text-white/80 text-sm font-medium">Initializing camera...</p>
+              <p className="text-white/80 text-sm font-medium">{t('common:recipeScanner.camera.initializing')}</p>
             </div>
           </div>
         )}
@@ -340,7 +342,7 @@ export default function RecipeScanner() {
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center backdrop-blur-sm border border-red-500/20">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
-              <h3 className="text-white text-xl font-bold mb-2">Camera Access Required</h3>
+              <h3 className="text-white text-xl font-bold mb-2">{t('common:recipeScanner.camera.accessRequired')}</h3>
               <p className="text-white/60 text-sm mb-8">{cameraError}</p>
               <div className="space-y-3">
                 <Button
@@ -348,14 +350,14 @@ export default function RecipeScanner() {
                   className="w-full bg-[#26A8FF] hover:bg-[#1A8FE6] text-white rounded-full h-12 font-semibold shadow-lg"
                 >
                   <Camera className="mr-2 h-5 w-5" />
-                  Enable Camera
+                  {t('common:recipeScanner.camera.retry')}
                 </Button>
                 <Button
                   onClick={() => setActiveTab('manual')}
                   variant="ghost"
                   className="w-full text-white/80 hover:text-white hover:bg-white/10 rounded-full h-12"
                 >
-                  Use Manual Entry Instead
+                  {t('common:recipeScanner.camera.switchToGallery')}
                 </Button>
               </div>
             </motion.div>
@@ -377,7 +379,7 @@ export default function RecipeScanner() {
           >
             {/* Hint Text */}
             <p className="text-white/80 text-sm font-medium mb-4">
-              {isAnalyzing ? "Analyzing ingredients..." : "Tap to capture your ingredients"}
+              {isAnalyzing ? t('common:recipeScanner.camera.analyzing') : t('common:recipeScanner.camera.tapToCapture')}
             </p>
             
             {/* Capture Button */}
@@ -458,16 +460,16 @@ export default function RecipeScanner() {
                   <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#26A8FF]/10 to-[#1A8FE6]/10 flex items-center justify-center mb-6">
                     <ImageIcon className="w-16 h-16 text-[#26A8FF]" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No Images Loaded</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('common:recipeScanner.gallery.empty')}</h3>
                   <p className="text-gray-500 text-center mb-8 max-w-md">
-                    Load images from your device to select and analyze ingredient photos
+                    {t('common:recipeScanner.gallery.subtitle')}
                   </p>
                   <Button
                     onClick={() => galleryInputRef.current?.click()}
                     className="bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] hover:from-[#1A8FE6] hover:to-[#0D7FD6] text-white px-8 py-6 rounded-2xl text-lg font-semibold shadow-lg"
                   >
                     <ImageIcon className="w-5 h-5 mr-2" />
-                    Load Images
+                    {t('common:recipeScanner.gallery.uploadButton')}
                   </Button>
                 </motion.div>
               ) : (
@@ -484,7 +486,7 @@ export default function RecipeScanner() {
                       className="w-full py-6 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#26A8FF] hover:bg-[#26A8FF]/5 transition-all"
                     >
                       <ImageIcon className="w-5 h-5 mr-2" />
-                      Load More Images
+                      {t('common:recipeScanner.gallery.uploadButton')}
                     </Button>
                   </motion.div>
 
@@ -507,7 +509,7 @@ export default function RecipeScanner() {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-4">
-                          <span className="text-white font-semibold text-sm">Select</span>
+                          <span className="text-white font-semibold text-sm">{t('common:recipeScanner.gallery.select')}</span>
                         </div>
                       </motion.div>
                     ))}
@@ -552,8 +554,8 @@ export default function RecipeScanner() {
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">AI Recipe Generator</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">List your ingredients</p>
+                      <h3 className="text-lg font-bold text-gray-900">{t('common:recipeScanner.manual.title')}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">{t('common:recipeScanner.manual.subtitle')}</p>
                     </div>
                   </div>
                 </div>
@@ -563,13 +565,13 @@ export default function RecipeScanner() {
                   <form onSubmit={textForm.handleSubmit(onTextSubmit)} className="space-y-4">
                     <div>
                       <Textarea
-                        placeholder="e.g., chicken breast, tomatoes, garlic, pasta, olive oil, basil"
+                        placeholder={t('common:recipeScanner.manual.placeholder')}
                         {...textForm.register("ingredients")}
                         rows={5}
                         className="w-full rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
                       />
                       <div className="mt-2 text-xs text-gray-400 bg-gray-50 px-3 py-2 rounded-full inline-block">
-                        Separate with commas for best results
+                        {t('common:recipeScanner.manual.hint')}
                       </div>
                     </div>
                     
@@ -581,12 +583,12 @@ export default function RecipeScanner() {
                       {isAnalyzing ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Generating Recipes...
+                          {t('common:recipeScanner.manual.generating')}
                         </>
                       ) : (
                         <>
                           <ChefHat className="mr-2 h-5 w-5" />
-                          Generate Recipes
+                          {t('common:recipeScanner.manual.generateButton')}
                         </>
                       )}
                     </Button>
@@ -606,19 +608,19 @@ export default function RecipeScanner() {
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 mb-2">How it works</h4>
+                    <h4 className="font-bold text-gray-900 mb-2">{t('common:recipeScanner.manual.howItWorks.title')}</h4>
                     <ul className="space-y-2 text-sm text-gray-700">
                       <li className="flex items-start gap-2">
                         <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>List all your available ingredients</span>
+                        <span>{t('common:recipeScanner.manual.howItWorks.step1')}</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>Our AI will create custom recipes using what you have</span>
+                        <span>{t('common:recipeScanner.manual.howItWorks.step2')}</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>Get multiple recipe options with cooking instructions</span>
+                        <span>{t('common:recipeScanner.manual.howItWorks.step3')}</span>
                       </li>
                     </ul>
                   </div>
@@ -667,8 +669,8 @@ export default function RecipeScanner() {
           {activeTab !== "photo" && (
             <div className="space-y-4">
               <div>
-                <h1 className="text-2xl font-extrabold text-gray-900">Scan Ingredients</h1>
-                <p className="text-sm text-gray-500 mt-1">Get AI-powered recipe suggestions</p>
+                <h1 className="text-2xl font-extrabold text-gray-900">{t('common:recipeScanner.title')}</h1>
+                <p className="text-sm text-gray-500 mt-1">{t('common:recipeScanner.subtitle')}</p>
               </div>
             </div>
           )}
@@ -690,7 +692,7 @@ export default function RecipeScanner() {
             >
               <div className="flex items-center justify-center gap-2">
                 <Camera className="w-4 h-4" />
-                <span>Photo</span>
+                <span>{t('common:recipeScanner.tabs.photo')}</span>
               </div>
             </motion.button>
 
@@ -707,7 +709,7 @@ export default function RecipeScanner() {
             >
               <div className="flex items-center justify-center gap-2">
                 <ImageIcon className="w-4 h-4" />
-                <span>Gallery</span>
+                <span>{t('common:recipeScanner.tabs.gallery')}</span>
               </div>
             </motion.button>
 
@@ -724,7 +726,7 @@ export default function RecipeScanner() {
             >
               <div className="flex items-center justify-center gap-2">
                 <Edit3 className="w-4 h-4" />
-                <span>Manual</span>
+                <span>{t('common:recipeScanner.tabs.manual')}</span>
               </div>
             </motion.button>
           </div>
@@ -821,7 +823,7 @@ export default function RecipeScanner() {
                         <Sparkles className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 mb-1">Suggestion</p>
+                        <p className="text-sm font-semibold text-gray-900 mb-1">{t('common:recipeScanner.errors.suggestion')}</p>
                         <p className="text-sm text-gray-700 leading-relaxed">{errorSuggestion}</p>
                       </div>
                     </div>
@@ -834,7 +836,7 @@ export default function RecipeScanner() {
                       onClick={() => setErrorModalOpen(false)}
                       className="w-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-2xl h-12 font-semibold shadow-lg hover:shadow-xl transition-all"
                     >
-                      Try Again
+                      {t('common:recipeScanner.errors.tryAgain')}
                     </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.97 }}
@@ -844,7 +846,7 @@ export default function RecipeScanner() {
                       }}
                       className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl h-12 font-semibold transition-all"
                     >
-                      Switch to Manual Entry
+                      {t('common:recipeScanner.errors.switchToManual')}
                     </motion.button>
                   </div>
                 </div>

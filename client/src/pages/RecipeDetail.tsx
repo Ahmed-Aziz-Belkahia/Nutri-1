@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'wouter';
 import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Navbar from '@/components/Navbar';
 import { useRecipeById } from '@/hooks/queries/useRecipes';
 
@@ -38,6 +39,7 @@ interface Recipe {
 }
 
 export default function RecipeDetail() {
+  const { t } = useTranslation(['common']);
   const { id } = useParams();
   const [location, navigate] = useLocation();
   const isFoodLog = location.includes('/food-log/');
@@ -131,7 +133,7 @@ export default function RecipeDetail() {
   if (!recipe) {
     return (
       <div className="min-h-screen gradient-bg flex items-center justify-center">
-        <p className="text-gray-500">Recipe not found</p>
+        <p className="text-gray-500">{t('common:recipeDetail.notFound')}</p>
       </div>
     );
   }
@@ -197,8 +199,8 @@ export default function RecipeDetail() {
                 <Clock className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Time</p>
-                <p className="text-sm font-semibold text-gray-900">{totalTime || 30} min</p>
+                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.time')}</p>
+                <p className="text-sm font-semibold text-gray-900">{totalTime || 30} {t('common:recipeDetail.stats.min')}</p>
               </div>
             </div>
             
@@ -207,7 +209,7 @@ export default function RecipeDetail() {
                 <Users className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Servings</p>
+                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.servings')}</p>
                 <p className="text-sm font-semibold text-gray-900">{recipe.servings || 1}</p>
               </div>
             </div>
@@ -217,7 +219,7 @@ export default function RecipeDetail() {
                 <Flame className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Calories</p>
+                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.calories')}</p>
                 <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
               </div>
             </div>
@@ -237,7 +239,7 @@ export default function RecipeDetail() {
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {t(`common:recipeDetail.tabs.${tab}`)}
                 {activeTab === tab && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#26A8FF]" />
                 )}
@@ -250,9 +252,9 @@ export default function RecipeDetail() {
             {activeTab === 'ingredients' && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-gray-900">Ingredients</h3>
+                  <h3 className="font-semibold text-gray-900">{t('common:recipeDetail.ingredients.title')}</h3>
                   <span className="text-xs text-gray-500">
-                    {checkedIngredients.size}/{ingredients.length} checked
+                    {checkedIngredients.size}/{ingredients.length} {t('common:recipeDetail.ingredients.checked')}
                   </span>
                 </div>
                 
@@ -296,9 +298,9 @@ export default function RecipeDetail() {
             {activeTab === 'instructions' && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-gray-900">Instructions</h3>
+                  <h3 className="font-semibold text-gray-900">{t('common:recipeDetail.instructions.title')}</h3>
                   <span className="text-xs text-gray-500">
-                    Step {currentInstructionStep + 1} of {instructions.length}
+                    {t('common:recipeDetail.instructions.stepOf', { current: currentInstructionStep + 1, total: instructions.length })}
                   </span>
                 </div>
                 
@@ -333,7 +335,7 @@ export default function RecipeDetail() {
                     onClick={() => setCurrentInstructionStep(prev => prev + 1)}
                     className="w-full py-3 bg-[#26A8FF] text-white rounded-xl font-medium hover:bg-[#1A8FE6] transition-colors"
                   >
-                    Next Step
+                    {t('common:recipeDetail.instructions.nextStep')}
                   </button>
                 )}
               </div>
@@ -342,12 +344,12 @@ export default function RecipeDetail() {
             {/* Nutrition Tab */}
             {activeTab === 'nutrition' && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Nutrition Facts</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">{t('common:recipeDetail.nutrition.title')}</h3>
                 
                 <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-4 border border-blue-100">
                   <div className="text-center mb-4">
                     <p className="text-3xl font-bold text-[#26A8FF]">{recipe.nutritionInfo?.calories || 0}</p>
-                    <p className="text-sm text-gray-500">Calories per serving</p>
+                    <p className="text-sm text-gray-500">{t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
@@ -356,7 +358,7 @@ export default function RecipeDetail() {
                         <span className="text-lg font-bold text-orange-500">P</span>
                       </div>
                       <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
-                      <p className="text-xs text-gray-500">Protein</p>
+                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.protein')}</p>
                     </div>
                     
                     <div className="text-center">
@@ -364,7 +366,7 @@ export default function RecipeDetail() {
                         <span className="text-lg font-bold text-green-500">C</span>
                       </div>
                       <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
-                      <p className="text-xs text-gray-500">Carbs</p>
+                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.carbs')}</p>
                     </div>
                     
                     <div className="text-center">
@@ -372,7 +374,7 @@ export default function RecipeDetail() {
                         <span className="text-lg font-bold text-red-500">F</span>
                       </div>
                       <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
-                      <p className="text-xs text-gray-500">Fat</p>
+                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.fat')}</p>
                     </div>
                   </div>
                 </div>
@@ -382,19 +384,19 @@ export default function RecipeDetail() {
                   <div className="space-y-2">
                     {recipe.nutritionInfo.fiber && (
                       <div className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Fiber</span>
+                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.fiber')}</span>
                         <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.fiber}g</span>
                       </div>
                     )}
                     {recipe.nutritionInfo.sugar && (
                       <div className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">Sugar</span>
+                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sugar')}</span>
                         <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sugar}g</span>
                       </div>
                     )}
                     {recipe.nutritionInfo.sodium && (
                       <div className="flex justify-between py-2">
-                        <span className="text-sm text-gray-600">Sodium</span>
+                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sodium')}</span>
                         <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sodium}mg</span>
                       </div>
                     )}
@@ -415,7 +417,7 @@ export default function RecipeDetail() {
       >
         <Play className="w-8 h-8 ml-1" />
         <span className="absolute -top-12 right-0 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-          Start Cooking
+          {t('common:recipeDetail.startCooking')}
         </span>
       </button>
     </div>

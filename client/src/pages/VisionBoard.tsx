@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Info } from "lucide-react";
@@ -102,7 +103,7 @@ export default function VisionBoard() {
           animate={{ opacity: 1 }}
         >
           <div className="w-16 h-16 border-4 border-[#0CC5BA] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Ładowanie tablicy wizji...</p>
+          <p className="text-gray-600">{t('common:visionBoard.loading')}</p>
         </motion.div>
       </div>
     );
@@ -112,9 +113,9 @@ export default function VisionBoard() {
     return (
       <div className="h-screen bg-gradient-to-br from-[#0CC5BA]/20 via-purple-500/10 to-blue-500/20 flex items-center justify-center overflow-hidden">
         <Card className="p-6 text-center">
-          <p className="text-gray-600 mb-4">Failed to load vision board.</p>
+          <p className="text-gray-600 mb-4">{t('common:visionBoard.failed')}</p>
           <Button onClick={() => setLocation("/dashboard")}>
-            Go to Dashboard
+            {t('common:visionBoard.goToDashboard')}
           </Button>
         </Card>
       </div>
@@ -133,7 +134,7 @@ export default function VisionBoard() {
                 animate={{ opacity: 1, x: 0 }}
                 className="text-sm font-medium"
               >
-                KROK 12 Z 13
+                {t('common:visionBoard.step')} 12 {t('common:visionBoard.of')} 13
               </motion.div>
               <motion.div
                 initial={{ scale: 0 }}
@@ -149,7 +150,7 @@ export default function VisionBoard() {
               transition={{ delay: 0.1 }}
               className="text-2xl font-bold"
             >
-              Twoja ścieżka do celu
+              {t('common:visionBoard.title')}
             </motion.h1>
             {/* Progress dots */}
             <div className="flex items-center gap-2 mt-4">
@@ -173,10 +174,10 @@ export default function VisionBoard() {
               className="text-center mb-8"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Twoja Tablica Wizji
+                {t('common:visionBoard.title')}
               </h2>
               <p className="text-gray-600 text-sm">
-                Spersonalizowany plan żywieniowy dla Twoich celów
+                {t('common:visionBoard.sections.personalInfo')}
               </p>
             </motion.div>
 
@@ -191,7 +192,7 @@ export default function VisionBoard() {
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-3 h-3 rounded-full bg-[#0CC5BA]"></div>
                   <h3 className="font-semibold text-gray-900">
-                    Twoje Dzienne Makroskładniki
+                    {t('common:visionBoard.sections.macros')}
                   </h3>
                 </div>
                 
@@ -200,25 +201,25 @@ export default function VisionBoard() {
                     <div className="text-3xl font-bold text-orange-500 mb-1">
                       {visionBoardData.macros.calories}
                     </div>
-                    <div className="text-sm text-gray-600">Kalorie</div>
+                    <div className="text-sm text-gray-600">{t('common:visionBoard.labels.calories')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-500 mb-1">
                       {visionBoardData.macros.protein}g
                     </div>
-                    <div className="text-sm text-gray-600">Białko</div>
+                    <div className="text-sm text-gray-600">{t('common:visionBoard.labels.protein')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-500 mb-1">
                       {visionBoardData.macros.carbs}g
                     </div>
-                    <div className="text-sm text-gray-600">Węglowodany</div>
+                    <div className="text-sm text-gray-600">{t('common:visionBoard.labels.carbs')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-yellow-600 mb-1">
                       {visionBoardData.macros.fat}g
                     </div>
-                    <div className="text-sm text-gray-600">Tłuszcze</div>
+                    <div className="text-sm text-gray-600">{t('common:visionBoard.labels.fat')}</div>
                   </div>
                 </div>
               </Card>
@@ -455,14 +456,14 @@ export default function VisionBoard() {
                 className="flex items-center gap-2 text-gray-600"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Wstecz
+                {t('common:simpleMealQuiz.actions.back')}
               </Button>
               
               <Button
                 onClick={handleContinue}
                 className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center gap-2"
               >
-                Rozpocznij!
+                {t('common:visionBoard.buttons.continue')}
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </motion.div>

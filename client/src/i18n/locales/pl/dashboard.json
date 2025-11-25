@@ -1,0 +1,17 @@
+{
+  "title": "Kokpit",
+  "welcome": "Witamy z powrotem",
+  "stats": {
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fats": "Tłuszcze",
+    "remaining": "pozostało"
+  },
+  "meals": {
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snacks": "Przekąski"
+  }
+}

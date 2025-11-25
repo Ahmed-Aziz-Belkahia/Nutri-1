@@ -20,18 +20,20 @@ import {
   Flame,
   Star
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Overview() {
   const { user } = useUser();
+  const { t } = useTranslation(['common']);
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const quickAddItems = [
-    { icon: <Apple className="w-4 h-4" />, label: "Fruit" },
-    { icon: <Utensils className="w-4 h-4" />, label: "Meal" },
-    { icon: <Pizza className="w-4 h-4" />, label: "Fast Food" },
-    { icon: <Cookie className="w-4 h-4" />, label: "Snack" },
-    { icon: <Coffee className="w-4 h-4" />, label: "Drink" },
+    { icon: <Apple className="w-4 h-4" />, label: t('common:overview.quickAdd.items.fruit') },
+    { icon: <Utensils className="w-4 h-4" />, label: t('common:overview.quickAdd.items.meal') },
+    { icon: <Pizza className="w-4 h-4" />, label: t('common:overview.quickAdd.items.fastFood') },
+    { icon: <Cookie className="w-4 h-4" />, label: t('common:overview.quickAdd.items.snack') },
+    { icon: <Coffee className="w-4 h-4" />, label: t('common:overview.quickAdd.items.drink') },
   ];
 
   // Level and XP functionality removed
@@ -70,7 +72,7 @@ export default function Overview() {
                   animate={{ opacity: 1, x: 0 }}
                   className="text-sm text-gray-500"
                 >
-                  Welcome back
+                  {t('common:overview.welcomeBack')}
                 </motion.p>
                 <motion.h2
                   initial={{ opacity: 0, x: -10 }}
@@ -78,7 +80,7 @@ export default function Overview() {
                   transition={{ delay: 0.1 }}
                   className="text-2xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent"
                 >
-                  {user?.email?.split('@')[0] || 'User'}
+                  {user?.email?.split('@')[0] || t('common:overview.userPlaceholder')}
                 </motion.h2>
               </div>
             </div>
@@ -109,7 +111,7 @@ export default function Overview() {
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 flex items-center justify-center mb-2 border border-[#0CC5BA]/20 shadow-[0_0_15px_rgba(12,197,186,0.1)]">
                   <Flame className="w-6 h-6 text-[#0CC5BA]" strokeWidth={2} />
                 </div>
-                <p className="text-xs text-gray-500 mb-1">Calories</p>
+                <p className="text-xs text-gray-500 mb-1">{t('common:overview.stats.calories')}</p>
                 <p className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">1,463</p>
               </div>
             </motion.div>
@@ -125,7 +127,7 @@ export default function Overview() {
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 flex items-center justify-center mb-2 border border-[#0CC5BA]/20 shadow-[0_0_15px_rgba(12,197,186,0.1)]">
                   <Activity className="w-6 h-6 text-[#0CC5BA]" strokeWidth={2} />
                 </div>
-                <p className="text-xs text-gray-500 mb-1">Protein</p>
+                <p className="text-xs text-gray-500 mb-1">{t('common:overview.stats.protein')}</p>
                 <p className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">82g</p>
               </div>
             </motion.div>
@@ -141,7 +143,7 @@ export default function Overview() {
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 flex items-center justify-center mb-2 border border-[#0CC5BA]/20 shadow-[0_0_15px_rgba(12,197,186,0.1)]">
                   <Scale className="w-6 h-6 text-[#0CC5BA]" strokeWidth={2} />
                 </div>
-                <p className="text-xs text-gray-500 mb-1">Weight</p>
+                <p className="text-xs text-gray-500 mb-1">{t('common:overview.stats.weight')}</p>
                 <p className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent">75kg</p>
               </div>
             </motion.div>
@@ -159,7 +161,7 @@ export default function Overview() {
             </div>
             <input
               type="text"
-              placeholder="Search foods, meals, recipes..."
+              placeholder={t('common:overview.searchPlaceholder')}
               className="w-full h-14 pl-12 pr-4 rounded-[24px] bg-white/80 backdrop-blur-sm border border-[#0CC5BA]/10 text-base shadow-lg shadow-[#0CC5BA]/5 focus:ring-[#0CC5BA]/20 focus:border-[#0CC5BA]/30 focus:shadow-[#0CC5BA]/10 transition-all duration-300"
             />
           </motion.div>
@@ -176,13 +178,13 @@ export default function Overview() {
           className="mb-8 bg-white/40 backdrop-blur-sm rounded-[24px] p-6 shadow-lg shadow-[#0CC5BA]/5 hover:shadow-[#0CC5BA]/10 hover:bg-white/50 transition-all duration-300"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">Quick Add</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">{t('common:overview.quickAdd.title')}</h3>
             <Button 
               variant="ghost" 
               size="sm" 
               className="text-[#0CC5BA] hover:text-[#0CC5BA]/80 hover:bg-[#0CC5BA]/5 group text-base rounded-full"
             >
-              View All
+              {t('common:overview.quickAdd.viewAll')}
             </Button>
           </div>
 
@@ -216,14 +218,14 @@ export default function Overview() {
           className="mb-8 bg-white/40 backdrop-blur-sm rounded-[24px] p-6 shadow-lg shadow-[#0CC5BA]/5 hover:shadow-[#0CC5BA]/10 hover:bg-white/50 transition-all duration-300"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">Today's Log</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent">{t('common:overview.todaysLog.title')}</h3>
             <Link href="/enhanced-add-food">
               <Button 
                 size="sm" 
                 className="bg-gradient-to-r from-[#0E95A7] to-[#1E6F7D] text-white hover:from-[#0E95A7]/90 hover:to-[#1E6F7D]/90 rounded-full shadow-lg shadow-[#0E95A7]/20"
               >
                 <Plus className="w-4 h-4 mr-1" />
-                Add Food
+                {t('common:overview.todaysLog.addFood')}
               </Button>
             </Link>
           </div>
@@ -251,9 +253,9 @@ export default function Overview() {
                 <Utensils className="w-10 h-10 text-[#0CC5BA]" />
               </motion.div>
               <div>
-                <h4 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent mb-2">No meals logged today</h4>
+                <h4 className="text-xl font-bold bg-gradient-to-br from-[#0CC5BA] via-[#0CBACC] to-[#0C9CCC] bg-clip-text text-transparent mb-2">{t('common:overview.todaysLog.noMealsTitle')}</h4>
                 <p className="text-base text-gray-500">
-                  Add your first meal to start tracking your nutrition
+                  {t('common:overview.todaysLog.noMealsDesc')}
                 </p>
               </div>
               <Link href="/enhanced-add-food">
@@ -266,7 +268,7 @@ export default function Overview() {
                     className="bg-gradient-to-r from-[#0E95A7] to-[#1E6F7D] text-white hover:from-[#0E95A7]/90 hover:to-[#1E6F7D]/90 rounded-full shadow-lg shadow-[#0E95A7]/20 px-8"
                   >
                     <Plus className="w-5 h-5 mr-2" />
-                    Start Logging
+                    {t('common:overview.todaysLog.startLogging')}
                   </Button>
                 </motion.div>
               </Link>

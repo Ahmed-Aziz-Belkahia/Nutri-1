@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -107,6 +108,7 @@ export default function OnboardingQuiz() {
   const [visionBoardPage, setVisionBoardPage] = useState(0);
   const [showFormulaExplanation, setShowFormulaExplanation] = useState(false);
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(null);
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -123,17 +125,6 @@ export default function OnboardingQuiz() {
   const goalWeightCALRef = useRef<number>(GOAL_WEIGHT_CAL);
   weightCALRef.current = WEIGHT_CAL;
   goalWeightCALRef.current = GOAL_WEIGHT_CAL;
-  
-  // Simple translation function for English
-  const t = (key: string) => {
-    const translations: Record<string, string> = {
-      'back': 'Back',
-      'next': 'Next',
-      'complete': 'Complete',
-      'saving': 'Saving...'
-    };
-    return translations[key] || key;
-  };
 
   const calculateTimeline = () => {
     if (formData.weightGoal === 'maintain') {
@@ -305,26 +296,26 @@ export default function OnboardingQuiz() {
               {/* Minimalist header */}
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  {step === 0 ? 'What is your main goal?' :
-                   step === 1 ? 'Choose your gender' :
-                   step === 2 ? 'How old are you?' :
-                   step === 3 ? 'What is your height?' :
-                   step === 4 ? 'How much do you weigh?' :
-                   step === 5 ? 'What is your goal weight?' :
-                   step === 6 ? 'What is your activity level?' :
-                   step === 7 ? 'Add profile picture' :
-                   step === 8 ? 'Your vision board' : 'Congratulations!'}
+                  {step === 0 ? t('common:onboardingQuiz.steps.goal.title') :
+                   step === 1 ? t('common:onboardingQuiz.steps.gender.title') :
+                   step === 2 ? t('common:onboardingQuiz.steps.age.title') :
+                   step === 3 ? t('common:onboardingQuiz.steps.height.title') :
+                   step === 4 ? t('common:onboardingQuiz.steps.weight.title') :
+                   step === 5 ? t('common:onboardingQuiz.steps.goalWeight.title') :
+                   step === 6 ? t('common:onboardingQuiz.steps.activityLevel.title') :
+                   step === 7 ? t('common:onboardingQuiz.steps.profilePicture.title') :
+                   step === 8 ? t('common:onboardingQuiz.steps.visionBoard.title') : t('common:onboardingQuiz.steps.completion.title')}
                 </h2>
                 <p className="text-gray-600 text-sm">
-                  {step === 0 ? 'Choose what matters most to you' :
-                   step === 1 ? 'Helps us better tailor your plan' :
-                   step === 2 ? 'We need this to calculate calories' :
-                   step === 3 ? 'Enter height in centimeters' :
-                   step === 4 ? 'Current weight in kilograms' :
-                   step === 5 ? 'What weight are you aiming for?' :
-                   step === 6 ? 'How often do you exercise?' :
-                   step === 7 ? 'Add your photo (optional)' :
-                   step === 8 ? 'Your personalized plan' : 'Your profile is ready!'}
+                  {step === 0 ? t('common:onboardingQuiz.steps.goal.subtitle') :
+                   step === 1 ? t('common:onboardingQuiz.steps.gender.subtitle') :
+                   step === 2 ? t('common:onboardingQuiz.steps.age.subtitle') :
+                   step === 3 ? t('common:onboardingQuiz.steps.height.subtitle') :
+                   step === 4 ? t('common:onboardingQuiz.steps.weight.subtitle') :
+                   step === 5 ? t('common:onboardingQuiz.steps.goalWeight.subtitle') :
+                   step === 6 ? t('common:onboardingQuiz.steps.activityLevel.subtitle') :
+                   step === 7 ? t('common:onboardingQuiz.steps.profilePicture.subtitle') :
+                   step === 8 ? t('common:onboardingQuiz.steps.visionBoard.subtitle') : t('common:onboardingQuiz.steps.completion.subtitle')}
                 </p>
               </div>
 
@@ -334,10 +325,10 @@ export default function OnboardingQuiz() {
                 {step === 0 && (
                   <div className="space-y-4">
                     {[
-                      { value: 'weight_loss', label: 'Weight Loss', desc: 'Reach your ideal weight' },
-                      { value: 'muscle_gain', label: 'Build Muscle', desc: 'Gain strength and mass' },
-                      { value: 'health_improve', label: 'Improve Health', desc: 'Feel better overall' },
-                      { value: 'other', label: 'Other', desc: 'Custom goal' }
+                      { value: 'weight_loss', label: t('common:onboardingQuiz.steps.goal.options.weightLoss.label'), desc: t('common:onboardingQuiz.steps.goal.options.weightLoss.desc') },
+                      { value: 'muscle_gain', label: t('common:onboardingQuiz.steps.goal.options.muscleGain.label'), desc: t('common:onboardingQuiz.steps.goal.options.muscleGain.desc') },
+                      { value: 'health_improve', label: t('common:onboardingQuiz.steps.goal.options.healthImprove.label'), desc: t('common:onboardingQuiz.steps.goal.options.healthImprove.desc') },
+                      { value: 'other', label: t('common:onboardingQuiz.steps.goal.options.other.label'), desc: t('common:onboardingQuiz.steps.goal.options.other.desc') }
                     ].map((goal) => (
                       <motion.div
                         key={goal.value}
@@ -393,11 +384,11 @@ export default function OnboardingQuiz() {
                       >
                         <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md border border-gray-200">
                           <label className="block text-sm font-medium text-gray-700 mb-3">
-                            Please specify your goal
+                            {t('common:onboardingQuiz.steps.goal.customGoalLabel')}
                           </label>
                           <input
                             type="text"
-                            placeholder="Enter your custom goal..."
+                            placeholder={t('common:onboardingQuiz.steps.goal.customGoalPlaceholder')}
                             value={formData.customGoal || ''}
                             onChange={(e) => setFormData(prev => ({ ...prev, customGoal: e.target.value }))}
                             className="w-full p-4 bg-white border border-gray-200 rounded-xl focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 focus:outline-none transition-all placeholder:text-gray-400"
@@ -415,7 +406,7 @@ export default function OnboardingQuiz() {
                     {[
                       { 
                         value: 'male', 
-                        label: 'Male',
+                        label: t('common:onboardingQuiz.steps.gender.male'),
                         icon: (
                           <svg viewBox="0 0 32 32" fill="none" className="w-12 h-12">
                             <circle cx="13" cy="16" r="7" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
@@ -427,7 +418,7 @@ export default function OnboardingQuiz() {
                       },
                       { 
                         value: 'female', 
-                        label: 'Female',
+                        label: t('common:onboardingQuiz.steps.gender.female'),
                         icon: (
                           <svg viewBox="0 0 24 24" fill="none" className="w-12 h-12">
                             <circle cx="12" cy="8" r="5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>

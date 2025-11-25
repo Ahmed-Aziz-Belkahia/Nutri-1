@@ -1,0 +1,301 @@
+{
+  "dashboard": {
+    "greeting": "Witaj",
+    "dailyProgress": "Postęp Dzienny",
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fats": "Tłuszcze",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snacks": "Przekąski",
+    "addMeal": "Dodaj Posiłek",
+    "viewAll": "Zobacz Wszystko",
+    "myMeals": "Moje Posiłki",
+    "todaysPlan": "Plan na Dziś",
+    "groceryList": "Lista Zakupów"
+  },
+  "navigation": {
+    "home": "Strona Główna",
+    "meals": "Posiłki",
+    "recipes": "Przepisy",
+    "profile": "Profil",
+    "settings": "Ustawienia"
+  },
+  "shoppingList": {
+    "tabs": {
+      "byMeal": "Według Posiłku",
+      "byCategory": "Według Kategorii",
+      "pricing": "Wycena"
+    },
+    "grouping": {
+      "mealType": "Według Typu Posiłku",
+      "category": "Według Kategorii"
+    },
+    "pricing": {
+      "title": "Szacowane Ceny",
+      "location": "Lokalizacja",
+      "updateLocation": "Aktualizuj Lokalizację",
+      "total": "Szacowany Koszt",
+      "perItem": "za sztukę",
+      "calculating": "Obliczanie cen...",
+      "error": "Nie można pobrać cen"
+    },
+    "items": {
+      "checked": "zaznaczone",
+      "unchecked": "niezaznaczone",
+      "markChecked": "Oznacz jako zaznaczone",
+      "markUnchecked": "Oznacz jako niezaznaczone",
+      "remove": "Usuń",
+      "edit": "Edytuj",
+      "add": "Dodaj Składnik"
+    },
+    "itemDetails": {
+      "title": "Szczegóły Składnika",
+      "name": "Nazwa",
+      "quantity": "Ilość",
+      "unit": "Jednostka",
+      "category": "Kategoria",
+      "notes": "Notatki",
+      "save": "Zapisz",
+      "cancel": "Anuluj"
+    },
+    "recipeDetails": {
+      "title": "Szczegóły Przepisu",
+      "viewRecipe": "Zobacz Przepis",
+      "close": "Zamknij"
+    },
+    "batchActions": {
+      "selectAll": "Zaznacz Wszystko",
+      "deselectAll": "Odznacz Wszystko",
+      "checkAll": "Zaznacz Wszystkie",
+      "uncheckAll": "Odznacz Wszystkie",
+      "removeChecked": "Usuń Zaznaczone"
+    },
+    "empty": {
+      "title": "Brak Przedmiotów",
+      "description": "Twoja lista zakupów jest pusta",
+      "addItems": "Dodaj składniki z planów posiłków"
+    }
+  },
+  "onboardingQuiz": {
+    "navigation": {
+      "back": "Wstecz",
+      "next": "Dalej",
+      "skip": "Pomiń",
+      "finish": "Zakończ"
+    },
+    "goal": {
+      "title": "Jaki jest Twój Cel?",
+      "subtitle": "Wybierz swój główny cel fitness",
+      "loseWeight": "Schudnąć",
+      "gainMuscle": "Zbudować Mięśnie",
+      "maintain": "Utrzymać Wagę",
+      "getHealthy": "Być Zdrowszym"
+    },
+    "gender": {
+      "title": "Twoja Płeć?",
+      "subtitle": "Pomaga nam spersonalizować Twój plan",
+      "male": "Mężczyzna",
+      "female": "Kobieta",
+      "other": "Inne",
+      "preferNotToSay": "Wolę nie mówić"
+    },
+    "age": {
+      "title": "Ile Masz Lat?",
+      "subtitle": "Twój wiek pomaga nam obliczyć Twoje potrzeby kaloryczne",
+      "years": "lat"
+    },
+    "height": {
+      "title": "Jaki Jest Twój Wzrost?",
+      "subtitle": "Pomaga nam obliczyć Twoje BMI i TDEE",
+      "cm": "cm",
+      "feet": "stopy",
+      "inches": "cale"
+    },
+    "weight": {
+      "title": "Jaka Jest Twoja Waga?",
+      "subtitle": "Twoja aktualna waga",
+      "kg": "kg",
+      "lbs": "funty"
+    },
+    "goalWeight": {
+      "title": "Twoja Waga Docelowa?",
+      "subtitle": "Do czego dążysz?",
+      "kg": "kg",
+      "lbs": "funty"
+    },
+    "activityLevel": {
+      "title": "Jaki Jest Twój Poziom Aktywności?",
+      "subtitle": "Jak aktywny jesteś na co dzień?",
+      "sedentary": "Siedzący",
+      "sedentaryDesc": "Mało lub brak ćwiczeń",
+      "light": "Lekko Aktywny",
+      "lightDesc": "Ćwiczenia 1-3 dni w tygodniu",
+      "moderate": "Umiarkowanie Aktywny",
+      "moderateDesc": "Ćwiczenia 3-5 dni w tygodniu",
+      "active": "Bardzo Aktywny",
+      "activeDesc": "Ćwiczenia 6-7 dni w tygodniu",
+      "veryActive": "Ekstremalnie Aktywny",
+      "veryActiveDesc": "Ciężkie ćwiczenia codziennie"
+    },
+    "profilePicture": {
+      "title": "Dodaj Zdjęcie Profilowe",
+      "subtitle": "Pomóż nam Cię poznać lepiej (opcjonalne)",
+      "upload": "Prześlij Zdjęcie",
+      "takePhoto": "Zrób Zdjęcie",
+      "remove": "Usuń Zdjęcie"
+    },
+    "visionBoard": {
+      "title": "Stwórz Swoją Tablicę Wizji",
+      "subtitle": "Wizualizuj swoje cele (opcjonalne)",
+      "addImages": "Dodaj Obrazy Inspiracji",
+      "uploadImage": "Prześlij Obraz",
+      "removeImage": "Usuń Obraz"
+    },
+    "completion": {
+      "title": "Gratulacje!",
+      "subtitle": "Twój Profil Jest Gotowy!",
+      "message": "Twoja Podróż Zaczyna Się Teraz",
+      "description": "Stworzyliśmy Twój spersonalizowany plan żywieniowy. Rozpocznijmy Twoją transformację!"
+    },
+    "calorieBreakdown": {
+      "title": "Twoje Dzienne Zapotrzebowanie Kaloryczne",
+      "subtitle": "Na podstawie Twoich celów i poziomu aktywności",
+      "calories": "Kalorie",
+      "protein": "Białko",
+      "carbs": "Węglowodany",
+      "fats": "Tłuszcze",
+      "perDay": "dziennie",
+      "breakdown": {
+        "title": "Jak Obliczyliśmy To",
+        "formulaTitle": "Formuła Obliczeń",
+        "formulaSubtitle": "Używamy równania Mifflin-St Jeor",
+        "bmr": "BMR (Podstawowa Przemiana Materii)",
+        "tdee": "TDEE (Całkowity Dzienny Wydatek Energetyczny)",
+        "adjustment": "Dostosowanie Celu",
+        "finalCalories": "Końcowe Dzienne Kalorie"
+      }
+    }
+  },
+  "progress": {
+    "weightMetrics": {
+      "title": "Metryki Wagi",
+      "subtitle": "Aktualna i docelowa waga",
+      "current": "Aktualna",
+      "goal": "Cel",
+      "kg": "kg"
+    },
+    "bodyMetrics": {
+      "title": "Metryki Ciała",
+      "subtitle": "BMI i obliczenia",
+      "bmi": "BMI",
+      "height": "Wzrost",
+      "cm": "cm"
+    },
+    "bodyComposition": {
+      "title": "Skład Ciała",
+      "subtitle": "Twoja szczegółowa analiza ciała",
+      "bmi": "BMI",
+      "weight": "Waga",
+      "height": "Wzrost"
+    },
+    "photos": {
+      "title": "Zdjęcia Postępów",
+      "subtitle": "Wizualne śledzenie Twojej podróży",
+      "viewAll": "Zobacz Wszystkie Zdjęcia",
+      "takePhoto": "Zrób Zdjęcie",
+      "uploadPhoto": "Prześlij Zdjęcie",
+      "changePhoto": "Zmień Dzisiejsze Zdjęcie",
+      "deleteConfirm": "Usuń Zdjęcie",
+      "deleteMessage": "Czy na pewno chcesz usunąć to zdjęcie postępów? Tej czynności nie można cofnąć.",
+      "cancel": "Anuluj",
+      "delete": "Usuń",
+      "noPhotos": "Brak zdjęć",
+      "noPhotosDescription": "Rozpocznij swoją wizualną podróż",
+      "gallery": "Galeria Zdjęć Postępów",
+      "close": "Zamknij"
+    },
+    "weightLog": {
+      "addWeight": "Dodaj Wagę",
+      "updateWeight": "Aktualizuj Wagę",
+      "deleteWeight": "Usuń Wagę",
+      "noEntries": "Brak wpisów"
+    },
+    "heightLog": {
+      "addHeight": "Dodaj Wzrost",
+      "updateHeight": "Aktualizuj Wzrost",
+      "noEntries": "Brak wpisów"
+    }
+  },
+  "emotionalLandingPage": {
+    "hero": {
+      "title1": "Twoja Podróż do",
+      "title2": "Zdrowszego Ciebie",
+      "title3": "Zaczyna Się Tutaj",
+      "subtitle": "Spersonalizowane planowanie posiłków napędzane przez AI, które dostosowuje się do Twojego stylu życia",
+      "cta": "Rozpocznij Za Darmo",
+      "secondaryCta": "Zobacz Jak To Działa"
+    },
+    "finalCTA": {
+      "title1": "Gotowy, Aby Zmienić",
+      "title2": "Swoje Nawyki Żywieniowe",
+      "title3": "Na Zawsze?",
+      "subtitle": "Dołącz do tysięcy, którzy osiągnęli swoje cele zdrowotne z NutriAI",
+      "cta": "Zacznij Swoją Transformację"
+    }
+  },
+  "circularButtonDemo": {
+    "title": "Demo Okrągłego Przycisku",
+    "heading": "Biały Okrągły Przycisk",
+    "description": "Ten przycisk ma białe tło z czarnym tekstem i subtelnym cieniem.",
+    "smallButtonAlert": "Mały przycisk kliknięty!",
+    "smallSize": "Mały (48x48px)",
+    "mediumButtonAlert": "Średni przycisk kliknięty!",
+    "mediumSize": "Średni (56x56px)",
+    "largeButtonAlert": "Duży przycisk kliknięty!",
+    "largeSize": "Duży (64x64px)"
+  },
+  "tealButtonDemo": {
+    "title": "Demo Turkusowego Przycisku",
+    "heading": "Turkusowy Okrągły Przycisk",
+    "description": "Ten przycisk ma turkusowe tło z białym tekstem i gradientem świetlnym.",
+    "smallButtonAlert": "Mały przycisk kliknięty!",
+    "smallSize": "Mały (48x48px)",
+    "mediumButtonAlert": "Średni przycisk kliknięty!",
+    "mediumSize": "Średni (56x56px)",
+    "largeButtonAlert": "Duży przycisk kliknięty!",
+    "largeSize": "Duży (64x64px)"
+  },
+  "privacy": {
+    "title": "Polityka Prywatności",
+    "lastUpdated": "Ostatnia aktualizacja",
+    "section1": {
+      "title": "1. Informacje Które Zbieramy",
+      "intro": "Zbieramy informacje, które nam przekazujesz:",
+      "userProvided": {
+        "personal": "Dane osobowe (imię, email, wiek, płeć)",
+        "health": "Dane zdrowotne (waga, wzrost, cele fitness, preferencje dietetyczne)"
+      },
+      "autoCollected": {
+        "title": "Informacje Zbierane Automatycznie",
+        "device": "Informacje o urządzeniu",
+        "usage": "Dane użytkowania",
+        "log": "Dane dziennika"
+      },
+      "thirdParty": {
+        "title": "Informacje od Stron Trzecich",
+        "description": "Możemy otrzymywać informacje od usług uwierzytelniania stron trzecich."
+      }
+    },
+    "section2": {
+      "title": "2. Jak Używamy Twoich Informacji",
+      "intro": "Używamy Twoich informacji do:",
+      "point1": "Dostarczania i ulepszania naszych usług",
+      "point2": "Personalizowania Twojego doświadczenia",
+      "point3": "Komunikowania się z Tobą",
+      "point4": "Analizowania trendów użytkowania"
+    }
+  }
+}

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useRecipeById } from '@/hooks/queries/useRecipes';
+import { useTranslation } from 'react-i18next';
 
 interface Timer {
   id: string;
@@ -46,6 +47,7 @@ interface Recipe {
 }
 
 export default function CookingMode() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [location, navigate] = useLocation();
   const isFoodLog = location.includes('/food-log/');
@@ -486,10 +488,10 @@ export default function CookingMode() {
 
         <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center relative z-10 animate-[slideUp_0.5s_ease-out]">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 animate-[fadeIn_0.6s_ease-out_0.2s_both]">
-            🎉 Congratulations!
+            {t('common:cookingMode.completion.title')}
           </h1>
           <p className="text-lg text-gray-600 mb-6 animate-[fadeIn_0.6s_ease-out_0.4s_both]">
-            You've successfully completed:
+            {t('common:cookingMode.completion.subtitle')}
           </p>
           
           {recipeData.imageUrl && (
@@ -509,17 +511,17 @@ export default function CookingMode() {
           <div className="grid grid-cols-3 gap-4 mb-8 animate-[fadeIn_0.6s_ease-out_0.7s_both]">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 transform hover:scale-105 transition-transform">
               <Clock className="w-6 h-6 text-[#26A8FF] mx-auto mb-2" />
-              <p className="text-xs text-gray-500">Time</p>
+              <p className="text-xs text-gray-500">{t('common:cookingMode.completion.time')}</p>
               <p className="text-lg font-bold text-gray-900">{formatTime(session.elapsedTime)}</p>
             </div>
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 transform hover:scale-105 transition-transform">
               <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-              <p className="text-xs text-gray-500">Calories</p>
+              <p className="text-xs text-gray-500">{t('common:cookingMode.completion.calories')}</p>
               <p className="text-lg font-bold text-gray-900">{recipeData.nutritionInfo?.calories || 0}</p>
             </div>
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 transform hover:scale-105 transition-transform">
               <Users className="w-6 h-6 text-green-500 mx-auto mb-2" />
-              <p className="text-xs text-gray-500">Servings</p>
+              <p className="text-xs text-gray-500">{t('common:cookingMode.completion.servings')}</p>
               <p className="text-lg font-bold text-gray-900">{recipeData.servings || 1}</p>
             </div>
           </div>
@@ -541,13 +543,13 @@ export default function CookingMode() {
               }}
               className="w-full py-4 bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-xl font-semibold hover:shadow-xl transform hover:scale-105 transition-all"
             >
-              Cook Again
+              {t('common:cookingMode.completion.cookAgain')}
             </button>
             <button
               onClick={handleExit}
               className="w-full py-4 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
             >
-              ← Back to Recipe
+              {t('common:cookingMode.completion.backToRecipe')}
             </button>
           </div>
         </div>
@@ -616,7 +618,7 @@ export default function CookingMode() {
             <div>
               <h1 className="font-bold text-lg truncate max-w-xs">{recipeData.name}</h1>
               <p className="text-sm text-gray-400">
-                Step {session.currentStep + 1} of {session.totalSteps}
+                {t('common:cookingMode.step')} {session.currentStep + 1} {t('common:cookingMode.of')} {session.totalSteps}
               </p>
             </div>
           </div>
@@ -646,8 +648,8 @@ export default function CookingMode() {
             />
           </div>
           <div className="flex justify-between mt-2 text-xs text-gray-400">
-            <span>{Math.round(progress)}% complete</span>
-            <span>{formatTime(session.elapsedTime)} elapsed</span>
+            <span>{Math.round(progress)}% {t('common:cookingMode.complete')}</span>
+            <span>{formatTime(session.elapsedTime)} {t('common:cookingMode.elapsed')}</span>
           </div>
         </div>
       </div>
@@ -665,7 +667,7 @@ export default function CookingMode() {
                 {stepType === 'critical' && (
                   <div className="flex items-center gap-2 text-orange-600 mb-2">
                     <AlertCircle className="w-5 h-5" />
-                    <span className="text-sm font-semibold">Important Step</span>
+                    <span className="text-sm font-semibold">{t('common:cookingMode.importantStep')}</span>
                   </div>
                 )}
                 <p className="text-2xl leading-relaxed text-gray-900">
@@ -684,7 +686,7 @@ export default function CookingMode() {
                 className="mt-4 px-4 py-2 bg-[#26A8FF] text-white rounded-lg flex items-center gap-2 hover:bg-[#1A8FE6] transition-colors"
               >
                 <TimerIcon className="w-4 h-4" />
-                Start {timerInfo.text} timer
+                {t('common:cookingMode.startTimerButton', { time: timerInfo.text })}
               </button>
             )}
           </div>
@@ -694,7 +696,7 @@ export default function CookingMode() {
             <div className="bg-gray-800 rounded-2xl p-6 mb-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <TimerIcon className="w-5 h-5" />
-                Active Timers
+                {t('common:cookingMode.activeTimers')}
               </h3>
               <div className="space-y-3">
                 {session.timers.map(timer => (
@@ -730,7 +732,7 @@ export default function CookingMode() {
             <div className="bg-gray-800 rounded-2xl p-6 mb-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <List className="w-5 h-5" />
-                Ingredients
+                {t('common:cookingMode.ingredients')}
               </h3>
               <div className="space-y-2">
                 {ingredients.map((ingredient, index) => (
@@ -764,19 +766,19 @@ export default function CookingMode() {
               }`}
             >
               <List className="w-4 h-4 inline mr-2" />
-              Ingredients
+              {t('common:cookingMode.ingredients')}
             </button>
             <button
               onClick={() => {
-                const minutes = prompt('Enter timer duration (minutes):');
+                const minutes = prompt(t('common:cookingMode.customTimerPrompt'));
                 if (minutes) {
-                  addTimer(parseInt(minutes), `Custom - ${minutes} min`);
+                  addTimer(parseInt(minutes), t('common:cookingMode.customTimerLabel', { minutes }));
                 }
               }}
               className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg font-medium hover:bg-gray-600 transition-colors"
             >
               <TimerIcon className="w-4 h-4 inline mr-2" />
-              Add Timer
+              {t('common:cookingMode.addTimer')}
             </button>
           </div>
 
@@ -788,7 +790,7 @@ export default function CookingMode() {
               className="flex-1 py-4 bg-gray-700 rounded-xl font-semibold hover:bg-gray-600 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <ChevronLeft className="w-5 h-5" />
-              Previous
+              {t('common:cookingMode.previous')}
             </button>
 
             <button
@@ -805,11 +807,11 @@ export default function CookingMode() {
               {session.currentStep === session.totalSteps - 1 ? (
                 <>
                   <Check className="w-5 h-5" />
-                  Complete
+                  {t('common:cookingMode.completeButton')}
                 </>
               ) : (
                 <>
-                  Next
+                  {t('common:cookingMode.next')}
                   <ChevronRight className="w-5 h-5" />
                 </>
               )}
@@ -822,20 +824,20 @@ export default function CookingMode() {
       {showExitConfirm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 rounded-2xl p-6 max-w-sm w-full">
-            <h3 className="text-xl font-bold mb-2">Exit Cooking Mode?</h3>
-            <p className="text-gray-400 mb-6">Your progress will be lost if you exit now.</p>
+            <h3 className="text-xl font-bold mb-2">{t('common:cookingMode.exitTitle')}</h3>
+            <p className="text-gray-400 mb-6">{t('common:cookingMode.exitMessage')}</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowExitConfirm(false)}
                 className="flex-1 py-3 bg-gray-700 rounded-xl font-semibold hover:bg-gray-600 transition-colors"
               >
-                Cancel
+                {t('common:cookingMode.cancel')}
               </button>
               <button
                 onClick={handleExit}
                 className="flex-1 py-3 bg-red-500 rounded-xl font-semibold hover:bg-red-600 transition-colors"
               >
-                Exit
+                {t('common:cookingMode.exit')}
               </button>
             </div>
           </div>

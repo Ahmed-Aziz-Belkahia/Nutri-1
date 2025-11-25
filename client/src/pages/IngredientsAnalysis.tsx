@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, Check, Loader2, Search, ChefHat, Utensils, BookOpen, Plus, Trash2, Edit2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -20,15 +21,17 @@ interface AnalysisStep {
   icon: React.ReactNode;
 }
 
-const analysisSteps: AnalysisStep[] = [
-  { id: 'detecting', label: 'Detecting ingredients...', icon: <Search className="w-5 h-5" /> },
-  { id: 'analyzing', label: 'Analyzing combinations...', icon: <ChefHat className="w-5 h-5" /> },
-  { id: 'generating', label: 'Creating recipes...', icon: <Utensils className="w-5 h-5" /> },
-  { id: 'finalizing', label: 'Adding instructions...', icon: <BookOpen className="w-5 h-5" /> },
+const getAnalysisSteps = (t: any): AnalysisStep[] => [
+  { id: 'detecting', label: t('common:ingredientsAnalysis.steps.detecting'), icon: <Search className="w-5 h-5" /> },
+  { id: 'analyzing', label: t('common:ingredientsAnalysis.steps.analyzing'), icon: <ChefHat className="w-5 h-5" /> },
+  { id: 'generating', label: t('common:ingredientsAnalysis.steps.generating'), icon: <Utensils className="w-5 h-5" /> },
+  { id: 'finalizing', label: t('common:ingredientsAnalysis.steps.finalizing'), icon: <BookOpen className="w-5 h-5" /> },
 ];
 
 export default function IngredientsAnalysis() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
+  const analysisSteps = getAnalysisSteps(t);
   const [currentState, setCurrentState] = useState<AnalysisState>('detecting');
   const [detectedIngredients, setDetectedIngredients] = useState<Ingredient[]>([]);
   const [difficulty, setDifficulty] = useState<string>('Medium');
@@ -98,7 +101,7 @@ export default function IngredientsAnalysis() {
         });
 
         if (!ingredientsResponse.ok) {
-          throw new Error('Failed to analyze ingredients');
+          throw new Error(t('common:ingredientsAnalysis.errors.failedToAnalyze'));
         }
 
         const ingredientsResult = await ingredientsResponse.json();
@@ -107,7 +110,7 @@ export default function IngredientsAnalysis() {
         if (!isMounted) return;
 
         if (!ingredientsResult || !ingredientsResult.ingredients) {
-          throw new Error('Invalid analysis result: Missing ingredients data');
+          throw new Error(t('common:ingredientsAnalysis.errors.invalidResult'));
         }
         
         // Parse and format ingredients
@@ -132,8 +135,8 @@ export default function IngredientsAnalysis() {
         localStorage.removeItem('analyzingIngredientsImage');
         
         toast({
-          title: "Analysis Error",
-          description: error instanceof Error ? error.message : "Failed to analyze ingredients. Please try again.",
+          title: t('common:ingredientsAnalysis.errors.analysisError'),
+          description: error instanceof Error ? error.message : t('common:ingredientsAnalysis.errors.tryAgain'),
           variant: "destructive",
         });
         
@@ -209,8 +212,8 @@ export default function IngredientsAnalysis() {
   const handleConfirmAndGenerate = async () => {
     if (detectedIngredients.length === 0) {
       toast({
-        title: "No Ingredients",
-        description: "Please add at least one ingredient to generate recipes.",
+        title: t('common:ingredientsAnalysis.errors.noIngredients'),
+        description: t('common:ingredientsAnalysis.errors.addOneIngredient'),
         variant: "destructive",
       });
       return;
@@ -240,7 +243,7 @@ export default function IngredientsAnalysis() {
       });
 
       if (!recipesResponse.ok) {
-        throw new Error('Failed to generate recipes');
+        throw new Error(t('common:ingredientsAnalysis.errors.failedToGenerate'));
       }
 
       const recipesResult = await recipesResponse.json();
@@ -398,8 +401,8 @@ export default function IngredientsAnalysis() {
       isPolling.current = false;
 
       toast({
-        title: "Generation Error",
-        description: error instanceof Error ? error.message : "Failed to generate recipes. Please try again.",
+        title: t('common:ingredientsAnalysis.errors.generationError'),
+        description: error instanceof Error ? error.message : t('common:ingredientsAnalysis.errors.tryAgain'),
         variant: "destructive",
       });
 
@@ -433,19 +436,19 @@ export default function IngredientsAnalysis() {
   const getCurrentStepMessage = () => {
     switch (currentState) {
       case 'detecting':
-        return 'Scanning ingredients...';
+        return t('common:ingredientsAnalysis.messages.scanning');
       case 'analyzing':
-        return 'Finding perfect combinations...';
+        return t('common:ingredientsAnalysis.messages.findingCombinations');
       case 'generating':
-        return 'Creating your recipes...';
+        return t('common:ingredientsAnalysis.messages.creatingRecipes');
       case 'finalizing':
-        return 'Adding final touches...';
+        return t('common:ingredientsAnalysis.messages.addingTouches');
       case 'complete':
-        return 'Recipes ready!';
+        return t('common:ingredientsAnalysis.messages.recipesReady');
       case 'error':
-        return 'Oops, something went wrong';
+        return t('common:ingredientsAnalysis.messages.somethingWrong');
       default:
-        return 'Processing...';
+        return t('common:ingredientsAnalysis.messages.processing');
     }
   };
 
@@ -684,14 +687,14 @@ export default function IngredientsAnalysis() {
                 {/* Ingredients List */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Detected Ingredients</h2>
+                    <h2 className="text-xl font-bold text-gray-800">{t('common:ingredientsAnalysis.confirmation.title')}</h2>
                     <Button
                       onClick={handleAddIngredient}
                       size="sm"
                       className="bg-gradient-to-r from-[#26A8FF] to-cyan-500 hover:from-[#1a8fdf] hover:to-cyan-600"
                     >
                       <Plus className="w-4 h-4 mr-1" />
-                      Add
+                      {t('common:ingredientsAnalysis.confirmation.add')}
                     </Button>
                   </div>
 
@@ -709,20 +712,20 @@ export default function IngredientsAnalysis() {
                             <Input
                               value={editName}
                               onChange={(e) => setEditName(e.target.value)}
-                              placeholder="Ingredient name"
+                              placeholder={t('common:ingredientsAnalysis.confirmation.ingredientName')}
                               className="bg-white"
                             />
                             <div className="flex gap-2">
                               <Input
                                 value={editQuantity}
                                 onChange={(e) => setEditQuantity(e.target.value)}
-                                placeholder="Quantity"
+                                placeholder={t('common:ingredientsAnalysis.confirmation.quantity')}
                                 className="bg-white flex-1"
                               />
                               <Input
                                 value={editUnit}
                                 onChange={(e) => setEditUnit(e.target.value)}
-                                placeholder="Unit"
+                                placeholder={t('common:ingredientsAnalysis.confirmation.unit')}
                                 className="bg-white flex-1"
                               />
                             </div>
@@ -733,7 +736,7 @@ export default function IngredientsAnalysis() {
                                 className="flex-1 bg-green-500 hover:bg-green-600"
                               >
                                 <Check className="w-4 h-4 mr-1" />
-                                Save
+                                {t('common:ingredientsAnalysis.confirmation.save')}
                               </Button>
                               <Button
                                 onClick={handleCancelEdit}
@@ -742,7 +745,7 @@ export default function IngredientsAnalysis() {
                                 className="flex-1"
                               >
                                 <X className="w-4 h-4 mr-1" />
-                                Cancel
+                                {t('common:ingredientsAnalysis.confirmation.cancel')}
                               </Button>
                             </div>
                           </div>
@@ -783,19 +786,19 @@ export default function IngredientsAnalysis() {
 
                 {/* Difficulty Selector */}
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-gray-200">
-                  <h3 className="text-lg font-bold text-gray-800 mb-4">Recipe Difficulty</h3>
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">{t('common:ingredientsAnalysis.confirmation.difficultyTitle')}</h3>
                   <div className="grid grid-cols-3 gap-3">
-                    {['Easy', 'Medium', 'Hard'].map((level) => (
+                    {[{key: 'Easy', label: t('common:ingredientsAnalysis.confirmation.easy')}, {key: 'Medium', label: t('common:ingredientsAnalysis.confirmation.medium')}, {key: 'Hard', label: t('common:ingredientsAnalysis.confirmation.hard')}].map((level) => (
                       <button
-                        key={level}
-                        onClick={() => setDifficulty(level)}
+                        key={level.key}
+                        onClick={() => setDifficulty(level.key)}
                         className={`py-3 px-4 rounded-xl font-semibold transition-all ${
-                          difficulty === level
+                          difficulty === level.key
                             ? 'bg-gradient-to-r from-[#26A8FF] to-cyan-500 text-white shadow-lg shadow-blue-500/30'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
-                        {level}
+                        {level.label}
                       </button>
                     ))}
                   </div>
@@ -808,7 +811,7 @@ export default function IngredientsAnalysis() {
                   disabled={detectedIngredients.length === 0}
                 >
                   <ChefHat className="w-5 h-5 mr-2" />
-                  Generate Recipes
+                  {t('common:ingredientsAnalysis.confirmation.continueButton')}
                 </Button>
               </motion.div>
             )}

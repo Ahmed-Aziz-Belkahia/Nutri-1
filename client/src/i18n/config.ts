@@ -39,6 +39,15 @@ import esOnboarding from './locales/es/onboarding.json';
 import esRecipes from './locales/es/recipes.json';
 import esAnalytics from './locales/es/analytics.json';
 
+import plCommon from './locales/pl/common.json';
+import plAuth from './locales/pl/auth.json';
+import plDashboard from './locales/pl/dashboard.json';
+import plProfile from './locales/pl/profile.json';
+import plMeals from './locales/pl/meals.json';
+import plOnboarding from './locales/pl/onboarding.json';
+import plRecipes from './locales/pl/recipes.json';
+import plAnalytics from './locales/pl/analytics.json';
+
 // Define resources
 const resources = {
   en: {
@@ -80,6 +89,16 @@ const resources = {
     onboarding: esOnboarding,
     recipes: esRecipes,
     analytics: esAnalytics,
+  },
+  pl: {
+    common: plCommon,
+    auth: plAuth,
+    dashboard: plDashboard,
+    profile: plProfile,
+    meals: plMeals,
+    onboarding: plOnboarding,
+    recipes: plRecipes,
+    analytics: plAnalytics,
   },
 };
 
@@ -123,4 +142,5 @@ export const AVAILABLE_LANGUAGES = [
   { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
   { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
   { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
+  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱' },
 ];

@@ -5,6 +5,7 @@ import { Sparkles, Check, Loader2, ChefHat, Scale, Flame, Beef } from 'lucide-re
 import { analyzeFoodImage } from '@/lib/vision';
 import { useFoodLog } from '@/hooks/use-food-log';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 type AnalysisState = 'detecting' | 'analyzing' | 'calculating' | 'finalizing' | 'complete' | 'error';
 
@@ -14,14 +15,16 @@ interface AnalysisStep {
   icon: React.ReactNode;
 }
 
-const analysisSteps: AnalysisStep[] = [
-  { id: 'detecting', label: 'Detecting food items...', icon: <ChefHat className="w-5 h-5" /> },
-  { id: 'analyzing', label: 'Analyzing ingredients...', icon: <Scale className="w-5 h-5" /> },
-  { id: 'calculating', label: 'Calculating nutrition...', icon: <Flame className="w-5 h-5" /> },
-  { id: 'finalizing', label: 'Finalizing details...', icon: <Beef className="w-5 h-5" /> },
+const getAnalysisSteps = (t: any): AnalysisStep[] => [
+  { id: 'detecting', label: t('common:mealAnalysis.steps.detecting'), icon: <ChefHat className="w-5 h-5" /> },
+  { id: 'analyzing', label: t('common:mealAnalysis.steps.analyzing'), icon: <Scale className="w-5 h-5" /> },
+  { id: 'calculating', label: t('common:mealAnalysis.steps.calculating'), icon: <Flame className="w-5 h-5" /> },
+  { id: 'finalizing', label: t('common:mealAnalysis.steps.finalizing'), icon: <Beef className="w-5 h-5" /> },
 ];
 
 export default function MealAnalysis() {
+  const { t } = useTranslation(['common']);
+  const analysisSteps = getAnalysisSteps(t);
   const [, setLocation] = useLocation();
   const [, params] = useRoute('/meal-analysis/:image');
   const [currentState, setCurrentState] = useState<AnalysisState>('detecting');
@@ -205,19 +208,19 @@ export default function MealAnalysis() {
   const getCurrentStepMessage = () => {
     switch (currentState) {
       case 'detecting':
-        return 'Scanning your food...';
+        return t('common:mealAnalysis.messages.scanningFood');
       case 'analyzing':
-        return 'Identifying ingredients...';
+        return t('common:mealAnalysis.messages.identifyingIngredients');
       case 'calculating':
-        return 'Crunching the numbers...';
+        return t('common:mealAnalysis.messages.crunchingNumbers');
       case 'finalizing':
-        return 'Almost done...';
+        return t('common:mealAnalysis.messages.almostDone');
       case 'complete':
-        return 'All set!';
+        return t('common:mealAnalysis.messages.allSet');
       case 'error':
-        return 'Oops, something went wrong';
+        return t('common:mealAnalysis.messages.somethingWrong');
       default:
-        return 'Processing...';
+        return t('common:mealAnalysis.messages.processing');
     }
   };
 
@@ -370,9 +373,9 @@ export default function MealAnalysis() {
             </AnimatePresence>
             
             <p className="text-gray-600 text-sm">
-              {isComplete ? 'Your meal has been analyzed successfully' : 
-               hasError ? 'Please try again' :
-               'Our AI is working its magic'}
+              {isComplete ? t('common:mealAnalysis.messages.analyzedSuccessfully') : 
+               hasError ? t('common:mealAnalysis.messages.pleaseTryAgain') :
+               t('common:mealAnalysis.messages.aiWorking')}
             </p>
           </motion.div>
 
@@ -458,8 +461,8 @@ export default function MealAnalysis() {
                     <Check className="w-6 h-6 text-white" strokeWidth={3} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-green-800">Perfect!</p>
-                    <p className="text-sm text-green-700 mt-0.5">Your meal has been added to your log</p>
+                    <p className="text-lg font-bold text-green-800">{t('common:mealAnalysis.success.perfect')}</p>
+                    <p className="text-sm text-green-700 mt-0.5">{t('common:mealAnalysis.success.addedToLog')}</p>
                   </div>
                 </div>
               </motion.div>
@@ -475,7 +478,7 @@ export default function MealAnalysis() {
                 className="bg-red-50 border-2 border-red-200 rounded-3xl p-6 shadow-xl"
               >
                 <p className="text-center text-red-700 font-medium">
-                  Unable to analyze your meal. Redirecting back...
+                  {t('common:mealAnalysis.error.unableToAnalyze')}
                 </p>
               </motion.div>
             )}

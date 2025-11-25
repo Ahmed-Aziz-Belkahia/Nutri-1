@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PlayCircle, ChevronRight } from "lucide-react";
@@ -9,35 +10,32 @@ import Navigation from "../components/Navigation";
 import { motion } from "framer-motion";
 
 export default function FoodDatabase() {
+  const { t } = useTranslation(['common']);
   const [, setLocation] = useLocation();
   const [location] = useLocation();
 
   const commonRecipes = [
     {
       id: 1,
-      name: "Green Salad",
-      description: "Fresh romaine lettuce\nClassic Greek style",
+      nameKey: "greenSalad",
       bgColor: "bg-[#E8F8F7]",
       emoji: "🥗"
     },
     {
       id: 2,
-      name: "Thai salad",
-      description: "Green papaya salad\nAuthentic Thai spices",
+      nameKey: "thaiSalad",
       bgColor: "bg-[#FCE8E8]",
       emoji: "🥘"
     },
     {
       id: 3,
-      name: "Chicken salad",
-      description: "Grilled chicken breast\nCrisp mixed greens",
+      nameKey: "chickenSalad",
       bgColor: "bg-[#E8F8F7]",
       emoji: "🥙"
     },
     {
       id: 4,
-      name: "Tuna salad",
-      description: "Fresh tuna\nMediterranean style",
+      nameKey: "tunaSalad",
       bgColor: "bg-[#FCE8E8]",
       emoji: "🐟"
     },
@@ -60,7 +58,7 @@ export default function FoodDatabase() {
                 animate={{ x: 0, opacity: 1 }}
                 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent"
               >
-                Hi, Good morning
+                {t('common:foodDatabase.greeting')}
               </motion.h1>
               <motion.div 
                 initial={{ x: -20, opacity: 0 }}
@@ -74,7 +72,7 @@ export default function FoodDatabase() {
                       ? 'font-semibold text-gray-900' 
                       : 'text-gray-400 hover:text-gray-600 hover:translate-x-0.5'
                   }`}>
-                    Home
+                    {t('common:foodDatabase.nav.home')}
                   </span>
                 </Link>
                 <Link href="/recipes">
@@ -83,7 +81,7 @@ export default function FoodDatabase() {
                       ? 'font-semibold text-gray-900' 
                       : 'text-gray-400 hover:text-gray-600 hover:translate-x-0.5'
                   }`}>
-                    Recipes
+                    {t('common:foodDatabase.nav.recipes')}
                   </span>
                 </Link>
               </motion.div>
@@ -103,10 +101,10 @@ export default function FoodDatabase() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-medium mb-0.5 group-hover:text-[#0CC5BA] transition-colors">
-                    Create Your Own Recipe
+                    {t('common:foodDatabase.createRecipe.title')}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Collect your favorite recipes
+                    {t('common:foodDatabase.createRecipe.description')}
                   </p>
                 </div>
                 <motion.div
@@ -127,14 +125,14 @@ export default function FoodDatabase() {
           >
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-base font-semibold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                TOP 100
+                {t('common:foodDatabase.top100.title')}
               </h2>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 className="text-[#0CC5BA] hover:text-[#0AB3A9] -mr-2 group"
               >
-                See all 
+                {t('common:foodDatabase.top100.seeAll')}
                 <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
               </Button>
             </div>
@@ -154,10 +152,10 @@ export default function FoodDatabase() {
                     </div>
                     <div className="p-2.5">
                       <h3 className="font-medium text-sm leading-snug group-hover:text-[#0CC5BA] transition-colors">
-                        {recipe.name}
+                        {t(`common:foodDatabase.recipes.${recipe.nameKey}.name`)}
                       </h3>
                       <p className="text-xs text-gray-500 whitespace-pre-line mt-0.5 leading-relaxed">
-                        {recipe.description}
+                        {t(`common:foodDatabase.recipes.${recipe.nameKey}.description`)}
                       </p>
                     </div>
                   </Card>

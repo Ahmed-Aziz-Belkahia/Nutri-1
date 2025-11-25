@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import FoodDetailView from "@/components/FoodDetailView";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 
@@ -16,6 +17,7 @@ interface FoodResponse {
 }
 
 export default function FoodDetail() {
+  const { t } = useTranslation(['common']);
   const [location] = useLocation();
   const foodId = location.split("/").pop();
 
@@ -38,7 +40,7 @@ export default function FoodDetail() {
   if (error || !food) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center text-white">
-        <p>Failed to load food details</p>
+        <p>{t('common:foodDetail.error')}</p>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Upload, ArrowRight, TrendingDown, Calendar, Target, Flame, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,6 +22,7 @@ interface OnboardingCompletionProps {
 }
 
 export default function OnboardingCompletion({ formData }: OnboardingCompletionProps) {
+  const { t } = useTranslation(['common']);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -71,7 +73,12 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
   // Calculate timeline: 0.5kg per week weight change
   const weightDifference = Math.abs(weight - goalWeight);
   const weeksToGoal = Math.ceil(weightDifference / 0.5);
-  const goalText = formData.weightGoal === "loss" ? "schudnąć" : formData.weightGoal === "gain" ? "przytyć" : "utrzymać wagę";
+  const getGoalText = () => {
+    if (formData.weightGoal === "loss") return t('common:onboardingCompletion.goalText.lose');
+    if (formData.weightGoal === "gain") return t('common:onboardingCompletion.goalText.gain');
+    return t('common:onboardingCompletion.goalText.maintain');
+  };
+  const goalText = getGoalText();
 
   const handleImageUpload = async (file: File) => {
     if (!file) return;
@@ -86,23 +93,21 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const result = await response.json();
+        if (!response.ok) {
+          throw new Error(t('common:onboardingCompletion.toast.uploadFailed'));
+        }      const result = await response.json();
       setProfileImage(result.imageUrl);
       
       toast({
-        title: "Profile picture uploaded!",
-        description: "Your photo has been saved successfully.",
+        title: t('common:onboardingCompletion.toast.profileUploaded'),
+        description: t('common:onboardingCompletion.toast.photoSaved'),
       });
     } catch (error) {
       console.error('Upload error:', error);
       toast({
         variant: "destructive",
-        title: "Upload failed",
-        description: "Please try uploading your photo again.",
+        title: t('common:onboardingCompletion.toast.uploadFailed'),
+        description: t('common:onboardingCompletion.toast.tryAgain'),
       });
     } finally {
       setIsUploading(false);
@@ -160,12 +165,12 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
       });
 
       if (!response.ok) {
-        throw new Error('Failed to complete onboarding');
+        throw new Error(t('common:onboardingCompletion.toast.configError'));
       }
 
       toast({
-        title: "Profile completed!",
-        description: "Your personalized nutrition plan is ready.",
+        title: t('common:onboardingCompletion.toast.profileCompleted'),
+        description: t('common:onboardingCompletion.toast.planReady'),
       });
 
       setLocation("/vision-board");
@@ -173,8 +178,8 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
       console.error('Completion error:', error);
       toast({
         variant: "destructive",
-        title: "Configuration Error",
-        description: "Please try again.",
+        title: t('common:onboardingCompletion.toast.configError'),
+        description: t('common:onboardingCompletion.toast.tryAgain'),
       });
     } finally {
       setIsCompleting(false);
@@ -201,14 +206,14 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 animate={{ scale: 1 }}
                 className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0CC5BA] to-blue-500 flex items-center justify-center mb-4 mx-auto"
               >
-                <span className="text-white font-bold text-lg">8</span>
+                <span className="text-white font-bold text-lg">{t('common:onboardingCompletion.stepNumber')}</span>
               </motion.div>
               <motion.h1
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="text-2xl font-bold bg-gradient-to-r from-[#0CC5BA] to-blue-500 bg-clip-text text-transparent mb-2"
               >
-                ZDJĘCIE PROFILOWE
+                {t('common:onboardingCompletion.title')}
               </motion.h1>
               <motion.p
                 initial={{ y: 20, opacity: 0 }}
@@ -216,7 +221,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 transition={{ delay: 0.1 }}
                 className="text-gray-600 text-sm"
               >
-                Dodaj zdjęcie profilowe (opcjonalne)
+                {t('common:onboardingCompletion.subtitle')}
               </motion.p>
             </div>
 
@@ -240,7 +245,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 ) : (
                   <div className="text-center">
                     <Upload className="w-8 h-8 text-[#0CC5BA] mx-auto mb-2" />
-                    <span className="text-xs text-gray-500">Prześlij zdjęcie</span>
+                    <span className="text-xs text-gray-500">{t('common:onboardingCompletion.uploadText')}</span>
                   </div>
                 )}
                 {isUploading && (
@@ -257,7 +262,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 className="hidden"
               />
               <p className="text-center text-xs text-gray-500">
-                Your profile picture will be displayed in your profile and in the app. You can change it later.
+                {t('common:onboardingCompletion.profileImageDescription')}
               </p>
             </motion.div>
 
@@ -273,10 +278,10 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                   <Flame className="w-6 h-6 text-orange-500" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Your daily calorie requirement
+                  {t('common:onboardingCompletion.calorieNeedTitle')}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  You can adjust the value according to your needs
+                  {t('common:onboardingCompletion.calorieNeedSubtitle')}
                 </p>
               </div>
 
@@ -286,14 +291,14 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                     <Flame className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">
-                    Your daily requirement
+                    {t('common:onboardingCompletion.yourRequirement')}
                   </span>
                 </div>
                 <div className="text-3xl font-bold text-gray-900 mb-1">
                   {dailyCalories.toLocaleString()}
                   <span className="text-sm font-normal text-gray-600 ml-1">kcal</span>
                 </div>
-                <p className="text-xs text-gray-600">dziennie</p>
+                <p className="text-xs text-gray-600">{t('common:onboardingCompletion.perDay')}</p>
               </Card>
             </motion.div>
 
@@ -308,36 +313,36 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 <div className="flex items-center gap-3 mb-4">
                   <Calendar className="w-6 h-6 text-blue-500" />
                   <div>
-                    <h4 className="font-semibold text-gray-900">Czasowy plan osiągnięcia celu</h4>
-                    <p className="text-sm text-gray-600">Przy obecnym tempie</p>
+                    <h4 className="font-semibold text-gray-900">{t('common:onboardingCompletion.timelineTitle')}</h4>
+                    <p className="text-sm text-gray-600">{t('common:onboardingCompletion.timelineSubtitle')}</p>
                   </div>
                 </div>
                 
                 <div className="text-center mb-4">
                   <p className="text-sm text-gray-600">
-                    Przy założeniu {goalText} 0.5kg tygodniowo:
+                    {t('common:onboardingCompletion.atCurrentPace')}
                   </p>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-900">{weight}kg</div>
-                    <div className="text-xs text-gray-500">obecna waga</div>
+                    <div className="text-xs text-gray-500">{t('common:onboardingCompletion.currentWeight')}</div>
                   </div>
                   
                   <div className="flex-1 mx-4">
                     <div className="flex items-center justify-center gap-2">
                       <TrendingDown className="w-5 h-5 text-blue-500" />
                       <div className="text-center">
-                        <div className="text-lg font-bold text-blue-600">{weeksToGoal} tygodni</div>
-                        <div className="text-xs text-gray-500">do osiągnięcia celu</div>
+                        <div className="text-lg font-bold text-blue-600">{weeksToGoal} {t('common:onboardingCompletion.weeks')}</div>
+                        <div className="text-xs text-gray-500">{t('common:onboardingCompletion.toGoal')}</div>
                       </div>
                     </div>
                   </div>
                   
                   <div className="text-center">
                     <div className="text-2xl font-bold text-[#0CC5BA]">{goalWeight}kg</div>
-                    <div className="text-xs text-gray-500">cel</div>
+                    <div className="text-xs text-gray-500">{t('common:onboardingCompletion.goal')}</div>
                   </div>
                 </div>
               </Card>
@@ -353,15 +358,15 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
               <div className="grid grid-cols-3 gap-3">
                 <Card className="p-4 text-center bg-green-50 border-green-200">
                   <div className="text-lg font-bold text-green-700">{macros.protein}g</div>
-                  <div className="text-xs text-gray-600">Protein</div>
+                  <div className="text-xs text-gray-600">{t('common:onboardingCompletion.macros.protein')}</div>
                 </Card>
                 <Card className="p-4 text-center bg-yellow-50 border-yellow-200">
                   <div className="text-lg font-bold text-yellow-700">{macros.carbs}g</div>
-                  <div className="text-xs text-gray-600">Carbs</div>
+                  <div className="text-xs text-gray-600">{t('common:onboardingCompletion.macros.carbs')}</div>
                 </Card>
                 <Card className="p-4 text-center bg-purple-50 border-purple-200">
                   <div className="text-lg font-bold text-purple-700">{macros.fat}g</div>
-                  <div className="text-xs text-gray-600">Fat</div>
+                  <div className="text-xs text-gray-600">{t('common:onboardingCompletion.macros.fat')}</div>
                 </Card>
               </div>
             </motion.div>
@@ -380,7 +385,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                 <div className="flex items-center gap-2">
                   <Info className="w-5 h-5 text-blue-500" />
                   <span className="font-semibold text-gray-900 text-sm">
-                    How we calculated your daily needs
+                    {t('common:onboardingCompletion.formulaTitle')}
                   </span>
                 </div>
                 {showFormulaExplanation ? (
@@ -403,12 +408,12 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                       <div className="space-y-4">
                         {/* BMR Section */}
                         <div>
-                          <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                            <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
                             <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            1. BMR (Basal Metabolic Rate)
+                            1. {t('common:onboardingCompletion.bmrTitle')}
                           </h4>
                           <p className="text-xs text-gray-600 mb-2">
-                            Using Mifflin-St Jeor equation (most widely used):
+                            {t('common:onboardingCompletion.bmrDescription')}
                           </p>
                           <div className={`${isMale ? 'bg-blue-50' : 'bg-pink-50'} p-3 rounded-lg text-xs`}>
                             <p className="font-mono text-[10px]">
@@ -422,19 +427,19 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
                             <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                            2. TDEE (Total Daily Energy Expenditure)
+                            2. {t('common:onboardingCompletion.tdeeTitle')}
                           </h4>
                           <p className="text-xs text-gray-600 mb-2">
-                            BMR × activity factor:
+                            {t('common:onboardingCompletion.tdeeDescription')}
                           </p>
                           <div className="bg-green-50 p-3 rounded-lg text-xs">
                             <p className="font-mono text-[10px]">
                               TDEE = {bmr} × {activityMultiplier} ({
-                                formData.activityLevel === 'sedentary' ? 'sedentary lifestyle' :
-                                formData.activityLevel === 'light' ? 'light activity' :
-                                formData.activityLevel === 'moderate' ? 'moderate activity' :
-                                formData.activityLevel === 'active' ? 'active lifestyle' :
-                                'very active'
+                                formData.activityLevel === 'sedentary' ? t('common:onboardingCompletion.formula.tdee.activityLevels.sedentary') :
+                                formData.activityLevel === 'light' ? t('common:onboardingCompletion.formula.tdee.activityLevels.light') :
+                                formData.activityLevel === 'moderate' ? t('common:onboardingCompletion.formula.tdee.activityLevels.moderate') :
+                                formData.activityLevel === 'active' ? t('common:onboardingCompletion.formula.tdee.activityLevels.active') :
+                                t('common:onboardingCompletion.formula.tdee.activityLevels.veryActive')
                               })
                             </p>
                             <p className="mt-2 font-semibold text-green-600">= {tdee} kcal/day</p>
@@ -445,39 +450,39 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm">
                             <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                            3. Adjusted for Your Goal
+                            3. {t('common:onboardingCompletion.goalAdjustmentTitle')}
                           </h4>
                           <div className="bg-orange-50 p-3 rounded-lg text-xs">
                             {formData.weightGoal === 'loss' && (
                               <>
-                                <p>Goal: <strong>Weight Loss</strong></p>
+                                <p>Goal: <strong>{t('common:onboardingCompletion.goalText.lose')}</strong></p>
                                 <p className="font-mono text-[10px] mt-2">
                                   Daily calories = {tdee} - 500 kcal
                                 </p>
                                 <p className="text-[10px] text-gray-600 mt-1">
-                                  500 kcal deficit/day = ~0.5 kg loss per week
+                                  {t('common:onboardingCompletion.lossDescription')}
                                 </p>
                               </>
                             )}
                             {formData.weightGoal === 'gain' && (
                               <>
-                                <p>Goal: <strong>Weight Gain</strong></p>
+                                <p>Goal: <strong>{t('common:onboardingCompletion.goalText.gain')}</strong></p>
                                 <p className="font-mono text-[10px] mt-2">
                                   Daily calories = {tdee} + 300 kcal
                                 </p>
                                 <p className="text-[10px] text-gray-600 mt-1">
-                                  300 kcal surplus/day for healthy mass gain
+                                  {t('common:onboardingCompletion.gainDescription')}
                                 </p>
                               </>
                             )}
                             {formData.weightGoal === 'maintain' && (
                               <>
-                                <p>Goal: <strong>Maintain Weight</strong></p>
+                                <p>Goal: <strong>{t('common:onboardingCompletion.goalText.maintain')}</strong></p>
                                 <p className="font-mono text-[10px] mt-2">
                                   Daily calories = {tdee} kcal
                                 </p>
                                 <p className="text-[10px] text-gray-600 mt-1">
-                                  Energy balance for weight maintenance
+                                  {t('common:onboardingCompletion.maintainDescription')}
                                 </p>
                               </>
                             )}
@@ -490,7 +495,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                         {/* Source Reference */}
                         <div className="pt-3 border-t border-gray-200">
                           <p className="text-[10px] text-gray-500">
-                            <strong>Source:</strong> Mifflin-St Jeor Equation - American Dietetic Association (2005)
+                            <strong>{t('common:onboardingCompletion.sourceLabel')}</strong> {t('common:onboardingCompletion.sourceText')}
                           </p>
                         </div>
                       </div>
@@ -515,7 +520,7 @@ export default function OnboardingCompletion({ formData }: OnboardingCompletionP
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    Zacznijmy!
+                    {t('common:onboardingCompletion.buttons.complete')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}

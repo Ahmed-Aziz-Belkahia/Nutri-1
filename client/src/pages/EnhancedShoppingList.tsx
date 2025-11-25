@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, addDays, isToday } from "date-fns";
+import { useTranslation } from 'react-i18next';
 import { 
   ArrowLeft, 
   Calendar,
@@ -154,6 +155,7 @@ function getCategoryColor(category: string): string {
 }
 
 export default function EnhancedShoppingList() {
+  const { t } = useTranslation(['common']);
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -325,7 +327,7 @@ export default function EnhancedShoppingList() {
               </Button>
               
               <span className="text-sm font-medium text-white px-2 py-1 bg-white/20 rounded-full">
-                Weekly Shopping List
+                {t('common:enhancedShoppingList.weeklyLabel')}
               </span>
               
               <Button 
@@ -347,13 +349,13 @@ export default function EnhancedShoppingList() {
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-3 mb-4 bg-white/80 backdrop-blur-sm shadow-sm">
             <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              All Items
+              {t('common:enhancedShoppingList.tabs.all')}
             </TabsTrigger>
             <TabsTrigger value="pending" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              To Buy
+              {t('common:enhancedShoppingList.tabs.pending')}
             </TabsTrigger>
             <TabsTrigger value="purchased" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#0CC5BA] data-[state=active]:to-blue-500 data-[state=active]:text-white">
-              Purchased
+              {t('common:enhancedShoppingList.tabs.purchased')}
             </TabsTrigger>
           </TabsList>
           
@@ -361,19 +363,19 @@ export default function EnhancedShoppingList() {
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="flex flex-col items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#0CC5BA]"></div>
-                <p className="mt-4 text-gray-500">Loading your shopping list...</p>
+                <p className="mt-4 text-gray-500">{t('common:enhancedShoppingList.loading')}</p>
               </div>
             </Card>
           ) : error ? (
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">{(error as Error).message || "Failed to load shopping list"}</p>
+                <p className="text-lg">{(error as Error).message || t('common:enhancedShoppingList.error')}</p>
                 <Button 
                   className="mt-6 bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white"
                   onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/shopping-list", selectedDateString] })}
                 >
-                  Try Again
+                  {t('common:enhancedShoppingList.tryAgain')}
                 </Button>
               </div>
             </Card>
@@ -381,8 +383,8 @@ export default function EnhancedShoppingList() {
             <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-sm">
               <div className="text-center text-gray-500">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-lg">No items in your shopping list for this day.</p>
-                <p className="text-sm mt-2">Try selecting a different date or add meals to your meal plan.</p>
+                <p className="text-lg">{t('common:enhancedShoppingList.empty.title')}</p>
+                <p className="text-sm mt-2">{t('common:enhancedShoppingList.empty.subtitle')}</p>
                 
                 {hasMealPlanForDate && mealPlanId && (
                   <Button
@@ -396,7 +398,7 @@ export default function EnhancedShoppingList() {
                         Generating...
                       </>
                     ) : (
-                      <>Generate Shopping List</>
+                      <>{t('common:enhancedShoppingList.empty.generateButton')}</>
                     )}
                   </Button>
                 )}
@@ -406,7 +408,7 @@ export default function EnhancedShoppingList() {
             <>
               <div className="mb-4 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-800">Group by:</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">{t('common:enhancedShoppingList.groupBy.label')}</h3>
                   <div className="flex items-center space-x-2">
                     <Button 
                       variant={groupBy === 'meal' ? 'default' : 'outline'} 
@@ -414,7 +416,7 @@ export default function EnhancedShoppingList() {
                       onClick={() => setGroupBy('meal')}
                       className={groupBy === 'meal' ? 'bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white' : ''}
                     >
-                      Meal Type
+                      {t('common:enhancedShoppingList.groupBy.mealType')}
                     </Button>
                     <Button 
                       variant={groupBy === 'category' ? 'default' : 'outline'} 
@@ -422,7 +424,7 @@ export default function EnhancedShoppingList() {
                       onClick={() => setGroupBy('category')}
                       className={groupBy === 'category' ? 'bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white' : ''}
                     >
-                      Category
+                      {t('common:enhancedShoppingList.groupBy.category')}
                     </Button>
                   </div>
                 </div>
@@ -461,7 +463,7 @@ export default function EnhancedShoppingList() {
                                   : 'border-gray-300 hover:border-[#0CC5BA]'
                               }`}
                               onClick={() => togglePurchaseMutation.mutate(item.id)}
-                              aria-label={item.isPurchased ? "Mark as not purchased" : "Mark as purchased"}
+                              aria-label={item.isPurchased ? t('common:enhancedShoppingList.item.markNotPurchased') : t('common:enhancedShoppingList.item.markPurchased')}
                             >
                               {item.isPurchased && (
                                 <Check className="h-4 w-4 text-white" />
@@ -494,7 +496,7 @@ export default function EnhancedShoppingList() {
                                 </div>
                                 {item.recipeName && (
                                   <div className="mt-1 text-xs text-gray-400 truncate">
-                                    For: {item.recipeName}
+                                    {t('common:enhancedShoppingList.item.for')} {item.recipeName}
                                   </div>
                                 )}
                               </div>
@@ -537,7 +539,7 @@ export default function EnhancedShoppingList() {
                               <button
                                 className="flex-shrink-0 mr-3 h-6 w-6 rounded-full flex items-center justify-center border border-gray-300 hover:border-[#0CC5BA]"
                                 onClick={() => togglePurchaseMutation.mutate(item.id)}
-                                aria-label="Mark as purchased"
+                                aria-label={t('common:enhancedShoppingList.item.markPurchased')}
                               ></button>
                               
                               <div className="flex-1 flex items-center min-w-0">
@@ -562,7 +564,7 @@ export default function EnhancedShoppingList() {
                                   </div>
                                   {item.recipeName && (
                                     <div className="mt-1 text-xs text-gray-400 truncate">
-                                      For: {item.recipeName}
+                                      {t('common:enhancedShoppingList.item.for')} {item.recipeName}
                                     </div>
                                   )}
                                 </div>
@@ -606,7 +608,7 @@ export default function EnhancedShoppingList() {
                               <button
                                 className="flex-shrink-0 mr-3 h-6 w-6 rounded-full flex items-center justify-center border bg-[#0CC5BA] border-[#0CC5BA]"
                                 onClick={() => togglePurchaseMutation.mutate(item.id)}
-                                aria-label="Mark as not purchased"
+                                aria-label={t('common:enhancedShoppingList.item.markNotPurchased')}
                               >
                                 <Check className="h-4 w-4 text-white" />
                               </button>
@@ -633,7 +635,7 @@ export default function EnhancedShoppingList() {
                                   </div>
                                   {item.recipeName && (
                                     <div className="mt-1 text-xs text-gray-400 truncate">
-                                      For: {item.recipeName}
+                                      {t('common:enhancedShoppingList.item.for')} {item.recipeName}
                                     </div>
                                   )}
                                 </div>

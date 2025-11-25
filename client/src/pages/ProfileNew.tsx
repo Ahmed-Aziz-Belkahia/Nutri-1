@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { Camera, Target, Scale, Ruler, Edit2, Save, X, LogOut, Award, Utensils, Zap, Calendar, FileText, Trash2, Activity, Star, Loader2, Heart, Globe } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Profile() {
+  const { t } = useTranslation(['common']);
   const { user, isLoading: isLoadingUser, refetch: refetchUser, logout } = useUser();
   const { data: profile, isLoading: isLoadingProfile, refetch: refetchProfile } = useUserProfile();
   const [, setLocation] = useLocation();
@@ -130,14 +132,14 @@ export default function Profile() {
       if (response.data.imageUrl) {
         await refetchUser();
         toast({
-          title: "Success",
-          description: "Profile picture updated successfully",
+          title: t('common:profileNew.toast.success'),
+          description: t('common:profileNew.toast.profileUpdated'),
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update profile picture",
+        title: t('common:profileNew.toast.error'),
+        description: t('common:profileNew.toast.updateFailed'),
         variant: "destructive",
       });
     } finally {
@@ -163,8 +165,8 @@ export default function Profile() {
     } catch (error) {
       console.error('Error deleting account:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete account. Please try again.",
+        title: t('common:profileNew.toast.error'),
+        description: t('common:profileNew.toast.deleteFailed'),
         variant: "destructive",
       });
     } finally {
@@ -204,14 +206,14 @@ export default function Profile() {
             className="text-center space-y-4 p-8 rounded-xl glass-card"
           >
             <h2 className="text-2xl font-bold gradient-text">
-              Please Sign In
+              {t('common:profileNew.pleaseSignIn')}
             </h2>
-            <p className="text-gray-600">You need to be logged in to view your profile</p>
+            <p className="text-gray-600">{t('common:profileNew.needLogin')}</p>
             <Button
               onClick={() => setLocation("/auth")}
               className="bg-gradient-to-r from-[var(--color-primary)] to-blue-500 text-white hover:opacity-90"
             >
-              Sign In
+              {t('common:profileNew.signIn')}
             </Button>
           </motion.div>
         </div>
@@ -275,7 +277,7 @@ export default function Profile() {
                 <div className="flex gap-2">
                   <div className="flex items-center px-3 py-1 rounded-full bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
                     <Award className="w-4 h-4 text-[var(--color-primary)] mr-1" />
-                    <span className="text-xs font-medium">Level {user?.level || 1}</span>
+                    <span className="text-xs font-medium">{t('common:profileNew.level')} {user?.level || 1}</span>
                   </div>
                   <div className="flex items-center px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20">
                     <Zap className="w-4 h-4 text-purple-500 mr-1" />
@@ -293,7 +295,7 @@ export default function Profile() {
                 <Ruler className="w-5 h-5 text-[var(--color-primary)]" />
               </div>
               <div className="text-lg font-bold text-gray-900">{profile?.height || 0}</div>
-              <div className="text-xs text-gray-500">cm</div>
+              <div className="text-xs text-gray-500">{t('common:profileNew.cm')}</div>
           </div>
           
           <div className="glass-card p-4 text-center">
@@ -301,7 +303,7 @@ export default function Profile() {
                 <Scale className="w-5 h-5 text-blue-500" />
               </div>
               <div className="text-lg font-bold text-gray-900">{profile?.currentWeight || 0}</div>
-              <div className="text-xs text-gray-500">kg</div>
+              <div className="text-xs text-gray-500">{t('common:profileNew.kg')}</div>
           </div>
           
           <div className="glass-card p-4 text-center">
@@ -309,7 +311,7 @@ export default function Profile() {
                 <Star className="w-5 h-5 text-purple-500" />
               </div>
               <div className="text-lg font-bold text-gray-900">{profile?.caloriesGoal || 0}</div>
-              <div className="text-xs text-gray-500">kcal</div>
+              <div className="text-xs text-gray-500">{t('common:profileNew.kcal')}</div>
           </div>
         </div>
       </motion.div>
@@ -322,7 +324,7 @@ export default function Profile() {
         className="mb-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold gradient-text">Body Metrics</h3>
+          <h3 className="text-xl font-bold gradient-text">{t('common:profileNew.sections.bodyMetrics')}</h3>
           <Button 
             size="icon" 
             variant="ghost" 
@@ -340,8 +342,8 @@ export default function Profile() {
                 <Ruler className="w-6 h-6 text-[var(--color-primary)]" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-500">Height</div>
-                <div className="text-xl font-bold text-gray-900">{profile?.height || 0} cm</div>
+                <div className="text-sm text-gray-500">{t('common:profileNew.metrics.height')}</div>
+                <div className="text-xl font-bold text-gray-900">{profile?.height || 0} {t('common:profileNew.cm')}</div>
               </div>
             </div>
             
@@ -350,8 +352,8 @@ export default function Profile() {
                 <Scale className="w-6 h-6 text-blue-500" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-500">Current Weight</div>
-                <div className="text-xl font-bold text-gray-900">{profile?.currentWeight || 0} kg</div>
+                <div className="text-sm text-gray-500">{t('common:profileNew.metrics.currentWeight')}</div>
+                <div className="text-xl font-bold text-gray-900">{profile?.currentWeight || 0} {t('common:profileNew.kg')}</div>
               </div>
             </div>
             
@@ -360,8 +362,8 @@ export default function Profile() {
                 <Calendar className="w-6 h-6 text-purple-500" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-500">Age</div>
-                <div className="text-xl font-bold text-gray-900">{profile?.age || 0} years</div>
+                <div className="text-sm text-gray-500">{t('common:profileNew.metrics.age')}</div>
+                <div className="text-xl font-bold text-gray-900">{profile?.age || 0} {t('common:profileNew.years')}</div>
               </div>
             </div>
           </div>
@@ -376,7 +378,7 @@ export default function Profile() {
         className="mb-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold gradient-text">Goals & Activity</h3>
+          <h3 className="text-xl font-bold gradient-text">{t('common:profileNew.sections.goalsActivity')}</h3>
           <Button 
             size="icon" 
             variant="ghost" 
@@ -409,7 +411,7 @@ export default function Profile() {
                 <Activity className="w-6 h-6 text-blue-500" />
               </div>
               <div className="flex-1">
-                <div className="text-sm text-gray-500">Activity Level</div>
+                <div className="text-sm text-gray-500">{t('common:profileNew.goals.activityLevel')}</div>
                 <div className="text-lg font-bold text-gray-900">
                   {profile?.activityLevel ? getActivityLevelInPolish(profile.activityLevel) : 'Not set'}
                 </div>
@@ -430,7 +432,7 @@ export default function Profile() {
         className="mb-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold gradient-text">Nutrition Goals</h3>
+          <h3 className="text-xl font-bold gradient-text">{t('common:profileNew.sections.nutritionGoals')}</h3>
           <Button 
             size="icon" 
             variant="ghost" 
@@ -508,9 +510,9 @@ export default function Profile() {
                 ></div>
               </div>
               <div className="flex text-xs justify-between mt-2">
-                <span className="text-[var(--color-primary)]">Protein</span>
-                <span className="text-blue-500">Carbs</span>
-                <span className="text-purple-500">Fat</span>
+                <span className="text-[var(--color-primary)]">{t('common:profileNew.macros.protein')}</span>
+                <span className="text-blue-500">{t('common:profileNew.macros.carbs')}</span>
+                <span className="text-purple-500">{t('common:profileNew.macros.fat')}</span>
               </div>
             </div>
           </div>
@@ -525,7 +527,7 @@ export default function Profile() {
         className="mb-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold gradient-text">Language & Preferences</h3>
+          <h3 className="text-xl font-bold gradient-text">{t('common:profileNew.sections.languagePreferences')}</h3>
         </div>
         
         <div className="glass-card">
@@ -550,8 +552,8 @@ export default function Profile() {
                   <FileText className="w-6 h-6 text-blue-500" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">Privacy Policy</div>
-                  <div className="text-sm text-gray-500">View our privacy policy</div>
+                  <div className="font-medium text-gray-900">{t('common:profileNew.account.privacyPolicy')}</div>
+                  <div className="text-sm text-gray-500">{t('common:profileNew.account.viewPrivacy')}</div>
                 </div>
               </div>
             </Link>
@@ -564,8 +566,8 @@ export default function Profile() {
                 <Trash2 className="w-6 h-6 text-red-500" />
               </div>
               <div className="flex-1">
-                <div className="font-medium text-gray-900">Delete Account</div>
-                <div className="text-sm text-gray-500">Permanently delete your account</div>
+                <div className="font-medium text-gray-900">{t('common:profileNew.account.deleteAccount')}</div>
+                <div className="text-sm text-gray-500">{t('common:profileNew.account.deletePermanent')}</div>
               </div>
             </div>
           </div>
