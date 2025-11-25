@@ -1,4 +1,125 @@
 {
+  "app": {
+    "name": "NutriAI",
+    "tagline": "Twój Towarzysz Żywieniowy Wspomagany przez AI"
+  },
+  "navigation": {
+    "dashboard": "Pulpit",
+    "meals": "Posiłki",
+    "recipes": "Przepisy",
+    "analytics": "Analityka",
+    "profile": "Profil",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj"
+  },
+  "actions": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "add": "Dodaj",
+    "remove": "Usuń",
+    "confirm": "Potwierdź",
+    "close": "Zamknij",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "submit": "Zatwierdź",
+    "upload": "Prześlij",
+    "download": "Pobierz",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "refresh": "Odśwież",
+    "clear": "Wyczyść",
+    "apply": "Zastosuj",
+    "reset": "Resetuj",
+    "continue": "Kontynuuj",
+    "skip": "Pomiń",
+    "finish": "Zakończ",
+    "loading": "Ładowanie...",
+    "saveChanges": "Zapisz zmiany",
+    "viewAll": "Zobacz wszystko",
+    "learnMore": "Dowiedz się więcej",
+    "getStarted": "Rozpocznij"
+  },
+  "time": {
+    "today": "Dziś",
+    "yesterday": "Wczoraj",
+    "tomorrow": "Jutro",
+    "thisWeek": "Ten tydzień",
+    "lastWeek": "Poprzedni tydzień",
+    "thisMonth": "Ten miesiąc",
+    "lastMonth": "Poprzedni miesiąc",
+    "morning": "Poranek",
+    "afternoon": "Popołudnie",
+    "evening": "Wieczór",
+    "night": "Noc",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snack": "Przekąska"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "funty",
+    "cm": "cm",
+    "ft": "stopy",
+    "ml": "ml",
+    "oz": "uncje",
+    "g": "g",
+    "kcal": "kcal",
+    "cal": "kal",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fat": "Tłuszcz",
+    "calories": "Kalorie"
+  },
+  "messages": {
+    "success": "Sukces!",
+    "error": "Błąd",
+    "warning": "Ostrzeżenie",
+    "info": "Informacja",
+    "confirmDelete": "Czy na pewno chcesz to usunąć?",
+    "noData": "Brak danych",
+    "networkError": "Błąd sieci. Sprawdź swoje połączenie.",
+    "unexpectedError": "Wystąpił nieoczekiwany błąd",
+    "pleaseWait": "Proszę czekać...",
+    "processing": "Przetwarzanie..."
+  },
+  "language": {
+    "select": "Wybierz język",
+    "current": "Obecny język",
+    "change": "Zmień język",
+    "english": "Angielski",
+    "arabic": "Arabski",
+    "french": "Francuski",
+    "spanish": "Hiszpański",
+    "polish": "Polski"
+  },
+  "days": {
+    "monday": "Poniedziałek",
+    "tuesday": "Wtorek",
+    "wednesday": "Środa",
+    "thursday": "Czwartek",
+    "friday": "Piątek",
+    "saturday": "Sobota",
+    "sunday": "Niedziela"
+  },
+  "months": {
+    "january": "Styczeń",
+    "february": "Luty",
+    "march": "Marzec",
+    "april": "Kwiecień",
+    "may": "Maj",
+    "june": "Czerwiec",
+    "july": "Lipiec",
+    "august": "Sierpień",
+    "september": "Wrzesień",
+    "october": "Październik",
+    "november": "Listopad",
+    "december": "Grudzień"
+  },
   "dashboard": {
     "greeting": "Witaj",
     "dailyProgress": "Postęp Dzienny",
@@ -16,12 +137,29 @@
     "todaysPlan": "Plan na Dziś",
     "groceryList": "Lista Zakupów"
   },
-  "navigation": {
-    "home": "Strona Główna",
-    "meals": "Posiłki",
-    "recipes": "Przepisy",
-    "profile": "Profil",
-    "settings": "Ustawienia"
+  "mealsSection": {
+    "noMealsYet": "Brak posiłków",
+    "addFirstMeal": "Dodaj swój pierwszy posiłek skanując, przesyłając lub wprowadzając ręcznie",
+    "scanMeal": "Skanuj posiłek",
+    "editMeal": "Edytuj posiłek",
+    "deleteMeal": "Usuń posiłek",
+    "deleteModal": {
+      "title": "Usunąć posiłek?",
+      "description": "Tej akcji nie można cofnąć",
+      "confirmQuestion": "Czy na pewno chcesz usunąć"
+    }
+  },
+  "mealPlanSection": {
+    "todaysMealPlan": "Dzisiejszy plan posiłków",
+    "noMealPlan": "Brak planu posiłków na dziś",
+    "generateMealPlan": "Wygeneruj plan posiłków",
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "ingredientsNeeded": "Potrzebne składniki",
+    "moreIngredients": "+{{count}} więcej składników →",
+    "noIngredients": "Brak dostępnych składników",
+    "noMealForType": "Brak zaplanowanego posiłku {{type}} na dziś"
   },
   "shoppingList": {
     "tabs": {
