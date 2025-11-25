@@ -234,8 +234,8 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {/* Google Sign In Button */}
-            <GoogleAuthButton mode={isLogin ? 'login' : 'register'} />
+            {/* Google Sign In Button - Temporarily commented out for Android implementation */}
+            {/* <GoogleAuthButton mode={isLogin ? 'login' : 'register'} /> */}
 
             {/* Toggle Auth Mode */}
             <div className="text-center mt-6">
