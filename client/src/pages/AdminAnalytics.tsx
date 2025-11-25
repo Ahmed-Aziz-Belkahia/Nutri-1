@@ -128,6 +128,13 @@ export default function AdminAnalytics() {
 
   useEffect(() => {
     loadAnalytics();
+    
+    // Auto-refresh every 5 seconds
+    const interval = setInterval(() => {
+      loadAnalytics();
+    }, 5000); // 5 seconds
+    
+    return () => clearInterval(interval);
   }, [timeRange]);
 
   const loadAnalytics = async () => {
@@ -246,21 +253,32 @@ export default function AdminAnalytics() {
             </div>
           </div>
           
-          {/* Time Range Selector */}
-          <div className="flex gap-2">
-            {(['7d', '30d', '90d'] as const).map((range) => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  timeRange === range
-                    ? 'bg-[#26A8FF] text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : '90 Days'}
-              </button>
-            ))}
+          {/* Time Range Selector & Auto-Refresh Indicator */}
+          <div className="flex gap-3 items-center">
+            <div className="flex gap-2">
+              {(['7d', '30d', '90d'] as const).map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    timeRange === range
+                      ? 'bg-[#26A8FF] text-white shadow-lg'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : '90 Days'}
+                </button>
+              ))}
+            </div>
+            
+            {/* Auto-refresh indicator */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+              <div className="relative">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+              </div>
+              <span className="text-xs font-medium text-green-700">Auto-refresh: 5s</span>
+            </div>
           </div>
         </div>
 
