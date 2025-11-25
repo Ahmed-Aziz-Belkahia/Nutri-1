@@ -92,6 +92,28 @@ interface ActivityData {
   requests: number;
 }
 
+interface UserDetail {
+  id: number;
+  email: string;
+  username?: string;
+  isAdmin: boolean;
+  hasCompletedOnboarding: boolean;
+  lastLoginAt?: string;
+  lastActivityDate?: string;
+  stats: {
+    totalTokens: number;
+    totalCost: number;
+    totalRequests: number;
+    foodLogsCount: number;
+    recipesCount: number;
+    tier: string;
+    dailyLimit: number;
+    monthlyLimit: number;
+    dailyUsed: number;
+    monthlyUsed: number;
+  };
+}
+
 export default function AdminAnalytics() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -102,6 +124,7 @@ export default function AdminAnalytics() {
   const [tokenStats, setTokenStats] = useState<TokenStats | null>(null);
   const [apiStats, setAPIStats] = useState<APIStats | null>(null);
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
+  const [allUsers, setAllUsers] = useState<UserDetail[]>([]);
 
   useEffect(() => {
     loadAnalytics();
@@ -110,11 +133,12 @@ export default function AdminAnalytics() {
   const loadAnalytics = async () => {
     setLoading(true);
     try {
-      const [usersRes, tokensRes, apiRes, activityRes] = await Promise.all([
+      const [usersRes, tokensRes, apiRes, activityRes, allUsersRes] = await Promise.all([
         fetch(`/api/admin/analytics/users`, { credentials: 'include' }),
         fetch(`/api/admin/analytics/tokens?range=${timeRange}`, { credentials: 'include' }),
         fetch(`/api/admin/analytics/api?range=${timeRange}`, { credentials: 'include' }),
-        fetch(`/api/admin/analytics/activity?range=${timeRange}`, { credentials: 'include' })
+        fetch(`/api/admin/analytics/activity?range=${timeRange}`, { credentials: 'include' }),
+        fetch(`/api/admin/users`, { credentials: 'include' })
       ]);
 
       console.log('Analytics API responses:', {
@@ -154,6 +178,14 @@ export default function AdminAnalytics() {
         setActivityData(data);
       } else {
         console.error('Activity API error:', await activityRes.text());
+      }
+
+      if (allUsersRes.ok) {
+        const data = await allUsersRes.json();
+        console.log('All users data:', data);
+        setAllUsers(data);
+      } else {
+        console.error('All users API error:', await allUsersRes.text());
       }
     } catch (error) {
       console.error('Error loading analytics:', error);
@@ -590,6 +622,143 @@ export default function AdminAnalytics() {
               {((userStats?.completedOnboarding || 0) / (userStats?.totalUsers || 1) * 100).toFixed(1)}% onboarded
             </p>
           </div>
+        </div>
+
+        {/* All Users Detailed Table */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Users className="w-6 h-6 text-[#26A8FF]" />
+              All Users ({allUsers.length})
+            </h2>
+            <div className="text-sm text-gray-500">
+              Showing detailed user information and statistics
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-3 px-3 font-semibold text-gray-700 text-sm">ID</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-700 text-sm">Email</th>
+                  <th className="text-left py-3 px-3 font-semibold text-gray-700 text-sm">Username</th>
+                  <th className="text-center py-3 px-3 font-semibold text-gray-700 text-sm">Status</th>
+                  <th className="text-center py-3 px-3 font-semibold text-gray-700 text-sm">Tier</th>
+                  <th className="text-right py-3 px-3 font-semibold text-gray-700 text-sm">Tokens</th>
+                  <th className="text-right py-3 px-3 font-semibold text-gray-700 text-sm">Cost</th>
+                  <th className="text-right py-3 px-3 font-semibold text-gray-700 text-sm">Requests</th>
+                  <th className="text-right py-3 px-3 font-semibold text-gray-700 text-sm">Food Logs</th>
+                  <th className="text-right py-3 px-3 font-semibold text-gray-700 text-sm">Recipes</th>
+                  <th className="text-center py-3 px-3 font-semibold text-gray-700 text-sm">Last Active</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allUsers.map((user, index) => (
+                  <tr 
+                    key={user.id} 
+                    className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                    }`}
+                  >
+                    <td className="py-3 px-3 font-mono text-xs text-gray-600">
+                      {user.id}
+                    </td>
+                    <td className="py-3 px-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#26A8FF] to-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                          {user.email?.[0]?.toUpperCase() || 'U'}
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{user.email}</div>
+                          {user.isAdmin && (
+                            <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium mt-0.5">
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-sm text-gray-700">
+                      {user.username || '-'}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      {user.hasCompletedOnboarding ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          <CheckCircle className="w-3 h-3" />
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                          <AlertCircle className="w-3 h-3" />
+                          Pending
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        user.stats.tier === 'premium' ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white' :
+                        user.stats.tier === 'pro' ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' :
+                        'bg-gray-200 text-gray-700'
+                      }`}>
+                        {user.stats.tier.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right font-semibold text-sm">
+                      <div className="text-gray-900">{formatNumber(user.stats.totalTokens)}</div>
+                      <div className="text-xs text-gray-500">
+                        {user.stats.monthlyLimit > 0 ? 
+                          `${((user.stats.monthlyUsed / user.stats.monthlyLimit) * 100).toFixed(0)}% of limit` :
+                          'No limit'
+                        }
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-right font-semibold text-green-600 text-sm">
+                      {formatCurrency(user.stats.totalCost)}
+                    </td>
+                    <td className="py-3 px-3 text-right text-gray-700 text-sm">
+                      {formatNumber(user.stats.totalRequests)}
+                    </td>
+                    <td className="py-3 px-3 text-right text-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded font-medium">
+                        <Activity className="w-3 h-3" />
+                        {user.stats.foodLogsCount}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right text-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded font-medium">
+                        <Server className="w-3 h-3" />
+                        {user.stats.recipesCount}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-center text-xs text-gray-500">
+                      {user.lastActivityDate ? 
+                        new Date(user.lastActivityDate).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        }) : 
+                        user.lastLoginAt ?
+                        new Date(user.lastLoginAt).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        }) :
+                        'Never'
+                      }
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {allUsers.length === 0 && (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">No users found</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

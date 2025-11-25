@@ -30,11 +30,56 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
 // Admin routes are now accessible to all authenticated users
 // router.use(isAdmin); // Commented out - no longer restricting to admins
 
-// Get all users
+// Get all users with detailed stats
 router.get('/users', async (req: AuthRequest, res: Response) => {
   try {
     const allUsers = await db.select().from(users).orderBy(desc(users.id));
-    res.json(allUsers);
+    
+    // Get token usage and limits for all users
+    const usersWithStats = await Promise.all(allUsers.map(async (user) => {
+      // Get token usage stats
+      const userUsage = await db.select()
+        .from(apiUsageTracking)
+        .where(eq(apiUsageTracking.userId, user.id));
+      
+      const totalTokens = userUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
+      const totalCost = userUsage.reduce((sum, u) => sum + u.costUsd, 0);
+      const totalRequests = userUsage.length;
+      
+      // Get token limits
+      const [limits] = await db.select()
+        .from(userTokenLimits)
+        .where(eq(userTokenLimits.userId, user.id))
+        .limit(1);
+      
+      // Get food logs count
+      const foodLogsCount = await db.select({ count: sql<number>`count(*)` })
+        .from(foodLogs)
+        .where(eq(foodLogs.userId, user.id));
+      
+      // Get recipes count
+      const recipesCount = await db.select({ count: sql<number>`count(*)` })
+        .from(recipes)
+        .where(eq(recipes.userId, user.id));
+      
+      return {
+        ...user,
+        stats: {
+          totalTokens,
+          totalCost,
+          totalRequests,
+          foodLogsCount: Number(foodLogsCount[0]?.count || 0),
+          recipesCount: Number(recipesCount[0]?.count || 0),
+          tier: limits?.tier || 'free',
+          dailyLimit: limits?.dailyTokenLimit || 10000,
+          monthlyLimit: limits?.monthlyTokenLimit || 300000,
+          dailyUsed: limits?.dailyTokensUsed || 0,
+          monthlyUsed: limits?.monthlyTokensUsed || 0
+        }
+      };
+    }));
+    
+    res.json(usersWithStats);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
