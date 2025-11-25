@@ -2101,6 +2101,11 @@ export function registerRoutes(app: Express): Server {
 
       // Generate fast weekly meal plans using template system (much faster than OpenAI)
       let mealPlanData;
+      
+      // Import progress functions at the top level to avoid scoping issues
+      const { generateMealPlanWithRecipes } = await import('./services/openai');
+      const { updateMealPlanProgress, clearMealPlanProgress } = await import('./services/meal-plan-progress');
+      
       try {
         const { generateFastPersonalizedMealPlan } = await import('./services/fast-meal-generator');
         
@@ -2147,9 +2152,6 @@ export function registerRoutes(app: Express): Server {
         
         // Use OpenAI to generate AI-based meal plan with user preferences
         console.log(`Generating AI-based meal plan with OpenAI for ${durationDays} days...`);
-        
-        const { generateMealPlanWithRecipes } = await import('./services/openai');
-        const { updateMealPlanProgress, clearMealPlanProgress } = await import('./services/meal-plan-progress');
         
         // Clear any existing progress before starting new generation
         clearMealPlanProgress(req.user!.id);
