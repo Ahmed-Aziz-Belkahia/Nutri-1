@@ -1,49 +1,15 @@
 import OpenAI from "openai";
 import fs from "fs";
 import { TokenLimitService } from "./token-limit.service";
+import { trackOpenAIUsage, trackFailedRequest } from "../utils/token-tracker";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY || '' // Use empty string as fallback to avoid null errors
 });
 
-/**
- * Helper to track OpenAI API usage after successful call
- */
-async function trackOpenAIUsage(
-  userId: number,
-  endpoint: string,
-  response: OpenAI.Chat.Completions.ChatCompletion,
-  model: string
-): Promise<void> {
-  if (!response.usage) {
-    console.warn('[Token Tracking] No usage data in OpenAI response');
-    return;
-  }
-
-  const tokensUsed = response.usage.total_tokens;
-  // Estimate cost (gpt-4o pricing: $2.50 per 1M input tokens, $10 per 1M output tokens)
-  const inputCost = (response.usage.prompt_tokens / 1000000) * 2.50;
-  const outputCost = (response.usage.completion_tokens / 1000000) * 10.00;
-  const totalCost = inputCost + outputCost;
-
-  await TokenLimitService.trackTokenUsage(
-    userId,
-    endpoint,
-    tokensUsed,
-    model,
-    totalCost,
-    'success',
-    {
-      promptTokens: response.usage.prompt_tokens,
-      completionTokens: response.usage.completion_tokens,
-      totalTokens: tokensUsed
-    }
-  );
-}
-
 // Food recognition from image
-export async function recognizeFoodFromImage(base64Image: string): Promise<{
+export async function recognizeFoodFromImage(base64Image: string, userId?: number): Promise<{
   foods: Array<{
     name: string;
     confidence: number;
@@ -51,6 +17,7 @@ export async function recognizeFoodFromImage(base64Image: string): Promise<{
     preparation?: string;
   }>;
 }> {
+  const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -73,12 +40,17 @@ export async function recognizeFoodFromImage(base64Image: string): Promise<{
     response_format: { type: "json_object" },
   });
 
+  // Track token usage if userId is provided
+  if (userId && response.usage) {
+    await trackOpenAIUsage(userId, '/api/food-recognition/image', response, 'gpt-4o', startTime);
+  }
+
   const content = response.choices[0].message.content || '{"foods":[]}';
   return JSON.parse(content);
 }
 
 // Text-based food analysis
-export async function analyzeFoodText(foodDescription: string): Promise<{
+export async function analyzeFoodText(foodDescription: string, userId?: number): Promise<{
   name: string;
   calories: number;
   protein: number;
@@ -115,6 +87,7 @@ export async function analyzeFoodText(foodDescription: string): Promise<{
     
     // Make API call to OpenAI
     console.log('[Food Text Analysis] Sending request to OpenAI...');
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -164,6 +137,11 @@ export async function analyzeFoodText(foodDescription: string): Promise<{
       response_format: { type: "json_object" },
       temperature: 0.2, // Lower temperature for more consistent results
     });
+
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/food-recognition/text', response, 'gpt-4o', startTime);
+    }
 
     // Get response content
     const content = response.choices[0].message.content;
@@ -234,7 +212,7 @@ export async function analyzeFoodText(foodDescription: string): Promise<{
 }
 
 // Nutritional analysis
-export async function analyzeNutrition(foodItems: Array<{ 
+export async function analyzeNutrition(foodItems: Array<{, userId?: number 
   name: string;
   quantity?: number;
   unit?: string;
@@ -260,6 +238,7 @@ export async function analyzeNutrition(foodItems: Array<{
     `${item.quantity || 1} ${item.unit || 'serving'} of ${item.name}`
   ).join(', ');
 
+  const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -275,6 +254,11 @@ export async function analyzeNutrition(foodItems: Array<{
     response_format: { type: "json_object" }
   });
 
+  // Track token usage if userId is provided
+  if (userId && response.usage) {
+    await trackOpenAIUsage(userId, '/api/nutrition-analysis', response, 'gpt-4o', startTime);
+  }
+
   const content = response.choices[0].message.content || '{"calories":0,"protein":0,"carbs":0,"fat":0,"components":[]}';
   return JSON.parse(content);
 }
@@ -285,7 +269,7 @@ export async function generateMealPlan(preferences: {
   dietaryType: string;
   allergies: string[];
   excludedIngredients: string[];
-}): Promise<{
+}, userId?: number): Promise<{
   meals: {
     breakfast: Array<{ name: string; calories: number }>;
     lunch: Array<{ name: string; calories: number }>;
@@ -294,6 +278,7 @@ export async function generateMealPlan(preferences: {
   };
   totalCalories: number;
 }> {
+  const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -321,6 +306,11 @@ export async function generateMealPlan(preferences: {
     response_format: { type: "json_object" }
   });
 
+  // Track token usage if userId is provided
+  if (userId && response.usage) {
+    await trackOpenAIUsage(userId, '/api/meal-plans/generate', response, 'gpt-4o', startTime);
+  }
+
   const content = response.choices[0].message.content || '{"meals":{"breakfast":[],"lunch":[],"dinner":[]},"totalCalories":0}';
   return JSON.parse(content);
 }
@@ -343,7 +333,7 @@ export async function generateMealPlanWithRecipes(preferences: {
   cookingEquipment?: string[];
   specialRequirements?: string;
   language?: string; // Add language preference
-}): Promise<{
+}, userId?: number): Promise<{
   meals: Array<{
     name: string;
     mealType: string;
@@ -372,6 +362,7 @@ export async function generateMealPlanWithRecipes(preferences: {
   const healthGoals = Array.isArray(preferences.healthGoals) ? preferences.healthGoals : [];
   const cuisinePreferences = Array.isArray(preferences.cuisinePreferences) ? preferences.cuisinePreferences : [];
   
+  const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -408,6 +399,11 @@ Guidelines:
     ],
     response_format: { type: "json_object" }
   });
+
+  // Track token usage if userId is provided
+  if (userId && response.usage) {
+    await trackOpenAIUsage(userId, '/api/meal-plans/with-recipes', response, 'gpt-4o', startTime);
+  }
 
   const content = response.choices[0].message.content || '{"meals":[],"totalCalories":0}';
   
@@ -640,6 +636,11 @@ Follow these non-negotiable rules:
       
       // Race the timeout against the actual request
       const response = await Promise.race([requestPromise, timeoutPromise]) as any;
+
+      // Track token usage for this batch if userId is provided
+      if (userId && response.usage) {
+        await trackOpenAIUsage(userId, `/api/meal-plans/monthly-batch-${batch + 1}`, response, 'gpt-4o', Date.now());
+      }
   
       const content = response?.choices?.[0]?.message?.content || '{"plan":[]}';
       const parsedResponse = JSON.parse(content);
@@ -1264,7 +1265,7 @@ function calculateDayDifference(day1: any, day2: any): number {
 }
 
 // Recipe suggestions
-export async function suggestRecipe(ingredients: string[]): Promise<{
+export async function suggestRecipe(ingredients: string[], userId?: number): Promise<{
   name: string;
   ingredients: string[];
   instructions: string[];
@@ -1275,6 +1276,7 @@ export async function suggestRecipe(ingredients: string[]): Promise<{
     fat: number;
   };
 }> {
+  const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
@@ -1298,6 +1300,11 @@ Include complete recipe details and nutritional information.`
     ],
     response_format: { type: "json_object" }
   });
+
+  // Track token usage if userId is provided
+  if (userId && response.usage) {
+    await trackOpenAIUsage(userId, '/api/recipes/suggest', response, 'gpt-4o', startTime);
+  }
 
   const content = response.choices[0].message.content || '{"name":"Simple Recipe","ingredients":[],"instructions":[],"nutritionInfo":{"calories":0,"protein":0,"carbs":0,"fat":0}}';
   return JSON.parse(content);

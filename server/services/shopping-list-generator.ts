@@ -6,6 +6,7 @@ import { db } from '@db';
 import { recipes, recipesInMealPlan, shoppingListItems, recipes as recipesTable } from '@db/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import OpenAI from 'openai';
+import { trackOpenAIUsage, trackFailedRequest } from '../utils/token-tracker';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -71,7 +72,7 @@ function manualDeduplicate(items: Array<{name: string; quantity: number; unit: s
 /**
  * Generate a consolidated weekly shopping list using AI
  */
-export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: number) {
+export async function generateWeeklyShoppingList(mealPlanIds: number[], userId: number, trackTokens: boolean = true) {
   console.log(`Generating AI-powered weekly shopping list for ${mealPlanIds.length} meal plans`);
   
   // Fetch all recipes associated with ALL meal plans
@@ -183,6 +184,7 @@ OUTPUT FORMAT (JSON only):
 FINAL CHECK: Count output entries. Each "name" value must be unique. No duplicates allowed.`;
 
   try {
+    const startTime = Date.now();
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -198,6 +200,11 @@ FINAL CHECK: Count output entries. Each "name" value must be unique. No duplicat
       temperature: 0.1,
       response_format: { type: "json_object" }
     });
+
+    // Track token usage if trackTokens is enabled
+    if (trackTokens && completion.usage) {
+      await trackOpenAIUsage(userId, '/api/shopping-list/generate', completion, 'gpt-4o-mini', startTime);
+    }
     
     const responseContent = completion.choices[0]?.message?.content;
     if (!responseContent) {

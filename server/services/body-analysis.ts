@@ -1,5 +1,6 @@
 import { OpenAI } from 'openai';
 import { z } from 'zod';
+import { trackOpenAIUsage, trackFailedRequest } from '../utils/token-tracker';
 
 // Initialize OpenAI client with configuration
 const openai = new OpenAI({
@@ -92,7 +93,8 @@ export async function analyzeBodyComposition(
   weight: number,
   height: number,
   gender: 'male' | 'female' = 'male',
-  age: number = 30
+  age: number = 30,
+  userId?: number
 ): Promise<BodyAnalysis> {
   try {
     // Calculate BMI for reference
@@ -153,6 +155,7 @@ export async function analyzeBodyComposition(
     }
 
     // Process image with OpenAI
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -176,6 +179,11 @@ export async function analyzeBodyComposition(
       ],
       max_tokens: 800,
     });
+
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/body-analysis', response, 'gpt-4o', startTime);
+    }
 
     const content = response.choices[0].message.content;
     

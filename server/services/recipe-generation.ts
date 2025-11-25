@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { insertRecipeSchema } from '@db/schema';
+import { trackOpenAIUsage, trackFailedRequest } from '../utils/token-tracker';
 
 // More flexible preference schema
 const UserPreferencesSchema = z.object({
@@ -176,7 +177,8 @@ function safeParseJson(jsonString: string): any {
 export async function generateRecipe(
   ingredients: string[],
   preferences: UserPreferences,
-  customPrompt?: string
+  customPrompt?: string,
+  userId?: number
 ): Promise<{recipes: GeneratedRecipe[]}> {
   try {
     // Validate input
@@ -270,6 +272,7 @@ The response MUST be a JSON object with this exact structure:
 }`;
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -280,6 +283,11 @@ The response MUST be a JSON object with this exact structure:
       max_tokens: 1000,
       response_format: { type: "json_object" }
     });
+
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/recipes/generate', response, 'gpt-4o', startTime);
+    }
 
     const content = response.choices[0].message.content;
     if (!content) {

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { trackOpenAIUsage, trackFailedRequest } from '../utils/token-tracker';
 
 // Define ingredient schema for recipe fields
 const IngredientItemSchema = z.object({
@@ -61,7 +62,7 @@ const FoodAnalysisSchema = z.object({
 
 export type FoodAnalysis = z.infer<typeof FoodAnalysisSchema>;
 
-async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): Promise<FoodAnalysis> {
+async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', userId?: number): Promise<FoodAnalysis> {
   try {
     if (!process.env.OPENAI_API_KEY) {
       console.error('[Food Recognition] OpenAI API key not configured');
@@ -72,6 +73,7 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg'): 
     console.log(`[Food Recognition] Starting image analysis with format: ${format}...`);
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -182,6 +184,11 @@ OTHER RULES:
 
     console.log('[Food Recognition] Received response from OpenAI');
 
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/food-recognition/image', response, 'gpt-4o', startTime);
+    }
+
     if (!response.choices[0].message.content) {
       throw new Error('Empty response from OpenAI');
     }
@@ -265,7 +272,7 @@ function isValidImageFormat(base64String: string): boolean {
   }
 }
 
-export async function analyzeFoodImage(imageBase64: string): Promise<FoodAnalysis> {
+export async function analyzeFoodImage(imageBase64: string, userId?: number): Promise<FoodAnalysis> {
   try {
     console.log('[Food Recognition] Starting image analysis...');
 
@@ -332,7 +339,7 @@ export async function analyzeFoodImage(imageBase64: string): Promise<FoodAnalysi
     // Get analysis from OpenAI - use detected format
     const format = cleanedImage.match(/data:image\/([a-zA-Z0-9]+);base64,/)?.[1] || 'jpeg';
     console.log(`[Food Recognition] Using format ${format} for OpenAI analysis`);
-    const result = await analyzeWithOpenAI(base64Data, format);
+    const result = await analyzeWithOpenAI(base64Data, format, userId);
     console.log('[Food Recognition] Analysis result:', JSON.stringify(result, null, 2));
 
     return result;
@@ -368,7 +375,7 @@ const RecipeAnalysisSchema = z.object({
 
 export type RecipeAnalysis = z.infer<typeof RecipeAnalysisSchema>;
 
-async function generateRecipeSuggestions(ingredients: any[]): Promise<any> {
+async function generateRecipeSuggestions(ingredients: any[], userId?: number): Promise<any> {
   try {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error('OpenAI API key not configured');
@@ -378,6 +385,7 @@ async function generateRecipeSuggestions(ingredients: any[]): Promise<any> {
     const ingredientsList = ingredients.map(i => i.name).join(', ');
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -396,6 +404,11 @@ async function generateRecipeSuggestions(ingredients: any[]): Promise<any> {
       response_format: { type: "json_object" }
     });
 
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/recipes/suggestions', response, 'gpt-4o', startTime);
+    }
+
     const content = response.choices[0].message.content;
     if (!content) throw new Error('Empty response from OpenAI');
 
@@ -406,7 +419,7 @@ async function generateRecipeSuggestions(ingredients: any[]): Promise<any> {
   }
 }
 
-export async function analyzeIngredientsWithOpenAI(imageBase64: string): Promise<{
+export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?: number): Promise<{
   ingredients: any[];
   recipes?: any;
 }> {
@@ -460,6 +473,7 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string): Promise
     console.log('[Recipe Analysis] Initializing ingredient analysis...');
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
@@ -508,6 +522,11 @@ Examples:
     });
 
     console.log('[Recipe Analysis] Received response from OpenAI');
+
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/ingredients/analyze', response, 'gpt-4o', startTime);
+    }
 
     const content = response.choices[0].message.content;
     if (!content) {
