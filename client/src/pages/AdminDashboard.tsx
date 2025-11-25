@@ -569,9 +569,17 @@ export default function AdminDashboard() {
   // Main admin dashboard
   return (
     <div className="w-full px-6 lg:px-12 py-8">
-      <h1 className="text-3xl font-bold mb-8 flex items-center">
-        <Shield className="mr-2" /> Admin Dashboard
-      </h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold flex items-center">
+          <Shield className="mr-2" /> Admin Dashboard
+        </h1>
+        <Button 
+          onClick={() => setLocation('/admin/analytics')}
+          className="bg-[#26A8FF] hover:bg-[#1E8FE0]"
+        >
+          View Analytics Dashboard
+        </Button>
+      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid grid-cols-3 mb-8">

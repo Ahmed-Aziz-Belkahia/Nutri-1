@@ -1,7 +1,16 @@
 import express, { Response, NextFunction } from "express";
 import { db } from "@db";
-import { users, foodLogs, recipes, userNutritionPreferences, weightLogs, progressPhotos } from "@db/schema";
-import { eq, desc } from "drizzle-orm";
+import { 
+  users, 
+  foodLogs, 
+  recipes, 
+  userNutritionPreferences, 
+  weightLogs, 
+  progressPhotos,
+  apiUsageTracking,
+  userTokenLimits
+} from "@db/schema";
+import { eq, desc, sql, gte, and } from "drizzle-orm";
 import { requireAuth, type AuthRequest } from "../utils/jwt";
 
 const router = express.Router();
@@ -166,6 +175,252 @@ router.get('/progress/:userId', isAdmin, async (req: Request, res: Response) => 
   } catch (error) {
     console.error('Error fetching user progress:', error);
     res.status(500).json({ error: 'Failed to fetch user progress' });
+  }
+});
+
+// ==================== ANALYTICS ROUTES ====================
+
+// Get user statistics
+router.get('/analytics/users', isAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const allUsers = await db.select().from(users);
+    
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    const totalUsers = allUsers.length;
+    const activeUsers = allUsers.filter(u => u.lastActivityDate).length;
+    const completedOnboarding = allUsers.filter(u => u.hasCompletedOnboarding).length;
+    const premiumUsers = 0; // Add premium tier logic when implemented
+    
+    // Count new users by time period (using lastLoginAt as proxy for creation)
+    const newUsersToday = allUsers.filter(u => 
+      u.lastLoginAt && new Date(u.lastLoginAt) >= todayStart
+    ).length;
+    
+    const newUsersThisWeek = allUsers.filter(u => 
+      u.lastLoginAt && new Date(u.lastLoginAt) >= weekStart
+    ).length;
+    
+    const newUsersThisMonth = allUsers.filter(u => 
+      u.lastLoginAt && new Date(u.lastLoginAt) >= monthStart
+    ).length;
+    
+    res.json({
+      totalUsers,
+      activeUsers,
+      newUsersToday,
+      newUsersThisWeek,
+      newUsersThisMonth,
+      premiumUsers,
+      completedOnboarding
+    });
+  } catch (error) {
+    console.error('Error fetching user analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch user analytics' });
+  }
+});
+
+// Get token usage statistics
+router.get('/analytics/tokens', isAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const range = req.query.range as string || '30d';
+    const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    const startDate = Math.floor(Date.now() / 1000) - (daysBack * 24 * 60 * 60);
+    
+    // Get all usage records
+    const allUsage = await db.select().from(apiUsageTracking);
+    const recentUsage = allUsage.filter(u => u.requestDate >= startDate);
+    
+    // Calculate totals
+    const totalTokensUsed = allUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
+    const totalCostUsd = allUsage.reduce((sum, u) => sum + u.costUsd, 0);
+    
+    // Get user count for averages
+    const userCount = await db.select().from(users);
+    const avgTokensPerUser = userCount.length > 0 ? totalTokensUsed / userCount.length : 0;
+    const avgCostPerUser = userCount.length > 0 ? totalCostUsd / userCount.length : 0;
+    
+    // Today's usage
+    const todayStart = Math.floor(new Date().setHours(0, 0, 0, 0) / 1000);
+    const todayUsage = allUsage.filter(u => u.requestDate >= todayStart);
+    const todayTokens = todayUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
+    const todayCost = todayUsage.reduce((sum, u) => sum + u.costUsd, 0);
+    
+    // Week usage
+    const weekStart = Math.floor(Date.now() / 1000) - (7 * 24 * 60 * 60);
+    const weekUsage = allUsage.filter(u => u.requestDate >= weekStart);
+    const weekTokens = weekUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
+    const weekCost = weekUsage.reduce((sum, u) => sum + u.costUsd, 0);
+    
+    // Month usage
+    const monthStart = Math.floor(Date.now() / 1000) - (30 * 24 * 60 * 60);
+    const monthUsage = allUsage.filter(u => u.requestDate >= monthStart);
+    const monthTokens = monthUsage.reduce((sum, u) => sum + u.tokensUsed, 0);
+    const monthCost = monthUsage.reduce((sum, u) => sum + u.costUsd, 0);
+    
+    // Top users by token usage
+    const userUsageMap = new Map<number, { tokensUsed: number; costUsd: number }>();
+    recentUsage.forEach(u => {
+      const current = userUsageMap.get(u.userId) || { tokensUsed: 0, costUsd: 0 };
+      userUsageMap.set(u.userId, {
+        tokensUsed: current.tokensUsed + u.tokensUsed,
+        costUsd: current.costUsd + u.costUsd
+      });
+    });
+    
+    const topUserIds = Array.from(userUsageMap.entries())
+      .sort((a, b) => b[1].tokensUsed - a[1].tokensUsed)
+      .slice(0, 10);
+    
+    const topUsersData = await Promise.all(
+      topUserIds.map(async ([userId, stats]) => {
+        const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+        return {
+          userId,
+          email: user?.email || 'Unknown',
+          tokensUsed: stats.tokensUsed,
+          costUsd: stats.costUsd
+        };
+      })
+    );
+    
+    res.json({
+      totalTokensUsed,
+      totalCostUsd,
+      avgTokensPerUser,
+      avgCostPerUser,
+      todayTokens,
+      todayCost,
+      weekTokens,
+      weekCost,
+      monthTokens,
+      monthCost,
+      topUsers: topUsersData
+    });
+  } catch (error) {
+    console.error('Error fetching token analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch token analytics' });
+  }
+});
+
+// Get API statistics
+router.get('/analytics/api', isAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const range = req.query.range as string || '30d';
+    const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    const startDate = Math.floor(Date.now() / 1000) - (daysBack * 24 * 60 * 60);
+    
+    const allUsage = await db.select().from(apiUsageTracking);
+    const recentUsage = allUsage.filter(u => u.requestDate >= startDate);
+    
+    const totalRequests = recentUsage.length;
+    const successfulRequests = recentUsage.filter(u => u.status === 'success').length;
+    const successRate = totalRequests > 0 ? successfulRequests / totalRequests : 0;
+    const errorRate = 1 - successRate;
+    
+    // Calculate average response time
+    const responseTimes = recentUsage
+      .map(u => u.metadata?.responseTime)
+      .filter((t): t is number => typeof t === 'number');
+    const avgResponseTime = responseTimes.length > 0 
+      ? responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length 
+      : 0;
+    
+    // Endpoint breakdown
+    const endpointMap = new Map<string, { count: number; totalTokens: number; totalCost: number }>();
+    recentUsage.forEach(u => {
+      const current = endpointMap.get(u.endpoint) || { count: 0, totalTokens: 0, totalCost: 0 };
+      endpointMap.set(u.endpoint, {
+        count: current.count + 1,
+        totalTokens: current.totalTokens + u.tokensUsed,
+        totalCost: current.totalCost + u.costUsd
+      });
+    });
+    
+    const endpointBreakdown = Array.from(endpointMap.entries())
+      .map(([endpoint, stats]) => ({
+        endpoint,
+        count: stats.count,
+        avgTokens: Math.round(stats.totalTokens / stats.count),
+        totalCost: stats.totalCost
+      }))
+      .sort((a, b) => b.count - a.count);
+    
+    // Model usage
+    const modelMap = new Map<string, { count: number; totalTokens: number; totalCost: number }>();
+    recentUsage.forEach(u => {
+      const model = u.model || 'unknown';
+      const current = modelMap.get(model) || { count: 0, totalTokens: 0, totalCost: 0 };
+      modelMap.set(model, {
+        count: current.count + 1,
+        totalTokens: current.totalTokens + u.tokensUsed,
+        totalCost: current.totalCost + u.costUsd
+      });
+    });
+    
+    const modelUsage = Array.from(modelMap.entries())
+      .map(([model, stats]) => ({
+        model,
+        count: stats.count,
+        totalTokens: stats.totalTokens,
+        totalCost: stats.totalCost
+      }))
+      .sort((a, b) => b.count - a.count);
+    
+    res.json({
+      totalRequests,
+      successRate,
+      errorRate,
+      avgResponseTime,
+      endpointBreakdown,
+      modelUsage
+    });
+  } catch (error) {
+    console.error('Error fetching API analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch API analytics' });
+  }
+});
+
+// Get activity data over time
+router.get('/analytics/activity', isAdmin, async (req: AuthRequest, res: Response) => {
+  try {
+    const range = req.query.range as string || '30d';
+    const daysBack = range === '7d' ? 7 : range === '30d' ? 30 : 90;
+    const startDate = Math.floor(Date.now() / 1000) - (daysBack * 24 * 60 * 60);
+    
+    const allUsage = await db.select().from(apiUsageTracking);
+    const recentUsage = allUsage.filter(u => u.requestDate >= startDate);
+    
+    // Group by date
+    const dateMap = new Map<string, { users: Set<number>; tokens: number; cost: number; requests: number }>();
+    
+    recentUsage.forEach(u => {
+      const date = new Date(u.requestDate * 1000).toISOString().split('T')[0];
+      const current = dateMap.get(date) || { users: new Set(), tokens: 0, cost: 0, requests: 0 };
+      current.users.add(u.userId);
+      current.tokens += u.tokensUsed;
+      current.cost += u.costUsd;
+      current.requests += 1;
+      dateMap.set(date, current);
+    });
+    
+    const activityData = Array.from(dateMap.entries())
+      .map(([date, stats]) => ({
+        date,
+        users: stats.users.size,
+        tokens: stats.tokens,
+        cost: parseFloat(stats.cost.toFixed(4)),
+        requests: stats.requests
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    
+    res.json(activityData);
+  } catch (error) {
+    console.error('Error fetching activity analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch activity analytics' });
   }
 });
 

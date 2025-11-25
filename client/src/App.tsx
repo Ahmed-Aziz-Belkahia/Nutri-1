@@ -57,6 +57,7 @@ import EnhancedShoppingList from "./pages/EnhancedShoppingList";
 import ImprovedShoppingList from "./pages/ImprovedShoppingList";
 import PremiumShoppingListPage from "./pages/PremiumShoppingListPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import { AdminProtectedRoute } from "./lib/admin-protected-route";
 
 import TodayMealPlan from "./pages/TodayMealPlan";
@@ -517,6 +518,12 @@ function App() {
             <Route path="/admin">
               <AdminProtectedRoute>
                 <AdminDashboard />
+              </AdminProtectedRoute>
+            </Route>
+            
+            <Route path="/admin/analytics">
+              <AdminProtectedRoute>
+                <AdminAnalytics />
               </AdminProtectedRoute>
             </Route>
 
