@@ -1,12 +1,58 @@
 {
   "title": "Posiłki",
-  "addMeal": "Dodaj Posiłek",
-  "breakfast": "Śniadanie",
-  "lunch": "Obiad",
-  "dinner": "Kolacja",
-  "snacks": "Przekąski",
-  "calories": "Kalorie",
-  "protein": "Białko",
-  "carbs": "Węglowodany",
-  "fats": "Tłuszcze"
+  "logMeal": "Zarejestruj Posiłek",
+  "scanFood": "Zeskanuj Jedzenie",
+  "searchFood": "Szukaj Jedzenia",
+  "addManually": "Dodaj Ręcznie",
+  "mealTypes": {
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snack": "Przekąska"
+  },
+  "details": {
+    "title": "Szczegóły Posiłku",
+    "name": "Nazwa Posiłku",
+    "calories": "Kalorie",
+    "protein": "Białko",
+    "carbs": "Węglowodany",
+    "fat": "Tłuszcz",
+    "servingSize": "Rozmiar Porcji",
+    "servings": "Porcje",
+    "time": "Czas",
+    "notes": "Notatki"
+  },
+  "scan": {
+    "title": "Zeskanuj Jedzenie",
+    "instructions": "Zrób zdjęcie swojego posiłku",
+    "analyzing": "Analizowanie posiłku...",
+    "success": "Posiłek rozpoznany!",
+    "error": "Nie można rozpoznać posiłku",
+    "retry": "Spróbuj ponownie",
+    "takePhoto": "Zrób Zdjęcie",
+    "uploadPhoto": "Prześlij Zdjęcie"
+  },
+  "log": {
+    "success": "Posiłek zarejestrowany pomyślnie",
+    "error": "Nie udało się zarejestrować posiłku",
+    "delete": "Usuń posiłek",
+    "deleteConfirm": "Czy na pewno chcesz usunąć ten posiłek?",
+    "deleted": "Posiłek usunięty"
+  },
+  "history": {
+    "title": "Historia Posiłków",
+    "filter": "Filtruj według daty",
+    "noMeals": "Brak zarejestrowanych posiłków",
+    "startLogging": "Zacznij rejestrować swoje posiłki"
+  },
+  "mealPlan": {
+    "title": "Plan Posiłków",
+    "generate": "Wygeneruj Plan Posiłków",
+    "today": "Plan na Dziś",
+    "week": "Ten Tydzień",
+    "generating": "Generowanie spersonalizowanego planu posiłków...",
+    "generated": "Plan posiłków wygenerowany!",
+    "noplan": "Brak planu posiłków",
+    "createPlan": "Utwórz swój pierwszy plan posiłków"
+  }
 }

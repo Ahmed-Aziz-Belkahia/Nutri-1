@@ -1,10 +1,74 @@
 {
   "title": "Przepisy",
   "search": "Szukaj przepisów",
-  "categories": "Kategorie",
-  "cookingTime": "Czas gotowania",
-  "servings": "Porcje",
-  "ingredients": "Składniki",
-  "instructions": "Instrukcje",
-  "nutrition": "Wartości Odżywcze"
+  "filters": {
+    "all": "Wszystkie Przepisy",
+    "favorites": "Ulubione",
+    "myRecipes": "Moje Przepisy",
+    "recent": "Ostatnio Oglądane",
+    "category": "Kategoria",
+    "difficulty": "Trudność",
+    "time": "Czas Gotowania"
+  },
+  "categories": {
+    "breakfast": "Śniadanie",
+    "lunch": "Obiad",
+    "dinner": "Kolacja",
+    "snacks": "Przekąski",
+    "dessert": "Deser",
+    "drinks": "Napoje",
+    "vegan": "Wegańskie",
+    "vegetarian": "Wegetariańskie",
+    "glutenFree": "Bez Glutenu",
+    "dairyFree": "Bez Nabiału",
+    "lowCarb": "Niskie Węglowodany",
+    "highProtein": "Wysokobiałkowe"
+  },
+  "difficulty": {
+    "easy": "Łatwy",
+    "medium": "Średni",
+    "hard": "Trudny"
+  },
+  "details": {
+    "ingredients": "Składniki",
+    "instructions": "Instrukcje",
+    "nutrition": "Wartości Odżywcze",
+    "servings": "Porcje",
+    "prepTime": "Czas Przygotowania",
+    "cookTime": "Czas Gotowania",
+    "totalTime": "Całkowity Czas",
+    "difficulty": "Trudność",
+    "calories": "Kalorie na porcję",
+    "addToMealPlan": "Dodaj do Planu Posiłków",
+    "saveRecipe": "Zapisz Przepis",
+    "share": "Udostępnij"
+  },
+  "create": {
+    "title": "Utwórz Przepis",
+    "name": "Nazwa Przepisu",
+    "description": "Opis",
+    "category": "Kategoria",
+    "servings": "Porcje",
+    "prepTime": "Czas Przygotowania",
+    "cookTime": "Czas Gotowania",
+    "ingredients": "Składniki",
+    "addIngredient": "Dodaj Składnik",
+    "instructions": "Instrukcje",
+    "addStep": "Dodaj Krok",
+    "uploadPhoto": "Prześlij Zdjęcie",
+    "save": "Zapisz Przepis",
+    "success": "Przepis utworzony pomyślnie",
+    "error": "Nie udało się utworzyć przepisu"
+  },
+  "generate": {
+    "title": "Wygeneruj Przepis",
+    "aiGenerate": "Generuj Przepis przez AI",
+    "prompt": "Co chciałbyś ugotować?",
+    "preferences": "Preferencje Dietetyczne",
+    "generate": "Generuj",
+    "generating": "Generowanie przepisu...",
+    "success": "Przepis wygenerowany!"
+  },
+  "noRecipes": "Nie znaleziono przepisów",
+  "addFirst": "Dodaj swój pierwszy przepis"
 }

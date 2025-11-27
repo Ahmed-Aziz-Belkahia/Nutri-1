@@ -1,55 +1,55 @@
 {
-  "title": "Analytics",
+  "title": "التحليلات",
   "overview": {
-    "title": "Overview",
-    "period": "Period",
-    "week": "Week",
-    "month": "Month",
-    "year": "Year",
-    "custom": "Custom"
+    "title": "نظرة عامة",
+    "period": "الفترة",
+    "week": "أسبوع",
+    "month": "شهر",
+    "year": "سنة",
+    "custom": "مخصص"
   },
   "progress": {
-    "title": "Progress Tracking",
-    "weightProgress": "Weight Progress",
-    "calorieProgress": "Calorie Progress",
-    "macroDistribution": "Macro Distribution",
-    "weeklyAverage": "Weekly Average",
-    "monthlyAverage": "Monthly Average"
+    "title": "تتبع التقدم",
+    "weightProgress": "تقدم الوزن",
+    "calorieProgress": "تقدم السعرات الحرارية",
+    "macroDistribution": "توزيع المغذيات الكبرى",
+    "weeklyAverage": "المتوسط الأسبوعي",
+    "monthlyAverage": "المتوسط الشهري"
   },
   "charts": {
-    "weight": "Weight Chart",
-    "calories": "Calories Chart",
-    "macros": "Macros Chart",
-    "waterIntake": "Water Intake",
-    "mealFrequency": "Meal Frequency"
+    "weight": "مخطط الوزن",
+    "calories": "مخطط السعرات الحرارية",
+    "macros": "مخطط المغذيات الكبرى",
+    "waterIntake": "استهلاك الماء",
+    "mealFrequency": "تكرار الوجبات"
   },
   "stats": {
-    "totalMeals": "Total Meals Logged",
-    "avgCalories": "Average Daily Calories",
-    "avgProtein": "Average Daily Protein",
-    "avgCarbs": "Average Daily Carbs",
-    "avgFat": "Average Daily Fat",
-    "waterGoal": "Water Goal Achievement",
-    "streakDays": "Current Streak",
-    "bestStreak": "Best Streak"
+    "totalMeals": "إجمالي الوجبات المسجلة",
+    "avgCalories": "متوسط السعرات الحرارية اليومية",
+    "avgProtein": "متوسط البروتين اليومي",
+    "avgCarbs": "متوسط الكربوهيدرات اليومية",
+    "avgFat": "متوسط الدهون اليومية",
+    "waterGoal": "إنجاز هدف الماء",
+    "streakDays": "السلسلة الحالية",
+    "bestStreak": "أفضل سلسلة"
   },
   "insights": {
-    "title": "Insights",
-    "calorieInsight": "Calorie Insight",
-    "macroInsight": "Macro Balance",
-    "consistencyInsight": "Consistency",
-    "progressInsight": "Progress Summary",
-    "onTrack": "You're on track!",
-    "needsImprovement": "Could use some improvement",
-    "excellent": "Excellent work!",
-    "suggestion": "Suggestion"
+    "title": "رؤى",
+    "calorieInsight": "رؤية السعرات الحرارية",
+    "macroInsight": "توازن المغذيات الكبرى",
+    "consistencyInsight": "الاتساق",
+    "progressInsight": "ملخص التقدم",
+    "onTrack": "أنت على المسار الصحيح!",
+    "needsImprovement": "يحتاج إلى بعض التحسين",
+    "excellent": "عمل ممتاز!",
+    "suggestion": "اقتراح"
   },
   "reports": {
-    "title": "Reports",
-    "generateReport": "Generate Report",
-    "downloadPDF": "Download PDF",
-    "shareReport": "Share Report",
-    "weeklyReport": "Weekly Report",
-    "monthlyReport": "Monthly Report"
+    "title": "التقارير",
+    "generateReport": "إنشاء تقرير",
+    "downloadPDF": "تحميل PDF",
+    "shareReport": "مشاركة التقرير",
+    "weeklyReport": "تقرير أسبوعي",
+    "monthlyReport": "تقرير شهري"
   }
 }

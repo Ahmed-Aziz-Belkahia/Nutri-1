@@ -1916,7 +1916,123 @@
         "addHeight": "إضافة طول",
         "updateHeight": "تحديث الطول",
         "noEntries": "لا توجد إدخالات"
+      },
+      "weightTrend": {
+        "title": "اتجاه الوزن",
+        "emptyState": "أضف سجلات الوزن لرؤية اتجاهك.",
+        "goal": "الهدف"
       }
+    }
+  },
+  "allRecipes": {
+    "title": "جميع الوصفات",
+    "recipesCount": "{{count}} وصفة",
+    "searchPlaceholder": "ابحث عن وصفات...",
+    "sort": "ترتيب",
+    "sortOptions": {
+      "newest": "الأحدث أولاً",
+      "name": "الاسم (أ-ي)",
+      "caloriesLow": "السعرات (من الأقل إلى الأعلى)",
+      "caloriesHigh": "السعرات (من الأعلى إلى الأقل)",
+      "timeLow": "وجبات سريعة أولاً",
+      "timeHigh": "الأطول وقتاً أولاً"
+    },
+    "searchResults": "تم العثور على {{count}} وصفة لـ \"{{query}}\"",
+    "searchResultsPlural": "تم العثور على {{count}} وصفة لـ \"{{query}}\"",
+    "searchResultsMany": "تم العثور على {{count}} وصفة لـ \"{{query}}\"",
+    "emptyState": {
+      "title": "لا توجد وصفات بعد",
+      "description": "امسح وجباتك لإنشاء مجموعة وصفات تلقائياً",
+      "button": "امسح وجبتك الأولى"
+    },
+    "noResults": "لا توجد وصفات تطابق بحثك"
+  },
+  "weeklyGroceryList": {
+    "title": "قائمة البقالة الأسبوعية",
+    "itemsCount": "{{count}} عنصر",
+    "emptyState": {
+      "title": "لا توجد عناصر بقالة لهذا الأسبوع",
+      "button": "إنشاء خطة وجبات"
+    },
+    "markPurchased": "تحديد كمشترى",
+    "markNotPurchased": "تحديد كغير مشترى"
+  },
+  "addFood": {
+    "title": "إضافة طعام",
+    "subtitle": "سجل وجباتك بسهولة",
+    "tabs": {
+      "photo": "صورة",
+      "gallery": "المعرض",
+      "manual": "يدوي"
+    },
+    "camera": {
+      "initializing": "جاري تهيئة الكاميرا...",
+      "accessRequired": "الوصول إلى الكاميرا مطلوب",
+      "enableCamera": "تفعيل الكاميرا",
+      "useManualEntry": "استخدام الإدخال اليدوي بدلاً من ذلك",
+      "captureHint": "اضغط لالتقاط وجبتك",
+      "analyzing": "جاري تحليل وجبتك..."
+    },
+    "gallery": {
+      "title": "اختر من المعرض",
+      "subtitle": "حدد صور الطعام للتحليل",
+      "noImages": "لم يتم تحميل صور",
+      "noImagesDescription": "قم بتحميل الصور من جهازك لتحديد وتحليل صور الطعام",
+      "loadImages": "تحميل الصور",
+      "loadMore": "تحميل المزيد من الصور",
+      "selectButton": "تحديد"
+    },
+    "aiAnalysis": {
+      "title": "تحليل بالذكاء الاصطناعي",
+      "subtitle": "فقط صف ما أكلته",
+      "placeholder": "مثال، بيضتان مخفوقتان مع السبانخ، خبز توست من القمح الكامل مع الأفوكادو، وموزة",
+      "hint": "كن محدداً للحصول على أفضل النتائج",
+      "analyzeButton": "تحليل وإضافة إلى السجل",
+      "analyzing": "جاري التحليل بالذكاء الاصطناعي..."
+    },
+    "manualEntry": {
+      "title": "إدخال يدوي",
+      "subtitle": "أدخل القيم الغذائية مباشرة",
+      "orLabel": "أو أدخل يدوياً",
+      "foodName": "اسم الطعام",
+      "foodNamePlaceholder": "مثال، زبادي يوناني، دجاج مشوي",
+      "nutritionInfo": "معلومات غذائية",
+      "calories": "السعرات الحرارية",
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون",
+      "placeholder": "0",
+      "kcal": "سعرة",
+      "grams": "جم",
+      "addButton": "إضافة إلى سجل الطعام",
+      "saving": "جاري الحفظ..."
+    },
+    "error": {
+      "suggestion": "اقتراح",
+      "tryAgain": "حاول مرة أخرى",
+      "switchToManual": "التبديل إلى الإدخال اليدوي"
+    },
+    "toast": {
+      "error": "خطأ",
+      "processing": "جاري المعالجة",
+      "analysisComplete": "اكتمل التحليل",
+      "addingToLog": "جاري إضافة {{name}} إلى سجلك...",
+      "failedToAdd": "فشل في إضافة الطعام إلى السجل",
+      "failedToAnalyze": "فشل في تحليل وصف الطعام. حاول أن تكون أكثر تحديداً أو استخدم الإدخال اليدوي.",
+      "galleryLoadFailed": "فشل في تحميل صور المعرض"
+    },
+    "errors": {
+      "analysisError": "خطأ في التحليل",
+      "failedToAnalyze": "فشل في تحليل الطعام",
+      "tryDifferentImage": "جرب صورة مختلفة أو الإدخال اليدوي",
+      "unsupportedImage": "صورة غير مدعومة",
+      "unsupportedFormat": "تنسيق الصورة غير مدعوم.",
+      "useCorrectFormat": "الرجاء استخدام صور JPEG أو PNG أو GIF أو WEBP. حاول التقاط صورة جديدة أو التبديل إلى الإدخال اليدوي",
+      "aiProcessingError": "خطأ في معالجة الذكاء الاصطناعي",
+      "serverError": "خطأ في الخادم أثناء تحليل الصورة.",
+      "tryBetterLighting": "واجه الذكاء الاصطناعي لدينا مشكلة مع هذه الصورة. حاول مع إضاءة أفضل أو رؤية أوضح للطعام.",
+      "enterDescription": "الرجاء إدخال وصف الطعام",
+      "invalidAnalysis": "نتيجة تحليل غير صالحة: بيانات مطلوبة مفقودة"
     }
   }
 }

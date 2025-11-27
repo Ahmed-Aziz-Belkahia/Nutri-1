@@ -1,55 +1,55 @@
 {
-  "title": "Analytics",
+  "title": "Analytique",
   "overview": {
-    "title": "Overview",
-    "period": "Period",
-    "week": "Week",
-    "month": "Month",
-    "year": "Year",
-    "custom": "Custom"
+    "title": "Aperçu",
+    "period": "Période",
+    "week": "Semaine",
+    "month": "Mois",
+    "year": "Année",
+    "custom": "Personnalisé"
   },
   "progress": {
-    "title": "Progress Tracking",
-    "weightProgress": "Weight Progress",
-    "calorieProgress": "Calorie Progress",
-    "macroDistribution": "Macro Distribution",
-    "weeklyAverage": "Weekly Average",
-    "monthlyAverage": "Monthly Average"
+    "title": "Suivi des Progrès",
+    "weightProgress": "Progrès de Poids",
+    "calorieProgress": "Progrès Calorique",
+    "macroDistribution": "Distribution des Macros",
+    "weeklyAverage": "Moyenne Hebdomadaire",
+    "monthlyAverage": "Moyenne Mensuelle"
   },
   "charts": {
-    "weight": "Weight Chart",
-    "calories": "Calories Chart",
-    "macros": "Macros Chart",
-    "waterIntake": "Water Intake",
-    "mealFrequency": "Meal Frequency"
+    "weight": "Graphique de Poids",
+    "calories": "Graphique des Calories",
+    "macros": "Graphique des Macros",
+    "waterIntake": "Consommation d'Eau",
+    "mealFrequency": "Fréquence des Repas"
   },
   "stats": {
-    "totalMeals": "Total Meals Logged",
-    "avgCalories": "Average Daily Calories",
-    "avgProtein": "Average Daily Protein",
-    "avgCarbs": "Average Daily Carbs",
-    "avgFat": "Average Daily Fat",
-    "waterGoal": "Water Goal Achievement",
-    "streakDays": "Current Streak",
-    "bestStreak": "Best Streak"
+    "totalMeals": "Total des Repas Enregistrés",
+    "avgCalories": "Calories Quotidiennes Moyennes",
+    "avgProtein": "Protéines Quotidiennes Moyennes",
+    "avgCarbs": "Glucides Quotidiens Moyens",
+    "avgFat": "Graisses Quotidiennes Moyennes",
+    "waterGoal": "Atteinte de l'Objectif d'Eau",
+    "streakDays": "Série Actuelle",
+    "bestStreak": "Meilleure Série"
   },
   "insights": {
-    "title": "Insights",
-    "calorieInsight": "Calorie Insight",
-    "macroInsight": "Macro Balance",
-    "consistencyInsight": "Consistency",
-    "progressInsight": "Progress Summary",
-    "onTrack": "You're on track!",
-    "needsImprovement": "Could use some improvement",
-    "excellent": "Excellent work!",
+    "title": "Aperçus",
+    "calorieInsight": "Aperçu des Calories",
+    "macroInsight": "Équilibre des Macros",
+    "consistencyInsight": "Cohérence",
+    "progressInsight": "Résumé des Progrès",
+    "onTrack": "Vous êtes sur la bonne voie!",
+    "needsImprovement": "Pourrait être amélioré",
+    "excellent": "Excellent travail!",
     "suggestion": "Suggestion"
   },
   "reports": {
-    "title": "Reports",
-    "generateReport": "Generate Report",
-    "downloadPDF": "Download PDF",
-    "shareReport": "Share Report",
-    "weeklyReport": "Weekly Report",
-    "monthlyReport": "Monthly Report"
+    "title": "Rapports",
+    "generateReport": "Générer un Rapport",
+    "downloadPDF": "Télécharger PDF",
+    "shareReport": "Partager le Rapport",
+    "weeklyReport": "Rapport Hebdomadaire",
+    "monthlyReport": "Rapport Mensuel"
   }
 }

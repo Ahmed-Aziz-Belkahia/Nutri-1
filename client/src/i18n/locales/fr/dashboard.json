@@ -1,50 +1,50 @@
 {
-  "welcome": "Welcome, {{name}}!",
+  "welcome": "Bienvenue, {{name}}!",
   "greeting": {
-    "morning": "Good Morning",
-    "afternoon": "Good Afternoon",
-    "evening": "Good Evening"
+    "morning": "Bonjour",
+    "afternoon": "Bon après-midi",
+    "evening": "Bonsoir"
   },
   "overview": {
-    "title": "Today's Overview",
-    "caloriesConsumed": "Calories Consumed",
-    "caloriesRemaining": "Calories Remaining",
-    "caloriesGoal": "Daily Goal",
-    "macros": "Macronutrients",
-    "waterIntake": "Water Intake",
-    "mealsLogged": "Meals Logged",
-    "streak": "Day Streak"
+    "title": "Aperçu d'aujourd'hui",
+    "caloriesConsumed": "Calories Consommées",
+    "caloriesRemaining": "Calories Restantes",
+    "caloriesGoal": "Objectif Quotidien",
+    "macros": "Macronutriments",
+    "waterIntake": "Consommation d'Eau",
+    "mealsLogged": "Repas Enregistrés",
+    "streak": "Série de Jours"
   },
   "quickActions": {
-    "title": "Quick Actions",
-    "logMeal": "Log Meal",
-    "scanFood": "Scan Food",
-    "addWater": "Add Water",
-    "logWeight": "Log Weight",
-    "generateMealPlan": "Generate Meal Plan",
-    "viewRecipes": "View Recipes"
+    "title": "Actions Rapides",
+    "logMeal": "Enregistrer un Repas",
+    "scanFood": "Scanner la Nourriture",
+    "addWater": "Ajouter de l'Eau",
+    "logWeight": "Enregistrer le Poids",
+    "generateMealPlan": "Générer un Plan de Repas",
+    "viewRecipes": "Voir les Recettes"
   },
   "recentMeals": {
-    "title": "Recent Meals",
-    "viewAll": "View All Meals",
-    "noMeals": "No meals logged yet",
-    "logYourFirst": "Log your first meal to start tracking"
+    "title": "Repas Récents",
+    "viewAll": "Voir Tous les Repas",
+    "noMeals": "Aucun repas enregistré",
+    "logYourFirst": "Enregistrez votre premier repas pour commencer le suivi"
   },
   "progress": {
-    "title": "Your Progress",
-    "weeklyGoal": "Weekly Goal",
-    "caloriesThis Week": "Calories This Week",
-    "averageDaily": "Average Daily",
-    "daysCompleted": "Days Completed",
-    "onTrack": "You're on track!",
-    "needsAttention": "Needs attention"
+    "title": "Vos Progrès",
+    "weeklyGoal": "Objectif Hebdomadaire",
+    "caloriesThis Week": "Calories Cette Semaine",
+    "averageDaily": "Moyenne Quotidienne",
+    "daysCompleted": "Jours Complétés",
+    "onTrack": "Vous êtes sur la bonne voie!",
+    "needsAttention": "Nécessite de l'attention"
   },
   "stats": {
-    "title": "Quick Stats",
-    "currentWeight": "Current Weight",
-    "goalWeight": "Goal Weight",
-    "toGo": "to go",
-    "bmi": "BMI",
-    "bodyFat": "Body Fat"
+    "title": "Statistiques Rapides",
+    "currentWeight": "Poids Actuel",
+    "goalWeight": "Poids Objectif",
+    "toGo": "restant",
+    "bmi": "IMC",
+    "bodyFat": "Masse Grasse"
   }
 }

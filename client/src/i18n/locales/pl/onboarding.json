@@ -1,9 +1,98 @@
 {
-  "title": "Onboarding",
-  "welcome": "Witamy w NutriAI",
-  "letsGetStarted": "Zacznijmy",
-  "next": "Dalej",
-  "back": "Wstecz",
-  "skip": "Pomiń",
-  "finish": "Zakończ"
+  "welcome": {
+    "title": "Witamy w NutriAI",
+    "subtitle": "Spersonalizujmy Twoją podróż żywieniową",
+    "start": "Rozpocznij"
+  },
+  "steps": {
+    "personalInfo": "Informacje Osobiste",
+    "goals": "Twoje Cele",
+    "activity": "Poziom Aktywności",
+    "preferences": "Preferencje",
+    "complete": "Zakończ"
+  },
+  "personalInfo": {
+    "title": "Opowiedz nam o sobie",
+    "subtitle": "To pomoże nam spersonalizować Twoje doświadczenie",
+    "name": "Twoje Imię",
+    "age": "Wiek",
+    "gender": "Płeć",
+    "male": "Mężczyzna",
+    "female": "Kobieta",
+    "height": "Wzrost",
+    "weight": "Obecna Waga",
+    "heightPlaceholder": "Wpisz wzrost w cm",
+    "weightPlaceholder": "Wpisz wagę w kg"
+  },
+  "goals": {
+    "title": "Jaki jest Twój cel?",
+    "subtitle": "Wybierz, co chcesz osiągnąć",
+    "loseWeight": "Schudnąć",
+    "loseWeightDesc": "Stwórz deficyt kaloryczny, aby schudnąć",
+    "gainWeight": "Przybrać na Wadze",
+    "gainWeightDesc": "Buduj mięśnie z nadwyżką kalorii",
+    "maintain": "Utrzymać Wagę",
+    "maintainDesc": "Pozostań przy obecnej wadze",
+    "goalWeight": "Docelowa Waga",
+    "goalWeightDesc": "Jaką wagę chciałbyś osiągnąć?",
+    "timeline": "Przewidywany Czas",
+    "timelineDesc": "Na podstawie zdrowego tempa utraty/przyrostu wagi"
+  },
+  "activity": {
+    "title": "Poziom Aktywności",
+    "subtitle": "Jak bardzo jesteś aktywny?",
+    "sedentary": "Siedzący Tryb Życia",
+    "sedentaryDesc": "Mało lub brak ćwiczeń",
+    "light": "Lekko Aktywny",
+    "lightDesc": "Lekkie ćwiczenia 1-3 dni/tydzień",
+    "moderate": "Umiarkowanie Aktywny",
+    "moderateDesc": "Umiarkowane ćwiczenia 3-5 dni/tydzień",
+    "active": "Bardzo Aktywny",
+    "activeDesc": "Intensywne ćwiczenia 6-7 dni/tydzień",
+    "veryActive": "Ekstra Aktywny",
+    "veryActiveDesc": "Bardzo intensywne ćwiczenia i praca fizyczna"
+  },
+  "preferences": {
+    "title": "Preferencje Żywieniowe",
+    "subtitle": "Czy masz jakieś ograniczenia dietetyczne lub preferencje?",
+    "none": "Brak",
+    "vegetarian": "Wegetariańska",
+    "vegan": "Wegańska",
+    "glutenFree": "Bez Glutenu",
+    "dairyFree": "Bez Nabiału",
+    "halal": "Halal",
+    "kosher": "Koszer",
+    "paleo": "Paleo",
+    "keto": "Keto",
+    "other": "Inne"
+  },
+  "complete": {
+    "title": "Gotowe!",
+    "subtitle": "Twój spersonalizowany plan jest gotowy",
+    "calorieGoal": "Dzienny Cel Kalorii",
+    "proteinGoal": "Cel Białka",
+    "carbsGoal": "Cel Węglowodanów",
+    "fatGoal": "Cel Tłuszczu",
+    "formulaExplanation": "Jak to obliczyliśmy",
+    "bmr": "BMR (Podstawowa Przemiana Materii)",
+    "tdee": "TDEE (Całkowite Dzienne Wydatki Energetyczne)",
+    "adjustment": "Dostosowane do Twojego Celu",
+    "startJourney": "Rozpocznij Swoją Podróż",
+    "uploadProfile": "Prześlij Zdjęcie Profilowe"
+  },
+  "calculation": {
+    "bmrTitle": "1. BMR (Podstawowa Przemiana Materii)",
+    "bmrDesc": "Używając równania Mifflin-St Jeor (najczęściej stosowane):",
+    "tdeeTitle": "2. TDEE (Całkowite Dzienne Wydatki Energetyczne)",
+    "tdeeDesc": "BMR × współczynnik aktywności:",
+    "adjustmentTitle": "3. Dostosowane do Twojego Celu",
+    "weightLoss": "Utrata Wagi",
+    "weightLossDesc": "Deficyt 500 kcal/dzień = ~0,5 kg utraty na tydzień",
+    "weightGain": "Przyrost Wagi",
+    "weightGainDesc": "Nadwyżka 300 kcal/dzień dla zdrowego przyrostu masy",
+    "maintain": "Utrzymanie Wagi",
+    "maintainDesc": "Równowaga energetyczna dla utrzymania wagi",
+    "source": "Źródło",
+    "sourceText": "Równanie Mifflin-St Jeor - American Dietetic Association (2005)"
+  }
 }

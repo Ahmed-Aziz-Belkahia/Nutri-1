@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import CalendarSelector from '@/components/dashboard/CalendarSelector';
 import MealPlanSection from '@/components/dashboard/MealPlanSection';
 import { useAllMealPlans } from '@/hooks/queries/useMealPlans';
@@ -74,6 +75,7 @@ function getDaysWithBuffer(): Day[] {
 }
 
 export default function MealPlanTab() {
+  const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getDaysWithBuffer());
   const queryClient = useQueryClient();
@@ -199,9 +201,9 @@ export default function MealPlanTab() {
       {/* Weekly Grocery List Section */}
       <div id="grocery-list" className="bg-white rounded-2xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-[#26A8FF]">Weekly Grocery List</h2>
+          <h2 className="text-lg font-semibold text-[#26A8FF]">{t('weeklyGroceryList.title', 'Weekly Grocery List')}</h2>
           <span className="text-sm text-gray-500">
-            {weeklyGroceryList.length} items
+            {t('weeklyGroceryList.itemsCount', '{{count}} items', { count: weeklyGroceryList.length })}
           </span>
         </div>
 
@@ -249,7 +251,7 @@ export default function MealPlanTab() {
                         ? 'bg-[#26A8FF] border-[#26A8FF]'
                         : 'border-gray-300 bg-white hover:border-[#26A8FF]'
                     }`}
-                    aria-label={isPurchased ? 'Mark as not purchased' : 'Mark as purchased'}
+                    aria-label={isPurchased ? t('weeklyGroceryList.markNotPurchased', 'Mark as not purchased') : t('weeklyGroceryList.markPurchased', 'Mark as purchased')}
                   >
                     {isPurchased && (
                       <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
@@ -268,12 +270,12 @@ export default function MealPlanTab() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <p className="text-gray-500 text-sm mb-4">No grocery items for this week</p>
+            <p className="text-gray-500 text-sm mb-4">{t('weeklyGroceryList.emptyState.title', 'No grocery items for this week')}</p>
             <button
               onClick={() => window.location.href = '/meal-planning-quiz'}
               className="px-4 py-2 bg-[#26A8FF] text-white rounded-lg text-sm font-medium hover:bg-[#1A8FE6] transition-colors"
             >
-              Generate Meal Plan
+              {t('weeklyGroceryList.emptyState.button', 'Generate Meal Plan')}
             </button>
           </div>
         )}

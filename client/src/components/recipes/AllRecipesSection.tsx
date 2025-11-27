@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, SlidersHorizontal, X, Check } from 'lucide-react';
 import RecipeCard from './RecipeCard';
 import { useLocation } from 'wouter';
+import { useTranslation } from 'react-i18next';
 
 interface Recipe {
   id: number;
@@ -27,6 +28,7 @@ interface AllRecipesSectionProps {
 type SortOption = 'newest' | 'calories-low' | 'calories-high' | 'time-low' | 'time-high' | 'name';
 
 export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSectionProps) {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -51,12 +53,12 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
   }, [showFilters]);
 
   const sortOptions: { value: SortOption; label: string }[] = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'name', label: 'Name (A-Z)' },
-    { value: 'calories-low', label: 'Calories (Low to High)' },
-    { value: 'calories-high', label: 'Calories (High to Low)' },
-    { value: 'time-low', label: 'Quick Meals First' },
-    { value: 'time-high', label: 'Longest Time First' },
+    { value: 'newest', label: t('allRecipes.sortOptions.newest', 'Newest First') },
+    { value: 'name', label: t('allRecipes.sortOptions.name', 'Name (A-Z)') },
+    { value: 'calories-low', label: t('allRecipes.sortOptions.caloriesLow', 'Calories (Low to High)') },
+    { value: 'calories-high', label: t('allRecipes.sortOptions.caloriesHigh', 'Calories (High to Low)') },
+    { value: 'time-low', label: t('allRecipes.sortOptions.timeLow', 'Quick Meals First') },
+    { value: 'time-high', label: t('allRecipes.sortOptions.timeHigh', 'Longest Time First') },
   ];
 
   // Filter recipes by search query
@@ -98,7 +100,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">All Recipes</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('allRecipes.title', 'All Recipes')}</h2>
         </div>
         
         {/* Loading skeleton */}
@@ -126,9 +128,9 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Recipes Yet</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('allRecipes.emptyState.title', 'No Recipes Yet')}</h3>
         <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-          Scan your meals to automatically create a recipe collection
+          {t('allRecipes.emptyState.description', 'Scan your meals to automatically create a recipe collection')}
         </p>
         <button 
           className="inline-flex items-center px-6 py-3 rounded-full text-white font-medium transition-all hover:shadow-lg"
@@ -139,7 +141,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          Scan Your First Meal
+          {t('allRecipes.emptyState.button', 'Scan Your First Meal')}
         </button>
       </div>
     );
@@ -149,8 +151,8 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
     <div className="space-y-4">
       {/* Header with Search and Filters */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">All Recipes</h2>
-        <span className="text-sm text-gray-500">{recipes.length} recipes</span>
+        <h2 className="text-xl font-bold text-gray-900">{t('allRecipes.title', 'All Recipes')}</h2>
+        <span className="text-sm text-gray-500">{t('allRecipes.recipesCount', '{{count}} recipes', { count: recipes.length })}</span>
       </div>
 
       {/* Search and Sort Bar */}
@@ -160,7 +162,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search recipes..."
+            placeholder={t('allRecipes.searchPlaceholder', 'Search recipes...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all"
@@ -181,7 +183,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             onClick={() => setShowFilters(!showFilters)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#26A8FF] focus:border-transparent transition-all text-sm font-medium text-gray-700"
           >
-            <span>Sort</span>
+            <span>{t('allRecipes.sort', 'Sort')}</span>
             <SlidersHorizontal className="w-5 h-5 text-[#26A8FF]" />
           </button>
 
@@ -213,7 +215,11 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
       {/* Search Results Info */}
       {searchQuery && (
         <div className="text-sm text-gray-600">
-          Found {sortedRecipes.length} recipe{sortedRecipes.length !== 1 ? 's' : ''} for "{searchQuery}"
+          {sortedRecipes.length === 1 
+            ? t('allRecipes.searchResults', 'Found {{count}} recipe for "{{query}}"', { count: sortedRecipes.length, query: searchQuery })
+            : sortedRecipes.length < 5
+            ? t('allRecipes.searchResultsPlural', 'Found {{count}} recipes for "{{query}}"', { count: sortedRecipes.length, query: searchQuery })
+            : t('allRecipes.searchResultsMany', 'Found {{count}} recipes for "{{query}}"', { count: sortedRecipes.length, query: searchQuery })}
         </div>
       )}
 
@@ -230,7 +236,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
         </div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-          <p className="text-gray-500">No recipes match your search</p>
+          <p className="text-gray-500">{t('allRecipes.noResults', 'No recipes match your search')}</p>
         </div>
       )}
     </div>

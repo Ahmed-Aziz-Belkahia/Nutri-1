@@ -1540,6 +1540,28 @@
       "suggestion": "Suggestion",
       "tryAgain": "Try Again",
       "switchToManual": "Switch to Manual Entry"
+    },
+    "toast": {
+      "error": "Error",
+      "processing": "Processing",
+      "analysisComplete": "Analysis Complete",
+      "addingToLog": "Adding {{name}} to your log...",
+      "failedToAdd": "Failed to add food to log",
+      "failedToAnalyze": "Failed to analyze food description. Try being more specific or use manual entry.",
+      "galleryLoadFailed": "Failed to load gallery images"
+    },
+    "errors": {
+      "analysisError": "Analysis Error",
+      "failedToAnalyze": "Failed to analyze food",
+      "tryDifferentImage": "Try a different image or manual entry",
+      "unsupportedImage": "Unsupported Image",
+      "unsupportedFormat": "Unsupported image format.",
+      "useCorrectFormat": "Please use JPEG, PNG, GIF, or WEBP images. Try taking a new photo or switching to manual entry",
+      "aiProcessingError": "AI Processing Error",
+      "serverError": "Server error analyzing image.",
+      "tryBetterLighting": "Our AI had trouble with this image. Try with better lighting or a clearer view of the food.",
+      "enterDescription": "Please enter a food description",
+      "invalidAnalysis": "Invalid analysis result: Missing required data"
     }
   },
   "cookingMode": {
@@ -1895,6 +1917,11 @@
   },
   "progress": {
     "title": "Progress",
+    "weightTrend": {
+      "title": "Weight Trend",
+      "emptyState": "Add weight logs to see your trend.",
+      "goal": "Goal"
+    },
     "weightMetrics": {
       "title": "Weight Metrics",
       "subtitle": "Current and target weight",
@@ -1943,5 +1970,37 @@
       "updateHeight": "Update Height",
       "noEntries": "No height entries yet"
     }
+  },
+  "allRecipes": {
+    "title": "All Recipes",
+    "recipesCount": "{{count}} recipes",
+    "searchPlaceholder": "Search recipes...",
+    "sort": "Sort",
+    "sortOptions": {
+      "newest": "Newest First",
+      "name": "Name (A-Z)",
+      "caloriesLow": "Calories (Low to High)",
+      "caloriesHigh": "Calories (High to Low)",
+      "timeLow": "Quick Meals First",
+      "timeHigh": "Longest Time First"
+    },
+    "searchResults": "Found {{count}} recipe for \"{{query}}\"",
+    "searchResultsPlural": "Found {{count}} recipes for \"{{query}}\"",
+    "emptyState": {
+      "title": "No Recipes Yet",
+      "description": "Scan your meals to automatically create a recipe collection",
+      "button": "Scan Your First Meal"
+    },
+    "noResults": "No recipes match your search"
+  },
+  "weeklyGroceryList": {
+    "title": "Weekly Grocery List",
+    "itemsCount": "{{count}} items",
+    "emptyState": {
+      "title": "No grocery items for this week",
+      "button": "Generate Meal Plan"
+    },
+    "markPurchased": "Mark as purchased",
+    "markNotPurchased": "Mark as not purchased"
   }
 }

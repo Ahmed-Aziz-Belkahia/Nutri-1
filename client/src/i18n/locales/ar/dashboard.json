@@ -1,50 +1,50 @@
 {
-  "welcome": "Welcome, {{name}}!",
+  "welcome": "مرحباً، {{name}}!",
   "greeting": {
-    "morning": "Good Morning",
-    "afternoon": "Good Afternoon",
-    "evening": "Good Evening"
+    "morning": "صباح الخير",
+    "afternoon": "مساء الخير",
+    "evening": "مساء الخير"
   },
   "overview": {
-    "title": "Today's Overview",
-    "caloriesConsumed": "Calories Consumed",
-    "caloriesRemaining": "Calories Remaining",
-    "caloriesGoal": "Daily Goal",
-    "macros": "Macronutrients",
-    "waterIntake": "Water Intake",
-    "mealsLogged": "Meals Logged",
-    "streak": "Day Streak"
+    "title": "نظرة عامة على اليوم",
+    "caloriesConsumed": "السعرات المستهلكة",
+    "caloriesRemaining": "السعرات المتبقية",
+    "caloriesGoal": "الهدف اليومي",
+    "macros": "المغذيات الكبرى",
+    "waterIntake": "استهلاك الماء",
+    "mealsLogged": "الوجبات المسجلة",
+    "streak": "سلسلة الأيام"
   },
   "quickActions": {
-    "title": "Quick Actions",
-    "logMeal": "Log Meal",
-    "scanFood": "Scan Food",
-    "addWater": "Add Water",
-    "logWeight": "Log Weight",
-    "generateMealPlan": "Generate Meal Plan",
-    "viewRecipes": "View Recipes"
+    "title": "إجراءات سريعة",
+    "logMeal": "تسجيل وجبة",
+    "scanFood": "مسح الطعام",
+    "addWater": "إضافة ماء",
+    "logWeight": "تسجيل الوزن",
+    "generateMealPlan": "إنشاء خطة وجبات",
+    "viewRecipes": "عرض الوصفات"
   },
   "recentMeals": {
-    "title": "Recent Meals",
-    "viewAll": "View All Meals",
-    "noMeals": "No meals logged yet",
-    "logYourFirst": "Log your first meal to start tracking"
+    "title": "الوجبات الأخيرة",
+    "viewAll": "عرض جميع الوجبات",
+    "noMeals": "لا توجد وجبات مسجلة بعد",
+    "logYourFirst": "سجل وجبتك الأولى لبدء التتبع"
   },
   "progress": {
-    "title": "Your Progress",
-    "weeklyGoal": "Weekly Goal",
-    "caloriesThis Week": "Calories This Week",
-    "averageDaily": "Average Daily",
-    "daysCompleted": "Days Completed",
-    "onTrack": "You're on track!",
-    "needsAttention": "Needs attention"
+    "title": "تقدمك",
+    "weeklyGoal": "الهدف الأسبوعي",
+    "caloriesThis Week": "السعرات هذا الأسبوع",
+    "averageDaily": "المتوسط اليومي",
+    "daysCompleted": "الأيام المكتملة",
+    "onTrack": "أنت على المسار الصحيح!",
+    "needsAttention": "يحتاج إلى انتباه"
   },
   "stats": {
-    "title": "Quick Stats",
-    "currentWeight": "Current Weight",
-    "goalWeight": "Goal Weight",
-    "toGo": "to go",
-    "bmi": "BMI",
-    "bodyFat": "Body Fat"
+    "title": "إحصائيات سريعة",
+    "currentWeight": "الوزن الحالي",
+    "goalWeight": "الوزن المستهدف",
+    "toGo": "متبقي",
+    "bmi": "مؤشر كتلة الجسم",
+    "bodyFat": "دهون الجسم"
   }
 }

@@ -1,17 +1,50 @@
 {
-  "title": "Kokpit",
-  "welcome": "Witamy z powrotem",
-  "stats": {
-    "calories": "Kalorie",
-    "protein": "Białko",
-    "carbs": "Węglowodany",
-    "fats": "Tłuszcze",
-    "remaining": "pozostało"
+  "welcome": "Witaj, {{name}}!",
+  "greeting": {
+    "morning": "Dzień Dobry",
+    "afternoon": "Dzień Dobry",
+    "evening": "Dobry Wieczór"
   },
-  "meals": {
-    "breakfast": "Śniadanie",
-    "lunch": "Obiad",
-    "dinner": "Kolacja",
-    "snacks": "Przekąski"
+  "overview": {
+    "title": "Dzisiejszy Przegląd",
+    "caloriesConsumed": "Spożyte Kalorie",
+    "caloriesRemaining": "Pozostałe Kalorie",
+    "caloriesGoal": "Dzienny Cel",
+    "macros": "Makroskładniki",
+    "waterIntake": "Spożycie Wody",
+    "mealsLogged": "Zarejestrowane Posiłki",
+    "streak": "Seria Dni"
+  },
+  "quickActions": {
+    "title": "Szybkie Akcje",
+    "logMeal": "Zarejestruj Posiłek",
+    "scanFood": "Zeskanuj Jedzenie",
+    "addWater": "Dodaj Wodę",
+    "logWeight": "Zarejestruj Wagę",
+    "generateMealPlan": "Wygeneruj Plan Posiłków",
+    "viewRecipes": "Zobacz Przepisy"
+  },
+  "recentMeals": {
+    "title": "Ostatnie Posiłki",
+    "viewAll": "Zobacz Wszystkie Posiłki",
+    "noMeals": "Brak zarejestrowanych posiłków",
+    "logYourFirst": "Zarejestruj swój pierwszy posiłek, aby rozpocząć śledzenie"
+  },
+  "progress": {
+    "title": "Twój Postęp",
+    "weeklyGoal": "Cel Tygodniowy",
+    "caloriesThisWeek": "Kalorie w tym tygodniu",
+    "averageDaily": "Średnia Dzienna",
+    "daysCompleted": "Dni Ukończone",
+    "onTrack": "Jesteś na dobrej drodze!",
+    "needsAttention": "Wymaga uwagi"
+  },
+  "stats": {
+    "title": "Szybkie Statystyki",
+    "currentWeight": "Obecna Waga",
+    "goalWeight": "Docelowa Waga",
+    "toGo": "do osiągnięcia",
+    "bmi": "BMI",
+    "bodyFat": "Tkanka Tłuszczowa"
   }
 }

@@ -1,58 +1,58 @@
 {
-  "title": "Meals",
-  "logMeal": "Log Meal",
-  "scanFood": "Scan Food",
-  "searchFood": "Search Food",
-  "addManually": "Add Manually",
+  "title": "Repas",
+  "logMeal": "Enregistrer un Repas",
+  "scanFood": "Scanner la Nourriture",
+  "searchFood": "Rechercher de la Nourriture",
+  "addManually": "Ajouter Manuellement",
   "mealTypes": {
-    "breakfast": "Breakfast",
-    "lunch": "Lunch",
-    "dinner": "Dinner",
-    "snack": "Snack"
+    "breakfast": "Petit-déjeuner",
+    "lunch": "Déjeuner",
+    "dinner": "Dîner",
+    "snack": "Collation"
   },
   "details": {
-    "title": "Meal Details",
-    "name": "Meal Name",
+    "title": "Détails du Repas",
+    "name": "Nom du Repas",
     "calories": "Calories",
-    "protein": "Protein",
-    "carbs": "Carbs",
-    "fat": "Fat",
-    "servingSize": "Serving Size",
-    "servings": "Servings",
-    "time": "Time",
+    "protein": "Protéines",
+    "carbs": "Glucides",
+    "fat": "Graisses",
+    "servingSize": "Taille de la Portion",
+    "servings": "Portions",
+    "time": "Heure",
     "notes": "Notes"
   },
   "scan": {
-    "title": "Scan Food",
-    "instructions": "Take a photo of your meal",
-    "analyzing": "Analyzing your meal...",
-    "success": "Meal recognized!",
-    "error": "Could not recognize the meal",
-    "retry": "Retry",
-    "takePhoto": "Take Photo",
-    "uploadPhoto": "Upload Photo"
+    "title": "Scanner la Nourriture",
+    "instructions": "Prenez une photo de votre repas",
+    "analyzing": "Analyse de votre repas...",
+    "success": "Repas reconnu!",
+    "error": "Impossible de reconnaître le repas",
+    "retry": "Réessayer",
+    "takePhoto": "Prendre une Photo",
+    "uploadPhoto": "Télécharger une Photo"
   },
   "log": {
-    "success": "Meal logged successfully",
-    "error": "Failed to log meal",
-    "delete": "Delete meal",
-    "deleteConfirm": "Are you sure you want to delete this meal?",
-    "deleted": "Meal deleted"
+    "success": "Repas enregistré avec succès",
+    "error": "Échec de l'enregistrement du repas",
+    "delete": "Supprimer le repas",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce repas?",
+    "deleted": "Repas supprimé"
   },
   "history": {
-    "title": "Meal History",
-    "filter": "Filter by date",
-    "noMeals": "No meals logged",
-    "startLogging": "Start logging your meals"
+    "title": "Historique des Repas",
+    "filter": "Filtrer par date",
+    "noMeals": "Aucun repas enregistré",
+    "startLogging": "Commencez à enregistrer vos repas"
   },
   "mealPlan": {
-    "title": "Meal Plan",
-    "generate": "Generate Meal Plan",
-    "today": "Today's Plan",
-    "week": "This Week",
-    "generating": "Generating your personalized meal plan...",
-    "generated": "Meal plan generated!",
-    "noplan": "No meal plan yet",
-    "createPlan": "Create your first meal plan"
+    "title": "Plan de Repas",
+    "generate": "Générer un Plan de Repas",
+    "today": "Plan d'Aujourd'hui",
+    "week": "Cette Semaine",
+    "generating": "Génération de votre plan de repas personnalisé...",
+    "generated": "Plan de repas généré!",
+    "noplan": "Pas encore de plan de repas",
+    "createPlan": "Créez votre premier plan de repas"
   }
 }

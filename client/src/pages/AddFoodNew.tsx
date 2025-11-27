@@ -251,8 +251,8 @@ export default function AddFoodNew() {
     } catch (error) {
       console.error('Gallery images upload error:', error);
       toast({
-        title: "Error",
-        description: "Failed to load gallery images",
+        title: t('common:addFood.toast.error'),
+        description: t('common:addFood.toast.galleryLoadFailed'),
         variant: "destructive",
       });
     }
@@ -281,19 +281,19 @@ export default function AddFoodNew() {
   const handleAnalysisError = (error: unknown) => {
     console.error('Analysis Error:', error);
     
-    let errorTitle = "Analysis Error";
-    let errorMessage = "Failed to analyze food";
-    let suggestion = "Try a different image or manual entry";
+    let errorTitle = t('common:addFood.errors.analysisError');
+    let errorMessage = t('common:addFood.errors.failedToAnalyze');
+    let suggestion = t('common:addFood.errors.tryDifferentImage');
     
     if (error instanceof Error) {
       if (error.message.includes('Invalid image format') || error.message.includes('unsupported image')) {
-        errorTitle = "Unsupported Image";
-        errorMessage = "Unsupported image format.";
-        suggestion = "Please use JPEG, PNG, GIF, or WEBP images. Try taking a new photo or switching to manual entry";
+        errorTitle = t('common:addFood.errors.unsupportedImage');
+        errorMessage = t('common:addFood.errors.unsupportedFormat');
+        suggestion = t('common:addFood.errors.useCorrectFormat');
       } else if (error.message.includes('HTTP error! status: 500')) {
-        errorTitle = "AI Processing Error";
-        errorMessage = "Server error analyzing image.";
-        suggestion = "Our AI had trouble with this image. Try with better lighting or a clearer view of the food.";
+        errorTitle = t('common:addFood.errors.aiProcessingError');
+        errorMessage = t('common:addFood.errors.serverError');
+        suggestion = t('common:addFood.errors.tryBetterLighting');
       } else {
         errorMessage = error.message;
       }
@@ -323,8 +323,8 @@ export default function AddFoodNew() {
       }));
 
       toast({
-        title: "Processing",
-        description: `Adding ${values.name} to your log...`,
+        title: t('common:addFood.toast.processing'),
+        description: t('common:addFood.toast.addingToLog', { name: values.name }),
       });
 
       // Redirect immediately - dashboard will process
@@ -334,8 +334,8 @@ export default function AddFoodNew() {
       
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to add food to log",
+        title: t('common:addFood.toast.error'),
+        description: error instanceof Error ? error.message : t('common:addFood.toast.failedToAdd'),
       });
       setIsAnalyzing(false);
     }
@@ -347,7 +347,7 @@ export default function AddFoodNew() {
       setIsAnalyzing(true);
       
       if (!values.text || values.text.trim() === '') {
-        throw new Error('Please enter a food description');
+        throw new Error(t('common:addFood.errors.enterDescription'));
       }
       
       console.log('[AddFoodNew] Analyzing text:', values.text);
@@ -357,7 +357,7 @@ export default function AddFoodNew() {
       console.log('[AddFoodNew] Analysis result:', result);
       
       if (!result || typeof result.name !== 'string' || typeof result.calories !== 'number') {
-        throw new Error('Invalid analysis result: Missing required data');
+        throw new Error(t('common:addFood.errors.invalidAnalysis'));
       }
       
       // Prepare food data
@@ -377,8 +377,8 @@ export default function AddFoodNew() {
       localStorage.setItem('pendingManualFood', JSON.stringify(foodData));
 
       toast({
-        title: "Analysis Complete",
-        description: `Adding ${result.name} to your log...`,
+        title: t('common:addFood.toast.analysisComplete'),
+        description: t('common:addFood.toast.addingToLog', { name: result.name }),
       });
 
       // Redirect to dashboard
@@ -388,10 +388,10 @@ export default function AddFoodNew() {
       
       toast({
         variant: "destructive",
-        title: "Error",
+        title: t('common:addFood.toast.error'),
         description: error instanceof Error 
           ? error.message 
-          : "Failed to analyze food description. Try being more specific or use manual entry."
+          : t('common:addFood.toast.failedToAnalyze')
       });
       setIsAnalyzing(false);
     }
