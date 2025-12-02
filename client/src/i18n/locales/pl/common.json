@@ -467,7 +467,47 @@
   },
   "profileHeader": {
     "welcomeBack": "Witaj ponownie",
+    "welcomeTo": "Witaj w",
     "defaultUser": "Użytkownik"
+  },
+  "weightCheckIn": {
+    "title": "Tygodniowa Kontrola Wagi",
+    "description": "Śledź swoje postępy, a my automatycznie dostosujemy kalorie",
+    "currentWeight": "Aktualna Waga",
+    "remindLater": "Przypomnij później",
+    "updateWeight": "Aktualizuj Wagę",
+    "savingProgress": "Zapisywanie postępów...",
+    "analyzingData": "Analizowanie danych o wadze",
+    "recalculating": "Przeliczanie kalorii...",
+    "optimizing": "Optymalizacja planu żywieniowego",
+    "allDone": "Gotowe!",
+    "updatedSuccessfully": "Twoje cele zostały zaktualizowane",
+    "success": {
+      "title": "Postęp zaktualizowany!",
+      "description": "Twoje kalorie zostały przeliczone na podstawie nowej wagi."
+    },
+    "error": {
+      "title": "Błąd",
+      "description": "Nie udało się zaktualizować wagi. Spróbuj ponownie."
+    }
+  },
+  "progress": {
+    "weightProgress": "Postęp Wagi",
+    "update": "Aktualizuj",
+    "current": "Aktualna",
+    "goal": "Cel",
+    "toGo": "Pozostało",
+    "thisWeek": "Ten Tydzień",
+    "totalChange": "Całkowita Zmiana",
+    "daysTracking": "dni śledzenia",
+    "goalProgress": "Postęp do Celu",
+    "start": "Start",
+    "logMoreWeight": "Zarejestruj więcej wpisów wagi, aby zobaczyć wykres postępu",
+    "caloriesInfo": {
+      "title": "Dostosowanie Kalorii",
+      "description": "Twój dzienny cel kalorii jest automatycznie przeliczany po aktualizacji wagi.",
+      "currentGoal": "Aktualny cel"
+    }
   },
   "groceryList": {
     "viewMore": "Zobacz więcej (pozostało {{count}})",

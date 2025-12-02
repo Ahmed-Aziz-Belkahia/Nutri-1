@@ -1894,7 +1894,47 @@
   },
   "profileHeader": {
     "welcomeBack": "Welcome back",
+    "welcomeTo": "Welcome to",
     "defaultUser": "User"
+  },
+  "weightCheckIn": {
+    "title": "Weekly Weight Check-In",
+    "description": "Track your progress and we'll adjust your calories automatically",
+    "currentWeight": "Current Weight",
+    "remindLater": "Remind Me Later",
+    "updateWeight": "Update Weight",
+    "savingProgress": "Saving Your Progress...",
+    "analyzingData": "Analyzing your weight data",
+    "recalculating": "Recalculating Calories...",
+    "optimizing": "Optimizing your nutrition plan",
+    "allDone": "All Done!",
+    "updatedSuccessfully": "Your goals have been updated",
+    "success": {
+      "title": "Progress Updated!",
+      "description": "Your calories have been recalculated based on your new weight."
+    },
+    "error": {
+      "title": "Error",
+      "description": "Failed to update weight. Please try again."
+    }
+  },
+  "progress": {
+    "weightProgress": "Weight Progress",
+    "update": "Update",
+    "current": "Current",
+    "goal": "Goal",
+    "toGo": "To Go",
+    "thisWeek": "This Week",
+    "totalChange": "Total Change",
+    "daysTracking": "days tracking",
+    "goalProgress": "Goal Progress",
+    "start": "Start",
+    "logMoreWeight": "Log more weight entries to see your progress chart",
+    "caloriesInfo": {
+      "title": "Calorie Adjustment",
+      "description": "Your daily calorie goal is automatically recalculated when you update your weight to keep you on track.",
+      "currentGoal": "Current goal"
+    }
   },
   "groceryList": {
     "viewMore": "View more ({{count}} remaining)",

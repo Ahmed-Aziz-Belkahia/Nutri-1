@@ -11,6 +11,7 @@ import { useWeightLogs } from '@/hooks/use-weight-logs';
 import { useAuth } from '@/hooks/use-auth';
 import WeightLogWidget from '@/components/WeightLogWidget';
 import HeightLogWidget from '@/components/HeightLogWidget';
+import WeightProgressTracker from '@/components/WeightProgressTracker';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -589,7 +590,18 @@ export default function ProgressPage() {
           {/* Section 1: Weight & Metrics */}
           {currentSection === 0 && (
             <div className="space-y-4">
-              <Card className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
+              {/* Weight Progress Tracker with Chart */}
+              <WeightProgressTracker 
+                onUpdateWeight={() => {
+                  // Scroll to the weight log widget or open the dialog
+                  const weightWidget = document.getElementById('weight-log-widget');
+                  if (weightWidget) {
+                    weightWidget.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              />
+              
+              <Card id="weight-log-widget" className="p-6 rounded-[28px] bg-white/20 backdrop-blur-xl border border-white/30">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center border border-white/20">
                     <Scale className="w-5 h-5 text-emerald-600" />

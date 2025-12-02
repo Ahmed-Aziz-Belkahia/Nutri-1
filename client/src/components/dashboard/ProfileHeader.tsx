@@ -14,32 +14,25 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps) {
   const { t } = useTranslation();
-  // Extract username from email (first half before @)
-  const displayName = user?.name || user?.username || (user?.email ? user.email.split('@')[0] : t('common:profileHeader.defaultUser'));
   
   return (
     <header className="header">
+      {/* NutriAI Logo */}
       <div 
-        className="profile-avatar cursor-pointer" 
-        onClick={() => window.location.href = '/profile'}
+        className="cursor-pointer w-12 h-12 flex items-center justify-center" 
+        onClick={() => window.location.href = '/'}
         role="button"
-        aria-label="Go to profile"
+        aria-label="Go to home"
       >
-        {user?.profileImage ? (
-          <img 
-            src={user.profileImage} 
-            alt={displayName} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-lg">
-            {displayName.charAt(0).toUpperCase()}
-          </div>
-        )}
+        <img 
+          src="/logo.png" 
+          alt="NutriAI" 
+          className="w-full h-full object-contain"
+        />
       </div>
       <div className="profile-info">
-        <p className="profile-greeting">{t('common:profileHeader.welcomeBack')}</p>
-        <p className="profile-name">{displayName}</p>
+        <p className="profile-greeting">{t('common:profileHeader.welcomeTo', 'Welcome to')}</p>
+        <p className="profile-name font-bold text-[#0CC5BA]">NutriAI</p>
       </div>
       <button 
         className="notification-button"

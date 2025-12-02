@@ -1847,28 +1847,47 @@
     },
     "profileHeader": {
       "welcomeBack": "مرحباً بعودتك",
+      "welcomeTo": "مرحباً بك في",
       "defaultUser": "المستخدم"
     },
-    "groceryList": {
-      "viewMore": "عرض المزيد ({{count}} متبقية)",
-      "generating": "جاري إنشاء قائمة البقالة...",
-      "noItems": "لا توجد عناصر في قائمة البقالة الخاصة بك"
-    },
-    "macroCard": {
-      "eatenCalories": "السعرات المستهلكة",
-      "eatenProtein": "البروتين المستهلك",
-      "eatenCarbs": "الكربوهيدرات المستهلكة",
-      "eatenFat": "الدهون المستهلكة",
-      "remaining": "تبقى {{amount}} {{unit}}",
-      "targetReached": "تم الوصول إلى الهدف!",
-      "of": "من {{target}} {{unit}}",
-      "view": "عرض {{macro}}"
-    },
-    "nutrition": {
-      "calShort": "سعرة",
-      "gramsShort": "جم"
+    "weightCheckIn": {
+      "title": "فحص الوزن الأسبوعي",
+      "description": "تتبع تقدمك وسنقوم بتعديل السعرات تلقائياً",
+      "currentWeight": "الوزن الحالي",
+      "remindLater": "ذكرني لاحقاً",
+      "updateWeight": "تحديث الوزن",
+      "savingProgress": "جاري حفظ تقدمك...",
+      "analyzingData": "تحليل بيانات الوزن",
+      "recalculating": "إعادة حساب السعرات...",
+      "optimizing": "تحسين خطة التغذية",
+      "allDone": "تم!",
+      "updatedSuccessfully": "تم تحديث أهدافك",
+      "success": {
+        "title": "تم تحديث التقدم!",
+        "description": "تم إعادة حساب السعرات بناءً على وزنك الجديد."
+      },
+      "error": {
+        "title": "خطأ",
+        "description": "فشل تحديث الوزن. حاول مرة أخرى."
+      }
     },
     "progress": {
+      "weightProgress": "تقدم الوزن",
+      "update": "تحديث",
+      "current": "الحالي",
+      "goal": "الهدف",
+      "toGo": "متبقي",
+      "thisWeek": "هذا الأسبوع",
+      "totalChange": "التغيير الكلي",
+      "daysTracking": "أيام متابعة",
+      "goalProgress": "التقدم نحو الهدف",
+      "start": "البداية",
+      "logMoreWeight": "سجل المزيد من الوزن لرؤية مخطط التقدم",
+      "caloriesInfo": {
+        "title": "تعديل السعرات",
+        "description": "يتم إعادة حساب هدف السعرات اليومي تلقائياً عند تحديث وزنك للحفاظ على مسارك.",
+        "currentGoal": "الهدف الحالي"
+      },
       "weightMetrics": {
         "title": "مقاييس الوزن",
         "subtitle": "الوزن الحالي والمستهدف",

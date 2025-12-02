@@ -18,6 +18,7 @@ import { useFoodLog } from "@/hooks/use-food-log";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle } from "lucide-react";
+import WeeklyWeightCheckIn from "@/components/WeeklyWeightCheckIn";
 
 interface GroceryItem {
   id: number;
@@ -295,6 +296,9 @@ export default function DashboardNew() {
 
   return (
     <BaseLayout>
+      {/* Weekly Weight Check-In Prompt */}
+      <WeeklyWeightCheckIn />
+      
       {/* Manual Food Processing Screen */}
       {isProcessingManualFood && (
         <motion.div

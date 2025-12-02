@@ -284,7 +284,15 @@ export async function generateMealPlan(preferences: {
     messages: [
       {
         role: "system",
-        content: "You are a nutrition and meal planning expert specializing in creating varied, appetizing meal plans. When naming meals, use descriptive, appealing names that highlight key flavors, cooking methods, or main ingredients. For example, use names like 'Mediterranean Quinoa Bowl with Roasted Vegetables', 'Honey-Glazed Salmon with Wild Rice', or 'Creamy Mushroom Risotto with Fresh Herbs' instead of generic names like 'Fish Dish' or 'Rice Bowl'. Each day in a meal plan must feature distinctly different types of meals using diverse main ingredients, cooking methods, and flavor profiles."
+        content: `You are a nutrition and meal planning expert specializing in creating practical, efficient meal plans.
+        
+CRITICAL: OPTIMIZE INGREDIENTS TO REDUCE GROCERY LIST
+1) Choose 8-10 BASE INGREDIENTS and build ALL meals around them
+2) REUSE the same proteins, vegetables, and grains across different meals
+3) Example base ingredients: chicken breast, eggs, rice, oats, spinach, tomatoes, onions, olive oil, Greek yogurt, whole wheat bread
+4) This approach reduces food waste and simplifies shopping
+
+When naming meals, use descriptive, appealing names that highlight key flavors or cooking methods.`
       },
       {
         role: "user",
@@ -294,11 +302,10 @@ export async function generateMealPlan(preferences: {
           - Allergies: ${preferences.allergies.join(', ')}
           - Excluded ingredients: ${preferences.excludedIngredients.join(', ')}
           
-          IMPORTANT: I need maximum variety in my meal plan! For each meal category (breakfast, lunch, dinner):
-          - Use different main protein sources across the week
-          - Incorporate diverse cooking methods (baking, grilling, sautéing, etc.)
-          - Include a variety of global cuisines and flavor profiles
-          - Create completely different meal types (not just variations of the same dish)
+          IMPORTANT: Use OVERLAPPING INGREDIENTS across meals to minimize the grocery list!
+          Pick a core set of 8-10 ingredients and create all meals using combinations of them.
+          For example, if using chicken for lunch, also use it for dinner.
+          If using spinach in breakfast, include it in lunch too.
           
           Return the meal plan in JSON format with breakfast, lunch, dinner, optional snacks, and calorie counts.`
       }
@@ -370,17 +377,31 @@ export async function generateMealPlanWithRecipes(preferences: {
         role: "system",
         content: `You are a nutrition expert creating simple, quick meal plans. Create meal plans in English.
 
-Guidelines:
-1) Create simple, practical meals that are quick to prepare
-2) Use common, easily available ingredients
-3) Keep cooking times under 30 minutes
-4) Use descriptive meal names like "Herb Scrambled Eggs", "Grilled Chicken Breast", "Vegetable Soup"
-5) Focus on nutritional balance rather than complexity
-6) Use standard measurements (cups, tablespoons, etc.)`
+CRITICAL GUIDELINES FOR INGREDIENT OPTIMIZATION:
+1) REUSE INGREDIENTS across meals - if using chicken for lunch, use chicken in dinner too
+2) Pick 5-7 BASE INGREDIENTS and create all meals around them (e.g., chicken, rice, eggs, spinach, tomatoes, olive oil, bread)
+3) This reduces the shopping list and food waste significantly
+4) Preferred base ingredients by category:
+   - Proteins: chicken breast, eggs, Greek yogurt, canned tuna
+   - Grains: rice, oats, whole wheat bread
+   - Vegetables: spinach, tomatoes, onions, bell peppers
+   - Healthy fats: olive oil, avocado
+   - Dairy: milk, cheese
+
+Other guidelines:
+5) Create simple, practical meals that are quick to prepare
+6) Use common, easily available ingredients
+7) Keep cooking times under 30 minutes
+8) Use descriptive meal names like "Herb Scrambled Eggs", "Grilled Chicken Breast", "Vegetable Soup"
+9) Focus on nutritional balance rather than complexity
+10) Use standard measurements (cups, tablespoons, etc.)`
       },
       {
         role: "user",
         content: `Create a simple 1-day meal plan with ${preferences.mealsPerDay} meals (${preferences.calorieTarget} calories total).
+          
+          IMPORTANT: Use overlapping ingredients across all meals to minimize the grocery list.
+          Pick a core set of 5-7 ingredients and base all meals on them.
           
           Diet: ${preferences.dietaryType}
           Allergies: ${allergies.join(', ') || 'None'}

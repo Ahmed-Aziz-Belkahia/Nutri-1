@@ -1847,28 +1847,47 @@
     },
     "profileHeader": {
       "welcomeBack": "Bienvenido de nuevo",
+      "welcomeTo": "Bienvenido a",
       "defaultUser": "Usuario"
     },
-    "groceryList": {
-      "viewMore": "Ver más ({{count}} restantes)",
-      "generating": "Generando lista de compras...",
-      "noItems": "No hay artículos en tu lista de compras"
-    },
-    "macroCard": {
-      "eatenCalories": "Calorías Consumidas",
-      "eatenProtein": "Proteína Consumida",
-      "eatenCarbs": "Carbohidratos Consumidos",
-      "eatenFat": "Grasas Consumidas",
-      "remaining": "{{amount}} {{unit}} restantes",
-      "targetReached": "¡Objetivo alcanzado!",
-      "of": "de {{target}} {{unit}}",
-      "view": "Ver {{macro}}"
-    },
-    "nutrition": {
-      "calShort": "cal",
-      "gramsShort": "g"
+    "weightCheckIn": {
+      "title": "Control Semanal de Peso",
+      "description": "Sigue tu progreso y ajustaremos tus calorías automáticamente",
+      "currentWeight": "Peso Actual",
+      "remindLater": "Recordarme después",
+      "updateWeight": "Actualizar Peso",
+      "savingProgress": "Guardando tu progreso...",
+      "analyzingData": "Analizando tus datos de peso",
+      "recalculating": "Recalculando calorías...",
+      "optimizing": "Optimizando tu plan nutricional",
+      "allDone": "¡Listo!",
+      "updatedSuccessfully": "Tus objetivos han sido actualizados",
+      "success": {
+        "title": "¡Progreso actualizado!",
+        "description": "Tus calorías han sido recalculadas según tu nuevo peso."
+      },
+      "error": {
+        "title": "Error",
+        "description": "No se pudo actualizar el peso. Por favor, inténtalo de nuevo."
+      }
     },
     "progress": {
+      "weightProgress": "Progreso de Peso",
+      "update": "Actualizar",
+      "current": "Actual",
+      "goal": "Objetivo",
+      "toGo": "Restante",
+      "thisWeek": "Esta Semana",
+      "totalChange": "Cambio Total",
+      "daysTracking": "días de seguimiento",
+      "goalProgress": "Progreso hacia el Objetivo",
+      "start": "Inicio",
+      "logMoreWeight": "Registra más entradas de peso para ver tu gráfico de progreso",
+      "caloriesInfo": {
+        "title": "Ajuste de Calorías",
+        "description": "Tu objetivo calórico diario se recalcula automáticamente cuando actualizas tu peso.",
+        "currentGoal": "Objetivo actual"
+      },
       "weightMetrics": {
         "title": "Métricas de peso",
         "subtitle": "Peso actual y objetivo",
