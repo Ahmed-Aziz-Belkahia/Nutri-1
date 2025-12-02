@@ -81,6 +81,7 @@ import EmotionalPaywall from "./pages/EmotionalPaywall";
 
 // Import VisionBoard page
 import VisionBoard from "./pages/VisionBoard";
+import TempNewOnboarding from "./pages/TempNewOnboarding";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { initializeWebViewOptimizations } from "./lib/webviewOptimizations";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
@@ -240,7 +241,7 @@ function App() {
             <>
               <Route path="/onboarding">
                 <ProtectedRoute>
-                  <OnboardingQuiz />
+                  <TempNewOnboarding />
                 </ProtectedRoute>
               </Route>
 
@@ -250,7 +251,17 @@ function App() {
               </ProtectedRoute>
             </Route>
 
+            <Route path="/temp-new-onboarding">
+              <ProtectedRoute>
+                <TempNewOnboarding />
+              </ProtectedRoute>
+            </Route>
 
+            <Route path="/old-onboarding">
+              <ProtectedRoute>
+                <OnboardingQuiz />
+              </ProtectedRoute>
+            </Route>
 
             <Route path="/dashboard">
               <ProtectedRoute>

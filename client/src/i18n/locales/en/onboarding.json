@@ -1,98 +1,220 @@
 {
+  "common": {
+    "continue": "Continue",
+    "getStarted": "Let's get started!",
+    "signIn": "Sign In",
+    "alreadyHaveAccount": "Already have an account?",
+    "retry": "Retry",
+    "saving": "Saving...",
+    "letsGetStarted": "Let's get started!",
+    "imperial": "Imperial",
+    "metric": "Metric",
+    "yes": "Yes",
+    "no": "No",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "ft",
+    "in": "in",
+    "error": "Error",
+    "saveError": "There was a problem saving your profile. Please try again."
+  },
   "welcome": {
-    "title": "Welcome to NutriAI",
-    "subtitle": "Let's personalize your nutrition journey",
-    "start": "Get Started"
+    "title": "AI-Powered Nutrition",
+    "subtitle": "made simple"
   },
-  "steps": {
-    "personalInfo": "Personal Info",
-    "goals": "Your Goals",
-    "activity": "Activity Level",
-    "preferences": "Preferences",
-    "complete": "Complete"
-  },
-  "personalInfo": {
-    "title": "Tell us about yourself",
-    "subtitle": "This helps us personalize your experience",
-    "name": "Your Name",
-    "age": "Age",
-    "gender": "Gender",
+  "gender": {
+    "title": "Choose your Gender",
+    "subtitle": "This will be used to calibrate your custom plan.",
     "male": "Male",
     "female": "Female",
-    "height": "Height",
-    "weight": "Current Weight",
-    "heightPlaceholder": "Enter height in cm",
-    "weightPlaceholder": "Enter weight in kg"
-  },
-  "goals": {
-    "title": "What's your goal?",
-    "subtitle": "Choose what you want to achieve",
-    "loseWeight": "Lose Weight",
-    "loseWeightDesc": "Create a calorie deficit for weight loss",
-    "gainWeight": "Gain Weight",
-    "gainWeightDesc": "Build muscle with calorie surplus",
-    "maintain": "Maintain Weight",
-    "maintainDesc": "Stay at your current weight",
-    "goalWeight": "Goal Weight",
-    "goalWeightDesc": "What weight would you like to reach?",
-    "timeline": "Expected Timeline",
-    "timelineDesc": "Based on healthy weight loss/gain rate"
-  },
-  "activity": {
-    "title": "Activity Level",
-    "subtitle": "How active are you?",
-    "sedentary": "Sedentary",
-    "sedentaryDesc": "Little or no exercise",
-    "light": "Lightly Active",
-    "lightDesc": "Light exercise 1-3 days/week",
-    "moderate": "Moderately Active",
-    "moderateDesc": "Moderate exercise 3-5 days/week",
-    "active": "Very Active",
-    "activeDesc": "Hard exercise 6-7 days/week",
-    "veryActive": "Extra Active",
-    "veryActiveDesc": "Very hard exercise & physical job"
-  },
-  "preferences": {
-    "title": "Dietary Preferences",
-    "subtitle": "Any dietary restrictions or preferences?",
-    "none": "None",
-    "vegetarian": "Vegetarian",
-    "vegan": "Vegan",
-    "glutenFree": "Gluten-Free",
-    "dairyFree": "Dairy-Free",
-    "halal": "Halal",
-    "kosher": "Kosher",
-    "paleo": "Paleo",
-    "keto": "Keto",
     "other": "Other"
   },
-  "complete": {
-    "title": "You're All Set!",
-    "subtitle": "Your personalized plan is ready",
-    "calorieGoal": "Daily Calorie Goal",
-    "proteinGoal": "Protein Goal",
-    "carbsGoal": "Carbs Goal",
-    "fatGoal": "Fat Goal",
-    "formulaExplanation": "How we calculated this",
-    "bmr": "BMR (Basal Metabolic Rate)",
-    "tdee": "TDEE (Total Daily Energy Expenditure)",
-    "adjustment": "Adjusted for Your Goal",
-    "startJourney": "Start Your Journey",
-    "uploadProfile": "Upload Profile Picture"
+  "heightWeight": {
+    "title": "Height & weight",
+    "subtitle": "This will be used to calibrate your custom plan.",
+    "height": "Height",
+    "weight": "Weight"
   },
-  "calculation": {
-    "bmrTitle": "1. BMR (Basal Metabolic Rate)",
-    "bmrDesc": "Using Mifflin-St Jeor equation (most widely used):",
-    "tdeeTitle": "2. TDEE (Total Daily Energy Expenditure)",
-    "tdeeDesc": "BMR × activity factor:",
-    "adjustmentTitle": "3. Adjusted for Your Goal",
-    "weightLoss": "Weight Loss",
-    "weightLossDesc": "500 kcal deficit/day = ~0.5 kg loss per week",
-    "weightGain": "Weight Gain",
-    "weightGainDesc": "300 kcal surplus/day for healthy mass gain",
-    "maintain": "Maintain Weight",
-    "maintainDesc": "Energy balance for weight maintenance",
-    "source": "Source",
-    "sourceText": "Mifflin-St Jeor Equation - American Dietetic Association (2005)"
+  "birthDate": {
+    "title": "When were you born?",
+    "subtitle": "This will be used to calibrate your custom plan.",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "goal": {
+    "title": "What is your goal?",
+    "subtitle": "This helps us generate a plan for your calorie intake.",
+    "loseWeight": "Lose weight",
+    "maintain": "Maintain",
+    "gainWeight": "Gain weight"
+  },
+  "desiredWeight": {
+    "title": "What is your desired weight?",
+    "lose": "Lose",
+    "gain": "Gain",
+    "maintain": "Maintain"
+  },
+  "motivation": {
+    "easy": {
+      "message": "It's very achievable!",
+      "description": "95% of users say that this change is easy to achieve and maintain with Nutri AI."
+    },
+    "realistic": {
+      "message": "It's not hard at all!",
+      "description": "90% of users see noticeable results with Nutri AI's personalized approach."
+    },
+    "hard": {
+      "message": "It's challenging but doable!",
+      "description": "75% of users achieve this goal with dedication and Nutri AI's personalized guidance."
+    },
+    "veryHard": {
+      "message": "It's ambitious but possible!",
+      "description": "This is an ambitious goal. With commitment and Nutri AI's support, you can make steady progress."
+    },
+    "isA": "is a",
+    "target": "target",
+    "difficulty": {
+      "easy": "easy",
+      "realistic": "realistic",
+      "hard": "hard",
+      "veryHard": "very hard"
+    },
+    "targetText": "{{action}} {{diff}} {{unit}} is a {{difficulty}} target."
+  },
+  "speed": {
+    "title": "How fast do you want to reach your goal?",
+    "slow": "Slow & Steady",
+    "medium": "Recommended",
+    "fast": "Aggressive",
+    "perWeek": "per week",
+    "loseSpeedLabel": "Weight loss speed per week",
+    "gainSpeedLabel": "Weight gain speed per week",
+    "maintainLabel": "Maintain your weight",
+    "recommended": "Recommended"
+  },
+  "comparison": {
+    "title": "Lose twice as much weight with Nutri AI vs on your own",
+    "withoutApp": "Without Nutri AI",
+    "withApp": "With Nutri AI",
+    "description": "Nutri AI makes it easy and holds you accountable."
+  },
+  "obstacles": {
+    "title": "What's stopping you from reaching your goals?",
+    "consistency": "Lack of consistency",
+    "eating": "Unhealthy eating habits",
+    "support": "Lack of support",
+    "schedule": "Busy schedule",
+    "inspiration": "Lack of meal inspiration"
+  },
+  "diet": {
+    "title": "Do you follow a specific diet?",
+    "classic": "Classic",
+    "pescatarian": "Pescatarian",
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan"
+  },
+  "accomplishments": {
+    "title": "What would you like to accomplish?",
+    "healthier": "Eat and live healthier",
+    "energy": "Boost my energy and mood",
+    "motivated": "Stay motivated and consistent",
+    "body": "Feel better about my body"
+  },
+  "potential": {
+    "title": "You have great potential to crush your goal",
+    "currentWeight": "Current",
+    "goalWeight": "Goal",
+    "yourWeightTransition": "Your weight transition",
+    "chartDescription": "Based on Nutri AI's data, weight loss starts gradually in the first week, then accelerates as your body adapts to your personalized plan.",
+    "week1": "Week 1",
+    "week2": "Week 2",
+    "week8": "Week 8"
+  },
+  "workout": {
+    "title": "How many workouts do you do per week?",
+    "subtitle": "This will be used to calibrate your custom plan.",
+    "low": "Workouts now and then",
+    "medium": "A few workouts per week",
+    "high": "Dedicated athlete"
+  },
+  "referral": {
+    "title": "Where did you hear about us?",
+    "appStore": "App Store",
+    "tiktok": "TikTok",
+    "youtube": "Youtube",
+    "tv": "TV",
+    "x": "X",
+    "instagram": "Instagram",
+    "google": "Google",
+    "facebook": "Facebook"
+  },
+  "otherApps": {
+    "title": "Have you tried other calorie tracking apps?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "results": {
+    "title": "NutriAI creates long-term results",
+    "stat": "80% of NutriAI users maintain their weight loss even 6 months later",
+    "yourWeight": "Your weight",
+    "month1": "Month 1",
+    "month6": "Month 6",
+    "nutriAI": "NutriAI",
+    "weight": "Weight",
+    "traditionalDiet": "Traditional diet"
+  },
+  "loading": {
+    "error": "Something went wrong. Please try again.",
+    "retry": "Retry",
+    "settingUp": "We're setting everything up for you",
+    "dailyRecommendation": "Daily recommendation for",
+    "steps": {
+      "analyzing": "Analyzing your profile...",
+      "calculating": "Calculating your daily targets...",
+      "personalizing": "Personalizing your nutrition plan...",
+      "finalizing": "Setting up your dashboard...",
+      "almostReady": "Almost ready..."
+    },
+    "items": {
+      "calories": "Calories",
+      "carbs": "Carbs",
+      "protein": "Protein",
+      "fats": "Fats",
+      "health": "Health Score"
+    }
+  },
+  "congratulations": {
+    "title": "Congratulations!",
+    "subtitle": "Your custom plan is ready",
+    "yourGoal": "Your Goal",
+    "targetDate": "Target Date",
+    "focus": "Focus",
+    "stayHealthy": "Stay healthy",
+    "dailyTargets": "Daily Targets",
+    "personalizedForYou": "Personalized for you",
+    "editable": "Editable",
+    "saving": "Saving...",
+    "maintainWeight": "Maintain your weight",
+    "lose": "Lose",
+    "gain": "Gain",
+    "macros": {
+      "calories": "Calories",
+      "protein": "Protein",
+      "carbs": "Carbs",
+      "fat": "Fat"
+    }
   }
 }

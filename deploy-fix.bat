@@ -1,3 +1,3 @@
 @echo off
 echo Deploying schema fix to VPS...
-ssh root@89.116.110.161 "cd /usr/local/lsws/Example/html/Nutri && git stash && git pull && npm run build && pm2 restart myapp && pm2 logs --lines 20"
+ssh root@72.61.182.248 "cd /usr/local/lsws/Example/html/Nutri && git stash && git pull && npm run build && pm2 restart myapp && pm2 logs --lines 20"

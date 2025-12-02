@@ -1,0 +1,2711 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronLeft } from 'lucide-react';
+import { FaApple, FaTiktok, FaYoutube, FaTv, FaXTwitter, FaInstagram, FaGoogle, FaFacebookF } from 'react-icons/fa6';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Line as ChartLine } from 'react-chartjs-2';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
+import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+  ChartOptions
+} from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
+
+// Logo Component
+const Logo = () => (
+  <div className="flex justify-center mt-4 mb-8">
+    <img 
+      src="/nutri-ai-logo.png" 
+      alt="NutriAI" 
+      className="h-20"
+    />
+  </div>
+);
+
+// Phone Mockup Component
+const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
+  <div className="flex-1 flex items-center justify-center mb-4">
+    <div className="relative" style={{ maxWidth: '200px', width: '100%' }}>
+      <img 
+        src={imageSrc} 
+        alt="NutriAI App" 
+        className="w-full h-auto drop-shadow-2xl"
+      />
+    </div>
+  </div>
+);
+
+// Heading Component
+const Heading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
+  <div className="text-center mb-8">
+    <h1 className="text-3xl font-bold text-[#1E293B] leading-tight">
+      {title}
+    </h1>
+    {subtitle && (
+      <h2 className="text-3xl font-bold text-[#1E293B] leading-tight">
+        {subtitle}
+      </h2>
+    )}
+  </div>
+);
+
+// Primary Button Component
+const PrimaryButton = ({ onClick, children, disabled = false }: { onClick: () => void; children: React.ReactNode; disabled?: boolean }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className="w-full py-4 bg-[#26A8FF] text-white font-semibold rounded-full text-base hover:bg-[#1A8FE6] transition-colors active:scale-95 transform disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg shadow-[#26A8FF]/25"
+  >
+    {children}
+  </button>
+);
+
+// Sign In Link Component
+const SignInLink = ({ onClick, alreadyHaveAccountText, signInText }: { onClick: () => void; alreadyHaveAccountText: string; signInText: string }) => (
+  <div className="text-center py-2">
+    <span className="text-gray-600 text-sm">
+      {alreadyHaveAccountText}{' '}
+    </span>
+    <button
+      onClick={onClick}
+      className="text-[#26A8FF] font-semibold text-sm hover:underline"
+    >
+      {signInText}
+    </button>
+  </div>
+);
+
+// Home Indicator Component
+const HomeIndicator = () => (
+  <div className="flex justify-center pb-1 mt-auto">
+    <div className="w-32 h-1 rounded-full bg-[#1E293B]/20"></div>
+  </div>
+);
+
+// Onboarding Layout Container
+const OnboardingLayout = ({ children, showLanguageSelector = true }: { children: React.ReactNode; showLanguageSelector?: boolean }) => (
+  <div className="min-h-screen bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-6 py-8 relative">
+    {/* Language selector at top right (RTL-aware) */}
+    {showLanguageSelector && (
+      <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-50">
+        <OnboardingLanguageSelector />
+      </div>
+    )}
+    <div className="flex-1 flex flex-col max-w-md w-full mx-auto">
+      {children}
+    </div>
+  </div>
+);
+
+// Back Button Component
+const BackButton = ({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="absolute left-6 top-12 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
+  >
+    <ChevronLeft className="w-6 h-6" />
+  </button>
+);
+
+// Progress Bar Component
+const ProgressBar = ({ current, total }: { current: number; total: number }) => (
+  <div className="absolute left-16 right-16 top-12 flex items-center h-10">
+    <div className="h-1 bg-[#26A8FF]/20 rounded-full overflow-hidden w-full">
+      <div 
+        className="h-full bg-[#26A8FF] rounded-full transition-all duration-300"
+        style={{ width: `${(current / total) * 100}%` }}
+      />
+    </div>
+  </div>
+);
+
+// Page Title Component
+const PageTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (
+  <div className="mb-12">
+    <h1 className="text-2xl font-bold text-[#1E293B] mb-2">
+      {title}
+    </h1>
+    {subtitle && (
+      <p className="text-[#64748B] text-sm">
+        {subtitle}
+      </p>
+    )}
+  </div>
+);
+
+// Selection Button Component
+const SelectionButton = ({ 
+  label, 
+  selected, 
+  onClick 
+}: { 
+  label: string; 
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full py-4 rounded-full text-base font-semibold transition-all border-2 ${
+      selected 
+        ? 'bg-[#26A8FF] text-white border-[#26A8FF] shadow-lg shadow-[#26A8FF]/25' 
+        : 'bg-white text-[#1E293B] border-gray-200 hover:border-[#26A8FF]/50 hover:bg-[#26A8FF]/5'
+    }`}
+  >
+    {label}
+  </button>
+);
+
+// Unit Toggle Component
+const UnitToggle = ({ isMetric, onChange, imperialLabel, metricLabel }: { isMetric: boolean; onChange: (metric: boolean) => void; imperialLabel: string; metricLabel: string }) => (
+  <div className="flex items-center justify-center gap-3 mb-8">
+    <span className={`text-sm font-semibold transition-all duration-200 ${!isMetric ? 'text-[#26A8FF]' : 'text-gray-400'}`}>
+      {imperialLabel}
+    </span>
+    <button
+      onClick={() => onChange(!isMetric)}
+      className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
+        isMetric ? 'bg-[#26A8FF]' : 'bg-gray-300'
+      }`}
+    >
+      <div 
+        className={`absolute top-0.5 w-7 h-7 bg-white rounded-full shadow-lg transition-all duration-300 ${
+          isMetric ? 'translate-x-[26px]' : 'translate-x-0.5'
+        }`}
+      />
+    </button>
+    <span className={`text-sm font-semibold transition-all duration-200 ${isMetric ? 'text-[#26A8FF]' : 'text-gray-400'}`}>
+      {metricLabel}
+    </span>
+  </div>
+);
+
+// Speed Slider Component with Animal Icons
+const SpeedSlider = ({ 
+  value, 
+  onChange, 
+  min, 
+  max, 
+  unit,
+  goalType,
+  labels
+}: { 
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  unit: string;
+  goalType: string;
+  labels: {
+    loseSpeedLabel: string;
+    gainSpeedLabel: string;
+    maintainLabel: string;
+    recommended: string;
+  };
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragStartValue, setDragStartValue] = useState(value);
+  
+  const percentage = ((value - min) / (max - min)) * 100;
+  
+  // Animal icons as emojis
+  const getAnimalIcon = (speed: 'slow' | 'medium' | 'fast') => {
+    if (speed === 'slow') return '🐢';
+    if (speed === 'medium') return '🐇';
+    return '🐆';
+  };
+  
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollRef.current) return;
+    
+    // Check if clicking on the track (not dragging)
+    const rect = scrollRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    const newValue = min + percentage * (max - min);
+    onChange(Math.max(min, Math.min(max, Math.round(newValue * 10) / 10)));
+    
+    setIsDragging(true);
+    setDragStartX(e.clientX);
+    setDragStartValue(Math.max(min, Math.min(max, Math.round(newValue * 10) / 10)));
+  };
+  
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!scrollRef.current) return;
+    
+    // Check if tapping on the track
+    const rect = scrollRef.current.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    const percentage = touchX / rect.width;
+    const newValue = min + percentage * (max - min);
+    onChange(Math.max(min, Math.min(max, Math.round(newValue * 10) / 10)));
+    
+    setIsDragging(true);
+    setDragStartX(e.touches[0].clientX);
+    setDragStartValue(Math.max(min, Math.min(max, Math.round(newValue * 10) / 10)));
+  };
+  
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const deltaX = e.clientX - dragStartX;
+    const containerWidth = scrollRef.current.clientWidth;
+    const deltaValue = (deltaX / containerWidth) * (max - min);
+    const newValue = Math.max(min, Math.min(max, dragStartValue + deltaValue));
+    onChange(Math.round(newValue * 10) / 10);
+  };
+  
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    const deltaX = e.touches[0].clientX - dragStartX;
+    const containerWidth = scrollRef.current.clientWidth;
+    const deltaValue = (deltaX / containerWidth) * (max - min);
+    const newValue = Math.max(min, Math.min(max, dragStartValue + deltaValue));
+    onChange(Math.round(newValue * 10) / 10);
+  };
+  
+  const handleEnd = () => {
+    setIsDragging(false);
+  };
+  
+  // Get speed label based on goal type
+  const getSpeedLabel = () => {
+    if (goalType === 'lose') return labels.loseSpeedLabel;
+    if (goalType === 'gain') return labels.gainSpeedLabel;
+    return labels.maintainLabel;
+  };
+  
+  return (
+    <div className="relative px-4">
+      {/* Speed label */}
+      <div className="text-center mb-4">
+        <p className="text-[#64748B] text-sm">{getSpeedLabel()}</p>
+      </div>
+      
+      {/* Current value display */}
+      <div className="text-center mb-8">
+        <div className="text-4xl font-bold text-[#1E293B]">
+          {value.toFixed(1)} {unit}
+        </div>
+      </div>
+      
+      {/* Swipeable Slider with animal icons */}
+      <div 
+        ref={scrollRef}
+        className="relative mb-8 select-none"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleEnd}
+        onMouseLeave={handleEnd}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleEnd}
+      >
+        {/* Animal icons */}
+        <div className="flex justify-between px-2 mb-6">
+          <span className="text-3xl">{getAnimalIcon('slow')}</span>
+          <span className="text-3xl">{getAnimalIcon('medium')}</span>
+          <span className="text-3xl">{getAnimalIcon('fast')}</span>
+        </div>
+        
+        {/* Slider track */}
+        <div className="relative h-2 bg-[#26A8FF]/20 rounded-full">
+          {/* Progress fill */}
+          <div 
+            className="absolute left-0 top-0 h-full bg-[#26A8FF] rounded-full transition-all duration-200"
+            style={{ width: `${percentage}%` }}
+          />
+          
+          {/* Slider thumb */}
+          <div 
+            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-[#26A8FF] rounded-full shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
+            style={{ left: `calc(${percentage}% - 12px)` }}
+          />
+        </div>
+        
+        {/* Min/Max labels */}
+        <div className="flex justify-between mt-2 text-xs text-gray-500">
+          <span>{min.toFixed(1)} {unit}</span>
+          <span>{max.toFixed(1)} {unit}</span>
+        </div>
+      </div>
+      
+      {/* Recommendation badge - always reserve space */}
+      <div className="flex justify-center h-10 items-center">
+        {value >= 0.5 && value <= 1.0 && (
+          <span className="px-4 py-2 bg-[#26A8FF]/10 rounded-full text-sm font-medium text-[#26A8FF]">
+            {labels.recommended}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Weight Transition Chart Component
+const WeightTransitionChart = ({ labels }: { labels: { title: string; description: string; week1: string; week2: string; week8: string } }) => {
+  const chartRef = useRef<any>(null);
+
+  const data = {
+    labels: ['Day 1', 'Day 7', 'Day 14', 'Day 21', 'Day 30', 'Day 60'],
+    datasets: [
+      {
+        label: 'Weight Progress',
+        data: [80, 79.5, 78.2, 76.8, 75, 72],
+        borderColor: '#26A8FF',
+        backgroundColor: (context: any) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+          gradient.addColorStop(0, 'rgba(38, 168, 255, 0.3)');
+          gradient.addColorStop(1, 'rgba(38, 168, 255, 0.05)');
+          return gradient;
+        },
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointRadius: [4, 4, 4, 4, 4, 0],
+        pointBackgroundColor: '#FFFFFF',
+        pointBorderColor: '#26A8FF',
+        pointBorderWidth: 2,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#FFFFFF',
+        pointHoverBorderColor: '#1A8FE6',
+        pointHoverBorderWidth: 3,
+      }
+    ]
+  };
+
+  const options: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    scales: {
+      x: {
+        grid: {
+          display: true,
+          color: 'rgba(156, 163, 175, 0.2)',
+          lineWidth: 1,
+          drawTicks: false,
+        },
+        ticks: {
+          color: '#6B7280',
+          font: {
+            size: 11,
+            weight: 500,
+          },
+          padding: 8,
+          callback: function(value, index) {
+            if (index === 0) return labels.week1;
+            if (index === 2) return labels.week2;
+            if (index === 5) return labels.week8;
+            return '';
+          }
+        },
+        border: {
+          display: false,
+        },
+      },
+      y: {
+        display: false,
+        min: 68,
+        max: 82,
+      },
+    },
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutQuart' as const,
+      delay: 300,
+    },
+    interaction: {
+      intersect: false,
+      mode: 'index' as const,
+    },
+  };
+
+  // Custom plugin to draw the target indicator
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (chart) {
+      const plugin = {
+        id: 'targetIndicator',
+        afterDatasetsDraw: (chart: any) => {
+          const ctx = chart.ctx;
+          const meta = chart.getDatasetMeta(0);
+          const lastPoint = meta.data[meta.data.length - 1];
+          
+          if (lastPoint) {
+            const x = lastPoint.x;
+            const y = lastPoint.y;
+            
+            // Draw orange circle
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, 16, 0, 2 * Math.PI);
+            ctx.fillStyle = '#F97316';
+            ctx.fill();
+            
+            // Draw target emoji
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🎯', x, y);
+            ctx.restore();
+          }
+        }
+      };
+      
+      ChartJS.register(plugin);
+    }
+  }, []);
+
+  return (
+    <div className="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100">
+      <h3 className="text-center font-semibold text-[#1E293B] mb-6">
+        {labels.title}
+      </h3>
+      
+      {/* Chart Container */}
+      <div className="relative h-48 mb-6">
+        <ChartLine ref={chartRef} data={data} options={options} />
+      </div>
+      
+      {/* Description */}
+      <p className="text-center text-sm text-[#64748B] leading-relaxed">
+        {labels.description}
+      </p>
+    </div>
+  );
+};
+
+// Trust Illustration Component
+const TrustIllustration = () => (
+  <div className="flex justify-center mb-8">
+    <div className="relative">
+      {/* Gradient circle background */}
+      <div className="w-52 h-52 rounded-full bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-100 flex items-center justify-center">
+        {/* Dots around the circle */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 200">
+          {Array.from({ length: 32 }, (_, i) => {
+            const angle = (i * 360) / 32;
+            const radius = 92;
+            const x = 100 + radius * Math.cos((angle * Math.PI) / 180);
+            const y = 100 + radius * Math.sin((angle * Math.PI) / 180);
+            return (
+              <circle
+                key={i}
+                cx={x}
+                cy={y}
+                r="1.5"
+                fill="#26A8FF"
+                opacity="0.5"
+              />
+            );
+          })}
+        </svg>
+        
+        {/* Simple handshake emoji as fallback */}
+        <div className="relative z-10 text-7xl">
+          🤝
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Setup Loading Page Component
+const SetupLoadingPage = ({ onComplete, labels }: { 
+  onComplete: () => void; 
+  labels: {
+    settingUp: string;
+    dailyRecommendation: string;
+    steps: {
+      analyzing: string;
+      calculating: string;
+      personalizing: string;
+      finalizing: string;
+      almostReady: string;
+    };
+    items: {
+      calories: string;
+      carbs: string;
+      protein: string;
+      fats: string;
+      health: string;
+    };
+  };
+}) => {
+  const [progress, setProgress] = useState(0);
+  const [currentMessage, setCurrentMessage] = useState(labels.steps.analyzing);
+  const [completedItems, setCompletedItems] = useState<string[]>([]);
+  
+  const setupItems = [
+    { key: 'calories', label: labels.items.calories },
+    { key: 'carbs', label: labels.items.carbs },
+    { key: 'protein', label: labels.items.protein },
+    { key: 'fats', label: labels.items.fats },
+    { key: 'health', label: labels.items.health }
+  ];
+  
+  const messages = [
+    labels.steps.analyzing,
+    labels.steps.calculating,
+    labels.steps.personalizing,
+    labels.steps.finalizing,
+    labels.steps.almostReady
+  ];
+  
+  useEffect(() => {
+    let currentProgress = 0;
+    
+    const interval = setInterval(() => {
+      currentProgress += 1;
+      setProgress(currentProgress);
+      
+      // Update message based on progress
+      const messageIndex = Math.floor((currentProgress / 100) * messages.length);
+      setCurrentMessage(messages[Math.min(messageIndex, messages.length - 1)]);
+      
+      // Mark items as complete based on progress
+      const itemsToComplete = Math.floor((currentProgress / 100) * setupItems.length);
+      setCompletedItems(setupItems.slice(0, itemsToComplete).map(item => item.key));
+      
+      if (currentProgress >= 100) {
+        clearInterval(interval);
+        // Mark all items complete
+        setCompletedItems(setupItems.map(item => item.key));
+        // Call onComplete after a brief delay
+        setTimeout(() => {
+          onComplete();
+        }, 800);
+      }
+    }, 50);
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <div className="flex-1 flex flex-col justify-center px-2">
+      {/* Large percentage display */}
+      <div className="text-center mb-4">
+        <h1 className="text-6xl font-bold text-[#26A8FF]">
+          {Math.floor(progress)}%
+        </h1>
+      </div>
+      
+      {/* Status message */}
+      <div className="text-center mb-8">
+        <h2 className="text-xl font-semibold text-[#1E293B]">
+          {labels.settingUp}
+        </h2>
+      </div>
+      
+      {/* Animated progress bar */}
+      <div className="mb-2">
+        <div className="h-2 bg-[#26A8FF]/20 rounded-full overflow-hidden">
+          <div 
+            className="h-full rounded-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] transition-all duration-100 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+      
+      {/* Current action message */}
+      <p className="text-center text-sm text-gray-500 mb-8">
+        {currentMessage}
+      </p>
+      
+      {/* Daily recommendation checklist */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <p className="font-semibold text-sm text-[#1E293B] mb-3">
+          {labels.dailyRecommendation}
+        </p>
+        <div className="space-y-2">
+          {setupItems.map((item) => (
+            <div key={item.key} className="flex items-center justify-between">
+              <span className="text-sm text-gray-700 flex items-center">
+                • {item.label}
+              </span>
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${
+                completedItems.includes(item.key) 
+                  ? 'bg-[#26A8FF]' 
+                  : 'border-2 border-gray-300'
+              }`}>
+                {completedItems.includes(item.key) && (
+                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Congratulations Page Component
+const CongratulationsPage = ({ 
+  weightKg, 
+  desiredWeightKg, 
+  selectedGoal,
+  dailyCalories,
+  macros: calculatedMacros,
+  labels,
+  locale = 'en'
+}: { 
+  weightKg: number; 
+  desiredWeightKg: number; 
+  selectedGoal: string | null;
+  dailyCalories?: number;
+  macros?: { protein: number; carbs: number; fat: number };
+  labels: {
+    title: string;
+    subtitle: string;
+    yourGoal: string;
+    targetDate: string;
+    focus: string;
+    stayHealthy: string;
+    dailyTargets: string;
+    personalizedForYou: string;
+    editable: string;
+    maintainWeight: string;
+    lose: string;
+    gain: string;
+    kgUnit: string;
+    macros: {
+      calories: string;
+      protein: string;
+      carbs: string;
+      fat: string;
+    };
+  };
+  locale?: string;
+}) => {
+  // Map language codes to locale codes for date formatting
+  const localeMap: { [key: string]: string } = {
+    en: 'en-US',
+    ar: 'ar-SA',
+    fr: 'fr-FR',
+    es: 'es-ES',
+    pl: 'pl-PL'
+  };
+  const dateLocale = localeMap[locale] || 'en-US';
+  
+  // Calculate the target date (approximately 12 weeks from now)
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + 84);
+  const targetDateStr = targetDate.toLocaleDateString(dateLocale, { month: 'long', day: 'numeric' });
+  
+  // Calculate weight difference
+  const weightDiff = Math.abs(weightKg - desiredWeightKg);
+  const goalText = selectedGoal === 'lose' ? labels.lose : selectedGoal === 'gain' ? labels.gain : labels.maintainWeight;
+  
+  // Use calculated values or defaults
+  const macros = [
+    { name: labels.macros.calories, value: dailyCalories || 2000, unit: '', color: '#26A8FF' },
+    { name: labels.macros.protein, value: calculatedMacros?.protein || 150, unit: 'g', color: '#FFA434' },
+    { name: labels.macros.carbs, value: calculatedMacros?.carbs || 200, unit: 'g', color: '#5AEB4E' },
+    { name: labels.macros.fat, value: calculatedMacros?.fat || 65, unit: 'g', color: '#FB6060' },
+  ];
+  
+  return (
+    <div className="flex-1 flex flex-col">
+      {/* Success Header */}
+      <div className="text-center pt-2 pb-6">
+        {/* Success checkmark */}
+        <div className="flex justify-center mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-full flex items-center justify-center shadow-xl shadow-[#26A8FF]/30">
+            <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        </div>
+        
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-[#1E293B] mb-1">
+          {labels.title}
+        </h1>
+        <p className="text-[#64748B] text-base">
+          {labels.subtitle}
+        </p>
+      </div>
+      
+      {/* Goal Card */}
+      <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[#64748B] text-xs uppercase tracking-wide mb-1">{labels.yourGoal}</p>
+            <p className="font-bold text-lg text-[#1E293B]">
+              {selectedGoal === 'maintain' ? labels.maintainWeight : `${goalText} ${weightDiff} ${labels.kgUnit}`}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-[#64748B] text-xs uppercase tracking-wide mb-1">{selectedGoal === 'maintain' ? labels.focus : labels.targetDate}</p>
+            <p className="font-semibold text-[#26A8FF]">
+              {selectedGoal === 'maintain' ? labels.stayHealthy : targetDateStr}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Daily Targets Card */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-1">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold text-[#1E293B] text-base">
+              {labels.dailyTargets}
+            </h3>
+            <p className="text-[#64748B] text-xs">
+              {labels.personalizedForYou}
+            </p>
+          </div>
+          <span className="text-xs text-[#26A8FF] font-medium bg-[#26A8FF]/10 px-3 py-1 rounded-full">
+            {labels.editable}
+          </span>
+        </div>
+        
+        {/* Macro Grid - 2x2 layout matching dashboard style */}
+        <div className="grid grid-cols-2 gap-3">
+          {macros.map((macro) => (
+            <div 
+              key={macro.name}
+              className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-100"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div 
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: macro.color }}
+                />
+                <span className="text-xs font-medium text-[#64748B]">{macro.name}</span>
+              </div>
+              
+              <p className="text-2xl font-bold text-[#1E293B]">
+                {macro.value}
+                {macro.unit && <span className="text-base font-normal text-[#64748B] ml-0.5">{macro.unit}</span>}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Accomplishment Option Component
+const AccomplishmentOption = ({ 
+  icon,
+  label,
+  selected, 
+  onClick 
+}: { 
+  icon: React.ReactNode;
+  label: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-4 rounded-2xl text-left transition-all ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-2 border-[#26A8FF]' 
+        : 'bg-white border-2 border-gray-100 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <span className="text-xl">{icon}</span>
+      <span className="font-medium text-[#1E293B] text-base">{label}</span>
+    </div>
+  </button>
+);
+
+// Diet Option Component
+const DietOption = ({ 
+  icon,
+  label,
+  selected, 
+  onClick 
+}: { 
+  icon: React.ReactNode;
+  label: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-4 rounded-2xl text-left transition-all ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-2 border-[#26A8FF]' 
+        : 'bg-white border-2 border-gray-100 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <span className="text-xl">{icon}</span>
+      <span className="font-medium text-[#1E293B] text-base">{label}</span>
+    </div>
+  </button>
+);
+
+// Obstacle Option Component
+const ObstacleOption = ({ 
+  icon,
+  label,
+  selected, 
+  onClick 
+}: { 
+  icon: React.ReactNode;
+  label: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
+        : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <span className="text-xl">{icon}</span>
+      <span className="font-medium text-[#1E293B]">{label}</span>
+    </div>
+  </button>
+);
+
+// Comparison Card Component
+const ComparisonCard = ({ 
+  label, 
+  value, 
+  isHighlight,
+  fillPercentage 
+}: { 
+  label: string; 
+  value: string; 
+  isHighlight: boolean;
+  fillPercentage?: number;
+}) => (
+  <div className="flex-1 h-full">
+    {/* Container with border and background */}
+    <div className="relative h-full rounded-3xl bg-gray-100 border-2 border-gray-200 overflow-hidden">
+      {/* Background fill */}
+      <div 
+        className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
+          isHighlight ? 'bg-[#26A8FF]' : 'bg-gray-300'
+        }`}
+        style={{ height: `${fillPercentage || 100}%` }}
+      />
+      
+      {/* Content */}
+      <div className={`relative z-10 p-6 flex flex-col items-center justify-center h-full ${
+        isHighlight ? 'text-white' : 'text-[#1E293B]'
+      }`}>
+        <p className={`text-sm font-semibold mb-3 ${
+          isHighlight ? 'text-white' : 'text-[#64748B]'
+        }`}>
+          {label}
+        </p>
+        <p className="text-4xl font-bold">
+          {value}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+// Weight Slider Component (Ruler Style)
+const WeightSlider = ({ 
+  value, 
+  onChange, 
+  min, 
+  max, 
+  unit,
+  currentWeight,
+  goalLabel
+}: { 
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  unit: string;
+  currentWeight: number;
+  goalLabel: string;
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const pixelsPerUnit = 20; // 20 pixels per kg (matching OnboardingQuiz)
+  const CAL = -10; // Calibration offset for center alignment
+  const totalUnits = Math.ceil(max - min) + 1;
+  
+  // Scroll to selected value
+  useEffect(() => {
+    if (scrollRef.current && !isDragging) {
+      const scrollPosition = (value - min) * pixelsPerUnit - CAL;
+      scrollRef.current.scrollLeft = scrollPosition;
+    }
+  }, [value, min, isDragging]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    
+    const scrollLeft = scrollRef.current.scrollLeft;
+    const newValue = min + (scrollLeft + CAL) / pixelsPerUnit;
+    const roundedValue = Math.round(newValue);
+    const clampedValue = Math.max(min, Math.min(max, roundedValue));
+    
+    if (clampedValue !== value) {
+      onChange(clampedValue);
+    }
+  };
+  
+  return (
+    <div className="relative w-full">
+      {/* Current value display */}
+      <div className="text-center mb-8">
+        <div className="text-sm text-[#64748B] mb-1">{goalLabel}</div>
+        <div className="text-5xl font-bold text-[#1E293B]">
+          {value.toFixed(1)} <span className="text-3xl text-[#64748B]">{unit}</span>
+        </div>
+      </div>
+      
+      {/* Ruler container */}
+      <div className="relative h-24 bg-gray-50 rounded-2xl overflow-hidden w-full">
+        {/* Center indicator line (fixed in middle) */}
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-[#26A8FF] z-20 pointer-events-none" />
+        <div className="absolute left-1/2 -translate-x-1/2 top-0 w-3 h-3 bg-[#26A8FF] rounded-b-full z-20 pointer-events-none" />
+        
+        {/* Scrollable ruler */}
+        <div 
+          ref={scrollRef}
+          onScroll={handleScroll}
+          onMouseDown={() => setIsDragging(true)}
+          onMouseUp={() => setIsDragging(false)}
+          onMouseLeave={() => setIsDragging(false)}
+          onTouchStart={() => setIsDragging(true)}
+          onTouchEnd={() => setIsDragging(false)}
+          className="h-full overflow-x-scroll scrollbar-hide cursor-grab active:cursor-grabbing"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          <div 
+            className="flex items-end h-16 select-none"
+            style={{ 
+              width: `${totalUnits * pixelsPerUnit}px`,
+              paddingLeft: '50%',
+              paddingRight: '50%'
+            }}
+          >
+            {Array.from({ length: totalUnits }, (_, i) => {
+              const tickValue = min + i;
+              const isMajorTick = tickValue % 10 === 0;
+              const isMediumTick = tickValue % 5 === 0 && tickValue % 10 !== 0;
+              const isCurrentWeight = Math.abs(tickValue - currentWeight) < 1;
+              
+              return (
+                <div key={i} className="flex flex-col items-center justify-end" style={{ minWidth: `${pixelsPerUnit}px` }}>
+                  {isMajorTick ? (
+                    <>
+                      <div className={`w-0.5 h-12 ${isCurrentWeight ? 'bg-[#26A8FF]' : 'bg-gray-400'}`} />
+                      <span className={`text-xs mt-1 font-bold ${isCurrentWeight ? 'text-[#26A8FF]' : 'text-[#1E293B]'}`}>
+                        {tickValue}
+                      </span>
+                    </>
+                  ) : isMediumTick ? (
+                    <>
+                      <div className={`w-0.5 h-8 ${isCurrentWeight ? 'bg-[#26A8FF]' : 'bg-gray-300'}`} />
+                      <span className={`text-[10px] mt-1 ${isCurrentWeight ? 'text-[#26A8FF]' : 'text-[#64748B]'}`}>
+                        {tickValue}
+                      </span>
+                    </>
+                  ) : (
+                    <div className={`w-0.5 h-4 ${isCurrentWeight ? 'bg-[#26A8FF]' : 'bg-gray-400'}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        
+        {/* Gradient overlays for fade effect */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10" />
+      </div>
+    </div>
+  );
+};
+
+// iOS Style Picker Component
+const IOSPicker = ({ 
+  value, 
+  onChange, 
+  items,
+  suffix = '',
+  formatter
+}: { 
+  value: number | string;
+  onChange: (value: any) => void;
+  items: (number | string)[];
+  suffix?: string;
+  formatter?: (value: any) => string;
+}) => {
+  const containerRef = useRef<HTMLUListElement>(null);
+  const itemHeight = 44;
+  const [selectedIndex, setSelectedIndex] = useState(items.indexOf(value));
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const index = items.indexOf(value);
+      setSelectedIndex(index);
+      containerRef.current.scrollTop = index * itemHeight;
+    }
+  }, [value, items, itemHeight]);
+
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const index = Math.round(scrollTop / itemHeight);
+      const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
+      setSelectedIndex(clampedIndex);
+    }
+  };
+
+  // Separate effect to handle value changes with debouncing for smooth animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const newValue = items[selectedIndex];
+      if (newValue !== undefined && newValue !== value) {
+        onChange(newValue);
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [selectedIndex, items, value, onChange]);
+
+  return (
+    <div className="ios-style-picker relative h-52 overflow-hidden rounded-xl bg-white">
+      <ul
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="ios-style-picker__option-list h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide list-none m-0 p-0"
+        style={{ 
+          paddingTop: `${itemHeight * 2}px`, 
+          paddingBottom: `${itemHeight * 2}px`,
+          scrollSnapType: 'y mandatory',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        {items.map((item, idx) => {
+          const distance = Math.abs(selectedIndex - idx);
+          const opacity = Math.max(0.2, 1 - (distance * 0.3));
+          const scale = idx === selectedIndex ? 1 : Math.max(0.85, 1 - (distance * 0.05));
+          
+          return (
+            <li
+              key={item}
+              className="ios-style-picker__option-item snap-center flex items-center justify-center transition-all duration-150"
+              style={{ height: `${itemHeight}px` }}
+            >
+              <span
+                className={`text-xl transition-all duration-300 ease-out ${
+                  idx === selectedIndex 
+                    ? 'text-[#1E293B] font-semibold' 
+                    : 'text-[#64748B] font-normal'
+                }`}
+                style={{
+                  opacity,
+                  transform: `scale(${scale})`,
+                  letterSpacing: '-0.02em',
+                  transition: 'all 0.3s ease-out'
+                }}
+              >
+                {formatter ? formatter(item) : `${item}${suffix}`}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="ios-style-picker__highlight absolute inset-0 pointer-events-none">
+        <ul className="ios-style-picker__highlight-list list-none m-0 p-0">
+          {/* Top gradient */}
+          <li className="ios-style-picker__highlight-item absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white via-white/80 to-transparent z-10" />
+          {/* Selection highlight */}
+          <li className="ios-style-picker__highlight-item absolute inset-x-0 top-1/2 -translate-y-1/2 h-11 bg-gray-50/50 border-y border-gray-200/60 z-0" />
+          {/* Bottom gradient */}
+          <li className="ios-style-picker__highlight-item absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+// Workout Icons
+const WorkoutIcon = ({ type }: { type: 'low' | 'medium' | 'high' }) => {
+  if (type === 'low') {
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="3.5" fill="currentColor" />
+      </svg>
+    );
+  }
+  if (type === 'medium') {
+    return (
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="7" cy="17" r="3" fill="currentColor" />
+        <circle cx="14" cy="8" r="3" fill="currentColor" />
+        <circle cx="21" cy="17" r="3" fill="currentColor" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <circle cx="7" cy="8" r="2.5" fill="currentColor" />
+      <circle cx="14" cy="8" r="2.5" fill="currentColor" />
+      <circle cx="21" cy="8" r="2.5" fill="currentColor" />
+      <circle cx="7" cy="15" r="2.5" fill="currentColor" />
+      <circle cx="14" cy="15" r="2.5" fill="currentColor" />
+      <circle cx="21" cy="15" r="2.5" fill="currentColor" />
+    </svg>
+  );
+};
+
+// Option Card Component - for workout selection
+const OptionCard = ({ 
+  iconType,
+  title,
+  subtitle,
+  selected, 
+  onClick 
+}: { 
+  iconType: 'low' | 'medium' | 'high';
+  title: string;
+  subtitle: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
+        : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <div className={`flex-shrink-0 ${selected ? 'text-[#26A8FF]' : 'text-[#1E293B]'}`}>
+        <WorkoutIcon type={iconType} />
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="font-semibold text-[#1E293B]">{title}</span>
+        </div>
+        <span className="text-sm text-[#64748B]">{subtitle}</span>
+      </div>
+    </div>
+  </button>
+);
+
+// Source Option Component - for "Where did you hear about us?"
+const SourceOption = ({ 
+  icon,
+  label,
+  selected, 
+  onClick 
+}: { 
+  icon: React.ReactNode;
+  label: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-3 rounded-2xl text-left transition-all border-2 ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
+        : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center flex-shrink-0">
+        {icon}
+      </div>
+      <span className="font-medium text-[#1E293B]">{label}</span>
+    </div>
+  </button>
+);
+
+// Yes/No Option Component
+const YesNoOption = ({ 
+  icon,
+  label,
+  selected, 
+  onClick 
+}: { 
+  icon: string;
+  label: string;
+  selected: boolean; 
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
+      selected 
+        ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
+        : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
+    }`}
+  >
+    <div className="flex items-center gap-3">
+      <span className="text-2xl">{icon}</span>
+      <span className="font-semibold text-[#1E293B] text-lg">{label}</span>
+    </div>
+  </button>
+);
+
+// Weight Loss Chart Component
+const WeightLossChart = ({ labels }: { 
+  labels: { 
+    yourWeight: string; 
+    month1: string; 
+    month6: string; 
+    nutriAI: string; 
+    weight: string; 
+    traditionalDiet: string; 
+  } 
+}) => {
+  // More realistic weight loss data (in kg, starting at 80kg)
+  // Nutri AI: steady ~0.5-0.8kg/week loss
+  // Traditional: slower, with plateaus and slight rebounds
+  const data = [
+    { month: 1, nutriAI: 80, traditional: 80 },
+    { month: 2, nutriAI: 77.5, traditional: 79 },
+    { month: 3, nutriAI: 75, traditional: 78.5 },
+    { month: 4, nutriAI: 73, traditional: 78 },
+    { month: 5, nutriAI: 71, traditional: 77.8 },
+    { month: 6, nutriAI: 69, traditional: 77.5 },
+  ];
+
+  return (
+    <div className="w-full bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100">
+      <div className="text-sm font-semibold text-[#1E293B] mb-6">{labels.yourWeight}</div>
+      <ResponsiveContainer width="100%" height={220}>
+        <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+          <defs>
+            <linearGradient id="nutriGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#26A8FF" stopOpacity={0.2}/>
+              <stop offset="95%" stopColor="#26A8FF" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+          <XAxis 
+            dataKey="month" 
+            tick={{ fontSize: 13, fill: '#6b7280', fontWeight: 500 }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(value) => value === 1 ? labels.month1 : value === 6 ? labels.month6 : ''}
+            ticks={[1, 6]}
+            domain={[1, 6]}
+          />
+          <YAxis hide domain={[65, 82]} />
+          
+          {/* Traditional Diet Line */}
+          <Line 
+            type="natural" 
+            dataKey="traditional" 
+            stroke="#ef4444" 
+            strokeWidth={3}
+            dot={{ fill: '#ef4444', r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+            name="traditional"
+          />
+          
+          {/* NutriAI Line with gradient fill */}
+          <Line 
+            type="natural" 
+            dataKey="nutriAI" 
+            stroke="#26A8FF" 
+            strokeWidth={3.5}
+            dot={{ fill: '#26A8FF', r: 5, strokeWidth: 0 }}
+            activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+            name="nutriAI"
+            fill="url(#nutriGradient)"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+      
+      {/* Legend */}
+      <div className="flex items-center gap-6 justify-center mt-6">
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-[#26A8FF] shadow-sm"></div>
+          <span className="text-xs font-semibold text-[#1E293B]">{labels.nutriAI}</span>
+          <span className="text-xs bg-[#26A8FF] text-white px-2.5 py-1 rounded-full font-medium">{labels.weight}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-0.5 bg-red-500 rounded-full"></div>
+          <span className="text-xs text-gray-600 font-medium">{labels.traditionalDiet}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default function TempNewOnboarding() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { t, i18n } = useTranslation('onboarding');
+
+  const [currentStep, setCurrentStep] = useState(0);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+  const [isMetric, setIsMetric] = useState(false);
+  const [heightFeet, setHeightFeet] = useState(5);
+  const [heightInches, setHeightInches] = useState(6);
+  const [heightCm, setHeightCm] = useState(170);
+  const [weightLbs, setWeightLbs] = useState(120);
+  const [weightKg, setWeightKg] = useState(54);
+  const [birthMonth, setBirthMonth] = useState('January');
+  const [birthDay, setBirthDay] = useState(1);
+  const [birthYear, setBirthYear] = useState(2000);
+  const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const [desiredWeightKg, setDesiredWeightKg] = useState(65);
+  const [desiredWeightLbs, setDesiredWeightLbs] = useState(143);
+  const [weightLossSpeed, setWeightLossSpeed] = useState(0.8);
+  const [weightGainSpeed, setWeightGainSpeed] = useState(0.5);
+  const [workoutFrequency, setWorkoutFrequency] = useState<string | null>(null);
+  const [referralSource, setReferralSource] = useState<string | null>(null);
+  const [hasUsedOtherApps, setHasUsedOtherApps] = useState<boolean | null>(null);
+  const [selectedObstacles, setSelectedObstacles] = useState<string[]>([]);
+  const [selectedDiet, setSelectedDiet] = useState<string | null>(null);
+  const [selectedAccomplishments, setSelectedAccomplishments] = useState<string[]>([]);
+
+  // Calculate age from birthdate
+  const calculateAge = () => {
+    const monthIndex = ['January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'].indexOf(birthMonth);
+    const birthDate = new Date(birthYear, monthIndex, birthDay);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Convert to metric for calculations
+  const getHeightInCm = () => {
+    if (isMetric) return heightCm;
+    return Math.round((heightFeet * 30.48) + (heightInches * 2.54));
+  };
+
+  const getWeightInKg = () => {
+    if (isMetric) return weightKg;
+    return Math.round(weightLbs * 0.453592);
+  };
+
+  const getGoalWeightInKg = () => {
+    if (isMetric) return desiredWeightKg;
+    return Math.round(desiredWeightLbs * 0.453592);
+  };
+
+  // Map workout frequency to activity level
+  const getActivityLevel = () => {
+    switch (workoutFrequency) {
+      case '0-2': return 'sedentary';
+      case '3-5': return 'moderate';
+      case '6+': return 'active';
+      default: return 'moderate';
+    }
+  };
+
+  // Map selectedGoal to weightGoal
+  const getWeightGoal = () => {
+    if (selectedGoal === 'lose') return 'loss';
+    if (selectedGoal === 'gain') return 'gain';
+    return 'maintain';
+  };
+
+  // Calculate daily calories using Mifflin-St Jeor equation
+  const calculateDailyCalories = () => {
+    const weight = getWeightInKg();
+    const height = getHeightInCm();
+    const age = calculateAge();
+    const isMale = selectedGender === 'male';
+    const isFemale = selectedGender === 'female';
+
+    // Mifflin-St Jeor: BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
+    // s = +5 for males, -161 for females, average for other
+    const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+    const bmr = isMale ? baseCalories + 5 : isFemale ? baseCalories - 161 : baseCalories - 78; // -78 is average of +5 and -161
+
+    // Activity multipliers
+    const activityMultipliers: { [key: string]: number } = {
+      sedentary: 1.2,
+      light: 1.375,
+      moderate: 1.55,
+      active: 1.725,
+      very_active: 1.9
+    };
+
+    const tdee = bmr * (activityMultipliers[getActivityLevel()] || 1.55);
+
+    // Goal adjustments
+    const weightGoal = getWeightGoal();
+    if (weightGoal === 'loss') {
+      return Math.round(tdee - 500); // 500 kcal deficit
+    } else if (weightGoal === 'gain') {
+      return Math.round(tdee + 300); // 300 kcal surplus
+    }
+    return Math.round(tdee);
+  };
+
+  // Calculate macros
+  const calculateMacros = (calories: number) => {
+    const weightGoal = getWeightGoal();
+    let proteinRatio, carbRatio, fatRatio;
+
+    switch (weightGoal) {
+      case 'loss':
+        proteinRatio = 0.30; // 30% protein
+        carbRatio = 0.35;    // 35% carbs
+        fatRatio = 0.35;     // 35% fat
+        break;
+      case 'gain':
+        proteinRatio = 0.25; // 25% protein
+        carbRatio = 0.45;    // 45% carbs
+        fatRatio = 0.30;     // 30% fat
+        break;
+      default:
+        proteinRatio = 0.25;
+        carbRatio = 0.40;
+        fatRatio = 0.35;
+    }
+
+    return {
+      protein: Math.round((calories * proteinRatio) / 4), // 4 cal per gram
+      carbs: Math.round((calories * carbRatio) / 4),
+      fat: Math.round((calories * fatRatio) / 9) // 9 cal per gram
+    };
+  };
+
+  // Mutation for completing onboarding
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const dailyCalories = calculateDailyCalories();
+      const macros = calculateMacros(dailyCalories);
+      
+      const profileData = {
+        age: calculateAge(),
+        gender: selectedGender || 'other',
+        height: getHeightInCm(),
+        weight: getWeightInKg(),
+        goalWeight: getGoalWeightInKg(),
+        weightGoal: getWeightGoal(),
+        activityLevel: getActivityLevel(),
+        calorieGoal: dailyCalories,
+        proteinGoal: macros.protein,
+        carbsGoal: macros.carbs,
+        fatGoal: macros.fat,
+        dietaryRestrictions: selectedDiet ? [selectedDiet] : [],
+        allergies: [],
+        mealBudget: 'medium',
+        experienceLevel: hasUsedOtherApps ? 'intermediate' : 'beginner',
+        preferredLanguage: 'en',
+        // Enhanced onboarding fields
+        weightLossSpeed: selectedGoal === 'lose' ? weightLossSpeed : null,
+        weightGainSpeed: selectedGoal === 'gain' ? weightGainSpeed : null,
+        obstacles: selectedObstacles,
+        accomplishments: selectedAccomplishments,
+        referralSource: referralSource,
+        hasUsedOtherApps: hasUsedOtherApps,
+        birthMonth,
+        birthDay,
+        birthYear,
+        isMetric,
+        // Store original user input values for better UX
+        workoutFrequency: workoutFrequency,
+        heightFeet: !isMetric ? heightFeet : null,
+        heightInches: !isMetric ? heightInches : null,
+        weightLbs: !isMetric ? weightLbs : null,
+        goalWeightLbs: !isMetric ? desiredWeightLbs : null,
+      };
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('profile', JSON.stringify(profileData));
+
+      const response = await fetch('/api/register/complete-onboarding', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Onboarding completion failed:', errorData);
+        throw new Error('Failed to complete onboarding');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      console.log('Onboarding completed successfully');
+      
+      // Invalidate user query to refresh auth state
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+
+      // Set flag to show tutorial overlay on dashboard
+      localStorage.setItem('justCompletedOnboarding', 'true');
+      
+      // Move to congratulations page
+      setCurrentStep(18);
+    },
+    onError: (error: Error) => {
+      console.error('Onboarding completion error:', error);
+      toast({
+        title: t('common.error'),
+        description: t('common.saveError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Function to toggle obstacle selection
+  const toggleObstacle = (obstacle: string) => {
+    setSelectedObstacles(prev => 
+      prev.includes(obstacle) 
+        ? prev.filter(o => o !== obstacle)
+        : [...prev, obstacle]
+    );
+  };
+
+  // Function to toggle accomplishment selection
+  const toggleAccomplishment = (accomplishment: string) => {
+    setSelectedAccomplishments(prev => 
+      prev.includes(accomplishment) 
+        ? prev.filter(a => a !== accomplishment)
+        : [...prev, accomplishment]
+    );
+  };
+
+  // Generate height and weight options
+  const feetOptions = [3, 4, 5, 6, 7, 8];
+  const inchesOptions = Array.from({ length: 12 }, (_, i) => i);
+  const cmOptions = Array.from({ length: 121 }, (_, i) => 100 + i); // 100-220 cm
+  const lbsOptions = Array.from({ length: 351 }, (_, i) => 70 + i); // 70-420 lbs
+  const kgOptions = Array.from({ length: 161 }, (_, i) => 30 + i); // 30-190 kg
+
+  // Birth date options
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
+
+  // Calculate weight ranges for desired weight
+  const getWeightRange = () => {
+    const current = isMetric ? weightKg : weightLbs;
+    if (selectedGoal === 'lose') {
+      return {
+        min: isMetric ? Math.max(30, current - 50) : Math.max(70, current - 110),
+        max: current
+      };
+    } else if (selectedGoal === 'gain') {
+      return {
+        min: current,
+        max: isMetric ? Math.min(190, current + 50) : Math.min(420, current + 110)
+      };
+    } else {
+      return {
+        min: isMetric ? Math.max(30, current - 10) : Math.max(70, current - 20),
+        max: isMetric ? Math.min(190, current + 10) : Math.min(420, current + 20)
+      };
+    }
+  };
+
+  // Get goal label
+  const getGoalLabel = () => {
+    if (selectedGoal === 'lose') return t('goal.loseWeight');
+    if (selectedGoal === 'gain') return t('goal.gainWeight');
+    return t('goal.maintain');
+  };
+
+  // Calculate weight difference for motivational message with difficulty level
+  const getWeightDifference = () => {
+    const current = isMetric ? weightKg : weightLbs;
+    const desired = isMetric ? desiredWeightKg : desiredWeightLbs;
+    const diff = Math.abs(current - desired);
+    const unit = isMetric ? 'kg' : 'lb';
+    
+    // Determine difficulty level based on weight difference
+    let difficulty = '';
+    let color = '';
+    
+    if (isMetric) {
+      // For kg
+      if (diff <= 5) {
+        difficulty = 'easy';
+        color = 'text-green-500';
+      } else if (diff <= 10) {
+        difficulty = 'realistic';
+        color = 'text-orange-500';
+      } else if (diff <= 20) {
+        difficulty = 'hard';
+        color = 'text-orange-600';
+      } else {
+        difficulty = 'veryHard';
+        color = 'text-red-500';
+      }
+    } else {
+      // For lbs
+      if (diff <= 11) {
+        difficulty = 'easy';
+        color = 'text-green-500';
+      } else if (diff <= 22) {
+        difficulty = 'realistic';
+        color = 'text-orange-500';
+      } else if (diff <= 44) {
+        difficulty = 'hard';
+        color = 'text-orange-600';
+      } else {
+        difficulty = 'veryHard';
+        color = 'text-red-500';
+      }
+    }
+    
+    if (selectedGoal === 'lose') {
+      return { action: t('desiredWeight.lose'), diff, unit, difficulty, color };
+    } else if (selectedGoal === 'gain') {
+      return { action: t('desiredWeight.gain'), diff, unit, difficulty, color };
+    } else {
+      return { action: t('desiredWeight.maintain'), diff: 0, unit, difficulty: 'easy', color: 'text-green-500' };
+    }
+  };
+
+  // Page 1: Welcome Screen
+  if (currentStep === 0) {
+    return (
+      <OnboardingLayout>
+        <Logo />
+        <PhoneMockup imageSrc="/phone-mockup.png" />
+        <Heading 
+          title={t('welcome.title')} 
+          subtitle={t('welcome.subtitle')} 
+        />
+        <div className="space-y-3 mb-6">
+          <PrimaryButton onClick={() => setCurrentStep(1)}>
+            {t('common.getStarted')}
+          </PrimaryButton>
+          <SignInLink 
+            onClick={() => window.location.href = '/auth'} 
+            alreadyHaveAccountText={t('common.alreadyHaveAccount')}
+            signInText={t('common.signIn')}
+          />
+        </div>
+        <HomeIndicator />
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 2: Gender Selection
+  if (currentStep === 1) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(0)} />
+        <ProgressBar current={1} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('gender.title')}
+            subtitle={t('gender.subtitle')}
+          />
+          
+          <div className="space-y-4 mb-12">
+            <SelectionButton
+              label={t('gender.male')}
+              selected={selectedGender === 'male'}
+              onClick={() => setSelectedGender('male')}
+            />
+            <SelectionButton
+              label={t('gender.female')}
+              selected={selectedGender === 'female'}
+              onClick={() => setSelectedGender('female')}
+            />
+            <SelectionButton
+              label={t('gender.other')}
+              selected={selectedGender === 'other'}
+              onClick={() => setSelectedGender('other')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(2)}
+            disabled={!selectedGender}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 3: Height & Weight
+  if (currentStep === 2) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(1)} />
+        <ProgressBar current={2} total={18} />
+        
+        <div className="flex-1 flex flex-col mt-16">
+          <PageTitle 
+            title={t('heightWeight.title')}
+            subtitle={t('heightWeight.subtitle')}
+          />
+          
+          <UnitToggle 
+            isMetric={isMetric} 
+            onChange={setIsMetric} 
+            imperialLabel={t('common.imperial')}
+            metricLabel={t('common.metric')}
+          />
+          
+          <div className="flex gap-4 mb-8">
+            {!isMetric ? (
+              <>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-[#1E293B] text-center mb-4">{t('heightWeight.height')}</h3>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <IOSPicker
+                        value={heightFeet}
+                        onChange={setHeightFeet}
+                        items={feetOptions}
+                        suffix=" ft"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <IOSPicker
+                        value={heightInches}
+                        onChange={setHeightInches}
+                        items={inchesOptions}
+                        suffix=" in"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-[#1E293B] text-center mb-4">{t('heightWeight.weight')}</h3>
+                  <IOSPicker
+                    value={weightLbs}
+                    onChange={setWeightLbs}
+                    items={lbsOptions}
+                    suffix=" lb"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-[#1E293B] text-center mb-4">{t('heightWeight.height')}</h3>
+                  <IOSPicker
+                    value={heightCm}
+                    onChange={setHeightCm}
+                    items={cmOptions}
+                    suffix=" cm"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-[#1E293B] text-center mb-4">{t('heightWeight.weight')}</h3>
+                  <IOSPicker
+                    value={weightKg}
+                    onChange={setWeightKg}
+                    items={kgOptions}
+                    suffix=" kg"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(3)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 4: Birth Date
+  if (currentStep === 3) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(2)} />
+        <ProgressBar current={3} total={18} />
+        
+        <div className="flex-1 flex flex-col mt-16">
+          <PageTitle 
+            title={t('birthDate.title')}
+            subtitle={t('birthDate.subtitle')}
+          />
+          
+          <div className="flex gap-3 mb-8 px-2">
+            <div className="flex-1">
+              <IOSPicker
+                value={birthMonth}
+                onChange={setBirthMonth}
+                items={months}
+                formatter={(value) => value}
+              />
+            </div>
+            <div className="w-20">
+              <IOSPicker
+                value={birthDay}
+                onChange={setBirthDay}
+                items={days}
+              />
+            </div>
+            <div className="w-24">
+              <IOSPicker
+                value={birthYear}
+                onChange={setBirthYear}
+                items={years}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(4)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 5: What is your goal?
+  if (currentStep === 4) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(3)} />
+        <ProgressBar current={4} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('goal.title')}
+            subtitle={t('goal.subtitle')}
+          />
+          
+          <div className="space-y-4 mb-12">
+            <SelectionButton
+              label={t('goal.loseWeight')}
+              selected={selectedGoal === 'lose'}
+              onClick={() => setSelectedGoal('lose')}
+            />
+            <SelectionButton
+              label={t('goal.maintain')}
+              selected={selectedGoal === 'maintain'}
+              onClick={() => setSelectedGoal('maintain')}
+            />
+            <SelectionButton
+              label={t('goal.gainWeight')}
+              selected={selectedGoal === 'gain'}
+              onClick={() => setSelectedGoal('gain')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(5)}
+            disabled={!selectedGoal}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 6: Desired Weight
+  if (currentStep === 5) {
+    const range = getWeightRange();
+    const currentWeight = isMetric ? weightKg : weightLbs;
+    const goalLabel = getGoalLabel();
+    
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(4)} />
+        <ProgressBar current={5} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('desiredWeight.title')}
+          />
+          
+          {/* Unit Toggle */}
+          <UnitToggle 
+            isMetric={isMetric} 
+            onChange={setIsMetric} 
+            imperialLabel={t('common.imperial')}
+            metricLabel={t('common.metric')}
+          />
+          
+          {/* Weight slider */}
+          <WeightSlider
+            value={isMetric ? desiredWeightKg : desiredWeightLbs}
+            onChange={isMetric ? setDesiredWeightKg : setDesiredWeightLbs}
+            min={range.min}
+            max={range.max}
+            unit={isMetric ? 'kg' : 'lb'}
+            currentWeight={currentWeight}
+            goalLabel={goalLabel}
+          />
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(6)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 7: Motivational Message
+  if (currentStep === 6) {
+    const { action, diff, unit, difficulty, color } = getWeightDifference();
+    
+    // Get appropriate message based on difficulty
+    const getMessage = () => {
+      return t(`motivation.${difficulty}.message`);
+    };
+
+    const getDescription = () => {
+      return t(`motivation.${difficulty}.description`);
+    };
+
+    // Get difficulty text for display
+    const getDifficultyText = () => {
+      return t(`motivation.difficulty.${difficulty}`);
+    };
+    
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(5)} />
+        <ProgressBar current={6} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <div className="text-center px-4">
+            <h1 className="text-3xl font-bold text-[#1E293B] mb-8 leading-tight">
+              {action} <span className={color}>{diff.toFixed(0)} {unit}</span> {t('motivation.isA')} {getDifficultyText()} {t('motivation.target')}. {getMessage()}
+            </h1>
+            
+            <p className="text-[#64748B] text-base leading-relaxed">
+              {getDescription()}
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(7)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 8: How fast do you want to reach your goal?
+  if (currentStep === 7) {
+    const speedUnit = isMetric ? 'kg' : 'lb';
+    const isLosing = selectedGoal === 'lose';
+    const isGaining = selectedGoal === 'gain';
+    
+    // Skip this page if maintaining weight - use effect to avoid render issues
+    if (selectedGoal === 'maintain') {
+      // Immediately move to next step without rendering
+      setTimeout(() => setCurrentStep(8), 0);
+      return (
+        <OnboardingLayout>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#26A8FF]"></div>
+          </div>
+        </OnboardingLayout>
+      );
+    }
+    
+    // Set speed ranges based on goal
+    const getSpeedRange = () => {
+      if (isLosing) {
+        return {
+          min: isMetric ? 0.1 : 0.2,
+          max: isMetric ? 1.5 : 3.3,
+          value: isMetric ? weightLossSpeed : weightLossSpeed * 2.2,
+          setter: (val: number) => setWeightLossSpeed(isMetric ? val : val / 2.2)
+        };
+      } else if (isGaining) {
+        return {
+          min: isMetric ? 0.1 : 0.2,
+          max: isMetric ? 1.0 : 2.2,
+          value: isMetric ? weightGainSpeed : weightGainSpeed * 2.2,
+          setter: (val: number) => setWeightGainSpeed(isMetric ? val : val / 2.2)
+        };
+      } else {
+        return null;
+      }
+    };
+    
+    const speedRange = getSpeedRange();
+    
+    if (!speedRange) {
+      setTimeout(() => setCurrentStep(8), 0);
+      return null;
+    }
+    
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(6)} />
+        <ProgressBar current={7} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('speed.title')}
+          />
+          
+          <SpeedSlider
+            value={speedRange.value}
+            onChange={speedRange.setter}
+            min={speedRange.min}
+            max={speedRange.max}
+            unit={speedUnit}
+            goalType={selectedGoal || 'lose'}
+            labels={{
+              loseSpeedLabel: t('speed.loseSpeedLabel'),
+              gainSpeedLabel: t('speed.gainSpeedLabel'),
+              maintainLabel: t('speed.maintainLabel'),
+              recommended: t('speed.recommended')
+            }}
+          />
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(8)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 9: Comparison - Nutri AI vs On Your Own
+  if (currentStep === 8) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => selectedGoal === 'maintain' ? setCurrentStep(6) : setCurrentStep(7)} />
+        <ProgressBar current={8} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('comparison.title')}
+          />
+          
+          {/* Comparison Container */}
+          <div className="bg-white rounded-3xl p-6 mb-8 shadow-sm border border-gray-100">
+            <div className="flex gap-4 mb-6" style={{ height: '180px' }}>
+              <ComparisonCard
+                label={t('comparison.withoutApp')}
+                value="20%"
+                isHighlight={false}
+                fillPercentage={20}
+              />
+              <ComparisonCard
+                label={t('comparison.withApp')}
+                value="2X"
+                isHighlight={true}
+                fillPercentage={90}
+              />
+            </div>
+            
+            {/* Description */}
+            <p className="text-center text-[#64748B] text-sm">
+              Nutri AI makes it easy and holds you accountable.
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(9)}
+          >
+            Continue
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 10: What's stopping you from reaching your goals?
+  if (currentStep === 9) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(8)} />
+        <ProgressBar current={9} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('obstacles.title')}
+          />
+          
+          <div className="space-y-3 mb-12">
+            <ObstacleOption
+              icon="📊"
+              label={t('obstacles.consistency')}
+              selected={selectedObstacles.includes('consistency')}
+              onClick={() => toggleObstacle('consistency')}
+            />
+            <ObstacleOption
+              icon="🍽️"
+              label={t('obstacles.eating')}
+              selected={selectedObstacles.includes('eating')}
+              onClick={() => toggleObstacle('eating')}
+            />
+            <ObstacleOption
+              icon="💎"
+              label={t('obstacles.support')}
+              selected={selectedObstacles.includes('support')}
+              onClick={() => toggleObstacle('support')}
+            />
+            <ObstacleOption
+              icon="📅"
+              label={t('obstacles.schedule')}
+              selected={selectedObstacles.includes('schedule')}
+              onClick={() => toggleObstacle('schedule')}
+            />
+            <ObstacleOption
+              icon="🍽️"
+              label={t('obstacles.inspiration')}
+              selected={selectedObstacles.includes('inspiration')}
+              onClick={() => toggleObstacle('inspiration')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(10)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 11: Do you follow a specific diet?
+  if (currentStep === 10) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(9)} />
+        <ProgressBar current={10} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('diet.title')}
+          />
+          
+          <div className="space-y-3 mb-12">
+            <DietOption
+              icon="🍖"
+              label={t('diet.classic')}
+              selected={selectedDiet === 'classic'}
+              onClick={() => setSelectedDiet('classic')}
+            />
+            <DietOption
+              icon="🐟"
+              label={t('diet.pescatarian')}
+              selected={selectedDiet === 'pescatarian'}
+              onClick={() => setSelectedDiet('pescatarian')}
+            />
+            <DietOption
+              icon="🥬"
+              label={t('diet.vegetarian')}
+              selected={selectedDiet === 'vegetarian'}
+              onClick={() => setSelectedDiet('vegetarian')}
+            />
+            <DietOption
+              icon="🌱"
+              label={t('diet.vegan')}
+              selected={selectedDiet === 'vegan'}
+              onClick={() => setSelectedDiet('vegan')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(11)}
+            disabled={!selectedDiet}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 12: What would you like to accomplish?
+  if (currentStep === 11) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(10)} />
+        <ProgressBar current={11} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('accomplishments.title')}
+          />
+          
+          <div className="space-y-3 mb-12">
+            <AccomplishmentOption
+              icon="🍎"
+              label={t('accomplishments.healthier')}
+              selected={selectedAccomplishments.includes('healthier')}
+              onClick={() => toggleAccomplishment('healthier')}
+            />
+            <AccomplishmentOption
+              icon="☀️"
+              label={t('accomplishments.energy')}
+              selected={selectedAccomplishments.includes('energy')}
+              onClick={() => toggleAccomplishment('energy')}
+            />
+            <AccomplishmentOption
+              icon="💪"
+              label={t('accomplishments.motivated')}
+              selected={selectedAccomplishments.includes('motivated')}
+              onClick={() => toggleAccomplishment('motivated')}
+            />
+            <AccomplishmentOption
+              icon="🧘"
+              label={t('accomplishments.body')}
+              selected={selectedAccomplishments.includes('body')}
+              onClick={() => toggleAccomplishment('body')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(12)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 13: You have great potential to crush your goal
+  if (currentStep === 12) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(11)} />
+        <ProgressBar current={12} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('potential.title')}
+          />
+          
+          <WeightTransitionChart 
+            labels={{
+              title: t('potential.yourWeightTransition'),
+              description: t('potential.chartDescription'),
+              week1: t('potential.week1'),
+              week2: t('potential.week2'),
+              week8: t('potential.week8')
+            }}
+          />
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(13)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 14: Workout frequency
+  if (currentStep === 13) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(12)} />
+        <ProgressBar current={13} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('workout.title')}
+            subtitle={t('workout.subtitle')}
+          />
+          
+          <div className="space-y-4 mb-12">
+            <OptionCard
+              iconType="low"
+              title="0-2"
+              subtitle={t('workout.low')}
+              selected={workoutFrequency === '0-2'}
+              onClick={() => setWorkoutFrequency('0-2')}
+            />
+            <OptionCard
+              iconType="medium"
+              title="3-5"
+              subtitle={t('workout.medium')}
+              selected={workoutFrequency === '3-5'}
+              onClick={() => setWorkoutFrequency('3-5')}
+            />
+            <OptionCard
+              iconType="high"
+              title="6+"
+              subtitle={t('workout.high')}
+              selected={workoutFrequency === '6+'}
+              onClick={() => setWorkoutFrequency('6+')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(14)}
+            disabled={!workoutFrequency}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 15: Where did you hear about us?
+  if (currentStep === 14) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(13)} />
+        <ProgressBar current={14} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('referral.title')}
+          />
+          
+          <div className="space-y-3 mb-12">
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center"><FaApple className="w-4 h-4 text-white" /></div>}
+              label={t('referral.appStore')}
+              selected={referralSource === 'appstore'}
+              onClick={() => setReferralSource('appstore')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center"><FaTiktok className="w-4 h-4 text-white" /></div>}
+              label={t('referral.tiktok')}
+              selected={referralSource === 'tiktok'}
+              onClick={() => setReferralSource('tiktok')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-red-600 flex items-center justify-center"><FaYoutube className="w-4 h-4 text-white" /></div>}
+              label={t('referral.youtube')}
+              selected={referralSource === 'youtube'}
+              onClick={() => setReferralSource('youtube')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center"><FaTv className="w-4 h-4 text-gray-700" /></div>}
+              label={t('referral.tv')}
+              selected={referralSource === 'tv'}
+              onClick={() => setReferralSource('tv')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center"><FaXTwitter className="w-4 h-4 text-white" /></div>}
+              label={t('referral.x')}
+              selected={referralSource === 'x'}
+              onClick={() => setReferralSource('x')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center"><FaInstagram className="w-4 h-4 text-white" /></div>}
+              label={t('referral.instagram')}
+              selected={referralSource === 'instagram'}
+              onClick={() => setReferralSource('instagram')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center bg-white"><FaGoogle className="w-4 h-4 text-blue-500" /></div>}
+              label={t('referral.google')}
+              selected={referralSource === 'google'}
+              onClick={() => setReferralSource('google')}
+            />
+            <SourceOption
+              icon={<div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center"><FaFacebookF className="w-4 h-4 text-white" /></div>}
+              label={t('referral.facebook')}
+              selected={referralSource === 'facebook'}
+              onClick={() => setReferralSource('facebook')}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(15)}
+            disabled={!referralSource}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 16: Have you tried other calorie tracking apps?
+  if (currentStep === 15) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(14)} />
+        <ProgressBar current={15} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle 
+            title={t('otherApps.title')}
+          />
+          
+          <div className="space-y-4 mb-12">
+            <YesNoOption
+              icon="👎"
+              label={t('otherApps.no')}
+              selected={hasUsedOtherApps === false}
+              onClick={() => setHasUsedOtherApps(false)}
+            />
+            <YesNoOption
+              icon="👍"
+              label={t('otherApps.yes')}
+              selected={hasUsedOtherApps === true}
+              onClick={() => setHasUsedOtherApps(true)}
+            />
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(16)}
+            disabled={hasUsedOtherApps === null}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 17: Results Chart
+  if (currentStep === 16) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={() => setCurrentStep(15)} />
+        <ProgressBar current={16} total={18} />
+        
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-[#1E293B] leading-tight">
+              {t('results.title')}
+            </h1>
+          </div>
+          
+          <WeightLossChart 
+            labels={{
+              yourWeight: t('results.yourWeight'),
+              month1: t('results.month1'),
+              month6: t('results.month6'),
+              nutriAI: t('results.nutriAI'),
+              weight: t('results.weight'),
+              traditionalDiet: t('results.traditionalDiet')
+            }}
+          />
+          
+          <div className="text-center mb-8">
+            <p className="text-[#1E293B] text-base">
+              {t('results.stat')}
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => setCurrentStep(17)}
+          >
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 18: Setup Loading Page
+  if (currentStep === 17) {
+    return (
+      <OnboardingLayout>
+        <SetupLoadingPage 
+          onComplete={() => {
+            // Submit onboarding data when loading completes
+            // The mutation's onSuccess handler will move to step 18
+            mutation.mutate();
+          }}
+          labels={{
+            settingUp: t('loading.settingUp'),
+            dailyRecommendation: t('loading.dailyRecommendation'),
+            steps: {
+              analyzing: t('loading.steps.analyzing'),
+              calculating: t('loading.steps.calculating'),
+              personalizing: t('loading.steps.personalizing'),
+              finalizing: t('loading.steps.finalizing'),
+              almostReady: t('loading.steps.almostReady')
+            },
+            items: {
+              calories: t('loading.items.calories'),
+              carbs: t('loading.items.carbs'),
+              protein: t('loading.items.protein'),
+              fats: t('loading.items.fats'),
+              health: t('loading.items.health')
+            }
+          }}
+        />
+        {mutation.isError && (
+          <div className="px-6 pb-4">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+              <p className="text-red-600 text-sm text-center">
+                {t('loading.error')}
+              </p>
+            </div>
+            <PrimaryButton onClick={() => mutation.mutate()}>
+              {t('loading.retry')}
+            </PrimaryButton>
+          </div>
+        )}
+        <HomeIndicator />
+      </OnboardingLayout>
+    );
+  }
+
+  // Page 19: Congratulations Page (Final page)
+  if (currentStep === 18) {
+    const dailyCalories = calculateDailyCalories();
+    const macros = calculateMacros(dailyCalories);
+    
+    return (
+      <OnboardingLayout>
+        <ProgressBar current={18} total={18} />
+        
+        <div className="mt-16">
+          <CongratulationsPage 
+            weightKg={getWeightInKg()} 
+            desiredWeightKg={getGoalWeightInKg()} 
+            selectedGoal={selectedGoal}
+            dailyCalories={dailyCalories}
+            macros={macros}
+            locale={i18n.language}
+            labels={{
+              title: t('congratulations.title'),
+              subtitle: t('congratulations.subtitle'),
+              yourGoal: t('congratulations.yourGoal'),
+              targetDate: t('congratulations.targetDate'),
+              focus: t('congratulations.focus'),
+              stayHealthy: t('congratulations.stayHealthy'),
+              dailyTargets: t('congratulations.dailyTargets'),
+              personalizedForYou: t('congratulations.personalizedForYou'),
+              editable: t('congratulations.editable'),
+              maintainWeight: t('congratulations.maintainWeight'),
+              lose: t('congratulations.lose'),
+              gain: t('congratulations.gain'),
+              kgUnit: t('common.kg'),
+              macros: {
+                calories: t('congratulations.macros.calories'),
+                protein: t('congratulations.macros.protein'),
+                carbs: t('congratulations.macros.carbs'),
+                fat: t('congratulations.macros.fat')
+              }
+            }}
+          />
+        </div>
+        
+        <div className="mt-auto space-y-4">
+          <PrimaryButton 
+            onClick={() => navigate('/dashboard')}
+            disabled={mutation.isPending}
+          >
+            {mutation.isPending ? t('congratulations.saving') : t('common.getStarted')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Fallback
+  return null;
+}

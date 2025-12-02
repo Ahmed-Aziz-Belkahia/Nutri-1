@@ -144,6 +144,22 @@ export const userNutritionPreferences = sqliteTable("user_nutrition_preferences"
   allergies: text("allergies", { mode: 'json' }).$type<string[]>(),
   mealBudget: text("meal_budget"),
   experienceLevel: text("experience_level"),
+  // New fields for enhanced onboarding
+  weightLossSpeed: real("weight_loss_speed"), // kg per week
+  weightGainSpeed: real("weight_gain_speed"), // kg per week  
+  obstacles: text("obstacles", { mode: 'json' }).$type<string[]>(), // ['busy_schedule', 'motivation', etc.]
+  accomplishments: text("accomplishments", { mode: 'json' }).$type<string[]>(), // ['healthier', 'energy', etc.]
+  referralSource: text("referral_source"), // 'tiktok', 'instagram', etc.
+  hasUsedOtherApps: integer("has_used_other_apps", { mode: 'boolean' }),
+  birthMonth: text("birth_month"),
+  birthDay: integer("birth_day"),
+  birthYear: integer("birth_year"),
+  isMetric: integer("is_metric", { mode: 'boolean' }).default(true),
+  workoutFrequency: text("workout_frequency"), // '0-2', '3-5', '6+' - raw user input
+  heightFeet: integer("height_feet"), // Store original imperial values
+  heightInches: integer("height_inches"),
+  weightLbs: real("weight_lbs"), // Store original imperial weight
+  goalWeightLbs: real("goal_weight_lbs"), // Store original imperial goal weight
   updatedAt: integer("updated_at", { mode: 'timestamp' }).notNull().default(sql`(strftime('%s', 'now'))`),
 });
 

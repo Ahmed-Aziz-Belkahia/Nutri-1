@@ -1,98 +1,220 @@
 {
+  "common": {
+    "continue": "متابعة",
+    "getStarted": "هيا نبدأ!",
+    "signIn": "تسجيل الدخول",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "retry": "إعادة المحاولة",
+    "saving": "جاري الحفظ...",
+    "letsGetStarted": "هيا نبدأ!",
+    "imperial": "إمبراطوري",
+    "metric": "متري",
+    "yes": "نعم",
+    "no": "لا",
+    "kg": "كغ",
+    "lbs": "رطل",
+    "cm": "سم",
+    "ft": "قدم",
+    "in": "بوصة",
+    "error": "خطأ",
+    "saveError": "حدثت مشكلة أثناء حفظ ملفك الشخصي. يرجى المحاولة مرة أخرى."
+  },
   "welcome": {
-    "title": "مرحباً في NutriAI",
-    "subtitle": "دعنا نخصص رحلتك الغذائية",
-    "start": "ابدأ الآن"
+    "title": "تغذية مدعومة بالذكاء الاصطناعي",
+    "subtitle": "بكل بساطة"
   },
-  "steps": {
-    "personalInfo": "المعلومات الشخصية",
-    "goals": "أهدافك",
-    "activity": "مستوى النشاط",
-    "preferences": "التفضيلات",
-    "complete": "إكمال"
-  },
-  "personalInfo": {
-    "title": "أخبرنا عن نفسك",
-    "subtitle": "هذا يساعدنا على تخصيص تجربتك",
-    "name": "اسمك",
-    "age": "العمر",
-    "gender": "الجنس",
+  "gender": {
+    "title": "اختر جنسك",
+    "subtitle": "سيتم استخدام هذا لتخصيص خطتك.",
     "male": "ذكر",
     "female": "أنثى",
+    "other": "آخر"
+  },
+  "heightWeight": {
+    "title": "الطول والوزن",
+    "subtitle": "سيتم استخدام هذا لتخصيص خطتك.",
     "height": "الطول",
-    "weight": "الوزن الحالي",
-    "heightPlaceholder": "أدخل الطول بالسنتيمتر",
-    "weightPlaceholder": "أدخل الوزن بالكيلوغرام"
+    "weight": "الوزن"
   },
-  "goals": {
+  "birthDate": {
+    "title": "متى ولدت؟",
+    "subtitle": "سيتم استخدام هذا لتخصيص خطتك.",
+    "months": {
+      "january": "يناير",
+      "february": "فبراير",
+      "march": "مارس",
+      "april": "أبريل",
+      "may": "مايو",
+      "june": "يونيو",
+      "july": "يوليو",
+      "august": "أغسطس",
+      "september": "سبتمبر",
+      "october": "أكتوبر",
+      "november": "نوفمبر",
+      "december": "ديسمبر"
+    }
+  },
+  "goal": {
     "title": "ما هو هدفك؟",
-    "subtitle": "اختر ما تريد تحقيقه",
+    "subtitle": "هذا يساعدنا على إنشاء خطة لاستهلاك السعرات الحرارية.",
     "loseWeight": "فقدان الوزن",
-    "loseWeightDesc": "خلق عجز في السعرات الحرارية لفقدان الوزن",
-    "gainWeight": "زيادة الوزن",
-    "gainWeightDesc": "بناء العضلات مع فائض في السعرات الحرارية",
     "maintain": "الحفاظ على الوزن",
-    "maintainDesc": "البقاء على وزنك الحالي",
-    "goalWeight": "الوزن المستهدف",
-    "goalWeightDesc": "ما الوزن الذي ترغب في الوصول إليه؟",
-    "timeline": "الجدول الزمني المتوقع",
-    "timelineDesc": "بناءً على معدل فقدان/زيادة الوزن الصحي"
+    "gainWeight": "زيادة الوزن"
   },
-  "activity": {
-    "title": "مستوى النشاط",
-    "subtitle": "ما مدى نشاطك؟",
-    "sedentary": "خامل",
-    "sedentaryDesc": "قليل أو بدون تمارين",
-    "light": "نشط قليلاً",
-    "lightDesc": "تمارين خفيفة 1-3 أيام/أسبوع",
-    "moderate": "نشط معتدل",
-    "moderateDesc": "تمارين معتدلة 3-5 أيام/أسبوع",
-    "active": "نشط جداً",
-    "activeDesc": "تمارين شاقة 6-7 أيام/أسبوع",
-    "veryActive": "نشط للغاية",
-    "veryActiveDesc": "تمارين شاقة جداً وعمل بدني"
+  "desiredWeight": {
+    "title": "ما هو وزنك المرغوب؟",
+    "lose": "خسارة",
+    "gain": "زيادة",
+    "maintain": "الحفاظ"
   },
-  "preferences": {
-    "title": "التفضيلات الغذائية",
-    "subtitle": "هل لديك أي قيود أو تفضيلات غذائية؟",
-    "none": "لا شيء",
+  "motivation": {
+    "easy": {
+      "message": "إنه قابل للتحقيق!",
+      "description": "95% من المستخدمين يقولون أن هذا التغيير سهل التحقيق والحفاظ عليه مع Nutri AI."
+    },
+    "realistic": {
+      "message": "ليس صعباً على الإطلاق!",
+      "description": "90% من المستخدمين يرون نتائج ملحوظة مع نهج Nutri AI المخصص."
+    },
+    "hard": {
+      "message": "إنه تحدٍ لكنه ممكن!",
+      "description": "75% من المستخدمين يحققون هذا الهدف مع التفاني وتوجيه Nutri AI المخصص."
+    },
+    "veryHard": {
+      "message": "طموح لكنه ممكن!",
+      "description": "هذا هدف طموح. مع الالتزام ودعم Nutri AI، يمكنك تحقيق تقدم مستمر."
+    },
+    "isA": "هو",
+    "target": "هدف",
+    "difficulty": {
+      "easy": "سهل",
+      "realistic": "واقعي",
+      "hard": "صعب",
+      "veryHard": "صعب جداً"
+    },
+    "targetText": "{{action}} {{diff}} {{unit}} هو هدف {{difficulty}}."
+  },
+  "speed": {
+    "title": "ما مدى سرعة وصولك لهدفك؟",
+    "slow": "بطيء وثابت",
+    "medium": "موصى به",
+    "fast": "سريع",
+    "perWeek": "في الأسبوع",
+    "loseSpeedLabel": "سرعة فقدان الوزن في الأسبوع",
+    "gainSpeedLabel": "سرعة زيادة الوزن في الأسبوع",
+    "maintainLabel": "الحفاظ على وزنك",
+    "recommended": "موصى به"
+  },
+  "comparison": {
+    "title": "اخسر ضعف الوزن مع Nutri AI مقارنة بمفردك",
+    "withoutApp": "بدون Nutri AI",
+    "withApp": "مع Nutri AI",
+    "description": "Nutri AI يجعل الأمر سهلاً ويحافظ على التزامك."
+  },
+  "obstacles": {
+    "title": "ما الذي يمنعك من تحقيق أهدافك؟",
+    "consistency": "عدم الاستمرارية",
+    "eating": "عادات الأكل غير الصحية",
+    "support": "نقص الدعم",
+    "schedule": "جدول مزدحم",
+    "inspiration": "نقص الإلهام للوجبات"
+  },
+  "diet": {
+    "title": "هل تتبع نظاماً غذائياً محدداً؟",
+    "classic": "كلاسيكي",
+    "pescatarian": "بيسكاتاري",
     "vegetarian": "نباتي",
-    "vegan": "نباتي صرف",
-    "glutenFree": "خالي من الغلوتين",
-    "dairyFree": "خالي من الألبان",
-    "halal": "حلال",
-    "kosher": "كوشر",
-    "paleo": "باليو",
-    "keto": "كيتو",
-    "other": "أخرى"
+    "vegan": "نباتي صرف"
   },
-  "complete": {
-    "title": "كل شيء جاهز!",
-    "subtitle": "خطتك الشخصية جاهزة",
-    "calorieGoal": "هدف السعرات الحرارية اليومية",
-    "proteinGoal": "هدف البروتين",
-    "carbsGoal": "هدف الكربوهيدرات",
-    "fatGoal": "هدف الدهون",
-    "formulaExplanation": "كيف قمنا بحساب ذلك",
-    "bmr": "BMR (معدل الأيض الأساسي)",
-    "tdee": "TDEE (إجمالي إنفاق الطاقة اليومي)",
-    "adjustment": "معدل حسب هدفك",
-    "startJourney": "ابدأ رحلتك",
-    "uploadProfile": "تحميل صورة الملف الشخصي"
+  "accomplishments": {
+    "title": "ماذا تريد أن تحقق؟",
+    "healthier": "تناول الطعام والعيش بشكل أكثر صحة",
+    "energy": "تعزيز طاقتي ومزاجي",
+    "motivated": "البقاء متحفزاً ومستمراً",
+    "body": "الشعور بشكل أفضل تجاه جسمي"
   },
-  "calculation": {
-    "bmrTitle": "1. BMR (معدل الأيض الأساسي)",
-    "bmrDesc": "باستخدام معادلة ميفلن-سانت جيور (الأكثر استخداماً):",
-    "tdeeTitle": "2. TDEE (إجمالي إنفاق الطاقة اليومي)",
-    "tdeeDesc": "BMR × عامل النشاط:",
-    "adjustmentTitle": "3. معدل حسب هدفك",
-    "weightLoss": "فقدان الوزن",
-    "weightLossDesc": "عجز 500 سعرة حرارية/يوم = ~0.5 كجم فقدان أسبوعياً",
-    "weightGain": "زيادة الوزن",
-    "weightGainDesc": "فائض 300 سعرة حرارية/يوم لزيادة كتلة صحية",
-    "maintain": "الحفاظ على الوزن",
-    "maintainDesc": "توازن الطاقة للحفاظ على الوزن",
-    "source": "المصدر",
-    "sourceText": "معادلة ميفلن-سانت جيور - الجمعية الأمريكية للتغذية (2005)"
+  "potential": {
+    "title": "لديك إمكانيات رائعة لتحقيق هدفك",
+    "currentWeight": "الحالي",
+    "goalWeight": "الهدف",
+    "yourWeightTransition": "تطور وزنك",
+    "chartDescription": "بناءً على بيانات Nutri AI، يبدأ فقدان الوزن تدريجياً في الأسبوع الأول، ثم يتسارع مع تكيف جسمك مع خطتك المخصصة.",
+    "week1": "الأسبوع 1",
+    "week2": "الأسبوع 2",
+    "week8": "الأسبوع 8"
+  },
+  "workout": {
+    "title": "كم تمريناً تقوم به في الأسبوع؟",
+    "subtitle": "سيتم استخدام هذا لتخصيص خطتك.",
+    "low": "تمارين من حين لآخر",
+    "medium": "بعض التمارين في الأسبوع",
+    "high": "رياضي متفاني"
+  },
+  "referral": {
+    "title": "من أين سمعت عنا؟",
+    "appStore": "آب ستور",
+    "tiktok": "تيك توك",
+    "youtube": "يوتيوب",
+    "tv": "التلفزيون",
+    "x": "إكس",
+    "instagram": "إنستغرام",
+    "google": "جوجل",
+    "facebook": "فيسبوك"
+  },
+  "otherApps": {
+    "title": "هل جربت تطبيقات أخرى لتتبع السعرات الحرارية؟",
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "results": {
+    "title": "NutriAI يحقق نتائج طويلة المدى",
+    "stat": "80% من مستخدمي NutriAI يحافظون على خسارة وزنهم حتى بعد 6 أشهر",
+    "yourWeight": "وزنك",
+    "month1": "الشهر 1",
+    "month6": "الشهر 6",
+    "nutriAI": "NutriAI",
+    "weight": "الوزن",
+    "traditionalDiet": "الحمية التقليدية"
+  },
+  "loading": {
+    "error": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "retry": "إعادة المحاولة",
+    "settingUp": "نحن نجهز كل شيء من أجلك",
+    "dailyRecommendation": "التوصية اليومية لـ",
+    "steps": {
+      "analyzing": "جاري تحليل ملفك الشخصي...",
+      "calculating": "جاري حساب أهدافك اليومية...",
+      "personalizing": "جاري تخصيص خطة التغذية الخاصة بك...",
+      "finalizing": "جاري إعداد لوحة التحكم...",
+      "almostReady": "جاهز تقريباً..."
+    },
+    "items": {
+      "calories": "السعرات الحرارية",
+      "carbs": "الكربوهيدرات",
+      "protein": "البروتين",
+      "fats": "الدهون",
+      "health": "درجة الصحة"
+    }
+  },
+  "congratulations": {
+    "title": "تهانينا!",
+    "subtitle": "خطتك المخصصة جاهزة",
+    "yourGoal": "هدفك",
+    "targetDate": "التاريخ المستهدف",
+    "focus": "التركيز",
+    "stayHealthy": "ابقَ بصحة جيدة",
+    "dailyTargets": "الأهداف اليومية",
+    "personalizedForYou": "مخصصة لك",
+    "editable": "قابل للتعديل",
+    "saving": "جاري الحفظ...",
+    "maintainWeight": "الحفاظ على وزنك",
+    "lose": "خسارة",
+    "gain": "زيادة",
+    "macros": {
+      "calories": "السعرات الحرارية",
+      "protein": "البروتين",
+      "carbs": "الكربوهيدرات",
+      "fat": "الدهون"
+    }
   }
 }

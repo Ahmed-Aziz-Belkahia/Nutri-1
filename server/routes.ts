@@ -138,8 +138,12 @@ export function registerRoutes(app: Express): Server {
       const adjustedCarbs = totalPercentage > 100 ? Math.round(carbsPercentage * 100 / totalPercentage) : carbsPercentage;
       const adjustedFat = totalPercentage > 100 ? Math.round(fatPercentage * 100 / totalPercentage) : fatPercentage;
 
-      // Update user preferences using Drizzle ORM for better safety
-      await db.insert(userNutritionPreferences).values({
+      // Check if user already has nutrition preferences (update vs insert)
+      const existingPrefs = await db.query.userNutritionPreferences.findFirst({
+        where: eq(userNutritionPreferences.userId, userId)
+      });
+
+      const nutritionData = {
         userId: userId,
         age: profileData.age,
         gender: profileData.gender,
@@ -155,10 +159,40 @@ export function registerRoutes(app: Express): Server {
         dietaryRestrictions: profileData.dietaryRestrictions || [],
         allergies: profileData.allergies || [],
         mealBudget: profileData.mealBudget,
-        experienceLevel: profileData.experienceLevel
-      });
-      
-      console.log("User nutrition preferences inserted successfully");
+        experienceLevel: profileData.experienceLevel,
+        // Enhanced onboarding fields
+        weightLossSpeed: profileData.weightLossSpeed || null,
+        weightGainSpeed: profileData.weightGainSpeed || null,
+        obstacles: profileData.obstacles || [],
+        accomplishments: profileData.accomplishments || [],
+        referralSource: profileData.referralSource || null,
+        hasUsedOtherApps: profileData.hasUsedOtherApps ?? null,
+        birthMonth: profileData.birthMonth || null,
+        birthDay: profileData.birthDay || null,
+        birthYear: profileData.birthYear || null,
+        isMetric: profileData.isMetric ?? true,
+        // Store original user input values for better UX
+        workoutFrequency: profileData.workoutFrequency || null,
+        heightFeet: profileData.heightFeet || null,
+        heightInches: profileData.heightInches || null,
+        weightLbs: profileData.weightLbs || null,
+        goalWeightLbs: profileData.goalWeightLbs || null,
+      };
+
+      if (existingPrefs) {
+        // Update existing preferences
+        await db.update(userNutritionPreferences)
+          .set(nutritionData)
+          .where(eq(userNutritionPreferences.userId, userId));
+        console.log("User nutrition preferences updated successfully");
+      } else {
+        // Insert new preferences
+        await db.insert(userNutritionPreferences).values(nutritionData);
+        console.log("User nutrition preferences inserted successfully");
+      }
+
+      // Determine preferred language from profileData or default to 'en'
+      const preferredLanguage = profileData.preferredLanguage || 'en';
 
       // Handle profile image if provided
       if (req.file) {
@@ -176,22 +210,22 @@ export function registerRoutes(app: Express): Server {
         await db.update(users)
           .set({ 
             profileImage: imageUrl, 
-            hasCompletedOnboarding: true, // Update the database field
-            preferred_language: 'pl'
+            hasCompletedOnboarding: true,
+            preferred_language: preferredLanguage
           })
           .where(eq(users.id, userId));
           
-        console.log(`Updated user ${userId} with profile image, language: pl, and completed onboarding status`);
+        console.log(`Updated user ${userId} with profile image, language: ${preferredLanguage}, and completed onboarding status`);
       } else {
         // Update hasCompletedOnboarding and language preference even without image
         await db.update(users)
           .set({ 
-            hasCompletedOnboarding: true, // Update the database field
-            preferred_language: 'pl'  
+            hasCompletedOnboarding: true,
+            preferred_language: preferredLanguage
           })
           .where(eq(users.id, userId));
           
-        console.log(`Updated user ${userId} language to: pl and completed onboarding status`);
+        console.log(`Updated user ${userId} language to: ${preferredLanguage} and completed onboarding status`);
       }
       
       // Verify the update was successful
@@ -6210,12 +6244,8 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
     // Make sure both camelCase and snake_case versions are consistent
     if (user) {
-      // The database field is has_completed_onboarding (snake_case) 
-      // But in JavaScript we use hasCompletedOnboarding (camelCase)
-      user.hasCompletedOnboarding = user.has_completed_onboarding;
-      
       // Log the values for debugging
-      console.log(`User ${user.id} onboarding status: ${user.has_completed_onboarding}`);
+      console.log(`User ${user.id} onboarding status: ${user.hasCompletedOnboarding}`);
     }
 
     res.json(user);

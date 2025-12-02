@@ -1,98 +1,220 @@
 {
+  "common": {
+    "continue": "Continuer",
+    "getStarted": "C'est parti !",
+    "signIn": "Se connecter",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "retry": "Réessayer",
+    "saving": "Enregistrement...",
+    "letsGetStarted": "C'est parti !",
+    "imperial": "Impérial",
+    "metric": "Métrique",
+    "yes": "Oui",
+    "no": "Non",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "pi",
+    "in": "po",
+    "error": "Erreur",
+    "saveError": "Un problème est survenu lors de l'enregistrement de votre profil. Veuillez réessayer."
+  },
   "welcome": {
-    "title": "Bienvenue sur NutriAI",
-    "subtitle": "Personnalisons votre parcours nutritionnel",
-    "start": "Commencer"
+    "title": "Nutrition propulsée par l'IA",
+    "subtitle": "en toute simplicité"
   },
-  "steps": {
-    "personalInfo": "Infos Personnelles",
-    "goals": "Vos Objectifs",
-    "activity": "Niveau d'Activité",
-    "preferences": "Préférences",
-    "complete": "Terminer"
-  },
-  "personalInfo": {
-    "title": "Parlez-nous de vous",
-    "subtitle": "Cela nous aide à personnaliser votre expérience",
-    "name": "Votre Nom",
-    "age": "Âge",
-    "gender": "Sexe",
+  "gender": {
+    "title": "Choisissez votre sexe",
+    "subtitle": "Cela sera utilisé pour calibrer votre plan personnalisé.",
     "male": "Homme",
     "female": "Femme",
-    "height": "Taille",
-    "weight": "Poids Actuel",
-    "heightPlaceholder": "Entrez la taille en cm",
-    "weightPlaceholder": "Entrez le poids en kg"
-  },
-  "goals": {
-    "title": "Quel est votre objectif ?",
-    "subtitle": "Choisissez ce que vous voulez atteindre",
-    "loseWeight": "Perdre du Poids",
-    "loseWeightDesc": "Créer un déficit calorique pour perdre du poids",
-    "gainWeight": "Prendre du Poids",
-    "gainWeightDesc": "Développer les muscles avec un surplus calorique",
-    "maintain": "Maintenir le Poids",
-    "maintainDesc": "Rester à votre poids actuel",
-    "goalWeight": "Poids Cible",
-    "goalWeightDesc": "Quel poids souhaitez-vous atteindre ?",
-    "timeline": "Calendrier Prévu",
-    "timelineDesc": "Basé sur un taux sain de perte/gain de poids"
-  },
-  "activity": {
-    "title": "Niveau d'Activité",
-    "subtitle": "À quel point êtes-vous actif ?",
-    "sedentary": "Sédentaire",
-    "sedentaryDesc": "Peu ou pas d'exercice",
-    "light": "Légèrement Actif",
-    "lightDesc": "Exercice léger 1-3 jours/semaine",
-    "moderate": "Modérément Actif",
-    "moderateDesc": "Exercice modéré 3-5 jours/semaine",
-    "active": "Très Actif",
-    "activeDesc": "Exercice intense 6-7 jours/semaine",
-    "veryActive": "Extra Actif",
-    "veryActiveDesc": "Exercice très intense et travail physique"
-  },
-  "preferences": {
-    "title": "Préférences Alimentaires",
-    "subtitle": "Des restrictions ou préférences alimentaires ?",
-    "none": "Aucun",
-    "vegetarian": "Végétarien",
-    "vegan": "Végétalien",
-    "glutenFree": "Sans Gluten",
-    "dairyFree": "Sans Produits Laitiers",
-    "halal": "Halal",
-    "kosher": "Casher",
-    "paleo": "Paléo",
-    "keto": "Keto",
     "other": "Autre"
   },
-  "complete": {
-    "title": "Tout est Prêt !",
-    "subtitle": "Votre plan personnalisé est prêt",
-    "calorieGoal": "Objectif Calorique Quotidien",
-    "proteinGoal": "Objectif Protéines",
-    "carbsGoal": "Objectif Glucides",
-    "fatGoal": "Objectif Graisses",
-    "formulaExplanation": "Comment nous avons calculé cela",
-    "bmr": "BMR (Métabolisme de Base)",
-    "tdee": "TDEE (Dépense Énergétique Totale Quotidienne)",
-    "adjustment": "Ajusté pour Votre Objectif",
-    "startJourney": "Commencez Votre Voyage",
-    "uploadProfile": "Télécharger une Photo de Profil"
+  "heightWeight": {
+    "title": "Taille et poids",
+    "subtitle": "Cela sera utilisé pour calibrer votre plan personnalisé.",
+    "height": "Taille",
+    "weight": "Poids"
   },
-  "calculation": {
-    "bmrTitle": "1. BMR (Métabolisme de Base)",
-    "bmrDesc": "Utilisant l'équation de Mifflin-St Jeor (la plus utilisée) :",
-    "tdeeTitle": "2. TDEE (Dépense Énergétique Totale Quotidienne)",
-    "tdeeDesc": "BMR × facteur d'activité :",
-    "adjustmentTitle": "3. Ajusté pour Votre Objectif",
-    "weightLoss": "Perte de Poids",
-    "weightLossDesc": "Déficit de 500 kcal/jour = ~0,5 kg de perte par semaine",
-    "weightGain": "Prise de Poids",
-    "weightGainDesc": "Surplus de 300 kcal/jour pour un gain de masse sain",
-    "maintain": "Maintenir le Poids",
-    "maintainDesc": "Équilibre énergétique pour maintenir le poids",
-    "source": "Source",
-    "sourceText": "Équation de Mifflin-St Jeor - Association Américaine de Diététique (2005)"
+  "birthDate": {
+    "title": "Quand êtes-vous né(e) ?",
+    "subtitle": "Cela sera utilisé pour calibrer votre plan personnalisé.",
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    }
+  },
+  "goal": {
+    "title": "Quel est votre objectif ?",
+    "subtitle": "Cela nous aide à générer un plan pour votre apport calorique.",
+    "loseWeight": "Perdre du poids",
+    "maintain": "Maintenir",
+    "gainWeight": "Prendre du poids"
+  },
+  "desiredWeight": {
+    "title": "Quel est votre poids désiré ?",
+    "lose": "Perdre",
+    "gain": "Prendre",
+    "maintain": "Maintenir"
+  },
+  "motivation": {
+    "easy": {
+      "message": "C'est très réalisable !",
+      "description": "95% des utilisateurs disent que ce changement est facile à atteindre et à maintenir avec Nutri AI."
+    },
+    "realistic": {
+      "message": "Ce n'est pas difficile du tout !",
+      "description": "90% des utilisateurs voient des résultats notables avec l'approche personnalisée de Nutri AI."
+    },
+    "hard": {
+      "message": "C'est un défi mais faisable !",
+      "description": "75% des utilisateurs atteignent cet objectif avec dévouement et les conseils personnalisés de Nutri AI."
+    },
+    "veryHard": {
+      "message": "C'est ambitieux mais possible !",
+      "description": "C'est un objectif ambitieux. Avec engagement et le soutien de Nutri AI, vous pouvez progresser régulièrement."
+    },
+    "isA": "est un",
+    "target": "objectif",
+    "difficulty": {
+      "easy": "facile",
+      "realistic": "réaliste",
+      "hard": "difficile",
+      "veryHard": "très difficile"
+    },
+    "targetText": "{{action}} {{diff}} {{unit}} est un objectif {{difficulty}}."
+  },
+  "speed": {
+    "title": "À quelle vitesse voulez-vous atteindre votre objectif ?",
+    "slow": "Lent et régulier",
+    "medium": "Recommandé",
+    "fast": "Agressif",
+    "perWeek": "par semaine",
+    "loseSpeedLabel": "Vitesse de perte de poids par semaine",
+    "gainSpeedLabel": "Vitesse de prise de poids par semaine",
+    "maintainLabel": "Maintenir votre poids",
+    "recommended": "Recommandé"
+  },
+  "comparison": {
+    "title": "Perdez deux fois plus de poids avec Nutri AI qu'en solo",
+    "withoutApp": "Sans Nutri AI",
+    "withApp": "Avec Nutri AI",
+    "description": "Nutri AI rend les choses faciles et vous garde responsable."
+  },
+  "obstacles": {
+    "title": "Qu'est-ce qui vous empêche d'atteindre vos objectifs ?",
+    "consistency": "Manque de régularité",
+    "eating": "Habitudes alimentaires malsaines",
+    "support": "Manque de soutien",
+    "schedule": "Emploi du temps chargé",
+    "inspiration": "Manque d'inspiration pour les repas"
+  },
+  "diet": {
+    "title": "Suivez-vous un régime spécifique ?",
+    "classic": "Classique",
+    "pescatarian": "Pescétarien",
+    "vegetarian": "Végétarien",
+    "vegan": "Végétalien"
+  },
+  "accomplishments": {
+    "title": "Qu'aimeriez-vous accomplir ?",
+    "healthier": "Manger et vivre plus sainement",
+    "energy": "Booster mon énergie et mon humeur",
+    "motivated": "Rester motivé et régulier",
+    "body": "Me sentir mieux dans mon corps"
+  },
+  "potential": {
+    "title": "Vous avez un grand potentiel pour atteindre votre objectif",
+    "currentWeight": "Actuel",
+    "goalWeight": "Objectif",
+    "yourWeightTransition": "Votre évolution de poids",
+    "chartDescription": "Selon les données de Nutri AI, la perte de poids commence progressivement la première semaine, puis s'accélère à mesure que votre corps s'adapte à votre plan personnalisé.",
+    "week1": "Semaine 1",
+    "week2": "Semaine 2",
+    "week8": "Semaine 8"
+  },
+  "workout": {
+    "title": "Combien d'entraînements faites-vous par semaine ?",
+    "subtitle": "Ceci sera utilisé pour calibrer votre plan personnalisé.",
+    "low": "Entraînements occasionnels",
+    "medium": "Quelques entraînements par semaine",
+    "high": "Athlète dévoué"
+  },
+  "referral": {
+    "title": "Où avez-vous entendu parler de nous ?",
+    "appStore": "App Store",
+    "tiktok": "TikTok",
+    "youtube": "Youtube",
+    "tv": "Télévision",
+    "x": "X",
+    "instagram": "Instagram",
+    "google": "Google",
+    "facebook": "Facebook"
+  },
+  "otherApps": {
+    "title": "Avez-vous essayé d'autres applications de suivi des calories ?",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "results": {
+    "title": "NutriAI crée des résultats durables",
+    "stat": "80% des utilisateurs NutriAI maintiennent leur perte de poids même 6 mois plus tard",
+    "yourWeight": "Votre poids",
+    "month1": "Mois 1",
+    "month6": "Mois 6",
+    "nutriAI": "NutriAI",
+    "weight": "Poids",
+    "traditionalDiet": "Régime traditionnel"
+  },
+  "loading": {
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "retry": "Réessayer",
+    "settingUp": "Nous préparons tout pour vous",
+    "dailyRecommendation": "Recommandation quotidienne pour",
+    "steps": {
+      "analyzing": "Analyse de votre profil...",
+      "calculating": "Calcul de vos objectifs quotidiens...",
+      "personalizing": "Personnalisation de votre plan nutritionnel...",
+      "finalizing": "Configuration de votre tableau de bord...",
+      "almostReady": "Presque prêt..."
+    },
+    "items": {
+      "calories": "Calories",
+      "carbs": "Glucides",
+      "protein": "Protéines",
+      "fats": "Lipides",
+      "health": "Score santé"
+    }
+  },
+  "congratulations": {
+    "title": "Félicitations !",
+    "subtitle": "Votre plan personnalisé est prêt",
+    "yourGoal": "Votre objectif",
+    "targetDate": "Date cible",
+    "focus": "Focus",
+    "stayHealthy": "Restez en bonne santé",
+    "dailyTargets": "Objectifs quotidiens",
+    "personalizedForYou": "Personnalisé pour vous",
+    "editable": "Modifiable",
+    "saving": "Enregistrement...",
+    "maintainWeight": "Maintenir votre poids",
+    "lose": "Perdre",
+    "gain": "Prendre",
+    "macros": {
+      "calories": "Calories",
+      "protein": "Protéines",
+      "carbs": "Glucides",
+      "fat": "Lipides"
+    }
   }
 }

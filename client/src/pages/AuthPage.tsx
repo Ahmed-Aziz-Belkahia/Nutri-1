@@ -3,7 +3,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { GoogleAuthButton } from "@/components/GoogleAuthButton";
+// Google OAuth temporarily disabled
+// import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 

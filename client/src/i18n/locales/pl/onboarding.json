@@ -1,98 +1,220 @@
 {
+  "common": {
+    "continue": "Kontynuuj",
+    "getStarted": "Zaczynamy!",
+    "signIn": "Zaloguj się",
+    "alreadyHaveAccount": "Masz już konto?",
+    "retry": "Spróbuj ponownie",
+    "saving": "Zapisywanie...",
+    "letsGetStarted": "Zaczynamy!",
+    "imperial": "Imperialny",
+    "metric": "Metryczny",
+    "yes": "Tak",
+    "no": "Nie",
+    "kg": "kg",
+    "lbs": "lbs",
+    "cm": "cm",
+    "ft": "stopy",
+    "in": "cale",
+    "error": "Błąd",
+    "saveError": "Wystąpił problem z zapisaniem Twojego profilu. Spróbuj ponownie."
+  },
   "welcome": {
-    "title": "Witamy w NutriAI",
-    "subtitle": "Spersonalizujmy Twoją podróż żywieniową",
-    "start": "Rozpocznij"
+    "title": "Żywienie wspierane przez AI",
+    "subtitle": "w prosty sposób"
   },
-  "steps": {
-    "personalInfo": "Informacje Osobiste",
-    "goals": "Twoje Cele",
-    "activity": "Poziom Aktywności",
-    "preferences": "Preferencje",
-    "complete": "Zakończ"
-  },
-  "personalInfo": {
-    "title": "Opowiedz nam o sobie",
-    "subtitle": "To pomoże nam spersonalizować Twoje doświadczenie",
-    "name": "Twoje Imię",
-    "age": "Wiek",
-    "gender": "Płeć",
+  "gender": {
+    "title": "Wybierz swoją płeć",
+    "subtitle": "To zostanie użyte do kalibracji Twojego planu.",
     "male": "Mężczyzna",
     "female": "Kobieta",
+    "other": "Inna"
+  },
+  "heightWeight": {
+    "title": "Wzrost i waga",
+    "subtitle": "To zostanie użyte do kalibracji Twojego planu.",
     "height": "Wzrost",
-    "weight": "Obecna Waga",
-    "heightPlaceholder": "Wpisz wzrost w cm",
-    "weightPlaceholder": "Wpisz wagę w kg"
+    "weight": "Waga"
   },
-  "goals": {
+  "birthDate": {
+    "title": "Kiedy się urodziłeś/aś?",
+    "subtitle": "To zostanie użyte do kalibracji Twojego planu.",
+    "months": {
+      "january": "Styczeń",
+      "february": "Luty",
+      "march": "Marzec",
+      "april": "Kwiecień",
+      "may": "Maj",
+      "june": "Czerwiec",
+      "july": "Lipiec",
+      "august": "Sierpień",
+      "september": "Wrzesień",
+      "october": "Październik",
+      "november": "Listopad",
+      "december": "Grudzień"
+    }
+  },
+  "goal": {
     "title": "Jaki jest Twój cel?",
-    "subtitle": "Wybierz, co chcesz osiągnąć",
+    "subtitle": "To pomoże nam stworzyć plan dla Twojego zapotrzebowania kalorycznego.",
     "loseWeight": "Schudnąć",
-    "loseWeightDesc": "Stwórz deficyt kaloryczny, aby schudnąć",
-    "gainWeight": "Przybrać na Wadze",
-    "gainWeightDesc": "Buduj mięśnie z nadwyżką kalorii",
-    "maintain": "Utrzymać Wagę",
-    "maintainDesc": "Pozostań przy obecnej wadze",
-    "goalWeight": "Docelowa Waga",
-    "goalWeightDesc": "Jaką wagę chciałbyś osiągnąć?",
-    "timeline": "Przewidywany Czas",
-    "timelineDesc": "Na podstawie zdrowego tempa utraty/przyrostu wagi"
+    "maintain": "Utrzymać wagę",
+    "gainWeight": "Przybrać na wadze"
   },
-  "activity": {
-    "title": "Poziom Aktywności",
-    "subtitle": "Jak bardzo jesteś aktywny?",
-    "sedentary": "Siedzący Tryb Życia",
-    "sedentaryDesc": "Mało lub brak ćwiczeń",
-    "light": "Lekko Aktywny",
-    "lightDesc": "Lekkie ćwiczenia 1-3 dni/tydzień",
-    "moderate": "Umiarkowanie Aktywny",
-    "moderateDesc": "Umiarkowane ćwiczenia 3-5 dni/tydzień",
-    "active": "Bardzo Aktywny",
-    "activeDesc": "Intensywne ćwiczenia 6-7 dni/tydzień",
-    "veryActive": "Ekstra Aktywny",
-    "veryActiveDesc": "Bardzo intensywne ćwiczenia i praca fizyczna"
+  "desiredWeight": {
+    "title": "Jaka jest Twoja wymarzona waga?",
+    "lose": "Schudnąć",
+    "gain": "Przybrać",
+    "maintain": "Utrzymać"
   },
-  "preferences": {
-    "title": "Preferencje Żywieniowe",
-    "subtitle": "Czy masz jakieś ograniczenia dietetyczne lub preferencje?",
-    "none": "Brak",
+  "motivation": {
+    "easy": {
+      "message": "To bardzo osiągalne!",
+      "description": "95% użytkowników mówi, że ta zmiana jest łatwa do osiągnięcia i utrzymania z Nutri AI."
+    },
+    "realistic": {
+      "message": "To wcale nie jest trudne!",
+      "description": "90% użytkowników widzi zauważalne rezultaty dzięki spersonalizowanemu podejściu Nutri AI."
+    },
+    "hard": {
+      "message": "To wyzwanie, ale wykonalne!",
+      "description": "75% użytkowników osiąga ten cel dzięki determinacji i spersonalizowanym wskazówkom Nutri AI."
+    },
+    "veryHard": {
+      "message": "To ambitne, ale możliwe!",
+      "description": "To ambitny cel. Dzięki zaangażowaniu i wsparciu Nutri AI możesz osiągać stałe postępy."
+    },
+    "isA": "to",
+    "target": "cel",
+    "difficulty": {
+      "easy": "łatwy",
+      "realistic": "realistyczny",
+      "hard": "trudny",
+      "veryHard": "bardzo trudny"
+    },
+    "targetText": "{{action}} {{diff}} {{unit}} to cel {{difficulty}}."
+  },
+  "speed": {
+    "title": "Jak szybko chcesz osiągnąć swój cel?",
+    "slow": "Powoli i stabilnie",
+    "medium": "Zalecane",
+    "fast": "Agresywnie",
+    "perWeek": "na tydzień",
+    "loseSpeedLabel": "Tempo utraty wagi na tydzień",
+    "gainSpeedLabel": "Tempo przybierania na wadze na tydzień",
+    "maintainLabel": "Utrzymać swoją wagę",
+    "recommended": "Zalecane"
+  },
+  "comparison": {
+    "title": "Schudnij dwa razy więcej z Nutri AI niż samodzielnie",
+    "withoutApp": "Bez Nutri AI",
+    "withApp": "Z Nutri AI",
+    "description": "Nutri AI sprawia, że jest to łatwe i pomaga Ci być konsekwentnym."
+  },
+  "obstacles": {
+    "title": "Co powstrzymuje Cię przed osiągnięciem celów?",
+    "consistency": "Brak konsekwencji",
+    "eating": "Niezdrowe nawyki żywieniowe",
+    "support": "Brak wsparcia",
+    "schedule": "Napięty grafik",
+    "inspiration": "Brak inspiracji kulinarnej"
+  },
+  "diet": {
+    "title": "Czy stosujesz określoną dietę?",
+    "classic": "Klasyczna",
+    "pescatarian": "Peskatariańska",
     "vegetarian": "Wegetariańska",
-    "vegan": "Wegańska",
-    "glutenFree": "Bez Glutenu",
-    "dairyFree": "Bez Nabiału",
-    "halal": "Halal",
-    "kosher": "Koszer",
-    "paleo": "Paleo",
-    "keto": "Keto",
-    "other": "Inne"
+    "vegan": "Wegańska"
   },
-  "complete": {
-    "title": "Gotowe!",
+  "accomplishments": {
+    "title": "Co chciałbyś/abyś osiągnąć?",
+    "healthier": "Jeść i żyć zdrowiej",
+    "energy": "Zwiększyć energię i poprawić nastrój",
+    "motivated": "Pozostać zmotywowanym i konsekwentnym",
+    "body": "Czuć się lepiej ze swoim ciałem"
+  },
+  "potential": {
+    "title": "Masz ogromny potencjał, aby osiągnąć swój cel",
+    "currentWeight": "Obecna",
+    "goalWeight": "Cel",
+    "yourWeightTransition": "Twoja zmiana wagi",
+    "chartDescription": "Według danych Nutri AI, utrata wagi zaczyna się stopniowo w pierwszym tygodniu, a następnie przyspiesza, gdy Twoje ciało dostosowuje się do spersonalizowanego planu.",
+    "week1": "Tydzień 1",
+    "week2": "Tydzień 2",
+    "week8": "Tydzień 8"
+  },
+  "workout": {
+    "title": "Ile treningów wykonujesz tygodniowo?",
+    "subtitle": "To zostanie użyte do kalibracji Twojego planu.",
+    "low": "Treningi od czasu do czasu",
+    "medium": "Kilka treningów w tygodniu",
+    "high": "Oddany sportowiec"
+  },
+  "referral": {
+    "title": "Skąd dowiedziałeś/aś się o nas?",
+    "appStore": "App Store",
+    "tiktok": "TikTok",
+    "youtube": "Youtube",
+    "tv": "Telewizja",
+    "x": "X",
+    "instagram": "Instagram",
+    "google": "Google",
+    "facebook": "Facebook"
+  },
+  "otherApps": {
+    "title": "Czy próbowałeś/aś innych aplikacji do śledzenia kalorii?",
+    "yes": "Tak",
+    "no": "Nie"
+  },
+  "results": {
+    "title": "NutriAI tworzy długoterminowe rezultaty",
+    "stat": "80% użytkowników NutriAI utrzymuje utratę wagi nawet po 6 miesiącach",
+    "yourWeight": "Twoja waga",
+    "month1": "Miesiąc 1",
+    "month6": "Miesiąc 6",
+    "nutriAI": "NutriAI",
+    "weight": "Waga",
+    "traditionalDiet": "Tradycyjna dieta"
+  },
+  "loading": {
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
+    "settingUp": "Przygotowujemy wszystko dla Ciebie",
+    "dailyRecommendation": "Dzienna rekomendacja dla",
+    "steps": {
+      "analyzing": "Analizowanie Twojego profilu...",
+      "calculating": "Obliczanie dziennych celów...",
+      "personalizing": "Personalizowanie planu żywieniowego...",
+      "finalizing": "Konfigurowanie Twojego panelu...",
+      "almostReady": "Prawie gotowe..."
+    },
+    "items": {
+      "calories": "Kalorie",
+      "carbs": "Węglowodany",
+      "protein": "Białko",
+      "fats": "Tłuszcze",
+      "health": "Wynik zdrowotny"
+    }
+  },
+  "congratulations": {
+    "title": "Gratulacje!",
     "subtitle": "Twój spersonalizowany plan jest gotowy",
-    "calorieGoal": "Dzienny Cel Kalorii",
-    "proteinGoal": "Cel Białka",
-    "carbsGoal": "Cel Węglowodanów",
-    "fatGoal": "Cel Tłuszczu",
-    "formulaExplanation": "Jak to obliczyliśmy",
-    "bmr": "BMR (Podstawowa Przemiana Materii)",
-    "tdee": "TDEE (Całkowite Dzienne Wydatki Energetyczne)",
-    "adjustment": "Dostosowane do Twojego Celu",
-    "startJourney": "Rozpocznij Swoją Podróż",
-    "uploadProfile": "Prześlij Zdjęcie Profilowe"
-  },
-  "calculation": {
-    "bmrTitle": "1. BMR (Podstawowa Przemiana Materii)",
-    "bmrDesc": "Używając równania Mifflin-St Jeor (najczęściej stosowane):",
-    "tdeeTitle": "2. TDEE (Całkowite Dzienne Wydatki Energetyczne)",
-    "tdeeDesc": "BMR × współczynnik aktywności:",
-    "adjustmentTitle": "3. Dostosowane do Twojego Celu",
-    "weightLoss": "Utrata Wagi",
-    "weightLossDesc": "Deficyt 500 kcal/dzień = ~0,5 kg utraty na tydzień",
-    "weightGain": "Przyrost Wagi",
-    "weightGainDesc": "Nadwyżka 300 kcal/dzień dla zdrowego przyrostu masy",
-    "maintain": "Utrzymanie Wagi",
-    "maintainDesc": "Równowaga energetyczna dla utrzymania wagi",
-    "source": "Źródło",
-    "sourceText": "Równanie Mifflin-St Jeor - American Dietetic Association (2005)"
+    "yourGoal": "Twój cel",
+    "targetDate": "Data docelowa",
+    "focus": "Fokus",
+    "stayHealthy": "Pozostań zdrowy",
+    "dailyTargets": "Cele dzienne",
+    "personalizedForYou": "Spersonalizowane dla Ciebie",
+    "editable": "Edytowalne",
+    "saving": "Zapisywanie...",
+    "maintainWeight": "Utrzymać swoją wagę",
+    "lose": "Schudnąć",
+    "gain": "Przybrać",
+    "macros": {
+      "calories": "Kalorie",
+      "protein": "Białko",
+      "carbs": "Węglowodany",
+      "fat": "Tłuszcze"
+    }
   }
 }
