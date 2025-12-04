@@ -87,12 +87,38 @@ export function calculateDailyCalories(
   }
 }
 
-// Calculate macro splits based on calorie goal
-export function calculateMacros(dailyCalories: number) {
+// Calculate macro splits based on calorie goal and weight goal
+// Uses goal-specific ratios backed by nutrition science
+export function calculateMacros(
+  dailyCalories: number, 
+  goalType: 'maintain' | 'lose' | 'gain' = 'maintain'
+) {
+  let proteinRatio: number, carbRatio: number, fatRatio: number;
+
+  switch (goalType) {
+    case 'lose':
+      // Higher protein for muscle preservation, moderate fat for satiety
+      proteinRatio = 0.30; // 30% protein
+      carbRatio = 0.35;    // 35% carbs
+      fatRatio = 0.35;     // 35% fat
+      break;
+    case 'gain':
+      // Higher carbs to support muscle building and training
+      proteinRatio = 0.25; // 25% protein
+      carbRatio = 0.45;    // 45% carbs
+      fatRatio = 0.30;     // 30% fat
+      break;
+    default:
+      // Balanced maintenance ratios
+      proteinRatio = 0.25; // 25% protein
+      carbRatio = 0.40;    // 40% carbs
+      fatRatio = 0.35;     // 35% fat
+  }
+
   return {
-    protein: Math.round((dailyCalories * 0.3) / 4), // 30% of calories, 4 calories per gram
-    carbs: Math.round((dailyCalories * 0.5) / 4),   // 50% of calories, 4 calories per gram
-    fat: Math.round((dailyCalories * 0.2) / 9),     // 20% of calories, 9 calories per gram
+    protein: Math.round((dailyCalories * proteinRatio) / 4), // 4 calories per gram
+    carbs: Math.round((dailyCalories * carbRatio) / 4),       // 4 calories per gram
+    fat: Math.round((dailyCalories * fatRatio) / 9),          // 9 calories per gram
   };
 }
 

@@ -115,7 +115,7 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
       gender === 'male'
     );
     
-    const newMacros = calculateMacros(newCalories);
+    const newMacros = calculateMacros(newCalories, goalType);
     
     return {
       calories: newCalories,

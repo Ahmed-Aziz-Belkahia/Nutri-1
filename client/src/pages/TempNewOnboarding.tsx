@@ -8,6 +8,7 @@ import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
+import { calculateDailyCalories, calculateMacros } from '@/lib/nutrition';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -1452,74 +1453,41 @@ export default function TempNewOnboarding() {
     return 'maintain';
   };
 
-  // Calculate daily calories using Mifflin-St Jeor equation
-  const calculateDailyCalories = () => {
+  // Wrapper function using shared calculateDailyCalories utility
+  const getCalculatedDailyCalories = () => {
     const weight = getWeightInKg();
     const height = getHeightInCm();
     const age = calculateAge();
     const isMale = selectedGender === 'male';
-    const isFemale = selectedGender === 'female';
-
-    // Mifflin-St Jeor: BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
-    // s = +5 for males, -161 for females, average for other
-    const baseCalories = 10 * weight + 6.25 * height - 5 * age;
-    const bmr = isMale ? baseCalories + 5 : isFemale ? baseCalories - 161 : baseCalories - 78; // -78 is average of +5 and -161
-
-    // Activity multipliers
-    const activityMultipliers: { [key: string]: number } = {
-      sedentary: 1.2,
-      light: 1.375,
-      moderate: 1.55,
-      active: 1.725,
-      very_active: 1.9
-    };
-
-    const tdee = bmr * (activityMultipliers[getActivityLevel()] || 1.55);
-
-    // Goal adjustments
     const weightGoal = getWeightGoal();
-    if (weightGoal === 'loss') {
-      return Math.round(tdee - 500); // 500 kcal deficit
-    } else if (weightGoal === 'gain') {
-      return Math.round(tdee + 300); // 300 kcal surplus
-    }
-    return Math.round(tdee);
+    
+    // Map to goalType format expected by shared utility
+    const goalType = weightGoal === 'loss' ? 'lose' : 
+                     weightGoal === 'gain' ? 'gain' : 'maintain';
+
+    return calculateDailyCalories(
+      age,
+      weight,
+      height,
+      getActivityLevel(),
+      goalType,
+      isMale
+    );
   };
 
-  // Calculate macros
-  const calculateMacros = (calories: number) => {
+  // Wrapper function using shared calculateMacros utility
+  const getCalculatedMacros = (calories: number) => {
     const weightGoal = getWeightGoal();
-    let proteinRatio, carbRatio, fatRatio;
-
-    switch (weightGoal) {
-      case 'loss':
-        proteinRatio = 0.30; // 30% protein
-        carbRatio = 0.35;    // 35% carbs
-        fatRatio = 0.35;     // 35% fat
-        break;
-      case 'gain':
-        proteinRatio = 0.25; // 25% protein
-        carbRatio = 0.45;    // 45% carbs
-        fatRatio = 0.30;     // 30% fat
-        break;
-      default:
-        proteinRatio = 0.25;
-        carbRatio = 0.40;
-        fatRatio = 0.35;
-    }
-
-    return {
-      protein: Math.round((calories * proteinRatio) / 4), // 4 cal per gram
-      carbs: Math.round((calories * carbRatio) / 4),
-      fat: Math.round((calories * fatRatio) / 9) // 9 cal per gram
-    };
+    const goalType = weightGoal === 'loss' ? 'lose' : 
+                     weightGoal === 'gain' ? 'gain' : 'maintain';
+    return calculateMacros(calories, goalType);
   };
 
   // Mutation for completing onboarding
   const mutation = useMutation({
     mutationFn: async () => {
-      const dailyCalories = calculateDailyCalories();
-      const macros = calculateMacros(dailyCalories);
+      const dailyCalories = getCalculatedDailyCalories();
+      const macros = getCalculatedMacros(dailyCalories);
       
       const profileData = {
         age: calculateAge(),
@@ -2654,8 +2622,8 @@ export default function TempNewOnboarding() {
 
   // Page 19: Congratulations Page (Final page)
   if (currentStep === 18) {
-    const dailyCalories = calculateDailyCalories();
-    const macros = calculateMacros(dailyCalories);
+    const dailyCalories = getCalculatedDailyCalories();
+    const macros = getCalculatedMacros(dailyCalories);
     
     return (
       <OnboardingLayout>

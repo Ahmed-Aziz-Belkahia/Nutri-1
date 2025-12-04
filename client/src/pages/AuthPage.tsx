@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { calculateDailyCalories, calculateMacros } from "@/lib/nutrition";
 // Google OAuth temporarily disabled
 // import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,40 +44,33 @@ export default function AuthPage() {
       const data = JSON.parse(pendingData);
       const formDataToSend = new FormData();
       
-      // Calculate nutrition values using Mifflin-St Jeor formula
-      const age = data.age;
-      const weight = data.weight;
-      const goalWeight = data.goalWeight;
-      const height = data.height;
+      // Map weightGoal to goalType format expected by utility
+      const goalType = data.weightGoal === 'loss' ? 'lose' : 
+                       data.weightGoal === 'gain' ? 'gain' : 'maintain';
       
-      const baseCalories = 10 * weight + 6.25 * height - 5 * age;
-      const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
-      
-      const activityMultiplier: Record<string, number> = {
-        sedentary: 1.2,
-        light: 1.375,
-        moderate: 1.55,
-        active: 1.725,
-        very_active: 1.9
-      };
-      
-      const tdee = bmr * (activityMultiplier[data.activityLevel] || 1.55);
-      
-      const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
-                           data.weightGoal === 'gain' ? tdee + 300 : tdee;
+      // Use shared calculation utilities
+      const dailyCalories = calculateDailyCalories(
+        data.age,
+        data.weight,
+        data.height,
+        data.activityLevel,
+        goalType,
+        data.gender === 'male'
+      );
+      const macros = calculateMacros(dailyCalories, goalType);
       
       const profileData = {
         age: data.age,
         gender: data.gender,
-        height: height,
-        weight: weight,
-        goalWeight: goalWeight,
+        height: data.height,
+        weight: data.weight,
+        goalWeight: data.goalWeight,
         weightGoal: data.weightGoal,
         activityLevel: data.activityLevel,
-        calorieGoal: Math.round(dailyCalories),
-        proteinGoal: Math.round(dailyCalories * 0.3 / 4),
-        carbsGoal: Math.round(dailyCalories * 0.4 / 4),
-        fatGoal: Math.round(dailyCalories * 0.3 / 9),
+        calorieGoal: dailyCalories,
+        proteinGoal: macros.protein,
+        carbsGoal: macros.carbs,
+        fatGoal: macros.fat,
         dietaryRestrictions: [],
         allergies: [],
         mealBudget: "medium",

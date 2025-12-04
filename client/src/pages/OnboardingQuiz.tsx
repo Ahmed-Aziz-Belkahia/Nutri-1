@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
+import { calculateDailyCalories, calculateMacros } from '@/lib/nutrition';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -67,40 +68,24 @@ const initialFormData: OnboardingData = {
   nutritionGoals: []
 };
 
+// Wrapper function that uses the shared calculateDailyCalories utility
 const calculateCalories = (data: OnboardingData) => {
   if (!data.age || !data.height || !data.weight || !data.gender || !data.activityLevel) {
     return 2000;
   }
 
-  // Standard activity multipliers
-  const activityMultipliers = {
-    sedentary: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    active: 1.725,
-    very_active: 1.9
-  };
-
-  // Mifflin-St Jeor BMR formula (most commonly used)
-  const age = data.age;
-  const weight = data.weight;
-  const height = data.height;
+  // Map weightGoal to goalType format expected by utility
+  const goalType = data.weightGoal === 'loss' ? 'lose' : 
+                   data.weightGoal === 'gain' ? 'gain' : 'maintain';
   
-  // BMR = (10 × weight in kg) + (6.25 × height in cm) - (5 × age) + s
-  // s = +5 for males, -161 for females
-  const baseCalories = 10 * weight + 6.25 * height - 5 * age;
-  const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
-
-  const tdee = bmr * (activityMultipliers[data.activityLevel as keyof typeof activityMultipliers] || 1.55);
-
-  // Standard calorie adjustments
-  const goalAdjustments = {
-    loss: -500,    // 500 kcal deficit for ~0.5kg/week loss
-    maintain: 0,
-    gain: 300      // 300 kcal surplus for healthy mass gain
-  };
-
-  return Math.round(tdee + (goalAdjustments[data.weightGoal as keyof typeof goalAdjustments] || 0));
+  return calculateDailyCalories(
+    data.age,
+    data.weight,
+    data.height,
+    data.activityLevel,
+    goalType,
+    data.gender === 'male'
+  );
 };
 
 export default function OnboardingQuiz() {
@@ -144,45 +129,34 @@ export default function OnboardingQuiz() {
     mutationFn: async (data: OnboardingData) => {
       const formDataToSend = new FormData();
       
-      // Calculate nutrition values using Mifflin-St Jeor formula
-      const age = data.age;
-      const weight = data.weight;
-      const goalWeight = data.goalWeight;
-      const height = data.height;
+      // Map weightGoal to goalType format expected by utility
+      const goalType = data.weightGoal === 'loss' ? 'lose' : 
+                       data.weightGoal === 'gain' ? 'gain' : 'maintain';
       
-      // Mifflin-St Jeor BMR calculation
-      // BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
-      // s = +5 for males, -161 for females
-      const baseCalories = 10 * weight + 6.25 * height - 5 * age;
-      const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
-      
-      const activityMultiplier = {
-        sedentary: 1.2,
-        light: 1.375,
-        moderate: 1.55,
-        active: 1.725,
-        very_active: 1.9
-      }[data.activityLevel] || 1.55;
-      
-      const tdee = bmr * activityMultiplier;
-      
-      // Standard calorie adjustments
-      const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
-                           data.weightGoal === 'gain' ? tdee + 300 : tdee;
+      // Use shared calculation utilities
+      const dailyCalories = calculateDailyCalories(
+        data.age,
+        data.weight,
+        data.height,
+        data.activityLevel,
+        goalType,
+        data.gender === 'male'
+      );
+      const macros = calculateMacros(dailyCalories, goalType);
       
       // Create profile data matching the backend expectation
       const profileData = {
         age: data.age,
         gender: data.gender,
-        height: height,
-        weight: weight,
-        goalWeight: goalWeight,
+        height: data.height,
+        weight: data.weight,
+        goalWeight: data.goalWeight,
         weightGoal: data.weightGoal,
         activityLevel: data.activityLevel,
-        calorieGoal: Math.round(dailyCalories),
-        proteinGoal: Math.round(dailyCalories * 0.3 / 4), // 30% of calories from protein
-        carbsGoal: Math.round(dailyCalories * 0.4 / 4),   // 40% of calories from carbs
-        fatGoal: Math.round(dailyCalories * 0.3 / 9),     // 30% of calories from fat
+        calorieGoal: dailyCalories,
+        proteinGoal: macros.protein,
+        carbsGoal: macros.carbs,
+        fatGoal: macros.fat,
         dietaryRestrictions: [],
         allergies: [],
         mealBudget: "medium",
@@ -1310,25 +1284,31 @@ export default function OnboardingQuiz() {
                             <p className="text-sm text-gray-600 font-medium">Daily Calories</p>
                           </div>
 
-                          {/* Macro Distribution */}
+                          {/* Macro Distribution - uses goal-specific ratios */}
                           <div className="grid grid-cols-3 gap-4">
-                            {[
-                              { 
-                                label: 'Protein', 
-                                value: Math.round(calculateCalories(formData) * 0.3 / 4),
-                                color: 'from-blue-500 to-cyan-500'
-                              },
-                              { 
-                                label: 'Carbs', 
-                                value: Math.round(calculateCalories(formData) * 0.4 / 4),
-                                color: 'from-amber-500 to-orange-500'
-                              },
-                              { 
-                                label: 'Fats', 
-                                value: Math.round(calculateCalories(formData) * 0.3 / 9),
-                                color: 'from-purple-500 to-pink-500'
-                              }
-                            ].map((macro, index) => (
+                            {(() => {
+                              const calories = calculateCalories(formData);
+                              const goalType = formData.weightGoal === 'loss' ? 'lose' : 
+                                               formData.weightGoal === 'gain' ? 'gain' : 'maintain';
+                              const macros = calculateMacros(calories, goalType);
+                              return [
+                                { 
+                                  label: 'Protein', 
+                                  value: macros.protein,
+                                  color: 'from-blue-500 to-cyan-500'
+                                },
+                                { 
+                                  label: 'Carbs', 
+                                  value: macros.carbs,
+                                  color: 'from-amber-500 to-orange-500'
+                                },
+                                { 
+                                  label: 'Fats', 
+                                  value: macros.fat,
+                                  color: 'from-purple-500 to-pink-500'
+                                }
+                              ];
+                            })().map((macro, index) => (
                               <motion.div
                                 key={macro.label}
                                 initial={{ opacity: 0, y: 20 }}
