@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
 import { calculateDailyCalories, calculateMacros } from '@/lib/nutrition';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUser } from '@/hooks/use-user';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -1834,8 +1835,28 @@ export default function TempNewOnboarding() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { t, i18n } = useTranslation('onboarding');
+  const { user, isLoading } = useUser();
 
-  const [currentStep, setCurrentStep] = useState(0);
+  // Redirect authenticated users who have completed onboarding to dashboard
+  useEffect(() => {
+    if (!isLoading && user?.hasCompletedOnboarding) {
+      navigate('/dashboard');
+    }
+  }, [user, isLoading, navigate]);
+
+  // Start authenticated users at step 1 (gender selection) instead of welcome screen
+  const [currentStep, setCurrentStep] = useState(() => {
+    // This will be updated in useEffect once user data is loaded
+    return 0;
+  });
+
+  // Set initial step based on auth status
+  useEffect(() => {
+    if (!isLoading && user && !user.hasCompletedOnboarding) {
+      // Authenticated user who hasn't completed onboarding - skip welcome screen
+      setCurrentStep(1);
+    }
+  }, [user, isLoading]);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [isMetric, setIsMetric] = useState(false);
   const [heightFeet, setHeightFeet] = useState(5);
