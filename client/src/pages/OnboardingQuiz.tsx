@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
-import { Camera, Upload, User, Target, Heart, Zap, Clock, Star, CalendarDays, Calendar, TrendingDown, Info, ChevronDown, ChevronUp } from 'lucide-react';
+import { Camera, Upload, User, Target, Heart, Zap, Clock, Star, CalendarDays, Calendar, TrendingDown, TrendingUp, Minus, Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 type OnboardingData = {
   perfectGoal: ('weight_loss' | 'muscle_gain' | 'energy_boost' | 'health_improve' | 'confidence_boost' | 'lifestyle_change' | 'other')[];
@@ -1534,24 +1534,69 @@ export default function OnboardingQuiz() {
                           transition={{ delay: 0.5 }}
                           className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-200"
                         >
+                          {/* Goal Type Header */}
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            {formData.weightGoal === 'loss' && (
+                              <>
+                                <TrendingDown className="w-5 h-5 text-[#0CC5BA]" />
+                                <span className="text-sm font-semibold text-gray-700">Weight Loss Journey</span>
+                              </>
+                            )}
+                            {formData.weightGoal === 'gain' && (
+                              <>
+                                <TrendingUp className="w-5 h-5 text-[#26A8FF]" />
+                                <span className="text-sm font-semibold text-gray-700">Weight Gain Journey</span>
+                              </>
+                            )}
+                            {formData.weightGoal === 'maintain' && (
+                              <>
+                                <Minus className="w-5 h-5 text-purple-500" />
+                                <span className="text-sm font-semibold text-gray-700">Weight Maintenance</span>
+                              </>
+                            )}
+                          </div>
+                          
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-sm text-gray-600">Current</div>
                               <div className="text-xl font-bold text-gray-800">{formData.weight} kg</div>
                             </div>
                             <div className="flex-1 mx-6">
-                              <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: "70%" }}
-                                  transition={{ delay: 0.7, duration: 1 }}
-                                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] rounded-full"
-                                />
-                              </div>
+                              {/* Progress visualization based on goal type */}
+                              {formData.weightGoal === 'loss' && (
+                                <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: "100%" }}
+                                    animate={{ width: "30%" }}
+                                    transition={{ delay: 0.7, duration: 1.5 }}
+                                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] rounded-full"
+                                  />
+                                </div>
+                              )}
+                              {formData.weightGoal === 'gain' && (
+                                <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: "30%" }}
+                                    animate={{ width: "100%" }}
+                                    transition={{ delay: 0.7, duration: 1.5 }}
+                                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#26A8FF] to-[#0CC5BA] rounded-full"
+                                  />
+                                </div>
+                              )}
+                              {formData.weightGoal === 'maintain' && (
+                                <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <motion.div 
+                                    initial={{ width: "50%" }}
+                                    animate={{ width: "50%" }}
+                                    transition={{ delay: 0.7, duration: 1 }}
+                                    className="absolute inset-y-0 left-1/4 bg-gradient-to-r from-purple-400 to-purple-500 rounded-full"
+                                  />
+                                </div>
+                              )}
                             </div>
                             <div>
                               <div className="text-sm text-gray-600">Goal</div>
-                              <div className="text-xl font-bold bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] bg-clip-text text-transparent">{formData.goalWeight} kg</div>
+                              <div className={`text-xl font-bold bg-gradient-to-r ${formData.weightGoal === 'maintain' ? 'from-purple-500 to-purple-600' : 'from-[#0CC5BA] to-[#26A8FF]'} bg-clip-text text-transparent`}>{formData.goalWeight} kg</div>
                             </div>
                           </div>
                         </motion.div>
@@ -1574,7 +1619,16 @@ export default function OnboardingQuiz() {
                               {/* Timeline Visualization */}
                               {formData.weightGoal !== 'maintain' && (
                                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200">
-                                  <h3 className="text-center text-lg font-semibold text-gray-700 mb-6">Your Success Journey</h3>
+                                  <div className="flex items-center justify-center gap-2 mb-6">
+                                    {formData.weightGoal === 'loss' ? (
+                                      <TrendingDown className="w-5 h-5 text-[#0CC5BA]" />
+                                    ) : (
+                                      <TrendingUp className="w-5 h-5 text-[#26A8FF]" />
+                                    )}
+                                    <h3 className="text-lg font-semibold text-gray-700">
+                                      {formData.weightGoal === 'loss' ? 'Your Weight Loss Timeline' : 'Your Weight Gain Timeline'}
+                                    </h3>
+                                  </div>
                                   
                                   {/* Time Display Cards */}
                                   <div className="grid grid-cols-3 gap-3 mb-6">
@@ -1630,16 +1684,22 @@ export default function OnboardingQuiz() {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 0.6 }}
-                                    className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-4 border border-purple-200"
+                                    className={`rounded-xl p-4 border ${formData.weightGoal === 'loss' ? 'bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-200' : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'}`}
                                   >
                                     <div className="flex items-center justify-between">
                                       <div className="flex items-center gap-2">
-                                        <TrendingDown className="w-4 h-4 text-purple-600" />
-                                        <span className="text-sm text-gray-700 font-medium">Weekly Progress</span>
+                                        {formData.weightGoal === 'loss' ? (
+                                          <TrendingDown className="w-4 h-4 text-teal-600" />
+                                        ) : (
+                                          <TrendingUp className="w-4 h-4 text-blue-600" />
+                                        )}
+                                        <span className="text-sm text-gray-700 font-medium">
+                                          {formData.weightGoal === 'loss' ? 'Weekly Weight Loss' : 'Weekly Weight Gain'}
+                                        </span>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                                          {Math.abs(timeline.weeklyProgress).toFixed(1)}
+                                        <span className={`text-lg font-bold bg-gradient-to-r ${formData.weightGoal === 'loss' ? 'from-teal-600 to-cyan-600' : 'from-blue-600 to-indigo-600'} bg-clip-text text-transparent`}>
+                                          {formData.weightGoal === 'loss' ? '-' : '+'}{Math.abs(timeline.weeklyProgress).toFixed(1)}
                                         </span>
                                         <span className="text-sm text-gray-600">kg/week</span>
                                       </div>
@@ -1651,10 +1711,35 @@ export default function OnboardingQuiz() {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${Math.min(Math.abs(timeline.weeklyProgress) * 100, 100)}%` }}
                                         transition={{ delay: 0.8, duration: 1 }}
-                                        className="h-full bg-gradient-to-r from-purple-500 to-indigo-500"
+                                        className={`h-full ${formData.weightGoal === 'loss' ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`}
                                       />
                                     </div>
                                   </motion.div>
+                                </div>
+                              )}
+
+                              {/* Maintain Weight Timeline */}
+                              {formData.weightGoal === 'maintain' && (
+                                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200">
+                                  <div className="flex items-center justify-center gap-2 mb-6">
+                                    <Minus className="w-5 h-5 text-purple-500" />
+                                    <h3 className="text-lg font-semibold text-gray-700">Maintaining Your Weight</h3>
+                                  </div>
+                                  
+                                  <div className="text-center space-y-4">
+                                    <motion.div 
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      transition={{ delay: 0.3, type: "spring" }}
+                                      className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 border-2 border-purple-300"
+                                    >
+                                      <span className="text-2xl font-bold text-purple-600">{formData.weight} kg</span>
+                                    </motion.div>
+                                    <p className="text-sm text-gray-600">
+                                      Your goal is to maintain your current weight of <strong>{formData.weight} kg</strong>.
+                                      We'll help you stay balanced with the right nutrition plan.
+                                    </p>
+                                  </div>
                                 </div>
                               )}
 
@@ -1663,13 +1748,21 @@ export default function OnboardingQuiz() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.6 }}
-                                className="bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-2xl p-6 shadow-lg text-center"
+                                className={`rounded-2xl p-6 shadow-lg text-center ${
+                                  formData.weightGoal === 'loss' ? 'bg-gradient-to-br from-[#0CC5BA] to-teal-500' :
+                                  formData.weightGoal === 'gain' ? 'bg-gradient-to-br from-[#26A8FF] to-blue-600' :
+                                  'bg-gradient-to-br from-purple-500 to-indigo-500'
+                                }`}
                               >
                                 <h3 className="text-2xl font-bold text-white mb-2">
-                                  You're All Set!
+                                  {formData.weightGoal === 'loss' ? 'Ready to Lose Weight!' :
+                                   formData.weightGoal === 'gain' ? 'Ready to Build Mass!' :
+                                   'Ready to Stay Balanced!'}
                                 </h3>
                                 <p className="text-white/90 text-sm">
-                                  Your personalized nutrition journey begins now
+                                  {formData.weightGoal === 'loss' ? 'Your weight loss journey begins now' :
+                                   formData.weightGoal === 'gain' ? 'Your muscle building journey begins now' :
+                                   'Your balanced nutrition journey begins now'}
                                 </p>
                               </motion.div>
                             </>
