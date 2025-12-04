@@ -740,6 +740,39 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Get ingredient-generated recipes (recipes created from ingredient scanning)
+  app.get("/api/food-logs/ingredient-recipes", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+
+      // Get food logs where source is 'ingredient_generation'
+      const ingredientRecipes = await db
+        .select()
+        .from(foodLogs)
+        .where(
+          and(
+            eq(foodLogs.userId, req.user!.id),
+            sql`${foodLogs.source} = 'ingredient_generation'`
+          )
+        )
+        .orderBy(desc(foodLogs.date))
+        .limit(limit);
+
+      console.log('[Food Logs API] Retrieved ingredient-generated recipes:', {
+        count: ingredientRecipes.length,
+        userId: req.user!.id
+      });
+
+      res.json(ingredientRecipes);
+    } catch (error) {
+      console.error('Error fetching ingredient-generated recipes:', error);
+      res.status(500).json({
+        error: 'Failed to fetch ingredient-generated recipes',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Get global top recipes sorted by likes
   app.get("/api/recipes/top", requireAuth, async (req: AuthRequest, res: Response) => {
     try {

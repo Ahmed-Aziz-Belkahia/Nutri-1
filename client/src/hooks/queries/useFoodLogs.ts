@@ -98,6 +98,21 @@ export function useScannedMealsToday(): UseQueryResult<FoodLog[]> {
   });
 }
 
+// Get ingredient-generated recipes
+export function useIngredientGeneratedRecipes(): UseQueryResult<FoodLog[]> {
+  return useQuery({
+    queryKey: ['foodLogs', 'ingredientRecipes'],
+    queryFn: async () => {
+      const response = await fetch('/api/food-logs/ingredient-recipes?limit=20', {
+        credentials: 'include'
+      });
+      if (!response.ok) throw new Error('Failed to fetch ingredient-generated recipes');
+      return response.json();
+    },
+    ...queryPresets.moderate,
+  });
+}
+
 // Mutation Hooks
 export function useAddFoodLog(date: string): UseMutationResult<any, Error, any> {
   const queryClient = useQueryClient();

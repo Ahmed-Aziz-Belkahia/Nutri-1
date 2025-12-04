@@ -302,7 +302,7 @@ export default function IngredientsAnalysis() {
             fiber: recipe.nutritionInfo?.fiber || recipe.fiber || 5,
             sugar: recipe.nutritionInfo?.sugar || recipe.sugar || 8,
             sodium: recipe.nutritionInfo?.sodium || recipe.sodium || 500,
-            image: imageData,
+            image: null, // Don't save ingredient image for generated recipes
             isRecipe: true,
             source: 'ingredient_generation', // Different source to separate from scanned meals
             components: ingredients.map((ing: any) => ing.name),

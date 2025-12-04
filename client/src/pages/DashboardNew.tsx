@@ -6,6 +6,7 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import CalendarSelector from "@/components/dashboard/CalendarSelector";
 import MacroCard from "@/components/dashboard/MacroCard";
 import MealsSection from "@/components/dashboard/MealsSection";
+import GeneratedRecipesSection from "@/components/dashboard/GeneratedRecipesSection";
 import GroceryList from "@/components/dashboard/GroceryList";
 import MealPlanSection from "@/components/dashboard/MealPlanSection";
 import { useFoodLogsByDate, useDailyTotals } from "@/hooks/queries/useFoodLogs";
@@ -393,6 +394,8 @@ export default function DashboardNew() {
         foodLogs={foodLogs}
         isLoading={logsLoading}
       />
+
+      <GeneratedRecipesSection />
 
       <MealPlanSection 
         mealPlan={mealPlan as any}
