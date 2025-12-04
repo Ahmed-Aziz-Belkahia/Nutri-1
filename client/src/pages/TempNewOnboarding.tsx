@@ -2141,11 +2141,11 @@ export default function TempNewOnboarding() {
           subtitle={t('welcome.subtitle')} 
         />
         <div className="space-y-3 mb-6">
-          <PrimaryButton onClick={() => setCurrentStep(1)}>
+          <PrimaryButton onClick={() => navigate('/auth')}>
             {t('common.getStarted')}
           </PrimaryButton>
           <SignInLink 
-            onClick={() => window.location.href = '/auth'} 
+            onClick={() => navigate('/auth')} 
             alreadyHaveAccountText={t('common.alreadyHaveAccount')}
             signInText={t('common.signIn')}
           />
