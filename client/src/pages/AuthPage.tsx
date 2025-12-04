@@ -167,7 +167,7 @@ export default function AuthPage() {
             </button>
 
             {/* Logo Section */}
-            <div className="flex flex-col items-center mb-6">
+            <div className="flex flex-col items-center">
               <motion.div 
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
