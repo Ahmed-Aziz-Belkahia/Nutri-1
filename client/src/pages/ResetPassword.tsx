@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, Shield } from "lucide-react";
+import { Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2, Shield, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -154,15 +154,18 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg relative overflow-hidden">
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl p-8 rounded-xl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-[420px]"
+      >
+        <Card className="bg-white border-0 shadow-sm rounded-2xl overflow-hidden">
+          {/* Top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF]" />
+          
+          <div className="p-6">
             <AnimatePresence mode="wait">
               {success ? (
                 <motion.div
@@ -170,9 +173,9 @@ export default function ResetPassword() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="text-center py-12"
+                  className="text-center py-8"
                 >
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="w-10 h-10 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
@@ -193,15 +196,25 @@ export default function ResetPassword() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
+                  {/* Back button */}
+                  <button
+                    type="button"
+                    onClick={() => setLocation("/auth")}
+                    className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors mb-6"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="text-sm">{t('auth:forgotPassword.backToLogin')}</span>
+                  </button>
+
                   {/* Logo Section - Code Step */}
-                  <div className="flex flex-col items-center mb-8">
+                  <div className="flex flex-col items-center mb-6">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.1, duration: 0.3 }}
-                      className="w-20 h-20 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-full flex items-center justify-center mb-6"
+                      className="w-16 h-16 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-2xl flex items-center justify-center mb-4"
                     >
-                      <Shield className="w-10 h-10 text-white" />
+                      <Shield className="w-8 h-8 text-white" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">
                       {t('auth:resetPassword.verifyCode.title')}
@@ -225,7 +238,7 @@ export default function ResetPassword() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+                        className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3"
                       >
                         <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-red-700">{error}</p>
@@ -234,7 +247,7 @@ export default function ResetPassword() {
                   </AnimatePresence>
 
                   {/* Code Form */}
-                  <form onSubmit={handleVerifyCode} className="space-y-6">
+                  <form onSubmit={handleVerifyCode} className="space-y-4">
                     <div className="space-y-2">
                       <label htmlFor="code" className="text-sm font-medium text-gray-700 block text-center">
                         {t('auth:resetPassword.verifyCode.code')}
@@ -259,7 +272,7 @@ export default function ResetPassword() {
                     <Button
                       type="submit"
                       disabled={isLoading || code.length !== 6}
-                      className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg"
+                      className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white rounded-xl font-semibold transition-all"
                     >
                       {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -288,14 +301,14 @@ export default function ResetPassword() {
                   exit={{ opacity: 0 }}
                 >
                   {/* Logo Section - Password Step */}
-                  <div className="flex flex-col items-center mb-8">
+                  <div className="flex flex-col items-center mb-6">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.1, duration: 0.3 }}
-                      className="w-20 h-20 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-full flex items-center justify-center mb-6"
+                      className="w-16 h-16 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-2xl flex items-center justify-center mb-4"
                     >
-                      <Lock className="w-10 h-10 text-white" />
+                      <Lock className="w-8 h-8 text-white" />
                     </motion.div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">
                       {t('auth:resetPassword.createPassword.title')}
@@ -317,7 +330,7 @@ export default function ResetPassword() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
+                        className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3"
                       >
                         <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-red-700">{error}</p>
@@ -328,11 +341,11 @@ export default function ResetPassword() {
                   {/* Password Form */}
                   <form onSubmit={handleResetPassword} className="space-y-4">
                     {email && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                        <p className="text-sm text-blue-900 text-center">
+                      <div className="bg-[#26A8FF]/5 border border-[#26A8FF]/20 rounded-xl p-4 mb-2">
+                        <p className="text-sm text-gray-700 text-center">
                           <span className="font-medium">{t('auth:resetPassword.createPassword.resettingFor')}</span>
                           <br />
-                          {email}
+                          <span className="text-gray-900">{email}</span>
                         </p>
                       </div>
                     )}
@@ -405,7 +418,7 @@ export default function ResetPassword() {
                     <Button
                       type="submit"
                       disabled={isLoading || !newPassword || !confirmPassword}
-                      className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg mt-6"
+                      className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white rounded-xl font-semibold transition-all mt-2"
                     >
                       {isLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin" />
@@ -417,25 +430,25 @@ export default function ResetPassword() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </Card>
+          </div>
+        </Card>
 
-          {/* Footer */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center text-xs text-gray-600 mt-6"
+        {/* Footer */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-xs text-gray-500 mt-6"
+        >
+          {t('auth:resetPassword.needHelp')}{" "}
+          <a
+            href="mailto:support@nutriai.pl"
+            className="text-[#26A8FF] hover:text-[#0CC5BA] font-medium"
           >
-            {t('auth:resetPassword.needHelp')}{" "}
-            <a
-              href="mailto:support@nutriai.pl"
-              className="text-[#26A8FF] hover:text-[#0CC5BA] font-medium"
-            >
-              {t('auth:resetPassword.contactSupport')}
-            </a>
-          </motion.p>
-        </motion.div>
-      </div>
+            {t('auth:resetPassword.contactSupport')}
+          </a>
+        </motion.p>
+      </motion.div>
     </div>
   );
 }

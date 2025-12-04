@@ -160,19 +160,22 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg relative overflow-hidden">
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl p-8 rounded-xl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-[420px]"
+      >
+        <Card className="bg-white border-0 shadow-sm rounded-2xl overflow-hidden">
+          {/* Top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF]" />
+          
+          <div className="p-6">
             {/* Back Button */}
             <button
               onClick={() => setLocation('/auth')}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-6"
+              className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors mb-6"
             >
               <ArrowLeft className="h-4 w-4" />
               <span className="text-sm">{t('auth:verifyEmail.backToSignIn')}</span>
@@ -192,7 +195,7 @@ export default function VerifyEmail() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", delay: 0.2 }}
-                    className="mx-auto w-20 h-20 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-full flex items-center justify-center mb-6"
+                    className="mx-auto w-20 h-20 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-2xl flex items-center justify-center mb-6"
                   >
                     <CheckCircle2 className="h-10 w-10 text-white" />
                   </motion.div>
@@ -207,7 +210,7 @@ export default function VerifyEmail() {
                   exit={{ opacity: 0 }}
                 >
                   {/* Logo Section */}
-                  <div className="flex flex-col items-center mb-8">
+                  <div className="flex flex-col items-center mb-6">
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
@@ -232,7 +235,7 @@ export default function VerifyEmail() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                        className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
                       >
                         {error}
                       </motion.div>
@@ -256,7 +259,7 @@ export default function VerifyEmail() {
                           onChange={(e) => handleCodeChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
                           onPaste={handlePaste}
-                          className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 outline-none transition-all"
+                          className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-[#26A8FF] focus:ring-2 focus:ring-[#26A8FF]/20 outline-none transition-all bg-white"
                           disabled={isVerifying}
                         />
                       ))}
@@ -267,7 +270,7 @@ export default function VerifyEmail() {
                   <Button
                     onClick={handleVerify}
                     disabled={isVerifying || code.some((d) => !d)}
-                    className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg mb-4"
+                    className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white rounded-xl font-semibold transition-all mb-4"
                   >
                     {isVerifying ? (
                       <Loader2 className="h-5 w-5 animate-spin" />
@@ -292,19 +295,19 @@ export default function VerifyEmail() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </Card>
+          </div>
+        </Card>
 
-          {/* Footer */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center text-xs text-gray-600 mt-6"
-          >
-            {t('auth:verifyEmail.codeExpires')}
-          </motion.p>
-        </motion.div>
-      </div>
+        {/* Footer */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-xs text-gray-500 mt-6"
+        >
+          {t('auth:verifyEmail.codeExpires')}
+        </motion.p>
+      </motion.div>
     </div>
   );
 }

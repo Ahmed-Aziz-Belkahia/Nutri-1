@@ -11,7 +11,8 @@ import {
   Mail,
   Lock,
   Eye,
-  EyeOff
+  EyeOff,
+  ArrowLeft
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
@@ -67,25 +68,45 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen gradient-bg relative overflow-hidden">
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card className="bg-white/95 backdrop-blur-sm shadow-xl p-8 rounded-xl">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-[420px]"
+      >
+        <Card className="bg-white border-0 shadow-sm rounded-2xl overflow-hidden">
+          {/* Top accent bar */}
+          <div className="h-1.5 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF]" />
+          
+          <div className="p-6">
+            {/* Back to landing */}
+            <button
+              onClick={() => setLocation('/')}
+              className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors mb-6"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="text-sm">{t('auth:common.backToHome', 'Back to Home')}</span>
+            </button>
+
             {/* Logo Section */}
-            <div className="flex flex-col items-center mb-8">
+            <div className="flex flex-col items-center mb-6">
               <motion.div 
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.3 }}
-                className="mb-6"
+                className="mb-4"
               >
-                <img src="/logo.png" alt="NutriAI" className="h-20 w-auto object-contain" />
+                <img src="/logo.png" alt="NutriAI" className="h-16 w-auto object-contain" />
               </motion.div>
+              <motion.h2
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-2xl font-bold text-gray-900 mb-1"
+              >
+                {isLogin ? t('auth:login.title', 'Welcome Back') : t('auth:register.title', 'Create Account')}
+              </motion.h2>
               <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -103,7 +124,7 @@ export default function AuthPage() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+                  className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
                 >
                   {error}
                 </motion.div>
@@ -215,7 +236,7 @@ export default function AuthPage() {
               <Button 
                 type="submit"
                 disabled={loginMutation.isPending || registerMutation.isPending}
-                className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:from-[#0BB5AA] hover:to-[#1E96EE] text-white rounded-xl font-semibold transition-all shadow-lg mt-6"
+                className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white rounded-xl font-semibold transition-all mt-6"
               >
                 {loginMutation.isPending || registerMutation.isPending ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -239,7 +260,7 @@ export default function AuthPage() {
             {/* <GoogleAuthButton mode={isLogin ? 'login' : 'register'} /> */}
 
             {/* Toggle Auth Mode */}
-            <div className="text-center mt-6">
+            <div className="text-center">
               <p className="text-sm text-gray-600">
                 {isLogin ? t('auth:login.noAccount') : t('auth:register.haveAccount')}
                 {" "}
@@ -258,19 +279,19 @@ export default function AuthPage() {
                 </button>
               </p>
             </div>
-          </Card>
+          </div>
+        </Card>
 
-          {/* Footer */}
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="text-center text-xs text-gray-600 mt-6"
-          >
-            {t('auth:common.termsAndPrivacy')}
-          </motion.p>
-        </motion.div>
-      </div>
+        {/* Footer */}
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-center text-xs text-gray-500 mt-6"
+        >
+          {t('auth:common.termsAndPrivacy')}
+        </motion.p>
+      </motion.div>
     </div>
   );
 }
