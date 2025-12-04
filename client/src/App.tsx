@@ -521,6 +521,11 @@ function App() {
             <Route path="/">
               <NavigationRedirect to={user?.hasCompletedOnboarding === false ? "/onboarding" : "/dashboard"} />
             </Route>
+            
+            {/* Fallback - redirect any unknown routes for authenticated users */}
+            <Route>
+              <NavigationRedirect to="/dashboard" />
+            </Route>
           </>
         ) : (
           // Public routes for unauthenticated users
