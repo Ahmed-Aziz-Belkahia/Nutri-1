@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { Camera, Target, Scale, Ruler, Edit2, Save, X, LogOut, Award, Utensils, Zap, Calendar, FileText, Trash2, Activity, Star, Loader2, Heart, Globe } from "lucide-react";
+import { Camera, Target, Scale, Ruler, Edit2, Save, X, LogOut, Award, Utensils, Zap, Calendar, FileText, Trash2, Activity, Star, Loader2, Heart, Globe, Check } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/hooks/use-user";
@@ -845,7 +845,7 @@ export default function Profile() {
         )}
       </AnimatePresence>
 
-      {/* Goals & Activity Modal */}
+      {/* Goals & Activity Modal - Modern Clean Design */}
       <AnimatePresence>
         {goalsDialogOpen && (
           <>
@@ -853,153 +853,193 @@ export default function Profile() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1002]"
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-md z-[1002]"
               onClick={() => setGoalsDialogOpen(false)}
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
+              className="fixed inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center z-[1003]"
             >
-              <div className="w-full max-w-md">
-                <div className="bg-white rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-                  <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-blue-500 px-6 py-8 text-white flex-shrink-0">
-                    <button
-                      onClick={() => setGoalsDialogOpen(false)}
-                      className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                      >
-                        <Target className="w-8 h-8 text-white" />
-                      </motion.div>
-                    </div>
-                    <h3 className="text-2xl font-bold text-center mb-2">Edit Goals & Activity</h3>
-                    <p className="text-white/90 text-center text-sm">Update your targets to get personalized recommendations</p>
+              <div className="w-full md:max-w-lg md:mx-4">
+                <div className="bg-white rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden">
+                  {/* Handle bar for mobile */}
+                  <div className="md:hidden flex justify-center pt-3 pb-2">
+                    <div className="w-10 h-1 bg-gray-300 rounded-full" />
                   </div>
-                  <div className="px-6 py-6 overflow-y-auto flex-1">
-                    <div className="space-y-5">
-                      <div className="space-y-2">
-                        <Label htmlFor="weightGoal" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Target className="w-4 h-4 text-[var(--color-primary)]" />
-                          Weight Goal
-                        </Label>
-                        <Select value={weightGoal} onValueChange={setWeightGoal}>
-                          <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]">
-                            <SelectValue placeholder="Select your weight goal" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="loss">Weight Loss</SelectItem>
-                            <SelectItem value="maintain">Maintain Weight</SelectItem>
-                            <SelectItem value="gain">Weight Gain</SelectItem>
-                          </SelectContent>
-                        </Select>
+                  
+                  {/* Header */}
+                  <div className="px-6 pt-4 pb-5 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">Goals & Activity</h3>
+                        <p className="text-sm text-gray-500 mt-0.5">Personalize your nutrition plan</p>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="goalWeight" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Scale className="w-4 h-4 text-[var(--color-primary)]" />
-                          Goal Weight (kg)
-                        </Label>
+                      <button
+                        onClick={() => setGoalsDialogOpen(false)}
+                        className="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                      >
+                        <X className="w-5 h-5 text-gray-600" />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="px-6 py-5 space-y-6 max-h-[60vh] overflow-y-auto">
+                    {/* Weight Goal Selection */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-700 mb-3 block">What's your goal?</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'loss', label: 'Lose', icon: '📉', color: 'from-red-500 to-orange-400' },
+                          { value: 'maintain', label: 'Maintain', icon: '⚖️', color: 'from-blue-500 to-cyan-400' },
+                          { value: 'gain', label: 'Gain', icon: '📈', color: 'from-green-500 to-emerald-400' },
+                        ].map((goal) => (
+                          <button
+                            key={goal.value}
+                            type="button"
+                            onClick={() => setWeightGoal(goal.value)}
+                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${
+                              weightGoal === goal.value
+                                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
+                                : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                          >
+                            <div className="text-2xl mb-1">{goal.icon}</div>
+                            <div className={`text-sm font-medium ${weightGoal === goal.value ? 'text-[var(--color-primary)]' : 'text-gray-700'}`}>
+                              {goal.label}
+                            </div>
+                            {weightGoal === goal.value && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--color-primary)] flex items-center justify-center"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Target Weight */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-700 mb-3 block">Target weight</label>
+                      <div className="relative">
                         <Input 
-                          id="goalWeight"
                           type="number"
                           min="1"
                           value={goalWeight}
                           onChange={(e) => setGoalWeight(e.target.value)}
-                          className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          placeholder="Enter your goal weight"
+                          className="h-14 pl-4 pr-14 text-lg font-medium rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] transition-all"
+                          placeholder="70"
                         />
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">kg</span>
                       </div>
+                    </div>
+                    
+                    {/* Activity Level */}
+                    <div>
+                      <label className="text-sm font-semibold text-gray-700 mb-3 block">Activity level</label>
                       <div className="space-y-2">
-                        <Label htmlFor="activityLevel" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Activity className="w-4 h-4 text-[var(--color-primary)]" />
-                          Activity Level
-                        </Label>
-                        <Select value={activityLevel} onValueChange={setActivityLevel}>
-                          <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]">
-                            <SelectValue placeholder="Select activity level" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Sedentary">Sedentary (no exercise)</SelectItem>
-                            <SelectItem value="Light">Light (1-3 days/week)</SelectItem>
-                            <SelectItem value="Moderate">Moderate (3-5 days/week)</SelectItem>
-                            <SelectItem value="Active">Active (6-7 days/week)</SelectItem>
-                            <SelectItem value="Very Active">Very Active (2x daily)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {[
+                          { value: 'Sedentary', label: 'Sedentary', desc: 'Little or no exercise', emoji: '🧘' },
+                          { value: 'Light', label: 'Light', desc: '1-3 days per week', emoji: '🚶' },
+                          { value: 'Moderate', label: 'Moderate', desc: '3-5 days per week', emoji: '🏃' },
+                          { value: 'Active', label: 'Active', desc: '6-7 days per week', emoji: '💪' },
+                          { value: 'Very Active', label: 'Very Active', desc: 'Intense training 2x daily', emoji: '🏋️' },
+                        ].map((level) => (
+                          <button
+                            key={level.value}
+                            type="button"
+                            onClick={() => setActivityLevel(level.value)}
+                            className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all duration-200 text-left ${
+                              activityLevel === level.value
+                                ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
+                                : 'border-gray-200 hover:border-gray-300 bg-white'
+                            }`}
+                          >
+                            <span className="text-xl">{level.emoji}</span>
+                            <div className="flex-1">
+                              <div className={`font-medium ${activityLevel === level.value ? 'text-[var(--color-primary)]' : 'text-gray-800'}`}>
+                                {level.label}
+                              </div>
+                              <div className="text-xs text-gray-500">{level.desc}</div>
+                            </div>
+                            {activityLevel === level.value && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="w-5 h-5 rounded-full bg-[var(--color-primary)] flex items-center justify-center flex-shrink-0"
+                              >
+                                <Check className="w-3 h-3 text-white" />
+                              </motion.div>
+                            )}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex-shrink-0">
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setGoalsDialogOpen(false)}
-                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-all text-base"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={async () => {
-                          try {
-                            // Map weightGoal to goalType format
-                            let goalType: 'maintain' | 'lose' | 'gain' = 'maintain';
-                            if (weightGoal === 'loss') goalType = 'lose';
-                            else if (weightGoal === 'gain') goalType = 'gain';
-                            
-                            // Map activity level to lowercase format for calculation
-                            const activityLevelLower = activityLevel.toLowerCase().replace(' ', '_');
-                            
-                            // Get current profile data for calculations
-                            const age = profile?.age || 25;
-                            const weight = profile?.currentWeight || 70;
-                            const height = profile?.height || 170;
-                            const gender = profile?.gender || 'male';
-                            
-                            // Recalculate calories and macros
-                            const newCalories = calculateDailyCalories(
-                              age,
-                              weight,
-                              height,
-                              activityLevelLower,
-                              goalType,
-                              gender === 'male'
-                            );
-                            const newMacros = calculateMacros(newCalories, goalType);
-                            
-                            const response = await fetch('/api/user/profile', {
-                              method: 'PUT',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({
-                                goalWeight: parseFloat(goalWeight),
-                                weightGoal: weightGoal,
-                                activityLevel: activityLevel,
-                                caloriesGoal: newCalories,
-                                proteinGoal: Math.round((newMacros.protein * 4 / newCalories) * 100),
-                                carbsGoal: Math.round((newMacros.carbs * 4 / newCalories) * 100),
-                                fatGoal: Math.round((newMacros.fat * 9 / newCalories) * 100),
-                              }),
-                            });
-                            if (!response.ok) throw new Error('Failed to update goals and activity');
-                            await refetchProfile();
-                            toast({ title: "Goals updated", description: "Your goals, activity level, and nutrition have been recalculated." });
-                            setGoalsDialogOpen(false);
-                          } catch (error) {
-                            toast({ variant: "destructive", title: "Error", description: "Failed to update goals. Please try again." });
-                          }
-                        }}
-                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-primary)] to-blue-500 hover:from-[var(--color-primary)]/90 hover:to-blue-500/90 active:scale-95 transition-all shadow-lg shadow-[var(--color-primary)]/30 text-base"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
+                  
+                  {/* Footer */}
+                  <div className="px-6 py-4 bg-gray-50/80 border-t border-gray-100">
+                    <button
+                      onClick={async () => {
+                        try {
+                          // Map weightGoal to goalType format
+                          let goalType: 'maintain' | 'lose' | 'gain' = 'maintain';
+                          if (weightGoal === 'loss') goalType = 'lose';
+                          else if (weightGoal === 'gain') goalType = 'gain';
+                          
+                          // Map activity level to lowercase format for calculation
+                          const activityLevelLower = activityLevel.toLowerCase().replace(' ', '_');
+                          
+                          // Get current profile data for calculations
+                          const age = profile?.age || 25;
+                          const weight = profile?.currentWeight || 70;
+                          const height = profile?.height || 170;
+                          const gender = profile?.gender || 'male';
+                          
+                          // Recalculate calories and macros
+                          const newCalories = calculateDailyCalories(
+                            age,
+                            weight,
+                            height,
+                            activityLevelLower,
+                            goalType,
+                            gender === 'male'
+                          );
+                          const newMacros = calculateMacros(newCalories, goalType);
+                          
+                          const response = await fetch('/api/user/profile', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              goalWeight: parseFloat(goalWeight),
+                              weightGoal: weightGoal,
+                              activityLevel: activityLevel,
+                              caloriesGoal: newCalories,
+                              proteinGoal: Math.round((newMacros.protein * 4 / newCalories) * 100),
+                              carbsGoal: Math.round((newMacros.carbs * 4 / newCalories) * 100),
+                              fatGoal: Math.round((newMacros.fat * 9 / newCalories) * 100),
+                            }),
+                          });
+                          if (!response.ok) throw new Error('Failed to update goals and activity');
+                          await refetchProfile();
+                          toast({ title: "Goals updated", description: "Your goals, activity level, and nutrition have been recalculated." });
+                          setGoalsDialogOpen(false);
+                        } catch (error) {
+                          toast({ variant: "destructive", title: "Error", description: "Failed to update goals. Please try again." });
+                        }
+                      }}
+                      className="w-full py-4 rounded-xl font-semibold text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary)]/90 active:scale-[0.98] transition-all text-base shadow-lg shadow-[var(--color-primary)]/20"
+                    >
+                      Save Changes
+                    </button>
                   </div>
                 </div>
               </div>
