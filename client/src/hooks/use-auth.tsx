@@ -234,18 +234,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Use the new JWT auth endpoint (will be redirected via 307)
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      
+      // Clear local session flags
+      localStorage.removeItem('nutriai_session_active');
+      localStorage.removeItem('nutriai_user_id');
+      
+      // Clear user data from React Query cache
       queryClient.setQueryData(["user"], null);
       // Force invalidate the user query to ensure the auth state is updated correctly
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      
       toast({
         title: "Logged out successfully",
       });
+      
+      // Force navigation to auth page
+      window.location.href = '/auth';
     } catch (error) {
+      // Even if logout API fails, clear local state and redirect
+      localStorage.removeItem('nutriai_session_active');
+      localStorage.removeItem('nutriai_user_id');
+      queryClient.setQueryData(["user"], null);
+      
       toast({
         variant: "destructive",
         title: "Logout failed",
         description: "An unexpected error occurred",
       });
+      
+      // Still redirect to auth page
+      window.location.href = '/auth';
     }
   };
 
