@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BaseLayout from "@/components/layouts/BaseLayout";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { calculateDailyCalories, calculateMacros } from "@/lib/nutrition";
 
 export default function Profile() {
   const { t } = useTranslation(['common']);
@@ -948,18 +949,47 @@ export default function Profile() {
                       <button
                         onClick={async () => {
                           try {
+                            // Map weightGoal to goalType format
+                            let goalType: 'maintain' | 'lose' | 'gain' = 'maintain';
+                            if (weightGoal === 'loss') goalType = 'lose';
+                            else if (weightGoal === 'gain') goalType = 'gain';
+                            
+                            // Map activity level to lowercase format for calculation
+                            const activityLevelLower = activityLevel.toLowerCase().replace(' ', '_');
+                            
+                            // Get current profile data for calculations
+                            const age = profile?.age || 25;
+                            const weight = profile?.currentWeight || 70;
+                            const height = profile?.height || 170;
+                            const gender = profile?.gender || 'male';
+                            
+                            // Recalculate calories and macros
+                            const newCalories = calculateDailyCalories(
+                              age,
+                              weight,
+                              height,
+                              activityLevelLower,
+                              goalType,
+                              gender === 'male'
+                            );
+                            const newMacros = calculateMacros(newCalories, goalType);
+                            
                             const response = await fetch('/api/user/profile', {
                               method: 'PUT',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({
                                 goalWeight: parseFloat(goalWeight),
                                 weightGoal: weightGoal,
-                                activityLevel: activityLevel
+                                activityLevel: activityLevel,
+                                caloriesGoal: newCalories,
+                                proteinGoal: Math.round((newMacros.protein * 4 / newCalories) * 100),
+                                carbsGoal: Math.round((newMacros.carbs * 4 / newCalories) * 100),
+                                fatGoal: Math.round((newMacros.fat * 9 / newCalories) * 100),
                               }),
                             });
                             if (!response.ok) throw new Error('Failed to update goals and activity');
                             await refetchProfile();
-                            toast({ title: "Goals updated", description: "Your goals and activity level have been updated." });
+                            toast({ title: "Goals updated", description: "Your goals, activity level, and nutrition have been recalculated." });
                             setGoalsDialogOpen(false);
                           } catch (error) {
                             toast({ variant: "destructive", title: "Error", description: "Failed to update goals. Please try again." });
