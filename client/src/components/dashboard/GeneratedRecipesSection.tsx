@@ -60,7 +60,7 @@ export default function GeneratedRecipesSection() {
     setOpenMenuId(null);
     
     if (!recipeId) return;
-    window.location.href = `/meal/${recipeId}`;
+    window.location.href = `/recipes/${recipeId}`;
   };
 
   const handleDelete = async (recipeId: number, e?: React.MouseEvent) => {
@@ -76,7 +76,7 @@ export default function GeneratedRecipesSection() {
     if (!recipeToDelete) return;
 
     try {
-      const response = await fetch(`/api/food-logs/${recipeToDelete.id}`, {
+      const response = await fetch(`/api/recipes/${recipeToDelete.id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -240,7 +240,7 @@ export default function GeneratedRecipesSection() {
 
                 {/* Recipe Image/Placeholder */}
                 <div 
-                  onClick={() => window.location.href = `/recipes/food-log/${recipe.id}`}
+                  onClick={() => window.location.href = `/recipes/${recipe.id}`}
                   className="h-[120px] bg-gradient-to-br from-[#26A8FF]/5 to-[#0CC5BA]/10 flex items-center justify-center"
                 >
                   <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#26A8FF]/20 to-[#0CC5BA]/20 flex items-center justify-center">
@@ -250,7 +250,7 @@ export default function GeneratedRecipesSection() {
 
                 {/* Recipe Info */}
                 <div 
-                  onClick={() => window.location.href = `/recipes/food-log/${recipe.id}`}
+                  onClick={() => window.location.href = `/recipes/${recipe.id}`}
                   className="p-3"
                 >
                   <h4 className="font-medium text-gray-900 text-sm line-clamp-2 mb-1">

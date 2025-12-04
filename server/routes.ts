@@ -745,25 +745,52 @@ export function registerRoutes(app: Express): Server {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
 
-      // Get food logs where source is 'ingredient_generation'
+      // Query from recipes table where source is 'ingredient_generation'
       const ingredientRecipes = await db
-        .select()
-        .from(foodLogs)
+        .select({
+          id: recipes.id,
+          name: recipes.name,
+          description: recipes.description,
+          imageUrl: recipes.imageUrl,
+          nutritionInfo: recipes.nutritionInfo,
+          ingredients: recipes.ingredients,
+          instructions: recipes.instructions,
+          source: recipes.source,
+          createdAt: recipes.createdAt,
+        })
+        .from(recipes)
         .where(
           and(
-            eq(foodLogs.userId, req.user!.id),
-            sql`${foodLogs.source} = 'ingredient_generation'`
+            eq(recipes.userId, req.user!.id),
+            eq(recipes.source, 'ingredient_generation')
           )
         )
-        .orderBy(desc(foodLogs.date))
+        .orderBy(desc(recipes.createdAt))
         .limit(limit);
 
-      console.log('[Food Logs API] Retrieved ingredient-generated recipes:', {
-        count: ingredientRecipes.length,
+      // Transform to match expected format with calories/protein/etc at top level
+      const transformedRecipes = ingredientRecipes.map(recipe => ({
+        id: recipe.id,
+        name: recipe.name,
+        description: recipe.description,
+        imageUrl: recipe.imageUrl,
+        image: recipe.imageUrl,
+        calories: recipe.nutritionInfo?.calories || 0,
+        protein: recipe.nutritionInfo?.protein || 0,
+        carbs: recipe.nutritionInfo?.carbs || 0,
+        fat: recipe.nutritionInfo?.fat || 0,
+        ingredients: recipe.ingredients,
+        instructions: recipe.instructions,
+        source: recipe.source,
+        createdAt: recipe.createdAt,
+      }));
+
+      console.log('[Recipes API] Retrieved ingredient-generated recipes:', {
+        count: transformedRecipes.length,
         userId: req.user!.id
       });
 
-      res.json(ingredientRecipes);
+      res.json(transformedRecipes);
     } catch (error) {
       console.error('Error fetching ingredient-generated recipes:', error);
       res.status(500).json({
