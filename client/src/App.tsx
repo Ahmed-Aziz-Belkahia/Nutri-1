@@ -530,8 +530,9 @@ function App() {
             <Route path="/test-login" component={TestLogin} />
             <Route path="/debug-login" component={DebugLogin} />
             <Route path="/emotional-landing" component={EmotionalLandingPage} />
-            <Route path="/onboarding" component={OnboardingQuiz} />
-            <Route path="/" component={OnboardingQuiz} />
+            <Route path="/onboarding" component={TempNewOnboarding} />
+            <Route path="/old-onboarding" component={OnboardingQuiz} />
+            <Route path="/" component={TempNewOnboarding} />
             
             {/* Email verification and password reset routes */}
             <Route path="/verify-email/:token" component={EmailVerifiedPage} />
