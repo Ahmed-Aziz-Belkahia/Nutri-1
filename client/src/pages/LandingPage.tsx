@@ -10,7 +10,7 @@ export default function LandingPage() {
   const { t } = useTranslation(['common']);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-2 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,18 +21,18 @@ export default function LandingPage() {
           {/* Top accent bar */}
           <div className="h-1 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF]" />
           
-          <div className="p-5 sm:p-8">
+          <div className="p-4 sm:p-8">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="flex justify-center mb-4 sm:mb-6"
+              className="flex justify-center mb-3 sm:mb-6"
             >
               <img 
                 src="/logo.png" 
                 alt="NutriAI" 
-                className="h-16 sm:h-20 w-auto object-contain"
+                className="h-14 sm:h-20 w-auto object-contain"
               />
             </motion.div>
 
@@ -41,7 +41,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-1"
+              className="text-xl sm:text-3xl font-bold text-gray-900 text-center mb-0.5"
             >
               {t('common:landing.appName')}
             </motion.h1>
@@ -51,7 +51,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="text-gray-600 text-sm sm:text-base text-center mb-5 sm:mb-8"
+              className="text-gray-600 text-xs sm:text-base text-center mb-4 sm:mb-8"
             >
               {t('common:landing.tagline')}
             </motion.p>
@@ -61,27 +61,27 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-6"
+              className="grid grid-cols-3 gap-1.5 sm:gap-3 mb-3 sm:mb-6"
             >
-              <div className="flex flex-col items-center text-center p-2.5 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#0CC5BA]/10 rounded-xl flex items-center justify-center mb-2 sm:mb-3">
-                  <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-[#0CC5BA]" />
+              <div className="flex flex-col items-center text-center p-2 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#0CC5BA]/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-1.5 sm:mb-3">
+                  <Camera className="w-4 h-4 sm:w-6 sm:h-6 text-[#0CC5BA]" />
                 </div>
-                <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.aiScan')}</span>
+                <span className="text-[9px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.aiScan')}</span>
               </div>
               
-              <div className="flex flex-col items-center text-center p-2.5 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#26A8FF]/10 rounded-xl flex items-center justify-center mb-2 sm:mb-3">
-                  <Utensils className="w-5 h-5 sm:w-6 sm:h-6 text-[#26A8FF]" />
+              <div className="flex flex-col items-center text-center p-2 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#26A8FF]/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-1.5 sm:mb-3">
+                  <Utensils className="w-4 h-4 sm:w-6 sm:h-6 text-[#26A8FF]" />
                 </div>
-                <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.mealPlans')}</span>
+                <span className="text-[9px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.mealPlans')}</span>
               </div>
               
-              <div className="flex flex-col items-center text-center p-2.5 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500/10 rounded-xl flex items-center justify-center mb-2 sm:mb-3">
-                  <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" />
+              <div className="flex flex-col items-center text-center p-2 sm:p-4 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-500/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-1.5 sm:mb-3">
+                  <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-purple-500" />
                 </div>
-                <span className="text-[10px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.track')}</span>
+                <span className="text-[9px] sm:text-xs text-gray-600 font-medium leading-tight">{t('common:landing.features.track')}</span>
               </div>
             </motion.div>
 
@@ -90,10 +90,10 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex items-center justify-center gap-2 mb-4 sm:mb-6 px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-[#0CC5BA]/5 to-[#26A8FF]/5 rounded-full border border-[#0CC5BA]/10 mx-auto w-fit"
+              className="flex items-center justify-center gap-1.5 sm:gap-2 mb-3 sm:mb-6 px-2.5 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-[#0CC5BA]/5 to-[#26A8FF]/5 rounded-full border border-[#0CC5BA]/10 mx-auto w-fit"
             >
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#26A8FF]" />
-              <span className="text-xs sm:text-sm text-gray-600">Powered by AI</span>
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[#26A8FF]" />
+              <span className="text-[10px] sm:text-sm text-gray-600">Powered by AI</span>
             </motion.div>
 
             {/* CTA Buttons */}
@@ -101,12 +101,12 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="space-y-2.5 sm:space-y-3"
+              className="space-y-2 sm:space-y-3"
             >
               <Button
                 onClick={() => setLocation("/auth?tab=signup")}
                 size="lg"
-                className="w-full h-12 sm:h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white text-sm sm:text-base font-semibold rounded-xl shadow-sm transition-all"
+                className="w-full h-11 sm:h-14 bg-gradient-to-r from-[#0CC5BA] via-purple-500 to-[#26A8FF] hover:opacity-90 text-white text-sm sm:text-base font-semibold rounded-xl shadow-sm transition-all"
               >
                 {t('common:landing.getStarted')}
               </Button>
@@ -115,7 +115,7 @@ export default function LandingPage() {
                 onClick={() => setLocation("/auth?tab=login")}
                 size="lg"
                 variant="outline"
-                className="w-full h-12 sm:h-14 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 text-sm sm:text-base font-semibold rounded-xl transition-all"
+                className="w-full h-11 sm:h-14 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 text-sm sm:text-base font-semibold rounded-xl transition-all"
               >
                 {t('common:landing.signIn')}
               </Button>
@@ -126,7 +126,7 @@ export default function LandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              className="text-center text-[10px] sm:text-xs text-gray-500 mt-4 sm:mt-6"
+              className="text-center text-[9px] sm:text-xs text-gray-500 mt-3 sm:mt-6"
             >
               {t('common:landing.termsNotice')}
             </motion.p>
