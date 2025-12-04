@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -284,6 +285,10 @@ export default function OnboardingQuiz() {
 
   return (
     <div className="h-screen gradient-bg relative overflow-hidden">
+      {/* Language selector at top right */}
+      <div className="absolute top-4 right-4 z-50">
+        <OnboardingLanguageSelector />
+      </div>
       <div className="max-w-[600px] mx-auto relative z-10 p-4 h-screen flex items-center">
         <AnimatePresence mode="wait">
           <motion.div
