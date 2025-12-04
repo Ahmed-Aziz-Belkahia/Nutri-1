@@ -267,10 +267,10 @@ export default function RecipeResults() {
         }
       }
       
-      // Fetch each recipe from the food logs endpoint
+      // Fetch each recipe from the recipes endpoint
       const recipePromises = recipeIds.map(async id => {
         try {
-          const response = await fetch(`/api/food-logs/${id}`, {
+          const response = await fetch(`/api/recipes/${id}`, {
             credentials: 'include'
           });
           if (!response.ok) {
@@ -311,7 +311,7 @@ export default function RecipeResults() {
         cookingTime: recipe.cookTime || recipe.cook_time || 15,
         flavor: recipe.flavor || 'Mixed',
         cuisine: recipe.cuisine || recipe.cuisineType || 'International',
-        nutritionalInfo: {
+        nutritionalInfo: recipe.nutritionInfo || {
           calories: recipe.calories || 0,
           protein: recipe.protein || 0,
           carbs: recipe.carbs || 0,
@@ -722,20 +722,17 @@ export default function RecipeResults() {
                 {/* View Recipe Button */}
                 <Button
                   onClick={async () => {
-                    // If recipe has an ID (saved in database), use recipes/food-log route
+                    // If recipe has an ID (saved in database), navigate to it
                     if (recipe.id) {
-                      setLocation(`/recipes/food-log/${recipe.id}`);
+                      setLocation(`/recipes/${recipe.id}`);
                       return;
                     }
                     
                     // If recipe is not saved, save it first then navigate
                     try {
-                      const imageData = analysisData?.image || localStorage.getItem('analyzingIngredientsImage');
-                      
                       const formattedRecipe = {
                         name: recipe.name,
                         description: recipe.description || `Recipe generated from scanned ingredients`,
-                        mealType: recipe.mealType || 'dinner',
                         ingredients: recipe.ingredients,
                         instructions: recipe.instructions,
                         prepTime: recipe.prepTime,
@@ -747,18 +744,10 @@ export default function RecipeResults() {
                         protein: recipe.nutritionalInfo.protein,
                         carbs: recipe.nutritionalInfo.carbs,
                         fat: recipe.nutritionalInfo.fat,
-                        fiber: 5,
-                        sugar: 8,
-                        sodium: 500,
-                        image: imageData,
-                        isRecipe: true,
-                        source: 'ingredient_generation',
-                        components: analysisData?.ingredients?.map((ing: any) => ing.name) || [],
-                        isAnalyzing: true,
-                        hideFromToday: true
+                        source: 'ingredient_generation'
                       };
 
-                      const saveResponse = await fetch('/api/food-logs', {
+                      const saveResponse = await fetch('/api/recipes', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(formattedRecipe),
@@ -767,7 +756,7 @@ export default function RecipeResults() {
 
                       if (saveResponse.ok) {
                         const savedRecipe = await saveResponse.json();
-                        setLocation(`/recipes/food-log/${savedRecipe.log.id}`);
+                        setLocation(`/recipes/${savedRecipe.id}`);
                       } else {
                         throw new Error('Failed to save recipe');
                       }

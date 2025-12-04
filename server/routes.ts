@@ -572,7 +572,7 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
 
-      const { name, description, calories, protein, carbs, fat, ingredients, instructions, isPublic, imageUrl } = req.body;
+      const { name, description, calories, protein, carbs, fat, ingredients, instructions, isPublic, imageUrl, source, prepTime, cookTime, servings, difficulty, cuisineType } = req.body;
 
       // Create the recipe in the database (only columns that exist in schema)
       const [newRecipe] = await db
@@ -591,7 +591,7 @@ export function registerRoutes(app: Express): Server {
           },
           imageUrl: imageUrl || '',
           isPublic: Boolean(isPublic),
-          source: 'created',
+          source: source || 'created',
           likesCount: 0,
           commentsCount: 0,
           createdAt: new Date(),

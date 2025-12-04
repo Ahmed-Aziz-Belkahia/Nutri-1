@@ -299,18 +299,10 @@ export default function IngredientsAnalysis() {
             protein: recipe.nutritionInfo?.protein || recipe.protein || 20,
             carbs: recipe.nutritionInfo?.carbs || recipe.carbs || 40,
             fat: recipe.nutritionInfo?.fat || recipe.fat || 15,
-            fiber: recipe.nutritionInfo?.fiber || recipe.fiber || 5,
-            sugar: recipe.nutritionInfo?.sugar || recipe.sugar || 8,
-            sodium: recipe.nutritionInfo?.sodium || recipe.sodium || 500,
-            image: null, // Don't save ingredient image for generated recipes
-            isRecipe: true,
-            source: 'ingredient_generation', // Different source to separate from scanned meals
-            components: ingredients.map((ing: any) => ing.name),
-            isAnalyzing: true,
-            hideFromToday: true // Flag to hide from today's scans
+            source: 'ingredient_generation' // Save to recipes page, not food logs
           };
 
-          const saveResponse = await fetch('/api/food-logs', {
+          const saveResponse = await fetch('/api/recipes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formattedRecipe),
@@ -319,7 +311,7 @@ export default function IngredientsAnalysis() {
 
           if (saveResponse.ok) {
             const savedRecipe = await saveResponse.json();
-            savedRecipes.push(savedRecipe.log);
+            savedRecipes.push(savedRecipe);
           }
         } catch (error) {
           console.error('[IngredientsAnalysis] Error saving recipe:', error);
@@ -357,13 +349,15 @@ export default function IngredientsAnalysis() {
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         try {
-          const verifyResponse = await fetch(`/api/food-logs?ids=${savedRecipeIds.join(',')}`, {
-            credentials: 'include'
-          });
+          // Verify each recipe is available in the database
+          const verifyPromises = savedRecipeIds.map(id => 
+            fetch(`/api/recipes/${id}`, { credentials: 'include' }).then(r => r.ok ? 1 : 0)
+          );
+          const verifyResults = await Promise.all(verifyPromises);
+          const verifiedCount = verifyResults.reduce((a, b) => a + b, 0);
 
-          if (verifyResponse.ok) {
-            const verifiedData = await verifyResponse.json();
-            const verifiedRecipes = Array.isArray(verifiedData) ? verifiedData : verifiedData.logs || [];
+          if (verifiedCount > 0) {
+            const verifiedRecipes = { length: verifiedCount };
 
             console.log(`[IngredientsAnalysis] Poll ${attempts}: Found ${verifiedRecipes.length} recipes in database`);
 
