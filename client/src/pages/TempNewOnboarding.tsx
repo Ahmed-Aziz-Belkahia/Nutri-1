@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
 import { calculateDailyCalories, calculateMacros } from '@/lib/nutrition';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -34,75 +35,150 @@ ChartJS.register(
   Legend
 );
 
-// Logo Component
+// Animation variants
+const pageVariants = {
+  initial: { opacity: 0, x: 50 },
+  animate: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } },
+  exit: { opacity: 0, x: -50, transition: { duration: 0.3 } }
+};
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } }
+};
+
+const fadeIn = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.4 } }
+};
+
+const scaleIn = {
+  initial: { opacity: 0, scale: 0.8 },
+  animate: { opacity: 1, scale: 1, transition: { duration: 0.5, type: "spring", stiffness: 200 } }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const staggerItem = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] } }
+};
+
+// Logo Component with animation
 const Logo = () => (
-  <div className="flex justify-center mt-4 mb-8">
+  <motion.div 
+    className="flex justify-center mt-4 mb-8"
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
+  >
     <img 
       src="/nutri-ai-logo.png" 
       alt="NutriAI" 
       className="h-20"
     />
-  </div>
+  </motion.div>
 );
 
-// Phone Mockup Component
+// Phone Mockup Component with animation
 const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
-  <div className="flex-1 flex items-center justify-center mb-4">
+  <motion.div 
+    className="flex-1 flex items-center justify-center mb-4"
+    initial={{ opacity: 0, y: 40, scale: 0.9 }}
+    animate={{ opacity: 1, y: 0, scale: 1 }}
+    transition={{ duration: 0.7, delay: 0.2, type: "spring", stiffness: 100 }}
+  >
     <div className="relative" style={{ maxWidth: '200px', width: '100%' }}>
-      <img 
+      <motion.img 
         src={imageSrc} 
         alt="NutriAI App" 
         className="w-full h-auto drop-shadow-2xl"
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.3 }}
       />
     </div>
-  </div>
+  </motion.div>
 );
 
-// Heading Component
+// Heading Component with animation
 const Heading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
-  <div className="text-center mb-8">
+  <motion.div 
+    className="text-center mb-8"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.3 }}
+  >
     <h1 className="text-3xl font-bold text-[#1E293B] leading-tight">
       {title}
     </h1>
     {subtitle && (
-      <h2 className="text-3xl font-bold text-[#1E293B] leading-tight">
+      <motion.h2 
+        className="text-3xl font-bold text-[#1E293B] leading-tight"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
+      >
         {subtitle}
-      </h2>
+      </motion.h2>
     )}
-  </div>
+  </motion.div>
 );
 
-// Primary Button Component
+// Primary Button Component with animation
 const PrimaryButton = ({ onClick, children, disabled = false }: { onClick: () => void; children: React.ReactNode; disabled?: boolean }) => (
-  <button
+  <motion.button
     onClick={onClick}
     disabled={disabled}
-    className="w-full py-4 bg-[#26A8FF] text-white font-semibold rounded-full text-base hover:bg-[#1A8FE6] transition-colors active:scale-95 transform disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg shadow-[#26A8FF]/25"
+    className="w-full py-4 bg-[#26A8FF] text-white font-semibold rounded-full text-base hover:bg-[#1A8FE6] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg shadow-[#26A8FF]/25"
+    whileHover={{ scale: disabled ? 1 : 1.02 }}
+    whileTap={{ scale: disabled ? 1 : 0.98 }}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
   >
     {children}
-  </button>
+  </motion.button>
 );
 
 // Sign In Link Component
 const SignInLink = ({ onClick, alreadyHaveAccountText, signInText }: { onClick: () => void; alreadyHaveAccountText: string; signInText: string }) => (
-  <div className="text-center py-2">
+  <motion.div 
+    className="text-center py-2"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4, delay: 0.6 }}
+  >
     <span className="text-gray-600 text-sm">
       {alreadyHaveAccountText}{' '}
     </span>
-    <button
+    <motion.button
       onClick={onClick}
       className="text-[#26A8FF] font-semibold text-sm hover:underline"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
       {signInText}
-    </button>
-  </div>
+    </motion.button>
+  </motion.div>
 );
 
 // Home Indicator Component
 const HomeIndicator = () => (
-  <div className="flex justify-center pb-1 mt-auto">
+  <motion.div 
+    className="flex justify-center pb-1 mt-auto"
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3, delay: 0.5 }}
+  >
     <div className="w-32 h-1 rounded-full bg-[#1E293B]/20"></div>
-  </div>
+  </motion.div>
 );
 
 // Onboarding Layout Container
@@ -120,86 +196,116 @@ const OnboardingLayout = ({ children, showLanguageSelector = true }: { children:
   </div>
 );
 
-// Back Button Component
+// Back Button Component with animation
 const BackButton = ({ onClick }: { onClick: () => void }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className="absolute left-6 top-12 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.3 }}
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.9 }}
   >
     <ChevronLeft className="w-6 h-6" />
-  </button>
+  </motion.button>
 );
 
-// Progress Bar Component
+// Progress Bar Component with animation
 const ProgressBar = ({ current, total }: { current: number; total: number }) => (
   <div className="absolute left-16 right-16 top-12 flex items-center h-10">
     <div className="h-1 bg-[#26A8FF]/20 rounded-full overflow-hidden w-full">
-      <div 
-        className="h-full bg-[#26A8FF] rounded-full transition-all duration-300"
-        style={{ width: `${(current / total) * 100}%` }}
+      <motion.div 
+        className="h-full bg-[#26A8FF] rounded-full"
+        initial={{ width: 0 }}
+        animate={{ width: `${(current / total) * 100}%` }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
       />
     </div>
   </div>
 );
 
-// Page Title Component
+// Page Title Component with animation
 const PageTitle = ({ title, subtitle }: { title: string; subtitle?: string }) => (
-  <div className="mb-12">
+  <motion.div 
+    className="mb-12"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.1 }}
+  >
     <h1 className="text-2xl font-bold text-[#1E293B] mb-2">
       {title}
     </h1>
     {subtitle && (
-      <p className="text-[#64748B] text-sm">
+      <motion.p 
+        className="text-[#64748B] text-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+      >
         {subtitle}
-      </p>
+      </motion.p>
     )}
-  </div>
+  </motion.div>
 );
 
-// Selection Button Component
+// Selection Button Component with animation
 const SelectionButton = ({ 
   label, 
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   label: string; 
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full py-4 rounded-full text-base font-semibold transition-all border-2 ${
       selected 
         ? 'bg-[#26A8FF] text-white border-[#26A8FF] shadow-lg shadow-[#26A8FF]/25' 
         : 'bg-white text-[#1E293B] border-gray-200 hover:border-[#26A8FF]/50 hover:bg-[#26A8FF]/5'
     }`}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     {label}
-  </button>
+  </motion.button>
 );
 
 // Unit Toggle Component
 const UnitToggle = ({ isMetric, onChange, imperialLabel, metricLabel }: { isMetric: boolean; onChange: (metric: boolean) => void; imperialLabel: string; metricLabel: string }) => (
-  <div className="flex items-center justify-center gap-3 mb-8">
+  <motion.div 
+    className="flex items-center justify-center gap-3 mb-8"
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: 0.3 }}
+  >
     <span className={`text-sm font-semibold transition-all duration-200 ${!isMetric ? 'text-[#26A8FF]' : 'text-gray-400'}`}>
       {imperialLabel}
     </span>
-    <button
+    <motion.button
       onClick={() => onChange(!isMetric)}
       className={`relative w-14 h-8 rounded-full transition-all duration-300 ${
         isMetric ? 'bg-[#26A8FF]' : 'bg-gray-300'
       }`}
+      whileTap={{ scale: 0.95 }}
     >
-      <div 
-        className={`absolute top-0.5 w-7 h-7 bg-white rounded-full shadow-lg transition-all duration-300 ${
-          isMetric ? 'translate-x-[26px]' : 'translate-x-0.5'
-        }`}
+      <motion.div 
+        className="absolute top-0.5 w-7 h-7 bg-white rounded-full shadow-lg"
+        animate={{ x: isMetric ? 26 : 2 }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
       />
-    </button>
+    </motion.button>
     <span className={`text-sm font-semibold transition-all duration-200 ${isMetric ? 'text-[#26A8FF]' : 'text-gray-400'}`}>
       {metricLabel}
     </span>
-  </div>
+  </motion.div>
 );
 
 // Speed Slider Component with Animal Icons
@@ -299,21 +405,36 @@ const SpeedSlider = ({
   };
   
   return (
-    <div className="relative px-4">
+    <motion.div 
+      className="relative px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
       {/* Speed label */}
-      <div className="text-center mb-4">
+      <motion.div 
+        className="text-center mb-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+      >
         <p className="text-[#64748B] text-sm">{getSpeedLabel()}</p>
-      </div>
+      </motion.div>
       
       {/* Current value display */}
-      <div className="text-center mb-8">
+      <motion.div 
+        className="text-center mb-8"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.4, type: "spring" }}
+      >
         <div className="text-4xl font-bold text-[#1E293B]">
           {value.toFixed(1)} {unit}
         </div>
-      </div>
+      </motion.div>
       
       {/* Swipeable Slider with animal icons */}
-      <div 
+      <motion.div 
         ref={scrollRef}
         className="relative mb-8 select-none"
         onMouseDown={handleMouseDown}
@@ -323,26 +444,55 @@ const SpeedSlider = ({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleEnd}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.5 }}
       >
         {/* Animal icons */}
         <div className="flex justify-between px-2 mb-6">
-          <span className="text-3xl">{getAnimalIcon('slow')}</span>
-          <span className="text-3xl">{getAnimalIcon('medium')}</span>
-          <span className="text-3xl">{getAnimalIcon('fast')}</span>
+          <motion.span 
+            className="text-3xl"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.6, type: "spring" }}
+          >
+            {getAnimalIcon('slow')}
+          </motion.span>
+          <motion.span 
+            className="text-3xl"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.7, type: "spring" }}
+          >
+            {getAnimalIcon('medium')}
+          </motion.span>
+          <motion.span 
+            className="text-3xl"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: 0.8, type: "spring" }}
+          >
+            {getAnimalIcon('fast')}
+          </motion.span>
         </div>
         
         {/* Slider track */}
         <div className="relative h-2 bg-[#26A8FF]/20 rounded-full">
           {/* Progress fill */}
-          <div 
-            className="absolute left-0 top-0 h-full bg-[#26A8FF] rounded-full transition-all duration-200"
-            style={{ width: `${percentage}%` }}
+          <motion.div 
+            className="absolute left-0 top-0 h-full bg-[#26A8FF] rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 0.3 }}
           />
           
           {/* Slider thumb */}
-          <div 
-            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-[#26A8FF] rounded-full shadow-md transition-all duration-200 cursor-grab active:cursor-grabbing"
-            style={{ left: `calc(${percentage}% - 12px)` }}
+          <motion.div 
+            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-2 border-[#26A8FF] rounded-full shadow-md cursor-grab active:cursor-grabbing"
+            animate={{ left: `calc(${percentage}% - 12px)` }}
+            transition={{ duration: 0.2 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
           />
         </div>
         
@@ -351,17 +501,25 @@ const SpeedSlider = ({
           <span>{min.toFixed(1)} {unit}</span>
           <span>{max.toFixed(1)} {unit}</span>
         </div>
-      </div>
+      </motion.div>
       
       {/* Recommendation badge - always reserve space */}
       <div className="flex justify-center h-10 items-center">
-        {value >= 0.5 && value <= 1.0 && (
-          <span className="px-4 py-2 bg-[#26A8FF]/10 rounded-full text-sm font-medium text-[#26A8FF]">
-            {labels.recommended}
-          </span>
-        )}
+        <AnimatePresence>
+          {value >= 0.5 && value <= 1.0 && (
+            <motion.span 
+              className="px-4 py-2 bg-[#26A8FF]/10 rounded-full text-sm font-medium text-[#26A8FF]"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+            >
+              {labels.recommended}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -489,30 +647,61 @@ const WeightTransitionChart = ({ labels }: { labels: { title: string; descriptio
   }, []);
 
   return (
-    <div className="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100">
-      <h3 className="text-center font-semibold text-[#1E293B] mb-6">
+    <motion.div 
+      className="bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <motion.h3 
+        className="text-center font-semibold text-[#1E293B] mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
         {labels.title}
-      </h3>
+      </motion.h3>
       
       {/* Chart Container */}
-      <div className="relative h-48 mb-6">
+      <motion.div 
+        className="relative h-48 mb-6"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
         <ChartLine ref={chartRef} data={data} options={options} />
-      </div>
+      </motion.div>
       
       {/* Description */}
-      <p className="text-center text-sm text-[#64748B] leading-relaxed">
+      <motion.p 
+        className="text-center text-sm text-[#64748B] leading-relaxed"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.7 }}
+      >
         {labels.description}
-      </p>
-    </div>
+      </motion.p>
+    </motion.div>
   );
 };
 
-// Trust Illustration Component
+// Trust Illustration Component with animation
 const TrustIllustration = () => (
-  <div className="flex justify-center mb-8">
+  <motion.div 
+    className="flex justify-center mb-8"
+    initial={{ opacity: 0, scale: 0.8 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.6, type: "spring", stiffness: 150 }}
+  >
     <div className="relative">
       {/* Gradient circle background */}
-      <div className="w-52 h-52 rounded-full bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-100 flex items-center justify-center">
+      <motion.div 
+        className="w-52 h-52 rounded-full bg-gradient-to-br from-blue-100 via-sky-50 to-cyan-100 flex items-center justify-center"
+        animate={{ 
+          boxShadow: ['0 0 0 0 rgba(38, 168, 255, 0.2)', '0 0 0 20px rgba(38, 168, 255, 0)', '0 0 0 0 rgba(38, 168, 255, 0.2)']
+        }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
         {/* Dots around the circle */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 200 200">
           {Array.from({ length: 32 }, (_, i) => {
@@ -521,25 +710,32 @@ const TrustIllustration = () => (
             const x = 100 + radius * Math.cos((angle * Math.PI) / 180);
             const y = 100 + radius * Math.sin((angle * Math.PI) / 180);
             return (
-              <circle
+              <motion.circle
                 key={i}
                 cx={x}
                 cy={y}
                 r="1.5"
                 fill="#26A8FF"
-                opacity="0.5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.5 }}
+                transition={{ duration: 0.3, delay: i * 0.03 }}
               />
             );
           })}
         </svg>
         
         {/* Simple handshake emoji as fallback */}
-        <div className="relative z-10 text-7xl">
+        <motion.div 
+          className="relative z-10 text-7xl"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3, type: "spring", stiffness: 200 }}
+        >
           🤝
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
-  </div>
+  </motion.div>
 );
 
 // Setup Loading Page Component
@@ -614,63 +810,124 @@ const SetupLoadingPage = ({ onComplete, labels }: {
   }, []);
   
   return (
-    <div className="flex-1 flex flex-col justify-center px-2">
+    <motion.div 
+      className="flex-1 flex flex-col justify-center px-2"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Large percentage display */}
-      <div className="text-center mb-4">
-        <h1 className="text-6xl font-bold text-[#26A8FF]">
+      <motion.div 
+        className="text-center mb-4"
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.h1 
+          className="text-6xl font-bold text-[#26A8FF]"
+          key={progress}
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.1 }}
+        >
           {Math.floor(progress)}%
-        </h1>
-      </div>
+        </motion.h1>
+      </motion.div>
       
       {/* Status message */}
-      <div className="text-center mb-8">
+      <motion.div 
+        className="text-center mb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+      >
         <h2 className="text-xl font-semibold text-[#1E293B]">
           {labels.settingUp}
         </h2>
-      </div>
+      </motion.div>
       
       {/* Animated progress bar */}
-      <div className="mb-2">
+      <motion.div 
+        className="mb-2"
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+      >
         <div className="h-2 bg-[#26A8FF]/20 rounded-full overflow-hidden">
-          <div 
-            className="h-full rounded-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] transition-all duration-100 ease-out"
-            style={{ width: `${progress}%` }}
+          <motion.div 
+            className="h-full rounded-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6]"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.1 }}
           />
         </div>
-      </div>
+      </motion.div>
       
       {/* Current action message */}
-      <p className="text-center text-sm text-gray-500 mb-8">
+      <motion.p 
+        className="text-center text-sm text-gray-500 mb-8"
+        key={currentMessage}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         {currentMessage}
-      </p>
+      </motion.p>
       
       {/* Daily recommendation checklist */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <motion.div 
+        className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
         <p className="font-semibold text-sm text-[#1E293B] mb-3">
           {labels.dailyRecommendation}
         </p>
         <div className="space-y-2">
-          {setupItems.map((item) => (
-            <div key={item.key} className="flex items-center justify-between">
+          {setupItems.map((item, index) => (
+            <motion.div 
+              key={item.key} 
+              className="flex items-center justify-between"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+            >
               <span className="text-sm text-gray-700 flex items-center">
                 • {item.label}
               </span>
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ${
-                completedItems.includes(item.key) 
-                  ? 'bg-[#26A8FF]' 
-                  : 'border-2 border-gray-300'
-              }`}>
+              <motion.div 
+                className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                  completedItems.includes(item.key) 
+                    ? 'bg-[#26A8FF]' 
+                    : 'border-2 border-gray-300'
+                }`}
+                initial={false}
+                animate={{ 
+                  scale: completedItems.includes(item.key) ? [1, 1.2, 1] : 1,
+                  backgroundColor: completedItems.includes(item.key) ? '#26A8FF' : 'transparent'
+                }}
+                transition={{ duration: 0.3 }}
+              >
                 {completedItems.includes(item.key) && (
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <motion.svg 
+                    className="w-3 h-3 text-white" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.2, type: "spring" }}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
+                  </motion.svg>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -740,29 +997,68 @@ const CongratulationsPage = ({
   ];
   
   return (
-    <div className="flex-1 flex flex-col">
+    <motion.div 
+      className="flex-1 flex flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Success Header */}
       <div className="text-center pt-2 pb-6">
         {/* Success checkmark */}
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-full flex items-center justify-center shadow-xl shadow-[#26A8FF]/30">
+        <motion.div 
+          className="flex justify-center mb-4"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
+        >
+          <motion.div 
+            className="w-16 h-16 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-full flex items-center justify-center shadow-xl shadow-[#26A8FF]/30"
+            animate={{ 
+              boxShadow: ['0 10px 40px rgba(38, 168, 255, 0.3)', '0 10px 60px rgba(38, 168, 255, 0.5)', '0 10px 40px rgba(38, 168, 255, 0.3)']
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
             <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              <motion.path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={3} 
+                d="M5 13l4 4L19 7"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
             </svg>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
         
         {/* Title */}
-        <h1 className="text-2xl font-bold text-[#1E293B] mb-1">
+        <motion.h1 
+          className="text-2xl font-bold text-[#1E293B] mb-1"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
           {labels.title}
-        </h1>
-        <p className="text-[#64748B] text-base">
+        </motion.h1>
+        <motion.p 
+          className="text-[#64748B] text-base"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+        >
           {labels.subtitle}
-        </p>
+        </motion.p>
       </div>
       
       {/* Goal Card */}
-      <div className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-100">
+      <motion.div 
+        className="bg-white rounded-2xl p-4 mb-4 shadow-sm border border-gray-100"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[#64748B] text-xs uppercase tracking-wide mb-1">{labels.yourGoal}</p>
@@ -777,10 +1073,15 @@ const CongratulationsPage = ({
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
       
       {/* Daily Targets Card */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-1">
+      <motion.div 
+        className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-1"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+      >
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-semibold text-[#1E293B] text-base">
@@ -790,117 +1091,173 @@ const CongratulationsPage = ({
               {labels.personalizedForYou}
             </p>
           </div>
-          <span className="text-xs text-[#26A8FF] font-medium bg-[#26A8FF]/10 px-3 py-1 rounded-full">
+          <motion.span 
+            className="text-xs text-[#26A8FF] font-medium bg-[#26A8FF]/10 px-3 py-1 rounded-full"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3, delay: 1, type: "spring" }}
+          >
             {labels.editable}
-          </span>
+          </motion.span>
         </div>
         
         {/* Macro Grid - 2x2 layout matching dashboard style */}
         <div className="grid grid-cols-2 gap-3">
-          {macros.map((macro) => (
-            <div 
+          {macros.map((macro, index) => (
+            <motion.div 
               key={macro.name}
               className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-100"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.8 + index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-2 mb-2">
-                <div 
+                <motion.div 
                   className="w-2 h-2 rounded-full"
                   style={{ backgroundColor: macro.color }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3, delay: 1 + index * 0.1, type: "spring" }}
                 />
                 <span className="text-xs font-medium text-[#64748B]">{macro.name}</span>
               </div>
               
-              <p className="text-2xl font-bold text-[#1E293B]">
+              <motion.p 
+                className="text-2xl font-bold text-[#1E293B]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.1 + index * 0.1 }}
+              >
                 {macro.value}
                 {macro.unit && <span className="text-base font-normal text-[#64748B] ml-0.5">{macro.unit}</span>}
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-// Accomplishment Option Component
+// Accomplishment Option Component with animation
 const AccomplishmentOption = ({ 
   icon,
   label,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   icon: React.ReactNode;
   label: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-4 rounded-2xl text-left transition-all ${
       selected 
         ? 'bg-[#26A8FF]/10 border-2 border-[#26A8FF]' 
         : 'bg-white border-2 border-gray-100 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.4, delay: index * 0.08 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
-      <span className="text-xl">{icon}</span>
+      <motion.span 
+        className="text-xl"
+        animate={{ scale: selected ? 1.2 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        {icon}
+      </motion.span>
       <span className="font-medium text-[#1E293B] text-base">{label}</span>
     </div>
-  </button>
+  </motion.button>
 );
 
-// Diet Option Component
+// Diet Option Component with animation
 const DietOption = ({ 
   icon,
   label,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   icon: React.ReactNode;
   label: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-4 rounded-2xl text-left transition-all ${
       selected 
         ? 'bg-[#26A8FF]/10 border-2 border-[#26A8FF]' 
         : 'bg-white border-2 border-gray-100 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.4, delay: index * 0.08 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
-      <span className="text-xl">{icon}</span>
+      <motion.span 
+        className="text-xl"
+        animate={{ scale: selected ? 1.2 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        {icon}
+      </motion.span>
       <span className="font-medium text-[#1E293B] text-base">{label}</span>
     </div>
-  </button>
+  </motion.button>
 );
 
-// Obstacle Option Component
+// Obstacle Option Component with animation
 const ObstacleOption = ({ 
   icon,
   label,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   icon: React.ReactNode;
   label: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
       selected 
         ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
         : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, x: -20 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ duration: 0.4, delay: index * 0.08 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
-      <span className="text-xl">{icon}</span>
+      <motion.span 
+        className="text-xl"
+        animate={{ scale: selected ? 1.2 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        {icon}
+      </motion.span>
       <span className="font-medium text-[#1E293B]">{label}</span>
     </div>
-  </button>
+  </motion.button>
 );
 
 // Comparison Card Component
@@ -908,22 +1265,31 @@ const ComparisonCard = ({
   label, 
   value, 
   isHighlight,
-  fillPercentage 
+  fillPercentage,
+  index = 0
 }: { 
   label: string; 
   value: string; 
   isHighlight: boolean;
   fillPercentage?: number;
+  index?: number;
 }) => (
-  <div className="flex-1 h-full">
+  <motion.div 
+    className="flex-1 h-full"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.3 + index * 0.15 }}
+  >
     {/* Container with border and background */}
     <div className="relative h-full rounded-3xl bg-gray-100 border-2 border-gray-200 overflow-hidden">
       {/* Background fill */}
-      <div 
-        className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
+      <motion.div 
+        className={`absolute bottom-0 left-0 right-0 ${
           isHighlight ? 'bg-[#26A8FF]' : 'bg-gray-300'
         }`}
-        style={{ height: `${fillPercentage || 100}%` }}
+        initial={{ height: 0 }}
+        animate={{ height: `${fillPercentage || 100}%` }}
+        transition={{ duration: 0.8, delay: 0.5 + index * 0.15, ease: "easeOut" }}
       />
       
       {/* Content */}
@@ -935,12 +1301,17 @@ const ComparisonCard = ({
         }`}>
           {label}
         </p>
-        <p className="text-4xl font-bold">
+        <motion.p 
+          className="text-4xl font-bold"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.7 + index * 0.15 }}
+        >
           {value}
-        </p>
+        </motion.p>
       </div>
     </div>
-  </div>
+  </motion.div>
 );
 
 // Weight Slider Component (Ruler Style)
@@ -989,17 +1360,39 @@ const WeightSlider = ({
   };
   
   return (
-    <div className="relative w-full">
+    <motion.div 
+      className="relative w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+    >
       {/* Current value display */}
       <div className="text-center mb-8">
-        <div className="text-sm text-[#64748B] mb-1">{goalLabel}</div>
-        <div className="text-5xl font-bold text-[#1E293B]">
+        <motion.div 
+          className="text-sm text-[#64748B] mb-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+        >
+          {goalLabel}
+        </motion.div>
+        <motion.div 
+          className="text-5xl font-bold text-[#1E293B]"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.5, type: "spring" }}
+        >
           {value.toFixed(1)} <span className="text-3xl text-[#64748B]">{unit}</span>
-        </div>
+        </motion.div>
       </div>
       
       {/* Ruler container */}
-      <div className="relative h-24 bg-gray-50 rounded-2xl overflow-hidden w-full">
+      <motion.div 
+        className="relative h-24 bg-gray-50 rounded-2xl overflow-hidden w-full"
+        initial={{ opacity: 0, scaleX: 0.9 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
+      >
         {/* Center indicator line (fixed in middle) */}
         <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-[#26A8FF] z-20 pointer-events-none" />
         <div className="absolute left-1/2 -translate-x-1/2 top-0 w-3 h-3 bg-[#26A8FF] rounded-b-full z-20 pointer-events-none" />
@@ -1058,8 +1451,8 @@ const WeightSlider = ({
         {/* Gradient overlays for fade effect */}
         <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 to-transparent pointer-events-none z-10" />
         <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none z-10" />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -1111,7 +1504,12 @@ const IOSPicker = ({
   }, [selectedIndex, items, value, onChange]);
 
   return (
-    <div className="ios-style-picker relative h-52 overflow-hidden rounded-xl bg-white">
+    <motion.div 
+      className="ios-style-picker relative h-52 overflow-hidden rounded-xl bg-white"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       <ul
         ref={containerRef}
         onScroll={handleScroll}
@@ -1164,7 +1562,7 @@ const IOSPicker = ({
           <li className="ios-style-picker__highlight-item absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-10" />
         </ul>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -1198,32 +1596,43 @@ const WorkoutIcon = ({ type }: { type: 'low' | 'medium' | 'high' }) => {
   );
 };
 
-// Option Card Component - for workout selection
+// Option Card Component - for workout selection with animation
 const OptionCard = ({ 
   iconType,
   title,
   subtitle,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   iconType: 'low' | 'medium' | 'high';
   title: string;
   subtitle: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
       selected 
         ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
         : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: index * 0.1 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
-      <div className={`flex-shrink-0 ${selected ? 'text-[#26A8FF]' : 'text-[#1E293B]'}`}>
+      <motion.div 
+        className={`flex-shrink-0 ${selected ? 'text-[#26A8FF]' : 'text-[#1E293B]'}`}
+        animate={{ scale: selected ? 1.1 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
         <WorkoutIcon type={iconType} />
-      </div>
+      </motion.div>
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
           <span className="font-semibold text-[#1E293B]">{title}</span>
@@ -1231,28 +1640,35 @@ const OptionCard = ({
         <span className="text-sm text-[#64748B]">{subtitle}</span>
       </div>
     </div>
-  </button>
+  </motion.button>
 );
 
-// Source Option Component - for "Where did you hear about us?"
+// Source Option Component - for "Where did you hear about us?" with animation
 const SourceOption = ({ 
   icon,
   label,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   icon: React.ReactNode;
   label: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-3 rounded-2xl text-left transition-all border-2 ${
       selected 
         ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
         : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.3, delay: index * 0.05 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
       <div className="flex items-center justify-center flex-shrink-0">
@@ -1260,34 +1676,47 @@ const SourceOption = ({
       </div>
       <span className="font-medium text-[#1E293B]">{label}</span>
     </div>
-  </button>
+  </motion.button>
 );
 
-// Yes/No Option Component
+// Yes/No Option Component with animation
 const YesNoOption = ({ 
   icon,
   label,
   selected, 
-  onClick 
+  onClick,
+  index = 0
 }: { 
   icon: string;
   label: string;
   selected: boolean; 
   onClick: () => void;
+  index?: number;
 }) => (
-  <button
+  <motion.button
     onClick={onClick}
     className={`w-full p-4 rounded-2xl text-left transition-all border-2 ${
       selected 
         ? 'bg-[#26A8FF]/10 border-[#26A8FF]' 
         : 'bg-white border-gray-200 hover:border-[#26A8FF]/30'
     }`}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4, delay: index * 0.15 }}
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
   >
     <div className="flex items-center gap-3">
-      <span className="text-2xl">{icon}</span>
+      <motion.span 
+        className="text-2xl"
+        animate={{ scale: selected ? 1.2 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        {icon}
+      </motion.span>
       <span className="font-semibold text-[#1E293B] text-lg">{label}</span>
     </div>
-  </button>
+  </motion.button>
 );
 
 // Weight Loss Chart Component
@@ -1314,55 +1743,78 @@ const WeightLossChart = ({ labels }: {
   ];
 
   return (
-    <div className="w-full bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100">
-      <div className="text-sm font-semibold text-[#1E293B] mb-6">{labels.yourWeight}</div>
-      <ResponsiveContainer width="100%" height={220}>
-        <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-          <defs>
-            <linearGradient id="nutriGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#26A8FF" stopOpacity={0.2}/>
-              <stop offset="95%" stopColor="#26A8FF" stopOpacity={0}/>
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          <XAxis 
-            dataKey="month" 
-            tick={{ fontSize: 13, fill: '#6b7280', fontWeight: 500 }}
-            axisLine={false}
-            tickLine={false}
-            tickFormatter={(value) => value === 1 ? labels.month1 : value === 6 ? labels.month6 : ''}
-            ticks={[1, 6]}
-            domain={[1, 6]}
-          />
-          <YAxis hide domain={[65, 82]} />
-          
-          {/* Traditional Diet Line */}
-          <Line 
-            type="natural" 
-            dataKey="traditional" 
-            stroke="#ef4444" 
-            strokeWidth={3}
-            dot={{ fill: '#ef4444', r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
-            name="traditional"
-          />
-          
-          {/* NutriAI Line with gradient fill */}
-          <Line 
-            type="natural" 
-            dataKey="nutriAI" 
-            stroke="#26A8FF" 
-            strokeWidth={3.5}
-            dot={{ fill: '#26A8FF', r: 5, strokeWidth: 0 }}
-            activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
-            name="nutriAI"
-            fill="url(#nutriGradient)"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+    <motion.div 
+      className="w-full bg-white rounded-3xl p-6 mb-6 shadow-sm border border-gray-100"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+    >
+      <motion.div 
+        className="text-sm font-semibold text-[#1E293B] mb-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
+      >
+        {labels.yourWeight}
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <ResponsiveContainer width="100%" height={220}>
+          <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+            <defs>
+              <linearGradient id="nutriGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#26A8FF" stopOpacity={0.2}/>
+                <stop offset="95%" stopColor="#26A8FF" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <XAxis 
+              dataKey="month" 
+              tick={{ fontSize: 13, fill: '#6b7280', fontWeight: 500 }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(value) => value === 1 ? labels.month1 : value === 6 ? labels.month6 : ''}
+              ticks={[1, 6]}
+              domain={[1, 6]}
+            />
+            <YAxis hide domain={[65, 82]} />
+            
+            {/* Traditional Diet Line */}
+            <Line 
+              type="natural" 
+              dataKey="traditional" 
+              stroke="#ef4444" 
+              strokeWidth={3}
+              dot={{ fill: '#ef4444', r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 6, strokeWidth: 2, stroke: '#fff' }}
+              name="traditional"
+            />
+            
+            {/* NutriAI Line with gradient fill */}
+            <Line 
+              type="natural" 
+              dataKey="nutriAI" 
+              stroke="#26A8FF" 
+              strokeWidth={3.5}
+              dot={{ fill: '#26A8FF', r: 5, strokeWidth: 0 }}
+              activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+              name="nutriAI"
+              fill="url(#nutriGradient)"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </motion.div>
       
       {/* Legend */}
-      <div className="flex items-center gap-6 justify-center mt-6">
+      <motion.div 
+        className="flex items-center gap-6 justify-center mt-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.7 }}
+      >
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded-full bg-[#26A8FF] shadow-sm"></div>
           <span className="text-xs font-semibold text-[#1E293B]">{labels.nutriAI}</span>
@@ -1372,8 +1824,8 @@ const WeightLossChart = ({ labels }: {
           <div className="w-10 h-0.5 bg-red-500 rounded-full"></div>
           <span className="text-xs text-gray-600 font-medium">{labels.traditionalDiet}</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -1721,16 +2173,19 @@ export default function TempNewOnboarding() {
               label={t('gender.male')}
               selected={selectedGender === 'male'}
               onClick={() => setSelectedGender('male')}
+              index={0}
             />
             <SelectionButton
               label={t('gender.female')}
               selected={selectedGender === 'female'}
               onClick={() => setSelectedGender('female')}
+              index={1}
             />
             <SelectionButton
               label={t('gender.other')}
               selected={selectedGender === 'other'}
               onClick={() => setSelectedGender('other')}
+              index={2}
             />
           </div>
         </div>
@@ -1908,16 +2363,19 @@ export default function TempNewOnboarding() {
               label={t('goal.loseWeight')}
               selected={selectedGoal === 'lose'}
               onClick={() => setSelectedGoal('lose')}
+              index={0}
             />
             <SelectionButton
               label={t('goal.maintain')}
               selected={selectedGoal === 'maintain'}
               onClick={() => setSelectedGoal('maintain')}
+              index={1}
             />
             <SelectionButton
               label={t('goal.gainWeight')}
               selected={selectedGoal === 'gain'}
               onClick={() => setSelectedGoal('gain')}
+              index={2}
             />
           </div>
         </div>
