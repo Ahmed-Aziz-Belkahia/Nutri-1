@@ -1,4 +1,7 @@
 {
+  "header": {
+    "welcome": "Witaj w NutriAI"
+  },
   "common": {
     "next": "Dalej",
     "back": "Wstecz",

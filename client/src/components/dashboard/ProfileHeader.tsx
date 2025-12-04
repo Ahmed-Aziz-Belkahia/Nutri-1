@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface User {
   profileImage?: string;
   name?: string;
@@ -11,6 +13,8 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps) {
+  const { t } = useTranslation();
+  
   return (
     <header className="header">
       {/* NutriAI Logo */}
@@ -23,9 +27,9 @@ export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps)
         <img 
           src="/logo.png" 
           alt="NutriAI" 
-          className="w-10 h-10 object-contain"
+          className="w-12 h-12 object-contain"
         />
-        <span className="text-lg font-semibold text-slate-800">Welcome to NutriAI</span>
+        <span className="text-lg font-semibold text-slate-800">{t('header.welcome')}</span>
       </div>
       {/* Spacer to center the logo area or push menu to the right */}
       <div className="flex-1" />
