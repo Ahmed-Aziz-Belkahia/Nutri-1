@@ -4,13 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { AVAILABLE_LANGUAGES, isRTL } from '../i18n/config';
 
-// Map language codes to country codes for flag images
-const FLAG_CODES: Record<string, string> = {
-  en: 'gb',
-  ar: 'sa',
-  fr: 'fr',
-  es: 'es',
-  pl: 'pl',
+// Map language codes to flag emojis
+const FLAG_EMOJIS: Record<string, string> = {
+  en: '🇬🇧',
+  ar: '🇸🇦',
+  fr: '🇫🇷',
+  es: '🇪🇸',
+  pl: '🇵🇱',
 };
 
 export function OnboardingLanguageSelector() {
@@ -35,7 +35,7 @@ export function OnboardingLanguageSelector() {
   };
 
   const currentLanguage = AVAILABLE_LANGUAGES.find(lang => lang.code === i18n.language) || AVAILABLE_LANGUAGES[0];
-  const currentFlagCode = FLAG_CODES[currentLanguage.code] || currentLanguage.code;
+  const currentFlagEmoji = FLAG_EMOJIS[currentLanguage.code] || '🌐';
 
   return (
     <div className="relative z-50">
@@ -44,12 +44,7 @@ export function OnboardingLanguageSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/60 hover:border-[#26A8FF]/50 hover:bg-white transition-all shadow-sm"
       >
-        <img 
-          src={`https://flagcdn.com/24x18/${currentFlagCode}.png`}
-          srcSet={`https://flagcdn.com/48x36/${currentFlagCode}.png 2x`}
-          alt={currentLanguage.name}
-          className="w-6 h-4 object-cover rounded-sm"
-        />
+        <span className="text-xl">{currentFlagEmoji}</span>
         <ChevronDown className={`w-3.5 h-3.5 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -76,7 +71,7 @@ export function OnboardingLanguageSelector() {
             >
               <div className="flex gap-1 p-2">
                 {AVAILABLE_LANGUAGES.map((language) => {
-                  const flagCode = FLAG_CODES[language.code] || language.code;
+                  const flagEmoji = FLAG_EMOJIS[language.code] || '🌐';
                   return (
                     <button
                       key={language.code}
@@ -86,12 +81,7 @@ export function OnboardingLanguageSelector() {
                       }`}
                       title={language.nativeName}
                     >
-                      <img 
-                        src={`https://flagcdn.com/32x24/${flagCode}.png`}
-                        srcSet={`https://flagcdn.com/64x48/${flagCode}.png 2x`}
-                        alt={language.name}
-                        className="w-8 h-6 object-cover rounded-sm"
-                      />
+                      <span className="text-2xl">{flagEmoji}</span>
                     </button>
                   );
                 })}
