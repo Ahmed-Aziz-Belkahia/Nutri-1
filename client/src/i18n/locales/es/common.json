@@ -1,4 +1,7 @@
 {
+  "header": {
+    "welcome": "Bienvenido a NutriAI"
+  },
   "app": {
     "name": "NutriAI",
     "tagline": "Your AI-Powered Nutrition Companion"
