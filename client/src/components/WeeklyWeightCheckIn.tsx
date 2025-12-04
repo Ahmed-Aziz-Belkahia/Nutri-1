@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronUp, ChevronDown, TrendingDown, TrendingUp, Minus, Scale, Target, Flame, CheckCircle, X } from "lucide-react";
 import { useWeightLogs } from '@/hooks/use-weight-logs';
 import { useUserProfile } from '@/hooks/use-user-profile';
@@ -19,11 +19,28 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
   const { weightLogs, addWeightLog, isAddingWeight } = useWeightLogs();
   const { data: userProfile, refetch: refetchProfile } = useUserProfile();
   const { toast } = useToast();
+  const hasCheckedRef = useRef(false);
 
-  // Check if a weekly check-in is needed
+  // Check if a weekly check-in is needed (only once on mount)
   useEffect(() => {
+    // Only run this check once when weightLogs are first loaded
+    if (hasCheckedRef.current || !weightLogs) return;
+    
     const checkWeeklyNeed = () => {
-      if (!weightLogs || weightLogs.length === 0) {
+      // Check if dismissed recently (within the last 24 hours)
+      const dismissedTimestamp = localStorage.getItem('weightCheckInDismissedAt');
+      if (dismissedTimestamp) {
+        const dismissedAt = parseInt(dismissedTimestamp, 10);
+        const now = Date.now();
+        const hoursSinceDismiss = (now - dismissedAt) / (1000 * 60 * 60);
+        
+        // If dismissed within last 24 hours, don't show
+        if (hoursSinceDismiss < 24) {
+          return;
+        }
+      }
+      
+      if (weightLogs.length === 0) {
         // No logs yet, prompt for first entry
         setIsDialogOpen(true);
         return;
@@ -39,20 +56,15 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
       const now = new Date();
       const daysSinceLastLog = Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24));
       
-      // Check if last log was dismissed today
-      const dismissedDate = localStorage.getItem('weightCheckInDismissed');
-      const today = now.toISOString().split('T')[0];
-      
-      if (dismissedDate === today) {
-        return; // Already dismissed today
-      }
-      
       // Prompt for weekly check-in (7+ days since last log)
       if (daysSinceLastLog >= 7) {
         setIsDialogOpen(true);
       }
     };
 
+    // Mark as checked so we don't re-run
+    hasCheckedRef.current = true;
+    
     // Small delay to prevent immediate popup
     const timer = setTimeout(checkWeeklyNeed, 2000);
     return () => clearTimeout(timer);
@@ -68,8 +80,8 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
   }, [userProfile, weightLogs]);
 
   const handleDismiss = () => {
-    const today = new Date().toISOString().split('T')[0];
-    localStorage.setItem('weightCheckInDismissed', today);
+    // Store timestamp instead of date for more precise control
+    localStorage.setItem('weightCheckInDismissedAt', Date.now().toString());
     setIsDialogOpen(false);
     onClose?.();
   };
