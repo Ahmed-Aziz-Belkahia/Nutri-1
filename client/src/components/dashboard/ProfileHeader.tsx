@@ -15,7 +15,7 @@ export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps)
     <header className="header">
       {/* NutriAI Logo */}
       <div 
-        className="cursor-pointer w-12 h-12 flex items-center justify-center" 
+        className="cursor-pointer flex items-center gap-3" 
         onClick={() => window.location.href = '/'}
         role="button"
         aria-label="Go to home"
@@ -23,8 +23,9 @@ export default function ProfileHeader({ user, onMenuClick }: ProfileHeaderProps)
         <img 
           src="/logo.png" 
           alt="NutriAI" 
-          className="w-full h-full object-contain"
+          className="w-10 h-10 object-contain"
         />
+        <span className="text-lg font-semibold text-slate-800">Welcome to NutriAI</span>
       </div>
       {/* Spacer to center the logo area or push menu to the right */}
       <div className="flex-1" />
