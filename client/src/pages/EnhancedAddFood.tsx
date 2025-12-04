@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -62,6 +63,7 @@ const createManualFoodSchema = (t: any) => z.object({
 
 export default function EnhancedAddFood() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"camera" | "manual">("camera");
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -165,6 +167,11 @@ export default function EnhancedAddFood() {
 
       const result = await response.json();
       console.log('[EnhancedAddFood] Food log saved successfully:', result);
+
+      // Invalidate all food log related queries to refresh the dashboard
+      await queryClient.invalidateQueries({ queryKey: ['food-logs'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/food-logs'] });
+      console.log('[EnhancedAddFood] Invalidated all food log queries');
 
       toast({
         title: "Food added successfully",

@@ -6,6 +6,7 @@ import { Sparkles, Check, Loader2, Search, ChefHat, Utensils, BookOpen, Plus, Tr
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useQueryClient } from '@tanstack/react-query';
 
 type AnalysisState = 'detecting' | 'analyzing' | 'confirming' | 'generating' | 'finalizing' | 'complete' | 'error';
 
@@ -30,6 +31,7 @@ const getAnalysisSteps = (t: any): AnalysisStep[] => [
 
 export default function IngredientsAnalysis() {
   const { t } = useTranslation(['common']);
+  const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
   const analysisSteps = getAnalysisSteps(t);
   const [currentState, setCurrentState] = useState<AnalysisState>('detecting');
@@ -319,6 +321,11 @@ export default function IngredientsAnalysis() {
       }
 
       console.log('[IngredientsAnalysis] Saved recipes:', savedRecipes);
+
+      // Invalidate recipe queries to refresh the Recipes page
+      await queryClient.invalidateQueries({ queryKey: ['recipes'] });
+      await queryClient.invalidateQueries({ queryKey: ['/api/recipes'] });
+      console.log('[IngredientsAnalysis] Invalidated recipe queries');
 
       // Store both original and saved recipes
       localStorage.setItem('generatedRecipes', JSON.stringify(recipesResult));

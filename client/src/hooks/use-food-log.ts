@@ -5,6 +5,7 @@ import { useUser } from "@/hooks/use-user";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { format } from "date-fns";
 import { sendAndroidNutritionState } from "@/lib/androidBridge";
+import { queryKeys } from "@/lib/queryKeys";
 
 interface FoodLogResponse {
   log: SelectFoodLog;
@@ -129,33 +130,37 @@ export function useFoodLog(selectedDate: Date = new Date()) {
       return data;
     },
     onSuccess: async (data) => {
-      console.log('[Food Log Hook] Mutation succeeded');
+      console.log('[Food Log Hook] Mutation succeeded, invalidating all food log queries');
 
       toast({
         title: "Success",
         description: "Food log added successfully!",
       });
 
-      // First update the cache with new log data
-      const updatedCacheData = queryClient.setQueryData<FoodLogsResponse>(
-        ["/api/food-logs", dateString],
-        (oldData) => {
-          console.log('[Food Log Hook] Cache BEFORE update:', {
-            hadOldData: !!oldData,
-            oldLogsCount: oldData?.logs?.length || 0,
-            oldLogIds: oldData?.logs?.map(l => l.id) || []
-          });
-          
-          const newLogsArray = oldData ? [data.log, ...oldData.logs] : [data.log];
-          
-          console.log('[Food Log Hook] Cache AFTER update:', {
-            logsCount: newLogsArray.length,
-            logIds: newLogsArray.map(l => l.id),
-            totals: data.totals,
-            newLogId: data.log.id,
-            newLogComponents: data.log.components
-          });
+      // Invalidate ALL food log related queries to ensure fresh data everywhere
+      await Promise.all([
+        // Invalidate all food-logs queries (catches everything)
+        queryClient.invalidateQueries({ queryKey: ['food-logs'] }),
+        // Invalidate by date using proper query key
+        queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.byDate(dateString) }),
+        // Invalidate totals
+        queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.totals(dateString) }),
+        // Invalidate scanned meals
+        queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.scanned() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.scannedToday() }),
+        // Invalidate legacy query keys (used by older hooks)
+        queryClient.invalidateQueries({ queryKey: ['/api/food-logs'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/food-logs', dateString] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/food-logs/recent-all'] }),
+      ]);
 
+      console.log('[Food Log Hook] All food log queries invalidated');
+
+      // Also update the cache optimistically with new log data
+      queryClient.setQueryData<FoodLogsResponse>(
+        queryKeys.foodLogs.byDate(dateString),
+        (oldData) => {
+          const newLogsArray = oldData ? [data.log, ...oldData.logs] : [data.log];
           return {
             logs: newLogsArray,
             totals: data.totals
@@ -171,14 +176,11 @@ export function useFoodLog(selectedDate: Date = new Date()) {
           // Get streak count from user data
           const streakCount = user.currentStreak || 0;
           
-          // Get the updated logs count from cache
-          const logsCount = updatedCacheData?.logs.length || 1;
-          
           // Create a daily logs object with the updated totals
           const dailyLogs = {
-            logs: updatedCacheData?.logs || [data.log],
+            logs: [data.log],
             totals: data.totals,
-            mealCount: logsCount
+            mealCount: 1
           };
           
           // Send the nutrition state update to Android
