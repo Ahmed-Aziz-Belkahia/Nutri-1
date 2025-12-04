@@ -5978,6 +5978,72 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
     }
   });
 
+  // Helper function to calculate calories using Mifflin-St Jeor equation
+  const calculateDailyCaloriesServer = (
+    age: number,
+    weight: number,
+    height: number,
+    activityLevel: string,
+    weightGoal: string,
+    gender: string
+  ): number => {
+    // Mifflin-St Jeor: BMR = (10 × weight) + (6.25 × height) - (5 × age) + s
+    // s = +5 for males, -161 for females
+    const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+    const bmr = gender === 'male' ? baseCalories + 5 : baseCalories - 161;
+    
+    // Activity multipliers
+    const activityMultipliers: Record<string, number> = {
+      sedentary: 1.2,
+      light: 1.375,
+      moderate: 1.55,
+      active: 1.725,
+      very_active: 1.9
+    };
+    
+    const tdee = bmr * (activityMultipliers[activityLevel] || 1.55);
+    
+    // Goal adjustments
+    if (weightGoal === 'loss') {
+      return Math.round(tdee - 500);
+    } else if (weightGoal === 'gain') {
+      return Math.round(tdee + 300);
+    }
+    return Math.round(tdee);
+  };
+
+  // Helper function to calculate macros based on goal
+  const calculateMacrosServer = (dailyCalories: number, weightGoal: string) => {
+    let proteinRatio: number, carbRatio: number, fatRatio: number;
+
+    switch (weightGoal) {
+      case 'loss':
+        proteinRatio = 0.30;
+        carbRatio = 0.35;
+        fatRatio = 0.35;
+        break;
+      case 'gain':
+        proteinRatio = 0.25;
+        carbRatio = 0.45;
+        fatRatio = 0.30;
+        break;
+      default:
+        proteinRatio = 0.25;
+        carbRatio = 0.40;
+        fatRatio = 0.35;
+    }
+
+    return {
+      protein: Math.round((dailyCalories * proteinRatio) / 4),
+      carbs: Math.round((dailyCalories * carbRatio) / 4),
+      fat: Math.round((dailyCalories * fatRatio) / 9),
+      // Also return percentages for storage
+      proteinPercentage: Math.round(proteinRatio * 100),
+      carbsPercentage: Math.round(carbRatio * 100),
+      fatPercentage: Math.round(fatRatio * 100),
+    };
+  };
+
   // Update user profile
   app.put("/api/user/profile", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
@@ -6055,21 +6121,69 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         calories
       });
 
+      // Determine final values for height and weight
+      const finalHeight = height !== undefined ? Number(height) : Number(preferences[0].height);
+      const finalWeight = weight !== undefined ? Number(weight) : Number(preferences[0].currentWeight);
+      const finalWeightGoal = weightGoal !== undefined ? weightGoal : preferences[0].weightGoal;
+      const finalActivityLevel = activityLevel !== undefined ? activityLevel : preferences[0].activityLevel;
+      
+      // Check if we need to recalculate calories (height, weight, activity level, or weight goal changed)
+      let finalCalories = calories;
+      let finalProteinPercentage = proteinPercentage;
+      let finalCarbsPercentage = carbsPercentage;
+      let finalFatPercentage = fatPercentage;
+      
+      const needsRecalculation = (height !== undefined || weight !== undefined || 
+                                   activityLevel !== undefined || weightGoal !== undefined) && 
+                                  caloriesGoal === undefined;
+      
+      if (needsRecalculation) {
+        // Height, weight, activity level, or weight goal changed - recalculate calories
+        const age = preferences[0].age || 30;
+        const gender = preferences[0].gender || 'male';
+        
+        console.log("Recalculating calories due to height/weight change:", {
+          age, finalWeight, finalHeight, finalActivityLevel, finalWeightGoal, gender
+        });
+        
+        finalCalories = calculateDailyCaloriesServer(
+          age,
+          finalWeight,
+          finalHeight,
+          finalActivityLevel || 'moderate',
+          finalWeightGoal || 'maintain',
+          gender
+        );
+        
+        // Also recalculate macros
+        const macros = calculateMacrosServer(finalCalories, finalWeightGoal || 'maintain');
+        finalProteinPercentage = macros.proteinPercentage;
+        finalCarbsPercentage = macros.carbsPercentage;
+        finalFatPercentage = macros.fatPercentage;
+        
+        console.log("Recalculated nutrition goals:", {
+          finalCalories,
+          protein: macros.protein,
+          carbs: macros.carbs,
+          fat: macros.fat
+        });
+      }
+
       // Update the user's nutrition preferences
       const updatedPreferences = await db
         .update(userNutritionPreferences)
         .set({
-          height: height !== undefined ? height : preferences[0].height,
-          currentWeight: weight !== undefined ? weight : preferences[0].currentWeight,
+          height: finalHeight,
+          currentWeight: finalWeight,
           goalWeight: goalWeight !== undefined ? goalWeight : preferences[0].goalWeight,
           // Add nutrition goal fields (stored as percentages)
-          caloriesGoal: calories,
-          proteinGoal: proteinPercentage,
-          carbsGoal: carbsPercentage,
-          fatGoal: fatPercentage,
+          caloriesGoal: finalCalories,
+          proteinGoal: finalProteinPercentage,
+          carbsGoal: finalCarbsPercentage,
+          fatGoal: finalFatPercentage,
           // Add weight goal and activity level
-          weightGoal: weightGoal !== undefined ? weightGoal : preferences[0].weightGoal,
-          activityLevel: activityLevel !== undefined ? activityLevel : preferences[0].activityLevel,
+          weightGoal: finalWeightGoal,
+          activityLevel: finalActivityLevel,
           // Add body analysis fields
           bodyFatPercentage: bodyFatPercentage !== undefined ? bodyFatPercentage : preferences[0].bodyFatPercentage,
           bodyType: bodyType !== undefined ? bodyType : preferences[0].bodyType,
