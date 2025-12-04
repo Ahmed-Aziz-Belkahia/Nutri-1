@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,12 +14,14 @@ import {
   EyeOff,
   ArrowLeft
 } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { useTranslation } from "react-i18next";
 
 export default function AuthPage() {
   const { t } = useTranslation(['auth']);
-  const [isLogin, setIsLogin] = useState(true);
+  const searchParams = useSearch();
+  const tabParam = new URLSearchParams(searchParams).get('tab');
+  const [isLogin, setIsLogin] = useState(tabParam !== 'signup');
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,6 +33,80 @@ export default function AuthPage() {
 
   const { loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
+
+  // Function to submit pending onboarding data
+  const submitPendingOnboardingData = async () => {
+    const pendingData = sessionStorage.getItem('pendingOnboardingData');
+    if (!pendingData) return false;
+
+    try {
+      const data = JSON.parse(pendingData);
+      const formDataToSend = new FormData();
+      
+      // Calculate nutrition values using Mifflin-St Jeor formula
+      const age = data.age;
+      const weight = data.weight;
+      const goalWeight = data.goalWeight;
+      const height = data.height;
+      
+      const baseCalories = 10 * weight + 6.25 * height - 5 * age;
+      const bmr = data.gender === 'male' ? baseCalories + 5 : baseCalories - 161;
+      
+      const activityMultiplier: Record<string, number> = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725,
+        very_active: 1.9
+      };
+      
+      const tdee = bmr * (activityMultiplier[data.activityLevel] || 1.55);
+      
+      const dailyCalories = data.weightGoal === 'loss' ? tdee - 500 : 
+                           data.weightGoal === 'gain' ? tdee + 300 : tdee;
+      
+      const profileData = {
+        age: data.age,
+        gender: data.gender,
+        height: height,
+        weight: weight,
+        goalWeight: goalWeight,
+        weightGoal: data.weightGoal,
+        activityLevel: data.activityLevel,
+        calorieGoal: Math.round(dailyCalories),
+        proteinGoal: Math.round(dailyCalories * 0.3 / 4),
+        carbsGoal: Math.round(dailyCalories * 0.4 / 4),
+        fatGoal: Math.round(dailyCalories * 0.3 / 9),
+        dietaryRestrictions: [],
+        allergies: [],
+        mealBudget: "medium",
+        experienceLevel: "beginner",
+        preferredLanguage: "pl",
+        energyPattern: "morning",
+        flavorPreference: "savory",
+        firstVictory: "energy",
+        motivationLevel: "medium",
+        nutritionGoals: []
+      };
+      
+      formDataToSend.append('profile', JSON.stringify(profileData));
+      
+      const response = await fetch('/api/complete-onboarding', {
+        method: 'POST',
+        body: formDataToSend,
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        sessionStorage.removeItem('pendingOnboardingData');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error submitting onboarding data:', error);
+      return false;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +134,14 @@ export default function AuthPage() {
           // Redirect to email verification page with email parameter
           setLocation(`/verify-email?email=${encodeURIComponent(formData.email)}`);
         } else {
-          setLocation("/onboarding");
+          // Check for pending onboarding data and submit it
+          const hasPendingData = sessionStorage.getItem('pendingOnboardingData');
+          if (hasPendingData) {
+            await submitPendingOnboardingData();
+            setLocation("/dashboard");
+          } else {
+            setLocation("/onboarding");
+          }
         }
       }
     } catch (error: any) {

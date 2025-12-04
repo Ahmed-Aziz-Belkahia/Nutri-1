@@ -251,7 +251,9 @@ export default function OnboardingQuiz() {
     } else if (step === 8 && visionBoardPage < 2) {
       setVisionBoardPage(prev => prev + 1);
     } else if (step === 8 && visionBoardPage === 2) {
-      mutation.mutate(formData);
+      // Store onboarding data in sessionStorage for after auth
+      sessionStorage.setItem('pendingOnboardingData', JSON.stringify(formData));
+      navigate('/auth?tab=signup');
     } else {
       setStep(prev => prev + 1);
     }
