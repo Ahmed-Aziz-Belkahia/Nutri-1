@@ -27,17 +27,19 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
     if (hasCheckedRef.current || !weightLogs) return;
     
     const checkWeeklyNeed = () => {
-      // Check if dismissed recently (within the last 24 hours)
-      const dismissedTimestamp = localStorage.getItem('weightCheckInDismissedAt');
-      if (dismissedTimestamp) {
-        const dismissedAt = parseInt(dismissedTimestamp, 10);
-        const now = Date.now();
-        const hoursSinceDismiss = (now - dismissedAt) / (1000 * 60 * 60);
-        
-        // If dismissed within last 24 hours, don't show
-        if (hoursSinceDismiss < 24) {
-          return;
-        }
+      const now = new Date();
+      
+      // Only show on Sundays (day 0)
+      if (now.getDay() !== 0) {
+        return;
+      }
+      
+      // Check if already shown/dismissed this Sunday
+      const lastShownSunday = localStorage.getItem('weightCheckInLastSunday');
+      const thisSunday = now.toISOString().split('T')[0]; // Today's date in YYYY-MM-DD
+      
+      if (lastShownSunday === thisSunday) {
+        return; // Already shown this Sunday
       }
       
       if (weightLogs.length === 0) {
@@ -53,7 +55,6 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
       
       const lastLog = sortedLogs[0];
       const lastLogDate = new Date(lastLog.loggedAt);
-      const now = new Date();
       const daysSinceLastLog = Math.floor((now.getTime() - lastLogDate.getTime()) / (1000 * 60 * 60 * 24));
       
       // Prompt for weekly check-in (7+ days since last log)
@@ -80,8 +81,9 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
   }, [userProfile, weightLogs]);
 
   const handleDismiss = () => {
-    // Store timestamp instead of date for more precise control
-    localStorage.setItem('weightCheckInDismissedAt', Date.now().toString());
+    // Mark this Sunday as shown so it won't show again until next Sunday
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('weightCheckInLastSunday', today);
     setIsDialogOpen(false);
     onClose?.();
   };
