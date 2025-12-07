@@ -275,6 +275,15 @@ OTHER RULES:
     try {
       result = JSON.parse(response.choices[0].message.content);
       console.log('[Food Recognition] Successfully parsed OpenAI response');
+      
+      // Normalize enum values to lowercase (OpenAI sometimes returns "Snack" instead of "snack")
+      if (result.mealType && typeof result.mealType === 'string') {
+        result.mealType = result.mealType.toLowerCase();
+      }
+      if (result.difficulty && typeof result.difficulty === 'string') {
+        result.difficulty = result.difficulty.toLowerCase();
+      }
+      
     } catch (parseError) {
       console.error('[Food Recognition] JSON parse error:', parseError);
       throw new Error('Invalid response format from OpenAI');

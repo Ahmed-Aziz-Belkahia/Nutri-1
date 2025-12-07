@@ -352,7 +352,7 @@ Generate practical, delicious meals that meet these requirements exactly.`
       date: `Day ${index + 1}`,
       meals: dayPlan.meals.map((meal: any) => ({
         name: meal.name,
-        mealType: meal.mealType,
+        mealType: typeof meal.mealType === 'string' ? meal.mealType.toLowerCase() : meal.mealType,
         recipe: {
           ingredients: Array.isArray(meal.recipe.ingredients) ? meal.recipe.ingredients : [],
           instructions: Array.isArray(meal.recipe.instructions) ? meal.recipe.instructions : [],
