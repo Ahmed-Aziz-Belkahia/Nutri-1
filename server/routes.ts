@@ -930,17 +930,35 @@ export function registerRoutes(app: Express): Server {
 
       console.log('Generating recipes for ingredients:', ingredientNames);
       
-      // Get the user's preferred language
+      // Get the user's preferred language and nutrition preferences
       const userId = req.user!.id;
       const userProfileResult = await db.query.users.findFirst({
         where: eq(users.id, userId)
+      });
+      
+      // Fetch user's dietary preferences from onboarding
+      const userNutritionPrefs = await db.query.userNutritionPreferences.findFirst({
+        where: eq(userNutritionPreferences.userId, userId)
+      });
+      
+      // Extract dietary restrictions and allergies
+      const dietaryRestrictions = userNutritionPrefs?.dietaryRestrictions || [];
+      const allergies = userNutritionPrefs?.allergies || [];
+      const mealBudget = userNutritionPrefs?.mealBudget || undefined;
+      const experienceLevel = userNutritionPrefs?.experienceLevel || undefined;
+      
+      console.log('[Recipe Generation] User dietary preferences:', {
+        dietaryRestrictions,
+        allergies,
+        mealBudget,
+        experienceLevel
       });
       
       // Extract language preference, defaulting to Polish
       const language = 'pl';
       console.log(`User language preference for recipes: ${language}`);
       
-      // Map the client preferences to what the API expects
+      // Map the client preferences to what the API expects, including user's dietary preferences
       const recipePreferences = {
         difficulty: preferences?.difficulty || defaultPreferences.difficulty,
         timeNeeded: preferences?.timeNeeded || preferences?.maxPrepTime || 
@@ -951,7 +969,12 @@ export function registerRoutes(app: Express): Server {
         // Add notes as a separate field
         notes: notes || '',
         // Add language preference
-        language: language
+        language: language,
+        // Add user's dietary preferences from onboarding
+        dietaryRestrictions: dietaryRestrictions,
+        allergies: allergies,
+        mealBudget: mealBudget,
+        experienceLevel: experienceLevel
       };
 
       console.log('Using preferences:', recipePreferences);
@@ -961,8 +984,8 @@ export function registerRoutes(app: Express): Server {
       const customPrompt = prompt || (notes ? `Consider these preparation notes when creating recipes: ${notes}` : undefined);
 
       try {
-        // Generate recipe using OpenAI with preferences
-        const result = await generateRecipe(ingredientNames, recipePreferences, customPrompt);
+        // Generate recipe using OpenAI with preferences and userId for token tracking
+        const result = await generateRecipe(ingredientNames, recipePreferences, customPrompt, userId);
         res.json(result);
       } catch (error) {
         console.error('Recipe generation error:', error);

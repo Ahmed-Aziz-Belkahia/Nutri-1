@@ -13,6 +13,11 @@ const UserPreferencesSchema = z.object({
   mealType: z.string().optional(), // Add meal type (breakfast/lunch/dinner/snack)
   language: z.string().optional(), // Add language preference
   notes: z.string().optional(), // Add notes for preparation instructions
+  // User dietary preferences from onboarding
+  dietaryRestrictions: z.array(z.string()).optional(), // ['vegetarian', 'vegan', 'gluten-free', etc.]
+  allergies: z.array(z.string()).optional(), // ['nuts', 'dairy', 'shellfish', etc.]
+  mealBudget: z.string().optional(), // 'low', 'medium', 'high'
+  experienceLevel: z.string().optional(), // 'beginner', 'intermediate', 'advanced'
 }).passthrough(); // Allow additional properties
 
 // More flexible recipe output schema
@@ -192,6 +197,20 @@ export async function generateRecipe(
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+    // Build dietary restrictions and allergies text
+    const dietaryRestrictionsText = preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0
+      ? `- Dietary restrictions: ${preferences.dietaryRestrictions.join(', ')}`
+      : '';
+    const allergiesText = preferences.allergies && preferences.allergies.length > 0
+      ? `- Food allergies (MUST AVOID): ${preferences.allergies.join(', ')}`
+      : '';
+    const budgetText = preferences.mealBudget
+      ? `- Budget preference: ${preferences.mealBudget}`
+      : '';
+    const experienceText = preferences.experienceLevel
+      ? `- Cooking experience: ${preferences.experienceLevel}`
+      : '';
+
     const systemPrompt = `You are a professional chef and culinary instructor specializing in creating detailed, easy-to-follow recipes. 
 Consider these specific preferences:
 - Difficulty level: ${preferences.difficulty}
@@ -199,16 +218,34 @@ Consider these specific preferences:
 - Preferred flavor profile: ${preferences.flavor}
 ${preferences.mealType && preferences.mealType !== 'Any' ? `- Meal type: ${preferences.mealType}` : ''}
 ${preferences.notes ? `- Preparation notes: ${preferences.notes}` : ''}
+${dietaryRestrictionsText}
+${allergiesText}
+${budgetText}
+${experienceText}
+
+${preferences.allergies && preferences.allergies.length > 0 ? `
+CRITICAL SAFETY REQUIREMENT:
+The user has the following food allergies: ${preferences.allergies.join(', ')}
+You MUST NOT include any ingredients that contain or may contain these allergens.
+This is a health and safety requirement - allergic reactions can be life-threatening.
+` : ''}
+
+${preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0 ? `
+DIETARY REQUIREMENTS:
+The user follows these dietary restrictions: ${preferences.dietaryRestrictions.join(', ')}
+Ensure all recipes comply with these dietary requirements.
+` : ''}
 
 For each recipe:
-1. Ensure the difficulty matches the user's preference
+1. Ensure the difficulty matches the user's preference${preferences.experienceLevel ? ` and cooking experience level (${preferences.experienceLevel})` : ''}
 2. Keep total preparation and cooking time within the specified time limit
 3. Adjust seasonings and ingredients to match the desired flavor profile
 4. Provide exact measurements, temperatures, and timing
 5. Include equipment needed
 6. Break down complex techniques into simple steps
 7. Add cooking tips and visual indicators for doneness
-8. Include food safety reminders`;
+8. Include food safety reminders
+${preferences.allergies && preferences.allergies.length > 0 ? '9. NEVER include allergens the user is allergic to' : ''}`;
 
     const userPrompt = `
 Create 2 different recipe ideas using these ingredients: ${ingredients.join(', ')}.
