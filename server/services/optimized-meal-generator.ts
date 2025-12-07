@@ -6,6 +6,14 @@ import { generateFastPersonalizedMealPlan } from './fast-meal-generator';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// Dietary preferences type definition
+interface UserDietaryPreferences {
+  allergies?: string;
+  dietaryRestrictions?: string;
+  mealBudget?: string;
+  experienceLevel?: string;
+}
+
 interface MealPlanPreferences {
   dietaryType: string;
   calorieTarget: number;
@@ -40,7 +48,8 @@ interface OptimizedMealResult {
 // Smart routing: Use templates for standard cases, AI for complex customization
 export async function generateOptimizedMealPlan(
   preferences: MealPlanPreferences, 
-  days: number = 1
+  days: number = 1,
+  userDietaryPreferences?: UserDietaryPreferences
 ): Promise<{
   plan: Array<{
     date: string;
@@ -58,10 +67,19 @@ export async function generateOptimizedMealPlan(
   const complexityScore = calculateComplexityScore(preferences);
   console.log(`📊 Complexity score: ${complexityScore}/10`);
   
+  // If user has dietary preferences from onboarding, force AI generation for accuracy
+  const hasDietaryPrefs = userDietaryPreferences && 
+    (userDietaryPreferences.allergies || userDietaryPreferences.dietaryRestrictions);
+  
   let result;
   let method: 'template' | 'ai-mini' | 'hybrid';
   
-  if (complexityScore <= 3) {
+  if (hasDietaryPrefs) {
+    // User has dietary preferences - use AI for accuracy
+    console.log('🎯 User dietary preferences detected - using AI generation for accuracy');
+    method = 'ai-mini';
+    result = await generateAIMealPlanFast(preferences, days, userDietaryPreferences);
+  } else if (complexityScore <= 3) {
     // Simple case: Use fast templates (unless dietary restrictions require AI)
     console.log('⚡ Using FAST template generation...');
     method = 'template';
@@ -71,7 +89,7 @@ export async function generateOptimizedMealPlan(
       if (error.message === 'DIETARY_COMPLIANCE_REQUIRED') {
         console.log('🌱 Dietary restrictions detected - switching to AI generation');
         method = 'ai-mini';
-        result = await generateAIMealPlanFast(preferences, days);
+        result = await generateAIMealPlanFast(preferences, days, userDietaryPreferences);
       } else {
         throw error;
       }
@@ -85,7 +103,7 @@ export async function generateOptimizedMealPlan(
     // High complexity: Use fast AI (GPT-4o-mini)
     console.log('🤖 Using FAST AI generation (GPT-4o-mini)...');
     method = 'ai-mini';
-    result = await generateAIMealPlanFast(preferences, days);
+    result = await generateAIMealPlanFast(preferences, days, userDietaryPreferences);
   }
   
   const endTime = Date.now();
@@ -187,7 +205,8 @@ async function generateHybridMealPlan(
 // Fast AI generation using GPT-4o-mini (much faster than GPT-4o)
 async function generateAIMealPlanFast(
   preferences: MealPlanPreferences, 
-  days: number
+  days: number,
+  userDietaryPreferences?: UserDietaryPreferences
 ): Promise<{
   plan: Array<{
     date: string;
@@ -196,6 +215,41 @@ async function generateAIMealPlanFast(
   }>;
   totalCost: number;
 }> {
+  
+  // Build dietary safety sections from user preferences
+  const buildDietaryConstraints = (): string => {
+    if (!userDietaryPreferences) return '';
+    
+    const sections: string[] = [];
+    if (userDietaryPreferences.allergies?.trim()) {
+      sections.push(`⚠️ CRITICAL ALLERGIES - NEVER USE: ${userDietaryPreferences.allergies}`);
+    }
+    if (userDietaryPreferences.dietaryRestrictions?.trim()) {
+      sections.push(`Dietary Restrictions: ${userDietaryPreferences.dietaryRestrictions}`);
+    }
+    if (userDietaryPreferences.mealBudget?.trim()) {
+      sections.push(`Budget: ${userDietaryPreferences.mealBudget}`);
+    }
+    if (userDietaryPreferences.experienceLevel?.trim()) {
+      sections.push(`Cooking Experience: ${userDietaryPreferences.experienceLevel}`);
+    }
+    return sections.length > 0 ? `\n\nUSER PROFILE FROM ONBOARDING:\n${sections.join('\n')}` : '';
+  };
+  
+  const buildSafetyWarning = (): string => {
+    if (!userDietaryPreferences?.allergies?.trim()) return '';
+    
+    return `
+CRITICAL SAFETY REQUIREMENTS:
+The user has ALLERGIES to: ${userDietaryPreferences.allergies}
+- NEVER include any ingredient containing these allergens
+- Check all ingredients for hidden sources of allergens
+- If a recipe typically uses an allergen, provide a safe alternative
+- Double-check every ingredient before including it`;
+  };
+  
+  const dietaryConstraints = buildDietaryConstraints();
+  const safetyWarning = buildSafetyWarning();
   
   try {
     // Use GPT-4o-mini for much faster generation (3-5 seconds vs 20-40 seconds)
@@ -208,6 +262,8 @@ async function generateAIMealPlanFast(
         {
           role: "system",
           content: `You are a nutrition expert creating personalized meal plans. Create meal plans in English. 
+
+${safetyWarning}
 
 CRITICAL DIETARY COMPLIANCE:
 - VEGETARIAN: NO meat, poultry, fish, seafood, or animal-derived broths. Include dairy and eggs if not excluded.
@@ -256,6 +312,7 @@ DIETARY TYPE: ${preferences.dietaryType}
 ${preferences.dietaryType === 'vegetarian' ? '⚠️ ABSOLUTELY NO MEAT, POULTRY, FISH, OR SEAFOOD. Only plant-based proteins, dairy, and eggs allowed.' : ''}
 ${preferences.dietaryType === 'vegan' ? '⚠️ ABSOLUTELY NO ANIMAL PRODUCTS. No meat, dairy, eggs, honey, or animal-derived ingredients.' : ''}
 ${(preferences.dietaryType === 'tylko mięso' || preferences.dietaryType === 'meat-only' || preferences.dietaryType === 'carnivore') ? '⚠️ ONLY ANIMAL PRODUCTS. No vegetables, fruits, grains, legumes, or plant foods. Focus on meat, poultry, fish, eggs, and dairy only.' : ''}
+${dietaryConstraints}
 
 - Daily calories: ${preferences.calorieTarget} (distribute evenly across ${preferences.mealsPerDay} meals = ~${Math.round(preferences.calorieTarget / preferences.mealsPerDay)} calories per meal)
 - Meals per day: ${preferences.mealsPerDay}

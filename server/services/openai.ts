@@ -8,6 +8,50 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '' // Use empty string as fallback to avoid null errors
 });
 
+// Dietary preferences type definition
+interface DietaryPreferences {
+  allergies?: string;
+  dietaryRestrictions?: string;
+  mealBudget?: string;
+  experienceLevel?: string;
+}
+
+// Helper function to build dietary constraint prompts
+function buildDietaryPromptSection(prefs: DietaryPreferences): string {
+  const sections: string[] = [];
+  
+  if (prefs.allergies && prefs.allergies.trim()) {
+    sections.push(`ALLERGIES (CRITICAL - MUST AVOID): ${prefs.allergies}`);
+  }
+  if (prefs.dietaryRestrictions && prefs.dietaryRestrictions.trim()) {
+    sections.push(`Dietary Restrictions: ${prefs.dietaryRestrictions}`);
+  }
+  if (prefs.mealBudget && prefs.mealBudget.trim()) {
+    sections.push(`Budget Preference: ${prefs.mealBudget}`);
+  }
+  if (prefs.experienceLevel && prefs.experienceLevel.trim()) {
+    sections.push(`Cooking Skill Level: ${prefs.experienceLevel}`);
+  }
+  
+  return sections.length > 0 ? `\n\nUSER DIETARY PROFILE:\n${sections.join('\n')}` : '';
+}
+
+// Helper function to build safety warnings for allergies
+function buildSafetyWarnings(prefs: DietaryPreferences): string {
+  if (!prefs.allergies || !prefs.allergies.trim()) {
+    return '';
+  }
+  
+  return `
+CRITICAL SAFETY REQUIREMENTS:
+The user has the following ALLERGIES: ${prefs.allergies}
+- NEVER include any ingredient containing these allergens
+- NEVER suggest recipes that contain these allergens
+- NEVER include hidden sources of these allergens
+- Always suggest safe alternatives when an allergen is commonly used in a recipe
+- If a recipe cannot be made without the allergen, suggest a different recipe entirely`;
+}
+
 // Food recognition from image
 export async function recognizeFoodFromImage(base64Image: string, userId?: number): Promise<{
   foods: Array<{
@@ -269,6 +313,11 @@ export async function generateMealPlan(preferences: {
   dietaryType: string;
   allergies: string[];
   excludedIngredients: string[];
+  // User dietary preferences from onboarding
+  dietaryRestrictions?: string[];
+  userAllergies?: string[]; // Additional allergies from onboarding
+  experienceLevel?: string;
+  mealBudget?: string;
 }, userId?: number): Promise<{
   meals: {
     breakfast: Array<{ name: string; calories: number }>;
@@ -278,6 +327,27 @@ export async function generateMealPlan(preferences: {
   };
   totalCalories: number;
 }> {
+  // Combine allergies from preferences and user onboarding
+  const allAllergies = [...(preferences.allergies || []), ...(preferences.userAllergies || [])];
+  const uniqueAllergies = [...new Set(allAllergies)];
+  
+  // Build dietary safety prompts
+  let dietarySafetyPrompt = '';
+  if (uniqueAllergies.length > 0) {
+    dietarySafetyPrompt += `
+CRITICAL SAFETY - ALLERGIES:
+The user is allergic to: ${uniqueAllergies.join(', ')}
+NEVER include any ingredients containing these allergens. This is a health requirement.
+`;
+  }
+  if (preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0) {
+    dietarySafetyPrompt += `
+DIETARY RESTRICTIONS: 
+The user follows: ${preferences.dietaryRestrictions.join(', ')}
+All meals must comply with these restrictions.
+`;
+  }
+
   const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -285,7 +355,7 @@ export async function generateMealPlan(preferences: {
       {
         role: "system",
         content: `You are a nutrition and meal planning expert specializing in creating practical, efficient meal plans.
-        
+${dietarySafetyPrompt}
 CRITICAL: OPTIMIZE INGREDIENTS TO REDUCE GROCERY LIST
 1) Choose 8-10 BASE INGREDIENTS and build ALL meals around them
 2) REUSE the same proteins, vegetables, and grains across different meals
@@ -299,13 +369,16 @@ When naming meals, use descriptive, appealing names that highlight key flavors o
         content: `Create a meal plan with the following requirements:
           - Daily calorie goal: ${preferences.calorieGoal}
           - Dietary type: ${preferences.dietaryType}
-          - Allergies: ${preferences.allergies.join(', ')}
-          - Excluded ingredients: ${preferences.excludedIngredients.join(', ')}
+          - Allergies: ${uniqueAllergies.join(', ') || 'None'}
+          - Excluded ingredients: ${preferences.excludedIngredients.join(', ') || 'None'}
+${preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0 ? `          - Dietary restrictions: ${preferences.dietaryRestrictions.join(', ')}` : ''}
           
           IMPORTANT: Use OVERLAPPING INGREDIENTS across meals to minimize the grocery list!
           Pick a core set of 8-10 ingredients and create all meals using combinations of them.
           For example, if using chicken for lunch, also use it for dinner.
           If using spinach in breakfast, include it in lunch too.
+${uniqueAllergies.length > 0 ? `
+          ⚠️ ALLERGY ALERT: Do NOT include any of these allergens: ${uniqueAllergies.join(', ')}` : ''}
           
           Return the meal plan in JSON format with breakfast, lunch, dinner, optional snacks, and calorie counts.`
       }
@@ -340,7 +413,7 @@ export async function generateMealPlanWithRecipes(preferences: {
   cookingEquipment?: string[];
   specialRequirements?: string;
   language?: string; // Add language preference
-}, userId?: number): Promise<{
+}, userId?: number, userDietaryPreferences?: DietaryPreferences): Promise<{
   meals: Array<{
     name: string;
     mealType: string;
@@ -369,6 +442,10 @@ export async function generateMealPlanWithRecipes(preferences: {
   const healthGoals = Array.isArray(preferences.healthGoals) ? preferences.healthGoals : [];
   const cuisinePreferences = Array.isArray(preferences.cuisinePreferences) ? preferences.cuisinePreferences : [];
   
+  // Build dietary constraints from user preferences
+  const dietaryConstraints = userDietaryPreferences ? buildDietaryPromptSection(userDietaryPreferences) : '';
+  const safetyWarnings = userDietaryPreferences ? buildSafetyWarnings(userDietaryPreferences) : '';
+  
   const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -376,6 +453,8 @@ export async function generateMealPlanWithRecipes(preferences: {
       {
         role: "system",
         content: `You are a nutrition expert creating simple, quick meal plans. Create meal plans in English.
+
+${safetyWarnings}
 
 CRITICAL GUIDELINES FOR INGREDIENT OPTIMIZATION:
 1) REUSE INGREDIENTS across meals - if using chicken for lunch, use chicken in dinner too
@@ -408,6 +487,7 @@ Other guidelines:
           Health Goals: ${healthGoals.join(', ') || 'General health'}
           Cuisine Preferences: ${cuisinePreferences.join(', ') || 'Any'}
           Cooking Skill Level: ${preferences.cookingSkillLevel || 'intermediate'}
+          ${dietaryConstraints}
           
           Create ${preferences.mealsPerDay} simple meals:
           ${preferences.mealsPerDay >= 1 ? '- 1 breakfast' : ''}
@@ -491,7 +571,7 @@ export async function generateMonthlyMealPlan(preferences: {
   specialRequirements?: string;
   duration?: string;
   language?: string; // Add language preference
-}): Promise<{
+}, userId?: number, userDietaryPreferences?: DietaryPreferences): Promise<{
   plan: Array<{
     date: string;
     dayOfWeek: string;
@@ -513,6 +593,10 @@ export async function generateMonthlyMealPlan(preferences: {
     totalDailyCalories: number;
   }>;
 }> {
+  // Build dietary constraints from user preferences
+  const dietaryConstraints = userDietaryPreferences ? buildDietaryPromptSection(userDietaryPreferences) : '';
+  const safetyWarnings = userDietaryPreferences ? buildSafetyWarnings(userDietaryPreferences) : '';
+  
   // Calculate how many days to generate based on the duration
   const requestedDays = preferences.duration === '3days' ? 3 : 
                          preferences.duration === 'week' ? 7 : 
@@ -570,6 +654,7 @@ export async function generateMonthlyMealPlan(preferences: {
       - Health goals: ${preferences.healthGoals?.join(', ') || 'Not specified'}
       - Cuisine preferences: ${preferences.cuisinePreferences?.join(', ') || 'Any'}
       - Cooking skill level: ${preferences.cookingSkillLevel || 'Intermediate'}
+      ${dietaryConstraints}
       
       IMPORTANT: Your response MUST include EXACTLY ${currentBatchSize} days in the meal plan. This is a critical requirement.
       
@@ -637,6 +722,9 @@ export async function generateMonthlyMealPlan(preferences: {
           {
             role: "system",
             content: `You are a nutrition and meal planning expert specializing in creating meal plans with ABSOLUTE MAXIMUM VARIETY.
+
+${safetyWarnings}
+
 Follow these non-negotiable rules: 
 1) Every single meal in the plan must be COMPLETELY DIFFERENT from all other meals in the entire plan - with ZERO repetition across days
 2) Each day's breakfast must be entirely different from ALL other days' breakfasts
@@ -1286,7 +1374,12 @@ function calculateDayDifference(day1: any, day2: any): number {
 }
 
 // Recipe suggestions
-export async function suggestRecipe(ingredients: string[], userId?: number): Promise<{
+export async function suggestRecipe(ingredients: string[], userId?: number, dietaryPreferences?: {
+  dietaryRestrictions?: string[];
+  allergies?: string[];
+  experienceLevel?: string;
+  mealBudget?: string;
+}): Promise<{
   name: string;
   ingredients: string[];
   instructions: string[];
@@ -1297,17 +1390,43 @@ export async function suggestRecipe(ingredients: string[], userId?: number): Pro
     fat: number;
   };
 }> {
+  // Build dietary restrictions prompt additions
+  const hasAllergies = dietaryPreferences?.allergies && dietaryPreferences.allergies.length > 0;
+  const hasRestrictions = dietaryPreferences?.dietaryRestrictions && dietaryPreferences.dietaryRestrictions.length > 0;
+  
+  let dietaryPromptAdditions = '';
+  if (hasAllergies) {
+    dietaryPromptAdditions += `
+CRITICAL SAFETY - ALLERGIES: The user is allergic to: ${dietaryPreferences!.allergies!.join(', ')}
+You MUST NOT include any ingredients containing these allergens. This is a health and safety requirement.
+`;
+  }
+  if (hasRestrictions) {
+    dietaryPromptAdditions += `
+DIETARY RESTRICTIONS: The user follows: ${dietaryPreferences!.dietaryRestrictions!.join(', ')}
+All recipes must comply with these dietary restrictions.
+`;
+  }
+  if (dietaryPreferences?.experienceLevel) {
+    dietaryPromptAdditions += `
+COOKING LEVEL: ${dietaryPreferences.experienceLevel} - adjust recipe complexity accordingly.
+`;
+  }
+
   const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
     messages: [
       {
         role: "system",
-        content: "You are a culinary expert. When suggesting recipes, create descriptive and appetizing names that highlight the key flavors, cooking methods, or main ingredients. For example, use names like 'Zesty Lemon Herb Roasted Chicken' or 'Creamy Garlic Parmesan Pasta' instead of generic names like 'Chicken Recipe' or 'Pasta Dish'. Suggest a recipe using the provided ingredients and include nutritional information. For instructions, write flowing paragraphs that start with action verbs and equipment needed, like 'Heat a large skillet over medium heat.' or 'Take a mixing bowl and combine the flour, sugar, and eggs.' Group related actions together in logical sequence."
+        content: `You are a culinary expert. When suggesting recipes, create descriptive and appetizing names that highlight the key flavors, cooking methods, or main ingredients. For example, use names like 'Zesty Lemon Herb Roasted Chicken' or 'Creamy Garlic Parmesan Pasta' instead of generic names like 'Chicken Recipe' or 'Pasta Dish'. Suggest a recipe using the provided ingredients and include nutritional information. For instructions, write flowing paragraphs that start with action verbs and equipment needed, like 'Heat a large skillet over medium heat.' or 'Take a mixing bowl and combine the flour, sugar, and eggs.' Group related actions together in logical sequence.
+${dietaryPromptAdditions}`
       },
       {
         role: "user",
         content: `Suggest a recipe using some or all of these ingredients: ${ingredients.join(', ')}. 
+${hasAllergies ? `\n⚠️ ALLERGY ALERT: AVOID these allergens completely: ${dietaryPreferences!.allergies!.join(', ')}` : ''}
+${hasRestrictions ? `\n📋 DIETARY RESTRICTIONS: Must follow: ${dietaryPreferences!.dietaryRestrictions!.join(', ')}` : ''}
         
 IMPORTANT INSTRUCTION FORMAT: Write cooking instructions as coherent paragraphs that:
 1. Begin with the equipment/tools needed ("Take a large bowl...", "Heat a pan...")

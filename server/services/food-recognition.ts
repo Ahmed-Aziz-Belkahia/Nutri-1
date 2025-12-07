@@ -422,6 +422,7 @@ async function generateRecipeSuggestions(ingredients: any[], userId?: number): P
 export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?: number): Promise<{
   ingredients: any[];
   recipes?: any;
+  confidence?: number;
 }> {
   try {
     if (!process.env.OPENAI_API_KEY) {

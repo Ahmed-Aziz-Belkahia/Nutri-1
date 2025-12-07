@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import multer from 'multer';
 import { recognizeFoodFromImage, analyzeNutrition, generateMealPlan, suggestRecipe } from '../services/openai';
 import { db } from '@db';
-import { userDietaryPreferences } from '@db/schema';
+import { userDietaryPreferences, userNutritionPreferences } from '@db/schema';
 import { eq, and } from 'drizzle-orm';
 import { mealPlans, recipes, recipesInMealPlan } from '@db/schema';
 import { requireAuth, type AuthRequest } from '../utils/jwt';
@@ -156,7 +156,21 @@ router.post('/suggest-recipe', async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Invalid ingredients provided' });
     }
 
-    const recipe = await suggestRecipe(ingredients);
+    // Fetch user's dietary preferences from onboarding
+    const nutritionPrefs = await db
+      .select()
+      .from(userNutritionPreferences)
+      .where(eq(userNutritionPreferences.userId, req.user!.id))
+      .limit(1);
+    
+    const dietaryPreferences = nutritionPrefs[0] ? {
+      allergies: nutritionPrefs[0].allergies || '',
+      dietaryRestrictions: nutritionPrefs[0].dietaryRestrictions || '',
+      mealBudget: nutritionPrefs[0].mealBudget || '',
+      experienceLevel: nutritionPrefs[0].experienceLevel || ''
+    } : undefined;
+
+    const recipe = await suggestRecipe(ingredients, req.user?.id, dietaryPreferences);
     res.json(recipe);
   } catch (error) {
     console.error('Recipe suggestion error:', error);

@@ -2299,6 +2299,22 @@ export function registerRoutes(app: Express): Server {
         // Small delay to show calculating step
         await new Promise(resolve => setTimeout(resolve, 500));
         
+        // Fetch user's dietary preferences from onboarding for safety constraints
+        const nutritionPrefs = await db
+          .select()
+          .from(userNutritionPreferences)
+          .where(eq(userNutritionPreferences.userId, req.user!.id))
+          .limit(1);
+        
+        const userDietaryProfile = nutritionPrefs[0] ? {
+          allergies: nutritionPrefs[0].allergies || '',
+          dietaryRestrictions: nutritionPrefs[0].dietaryRestrictions || '',
+          mealBudget: nutritionPrefs[0].mealBudget || '',
+          experienceLevel: nutritionPrefs[0].experienceLevel || ''
+        } : undefined;
+        
+        console.log('User dietary profile from onboarding:', userDietaryProfile);
+        
         // Generate meal plans for each day
         const dailyPlans = [];
         for (let day = 0; day < durationDays; day++) {
@@ -2330,7 +2346,7 @@ export function registerRoutes(app: Express): Server {
             cuisinePreferences: currentPrefs.cuisinePreferences,
             cookingSkillLevel: currentPrefs.cookingSkillLevel,
             language: 'en' // Always use English
-          });
+          }, req.user!.id, userDietaryProfile);
           
           dailyPlans.push({
             date: new Date(Date.now() + day * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -3272,6 +3288,20 @@ export function registerRoutes(app: Express): Server {
         language
       });
       
+      // Fetch user's dietary preferences from onboarding for safety constraints
+      const nutritionPrefsForOptimized = await db
+        .select()
+        .from(userNutritionPreferences)
+        .where(eq(userNutritionPreferences.userId, req.user!.id))
+        .limit(1);
+      
+      const userDietaryProfileForOptimized = nutritionPrefsForOptimized[0] ? {
+        allergies: nutritionPrefsForOptimized[0].allergies || '',
+        dietaryRestrictions: nutritionPrefsForOptimized[0].dietaryRestrictions || '',
+        mealBudget: nutritionPrefsForOptimized[0].mealBudget || '',
+        experienceLevel: nutritionPrefsForOptimized[0].experienceLevel || ''
+      } : undefined;
+      
       // Generate meal plan using optimized system (balances speed and accuracy)
       const { generateOptimizedMealPlan } = await import('./services/optimized-meal-generator');
       
@@ -3288,7 +3318,7 @@ export function registerRoutes(app: Express): Server {
         healthGoals,
         cuisinePreferences,
         cookingSkillLevel
-      }, 1);
+      }, 1, userDietaryProfileForOptimized);
       
       console.log(`✅ Meal plan generated using ${aiMealResult.generationMethod} method`);
       
