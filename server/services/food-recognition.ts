@@ -1,6 +1,60 @@
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { trackOpenAIUsage, trackFailedRequest } from '../utils/token-tracker';
+import { makeVisionRequest, makeAIRequest, AI_MODELS } from './ai-service-manager';
+import { db } from '@db';
+import { userNutritionPreferences } from '@db/schema';
+import { eq } from 'drizzle-orm';
+
+// Dietary preferences interface
+interface UserDietaryProfile {
+  allergies?: string;
+  dietaryRestrictions?: string;
+  mealBudget?: string;
+  experienceLevel?: string;
+}
+
+// Get user's dietary preferences from database
+async function getUserDietaryProfile(userId: number): Promise<UserDietaryProfile | null> {
+  try {
+    const prefs = await db
+      .select()
+      .from(userNutritionPreferences)
+      .where(eq(userNutritionPreferences.userId, userId))
+      .limit(1);
+    
+    if (!prefs[0]) return null;
+    
+    return {
+      allergies: Array.isArray(prefs[0].allergies) ? prefs[0].allergies.join(', ') : (prefs[0].allergies || ''),
+      dietaryRestrictions: Array.isArray(prefs[0].dietaryRestrictions) ? prefs[0].dietaryRestrictions.join(', ') : (prefs[0].dietaryRestrictions || ''),
+      mealBudget: prefs[0].mealBudget || '',
+      experienceLevel: prefs[0].experienceLevel || ''
+    };
+  } catch (error) {
+    console.error('[Food Recognition] Error fetching dietary profile:', error);
+    return null;
+  }
+}
+
+// Build dietary warning prompts
+function buildDietaryWarnings(profile: UserDietaryProfile | null): string {
+  if (!profile) return '';
+  
+  const warnings: string[] = [];
+  
+  if (profile.allergies?.trim()) {
+    warnings.push(`\n⚠️ ALLERGEN ALERT: User is allergic to: ${profile.allergies}`);
+    warnings.push('If any identified food may contain these allergens, add "allergenWarning": true to the response.');
+  }
+  
+  if (profile.dietaryRestrictions?.trim()) {
+    warnings.push(`\nDietary Restrictions: ${profile.dietaryRestrictions}`);
+    warnings.push('Flag any foods that may violate these restrictions.');
+  }
+  
+  return warnings.join('\n');
+}
 
 // Define ingredient schema for recipe fields
 const IngredientItemSchema = z.object({
@@ -36,7 +90,7 @@ const FoodComponentSchema = z.object({
   }).passthrough(),
 });
 
-// Enhanced schema with recipe fields
+// Enhanced schema with recipe fields and safety flags
 const FoodAnalysisSchema = z.object({
   name: z.string(),
   calories: z.number(),
@@ -58,11 +112,17 @@ const FoodAnalysisSchema = z.object({
   mealType: z.enum(['breakfast', 'lunch', 'dinner', 'snack']).optional().nullable(),
   difficulty: z.enum(['easy', 'medium', 'hard']).optional().nullable(),
   tags: z.array(z.string()).optional().nullable(),
+  
+  // Safety and dietary flags
+  allergenWarning: z.boolean().optional(),
+  potentialAllergens: z.array(z.string()).optional(),
+  dietaryFlags: z.array(z.string()).optional(), // e.g., ['contains-dairy', 'high-sodium']
+  healthScore: z.number().min(1).max(10).optional(), // 1-10 health rating
 }).strict();
 
 export type FoodAnalysis = z.infer<typeof FoodAnalysisSchema>;
 
-async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', userId?: number): Promise<FoodAnalysis> {
+async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', userId?: number, dietaryProfile?: UserDietaryProfile | null): Promise<FoodAnalysis> {
   try {
     if (!process.env.OPENAI_API_KEY) {
       console.error('[Food Recognition] OpenAI API key not configured');
@@ -71,6 +131,9 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', u
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     console.log(`[Food Recognition] Starting image analysis with format: ${format}...`);
+    
+    // Build dietary warnings if user has dietary restrictions
+    const dietaryWarnings = buildDietaryWarnings(dietaryProfile || null);
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const startTime = Date.now();
@@ -79,7 +142,15 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', u
       messages: [
         {
           role: "system",
-          content: "You are a precise food analysis system that ALWAYS breaks down food products into separate components with detailed information. Additionally, you identify recognizable recipes and generate cooking instructions. Respond with structured JSON data in English."
+          content: `You are a precise food analysis system that ALWAYS breaks down food products into separate components with detailed information. Additionally, you identify recognizable recipes and generate cooking instructions. Respond with structured JSON data in English.
+
+KEY ACCURACY GUIDELINES:
+1. Be conservative with calorie estimates - use USDA database standards
+2. Consider visible portion sizes carefully - don't overestimate
+3. Account for cooking methods (fried adds fat, grilled is leaner)
+4. Identify hidden calories (sauces, oils, butter)
+5. Rate your confidence honestly based on image clarity and food visibility
+${dietaryWarnings}`
         },
         {
           role: "user",
@@ -131,7 +202,11 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', u
   "cuisineType": "Cuisine type (e.g., 'Polish', 'Italian', 'Asian')",
   "mealType": "Meal type ('breakfast', 'lunch', 'dinner', 'snack')",
   "difficulty": "Difficulty level ('easy', 'medium', 'hard')",
-  "tags": ["tag1", "tag2"]
+  "tags": ["tag1", "tag2"],
+  "allergenWarning": true_if_common_allergens_detected,
+  "potentialAllergens": ["list", "of", "detected", "allergens"],
+  "dietaryFlags": ["contains-dairy", "high-sodium", "vegetarian", etc],
+  "healthScore": 1_to_10_rating
 }
 
 IMPORTANT RULES FOR PREPARATION TIMES:
@@ -168,7 +243,10 @@ OTHER RULES:
 - ingredients should be based on components, but in the form of cooking ingredients
 - instructions are cooking steps (only for recognizable recipes)
 - Always include at least one element in components
-- Be REALISTIC with times - don't overestimate them`
+- Be REALISTIC with times - don't overestimate them
+- Include healthScore (1-10): 1=very unhealthy, 5=moderate, 10=very healthy
+- Detect common allergens: dairy, gluten, nuts, shellfish, eggs, soy, etc.
+- Add dietaryFlags for: vegetarian, vegan, gluten-free, high-protein, low-carb, high-sodium, etc.`
             },
             {
               type: "image_url",
@@ -339,7 +417,17 @@ export async function analyzeFoodImage(imageBase64: string, userId?: number): Pr
     // Get analysis from OpenAI - use detected format
     const format = cleanedImage.match(/data:image\/([a-zA-Z0-9]+);base64,/)?.[1] || 'jpeg';
     console.log(`[Food Recognition] Using format ${format} for OpenAI analysis`);
-    const result = await analyzeWithOpenAI(base64Data, format, userId);
+    
+    // Fetch user's dietary profile for allergen detection
+    let dietaryProfile: UserDietaryProfile | null = null;
+    if (userId) {
+      dietaryProfile = await getUserDietaryProfile(userId);
+      if (dietaryProfile?.allergies) {
+        console.log(`[Food Recognition] User has allergies: ${dietaryProfile.allergies}`);
+      }
+    }
+    
+    const result = await analyzeWithOpenAI(base64Data, format, userId, dietaryProfile);
     console.log('[Food Recognition] Analysis result:', JSON.stringify(result, null, 2));
 
     return result;
@@ -383,6 +471,29 @@ async function generateRecipeSuggestions(ingredients: any[], userId?: number): P
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const ingredientsList = ingredients.map(i => i.name).join(', ');
+    
+    // Fetch user's dietary profile for safe recipe generation
+    let dietaryProfile: UserDietaryProfile | null = null;
+    let dietaryConstraints = '';
+    if (userId) {
+      dietaryProfile = await getUserDietaryProfile(userId);
+      if (dietaryProfile) {
+        const constraints: string[] = [];
+        if (dietaryProfile.allergies?.trim()) {
+          constraints.push(`CRITICAL - User has ALLERGIES to: ${dietaryProfile.allergies}. NEVER include these ingredients.`);
+        }
+        if (dietaryProfile.dietaryRestrictions?.trim()) {
+          constraints.push(`Dietary restrictions: ${dietaryProfile.dietaryRestrictions}`);
+        }
+        if (dietaryProfile.experienceLevel?.trim()) {
+          constraints.push(`Cooking skill level: ${dietaryProfile.experienceLevel} - adjust recipe complexity accordingly`);
+        }
+        if (dietaryProfile.mealBudget?.trim()) {
+          constraints.push(`Budget preference: ${dietaryProfile.mealBudget}`);
+        }
+        dietaryConstraints = constraints.length > 0 ? `\n\nUSER DIETARY PROFILE:\n${constraints.join('\n')}` : '';
+      }
+    }
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const startTime = Date.now();
@@ -391,13 +502,31 @@ async function generateRecipeSuggestions(ingredients: any[], userId?: number): P
       messages: [
         {
           role: "system",
-          content: "You are a creative chef. Generate unique recipe suggestions based on available ingredients."
+          content: `You are a creative chef who creates safe, delicious recipes. Generate unique recipe suggestions based on available ingredients while respecting all dietary restrictions and allergies.${dietaryConstraints}`
         },
         {
           role: "user",
           content: `Create creative recipe suggestions using these ingredients: ${ingredientsList}. 
-            Return the suggestions as a JSON array with detailed recipes and instructions.
-            Include preparation steps, cooking time, difficulty level, and nutritional information.`
+            Return the suggestions as a JSON object with this structure:
+            {
+              "recipes": [
+                {
+                  "name": "Recipe name",
+                  "description": "Brief description",
+                  "ingredients": ["ingredient with quantity"],
+                  "instructions": ["step 1", "step 2"],
+                  "prepTime": 15,
+                  "cookTime": 30,
+                  "difficulty": "easy|medium|hard",
+                  "servings": 4,
+                  "nutrition": {"calories": 400, "protein": 25, "carbs": 30, "fat": 15},
+                  "matchPercentage": 85,
+                  "missingIngredients": ["ingredient not in available list"],
+                  "dietaryInfo": ["vegetarian", "gluten-free", etc]
+                }
+              ]
+            }
+            Include at least 3 recipe suggestions, sorted by matchPercentage (highest first).`
         }
       ],
       temperature: 0.8,
@@ -472,6 +601,17 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?:
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     console.log('[Recipe Analysis] Initializing ingredient analysis...');
+    
+    // Fetch user's dietary profile for safety warnings
+    let dietaryProfile: UserDietaryProfile | null = null;
+    if (userId) {
+      dietaryProfile = await getUserDietaryProfile(userId);
+    }
+    
+    // Build allergen warning section
+    const allergenSection = dietaryProfile?.allergies?.trim() 
+      ? `\n\nALLERGEN ALERT: User is allergic to: ${dietaryProfile.allergies}\nIf any ingredient may contain or be related to these allergens, add "allergenRisk": true to that ingredient.`
+      : '';
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const startTime = Date.now();
@@ -480,7 +620,7 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?:
       messages: [
         {
           role: "system",
-          content: "You are a precise ingredient analysis system that identifies individual ingredients from food images."
+          content: `You are a precise ingredient analysis system that identifies individual ingredients from food images. Be thorough and accurate.${allergenSection}`
         },
         {
           role: "user",
@@ -498,17 +638,22 @@ Return ONLY a JSON response with this exact structure:
       "unit": "piece",
       "estimatedWeight": 100,
       "freshness": "fresh",
-      "quality": "good quality"
+      "quality": "good quality",
+      "allergenRisk": false,
+      "category": "vegetable|fruit|protein|dairy|grain|spice|other"
     }
   ],
-  "confidence": 0.9
+  "confidence": 0.9,
+  "totalEstimatedCalories": 500,
+  "suggestedMealType": "lunch|dinner|breakfast|snack"
 }
 
 Examples:
 - If you see tomatoes, identify them as "tomatoes" not "red vegetables"
 - If you see onions, specify "yellow onions" or "red onions" 
 - If you see herbs, identify specific ones like "basil" or "parsley"
-- Include reasonable quantity estimates based on what's visible`
+- Include reasonable quantity estimates based on what's visible
+- Flag any ingredients that may pose allergen risks`
             },
             {
               type: "image_url",
@@ -638,12 +783,20 @@ function getNutritionalInfo(foodItem: string): FoodAnalysis {
   }
 }
 
-export async function validateMacrosWithChatGPT(foodItems: string[]): Promise<{
+export async function validateMacrosWithChatGPT(foodItems: string[], userId?: number): Promise<{
   calories: number;
   protein: number;
   carbs: number;
   fat: number;
   confidence: number;
+  breakdown?: Array<{
+    item: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }>;
+  healthInsights?: string[];
 }> {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -652,30 +805,67 @@ export async function validateMacrosWithChatGPT(foodItems: string[]): Promise<{
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const foodItemsList = foodItems.join(', ');
+    
+    // Fetch user's dietary profile for context
+    let contextInfo = '';
+    if (userId) {
+      const dietaryProfile = await getUserDietaryProfile(userId);
+      if (dietaryProfile?.allergies) {
+        contextInfo = `\n\nNote: Check if any items contain allergens: ${dietaryProfile.allergies}`;
+      }
+    }
 
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {
           role: "system",
-          content: "You are a nutrition expert. Analyze the given food items and provide accurate macro estimates. Consider standard portion sizes and typical preparations."
+          content: `You are a certified nutritionist with expertise in food analysis. Provide accurate macro estimates using USDA database standards as reference. Be conservative with estimates - it's better to slightly underestimate than overestimate portions.${contextInfo}`
         },
         {
           role: "user",
-          content: `Please analyze these food items and provide accurate macro estimates: ${foodItemsList}. 
-            Return the results as a JSON object with these fields:
-            {
-              "calories": number (total calories),
-              "protein": number (grams),
-              "carbs": number (grams),
-              "fat": number (grams),
-              "confidence": number (0-1 indicating estimation confidence)
-            }`
+          content: `Analyze these food items and provide accurate macro estimates: ${foodItemsList}. 
+            
+Use these guidelines:
+- Consider standard restaurant/home portions
+- Account for typical preparation methods (fried, baked, etc.)
+- Include hidden calories (oils, sauces, butter)
+- Be conservative with portion estimates
+
+Return a JSON object with this structure:
+{
+  "calories": total_calories,
+  "protein": total_protein_grams,
+  "carbs": total_carbs_grams,
+  "fat": total_fat_grams,
+  "confidence": 0.0_to_1.0,
+  "breakdown": [
+    {
+      "item": "food item name",
+      "calories": item_calories,
+      "protein": item_protein,
+      "carbs": item_carbs,
+      "fat": item_fat
+    }
+  ],
+  "healthInsights": [
+    "This meal is high in protein",
+    "Consider adding more vegetables",
+    etc
+  ],
+  "allergenWarnings": ["contains gluten", "may contain dairy"]
+}`
         }
       ],
-      temperature: 0.3,
+      temperature: 0.2,
       response_format: { type: "json_object" }
     });
+
+    // Track token usage if userId is provided
+    if (userId && response.usage) {
+      await trackOpenAIUsage(userId, '/api/macros/validate', response, 'gpt-4o', startTime);
+    }
 
     const content = response.choices[0].message.content;
     if (!content) throw new Error('Empty response from OpenAI');
@@ -688,7 +878,9 @@ export async function validateMacrosWithChatGPT(foodItems: string[]): Promise<{
       protein: Number(result.protein.toFixed(1)),
       carbs: Number(result.carbs.toFixed(1)),
       fat: Number(result.fat.toFixed(1)),
-      confidence: result.confidence
+      confidence: result.confidence,
+      breakdown: result.breakdown,
+      healthInsights: result.healthInsights
     };
   } catch (error) {
     console.error('ChatGPT Macro Validation Error:', error);
