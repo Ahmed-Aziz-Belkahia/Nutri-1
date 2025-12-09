@@ -476,7 +476,8 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/recipes", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
 
-      const type = req.query.type as string || 'created';
+      // Support both 'type' and 'filter' query params for backwards compatibility
+      const type = (req.query.type as string) || (req.query.filter as string) || 'created';
       
       console.log(`Fetching ${type} recipes for user ${req.user!.id}`);
       
@@ -490,14 +491,21 @@ export function registerRoutes(app: Express): Server {
       // Create a Set for O(1) lookups
       const likedIds = new Set(likedRecipeIds.map(r => r.id));
       
-      // Main query without the expensive EXISTS subquery
+      // Determine which sources to fetch based on filter type
+      // 'created' includes: 'created', 'ingredient_generation', 'ai_generated', 'meal_plan'
+      // 'saved' includes: 'saved', 'favorited'
+      const createdSources = ['created', 'ingredient_generation', 'ai_generated', 'meal_plan'];
+      const savedSources = ['saved', 'favorited'];
+      const sourcesToFetch = type === 'saved' ? savedSources : createdSources;
+      
+      // Main query - include multiple source types
       const userRecipes = await db
         .select()
         .from(recipes)
         .where(
           and(
             eq(recipes.userId, req.user!.id),
-            type === 'saved' ? eq(recipes.source, 'saved') : eq(recipes.source, 'created')
+            inArray(recipes.source, sourcesToFetch)
           )
         )
         .orderBy(desc(recipes.createdAt))
