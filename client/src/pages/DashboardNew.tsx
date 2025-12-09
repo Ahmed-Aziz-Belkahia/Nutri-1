@@ -72,9 +72,12 @@ export default function DashboardNew() {
   const { t } = useTranslation(['common']);
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const { addFood } = useFoodLog();
   const { toast } = useToast();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  
+  // Convert selectedDate string to Date object for useFoodLog hook
+  const selectedDateObj = useMemo(() => new Date(`${selectedDate}T12:00:00`), [selectedDate]);
+  const { addFood } = useFoodLog(selectedDateObj);
   const [allDays] = useState(getLast3MonthsPlus7Days());
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
