@@ -101,7 +101,7 @@ export function useFoodLog(selectedDate: Date = new Date()) {
 
       const payload = {
         ...food,
-        date: selectedDate.toISOString(),
+        date: format(selectedDate, 'yyyy-MM-dd'), // Send date in local timezone format
         isAnalyzing: (food as any).isAnalyzing, // Explicitly include the isAnalyzing flag
         components: food.components?.map((comp: FoodComponent) => ({
           ...comp,

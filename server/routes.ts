@@ -4697,11 +4697,31 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Parse the date from the request or use current date
-      const rawDate = date ? new Date(date) : new Date();
+      // The client sends the date in their local timezone, we want to preserve that date
+      let dateString: string;
+      if (date) {
+        // If client sent a date, extract just the YYYY-MM-DD portion
+        // This handles both ISO strings and YYYY-MM-DD format strings
+        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          // Already in YYYY-MM-DD format
+          dateString = date;
+        } else {
+          // Parse and extract date in local context (first 10 chars of ISO or date object)
+          const parsed = new Date(date);
+          // Use the date portion from the original string if it's an ISO string
+          if (typeof date === 'string' && date.length >= 10) {
+            dateString = date.substring(0, 10);
+          } else {
+            dateString = parsed.toISOString().split('T')[0];
+          }
+        }
+      } else {
+        // No date provided, use today's date on the server
+        dateString = new Date().toISOString().split('T')[0];
+      }
       
-      // Normalize the date to avoid timezone issues by extracting YYYY-MM-DD
-      const dateString = rawDate.toISOString().split('T')[0];
-      const logDate = new Date(`${dateString}T12:00:00.000Z`); // Use noon to avoid timezone edge cases
+      // Store at noon UTC to avoid timezone boundary issues during queries
+      const logDate = new Date(`${dateString}T12:00:00.000Z`);
       
       console.log('[Food Logs API] Using log date:', {
         original: date || 'current date',

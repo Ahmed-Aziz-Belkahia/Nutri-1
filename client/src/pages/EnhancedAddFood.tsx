@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, FC } from 'react';
+import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -132,7 +133,7 @@ export default function EnhancedAddFood() {
         carbs: parseFloat(data.carbs),
         fat: parseFloat(data.fat),
         image: capturedImage || null,
-        date: new Date().toISOString(),
+        date: format(new Date(), 'yyyy-MM-dd'), // Use local timezone date
         components: [{
           name: data.name,
           calories: parseFloat(data.calories),

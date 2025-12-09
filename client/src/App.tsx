@@ -37,6 +37,7 @@ import CircularButtonDemo from "./pages/CircularButtonDemo";
 import TealButtonDemo from "./pages/TealButtonDemo";
 // Calendar page removed
 import { useEffect, useState, Suspense, lazy } from "react";
+import { format } from "date-fns";
 import BottomNav from "./components/BottomNav";
 import TransformationQuiz from "./pages/Onboarding/TransformationQuiz";
 import Goals from "./pages/settings/goals";
@@ -101,7 +102,7 @@ function NavigationRedirect({ to }: { to: string }) {
 function DataPrefetcher() {
   const queryClient = useQueryClient();
   const [prefetched, setPrefetched] = useState(false);
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const today = format(new Date(), 'yyyy-MM-dd'); // Get today's date in YYYY-MM-DD format (local timezone)
 
   useEffect(() => {
     if (!prefetched) {

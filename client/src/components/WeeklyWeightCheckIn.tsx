@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronUp, ChevronDown, TrendingDown, TrendingUp, Minus, Scale, Target, Flame, CheckCircle, X } from "lucide-react";
+import { format } from "date-fns";
 import { useWeightLogs } from '@/hooks/use-weight-logs';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +37,7 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
       
       // Check if already shown/dismissed this Sunday
       const lastShownSunday = localStorage.getItem('weightCheckInLastSunday');
-      const thisSunday = now.toISOString().split('T')[0]; // Today's date in YYYY-MM-DD
+      const thisSunday = format(now, 'yyyy-MM-dd'); // Today's date in YYYY-MM-DD (local timezone)
       
       if (lastShownSunday === thisSunday) {
         return; // Already shown this Sunday
@@ -82,7 +83,7 @@ export default function WeeklyWeightCheckIn({ onClose }: WeeklyWeightCheckInProp
 
   const handleDismiss = () => {
     // Mark this Sunday as shown so it won't show again until next Sunday
-    const today = new Date().toISOString().split('T')[0];
+    const today = format(new Date(), 'yyyy-MM-dd');
     localStorage.setItem('weightCheckInLastSunday', today);
     setIsDialogOpen(false);
     onClose?.();
