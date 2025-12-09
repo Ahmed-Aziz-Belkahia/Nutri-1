@@ -75,7 +75,7 @@ const staggerItem = {
 // Logo Component with animation
 const Logo = () => (
   <motion.div 
-    className="flex justify-center mt-4 mb-8"
+    className="flex justify-center mt-2 mb-4"
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
@@ -83,7 +83,7 @@ const Logo = () => (
     <img 
       src="/nutri-ai-logo.png" 
       alt="NutriAI" 
-      className="h-20"
+      className="h-14"
     />
   </motion.div>
 );
@@ -91,16 +91,16 @@ const Logo = () => (
 // Phone Mockup Component with animation
 const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
   <motion.div 
-    className="flex-1 flex items-center justify-center mb-4"
-    initial={{ opacity: 0, y: 40, scale: 0.9 }}
+    className="flex items-center justify-center my-2"
+    initial={{ opacity: 0, y: 20, scale: 0.95 }}
     animate={{ opacity: 1, y: 0, scale: 1 }}
-    transition={{ duration: 0.7, delay: 0.2, type: "spring", stiffness: 100 }}
+    transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 120 }}
   >
-    <div className="relative" style={{ maxWidth: '200px', width: '100%' }}>
+    <div className="relative" style={{ maxWidth: '140px', width: '100%' }}>
       <motion.img 
         src={imageSrc} 
         alt="NutriAI App" 
-        className="w-full h-auto drop-shadow-2xl"
+        className="w-full h-auto drop-shadow-xl"
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.3 }}
       />
@@ -111,17 +111,17 @@ const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
 // Heading Component with animation
 const Heading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
   <motion.div 
-    className="text-center mb-8"
+    className="text-center mb-4"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay: 0.3 }}
   >
-    <h1 className="text-3xl font-bold text-[#1E293B] leading-tight">
+    <h1 className="text-2xl font-bold text-[#1E293B] leading-tight">
       {title}
     </h1>
     {subtitle && (
       <motion.h2 
-        className="text-3xl font-bold text-[#1E293B] leading-tight"
+        className="text-2xl font-bold text-[#1E293B] leading-tight"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.5 }}
@@ -184,7 +184,7 @@ const HomeIndicator = () => (
 
 // Onboarding Layout Container
 const OnboardingLayout = ({ children, showLanguageSelector = true }: { children: React.ReactNode; showLanguageSelector?: boolean }) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-6 py-8 relative">
+  <div className="min-h-screen bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-6 py-4 relative">
     {/* Language selector at top right (RTL-aware) */}
     {showLanguageSelector && (
       <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-50">
@@ -525,15 +525,46 @@ const SpeedSlider = ({
 };
 
 // Weight Transition Chart Component
-const WeightTransitionChart = ({ labels }: { labels: { title: string; description: string; week1: string; week2: string; week8: string } }) => {
+const WeightTransitionChart = ({ labels, goal }: { labels: { title: string; description: string; week1: string; week2: string; week8: string }; goal: string | null }) => {
   const chartRef = useRef<any>(null);
+
+  // Generate data based on goal
+  const getChartData = () => {
+    switch (goal) {
+      case 'gain':
+        // Weight gain: gradual increase
+        return [65, 65.8, 67, 68.5, 70, 73];
+      case 'maintain':
+        // Maintain: stable with minor fluctuations
+        return [75, 75.2, 74.8, 75.1, 74.9, 75];
+      case 'lose':
+      default:
+        // Weight loss: gradual decrease
+        return [80, 79.5, 78.2, 76.8, 75, 72];
+    }
+  };
+
+  const getYAxisRange = () => {
+    switch (goal) {
+      case 'gain':
+        return { min: 62, max: 76 };
+      case 'maintain':
+        return { min: 72, max: 78 };
+      case 'lose':
+      default:
+        return { min: 68, max: 82 };
+    }
+  };
+
+  const chartData = getChartData();
+  const yAxisRange = getYAxisRange();
 
   const data = {
     labels: ['Day 1', 'Day 7', 'Day 14', 'Day 21', 'Day 30', 'Day 60'],
     datasets: [
       {
         label: 'Weight Progress',
-        data: [80, 79.5, 78.2, 76.8, 75, 72],
+        data: chartData,
         borderColor: '#26A8FF',
         backgroundColor: (context: any) => {
           const ctx = context.chart.ctx;
@@ -596,8 +627,8 @@ const WeightTransitionChart = ({ labels }: { labels: { title: string; descriptio
       },
       y: {
         display: false,
-        min: 68,
-        max: 82,
+        min: yAxisRange.min,
+        max: yAxisRange.max,
       },
     },
     animation: {
@@ -1720,8 +1751,8 @@ const YesNoOption = ({
   </motion.button>
 );
 
-// Weight Loss Chart Component
-const WeightLossChart = ({ labels }: { 
+// Weight Chart Component (adapts based on goal)
+const WeightLossChart = ({ labels, goal }: { 
   labels: { 
     yourWeight: string; 
     month1: string; 
@@ -1729,19 +1760,60 @@ const WeightLossChart = ({ labels }: {
     nutriAI: string; 
     weight: string; 
     traditionalDiet: string; 
-  } 
+  };
+  goal: string | null;
 }) => {
-  // More realistic weight loss data (in kg, starting at 80kg)
-  // Nutri AI: steady ~0.5-0.8kg/week loss
-  // Traditional: slower, with plateaus and slight rebounds
-  const data = [
-    { month: 1, nutriAI: 80, traditional: 80 },
-    { month: 2, nutriAI: 77.5, traditional: 79 },
-    { month: 3, nutriAI: 75, traditional: 78.5 },
-    { month: 4, nutriAI: 73, traditional: 78 },
-    { month: 5, nutriAI: 71, traditional: 77.8 },
-    { month: 6, nutriAI: 69, traditional: 77.5 },
-  ];
+  // Generate data based on goal
+  const getChartData = () => {
+    switch (goal) {
+      case 'gain':
+        // Weight gain: NutriAI helps gain muscle mass effectively
+        return [
+          { month: 1, nutriAI: 65, traditional: 65 },
+          { month: 2, nutriAI: 66.5, traditional: 65.5 },
+          { month: 3, nutriAI: 68, traditional: 66 },
+          { month: 4, nutriAI: 70, traditional: 66.3 },
+          { month: 5, nutriAI: 72, traditional: 66.5 },
+          { month: 6, nutriAI: 74, traditional: 67 },
+        ];
+      case 'maintain':
+        // Maintain: NutriAI keeps weight stable, traditional fluctuates
+        return [
+          { month: 1, nutriAI: 75, traditional: 75 },
+          { month: 2, nutriAI: 75.1, traditional: 76 },
+          { month: 3, nutriAI: 74.9, traditional: 74 },
+          { month: 4, nutriAI: 75, traditional: 76.5 },
+          { month: 5, nutriAI: 75.1, traditional: 74.5 },
+          { month: 6, nutriAI: 75, traditional: 77 },
+        ];
+      case 'lose':
+      default:
+        // Weight loss: NutriAI more effective than traditional
+        return [
+          { month: 1, nutriAI: 80, traditional: 80 },
+          { month: 2, nutriAI: 77.5, traditional: 79 },
+          { month: 3, nutriAI: 75, traditional: 78.5 },
+          { month: 4, nutriAI: 73, traditional: 78 },
+          { month: 5, nutriAI: 71, traditional: 77.8 },
+          { month: 6, nutriAI: 69, traditional: 77.5 },
+        ];
+    }
+  };
+
+  const getYAxisDomain = () => {
+    switch (goal) {
+      case 'gain':
+        return [62, 77];
+      case 'maintain':
+        return [72, 79];
+      case 'lose':
+      default:
+        return [65, 82];
+    }
+  };
+
+  const data = getChartData();
+  const yAxisDomain = getYAxisDomain();
 
   return (
     <motion.div 
@@ -1781,7 +1853,7 @@ const WeightLossChart = ({ labels }: {
               ticks={[1, 6]}
               domain={[1, 6]}
             />
-            <YAxis hide domain={[65, 82]} />
+            <YAxis hide domain={yAxisDomain} />
             
             {/* Traditional Diet Line */}
             <Line 
@@ -1858,7 +1930,7 @@ export default function TempNewOnboarding() {
     }
   }, [user, isLoading]);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
-  const [isMetric, setIsMetric] = useState(false);
+  const [isMetric, setIsMetric] = useState(true);
   const [heightFeet, setHeightFeet] = useState(5);
   const [heightInches, setHeightInches] = useState(6);
   const [heightCm, setHeightCm] = useState(170);
@@ -2161,7 +2233,7 @@ export default function TempNewOnboarding() {
           title={t('welcome.title')} 
           subtitle={t('welcome.subtitle')} 
         />
-        <div className="space-y-3 mb-6">
+        <div className="space-y-2 mb-4">
           <PrimaryButton onClick={() => navigate('/auth')}>
             {t('common.getStarted')}
           </PrimaryButton>
@@ -2818,6 +2890,7 @@ export default function TempNewOnboarding() {
           />
           
           <WeightTransitionChart 
+            goal={selectedGoal}
             labels={{
               title: t('potential.yourWeightTransition'),
               description: t('potential.chartDescription'),
@@ -2905,12 +2978,6 @@ export default function TempNewOnboarding() {
           
           <div className="space-y-3 mb-12">
             <SourceOption
-              icon={<div className="w-6 h-6 rounded-lg bg-blue-500 flex items-center justify-center"><FaApple className="w-4 h-4 text-white" /></div>}
-              label={t('referral.appStore')}
-              selected={referralSource === 'appstore'}
-              onClick={() => setReferralSource('appstore')}
-            />
-            <SourceOption
               icon={<div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center"><FaTiktok className="w-4 h-4 text-white" /></div>}
               label={t('referral.tiktok')}
               selected={referralSource === 'tiktok'}
@@ -2921,18 +2988,6 @@ export default function TempNewOnboarding() {
               label={t('referral.youtube')}
               selected={referralSource === 'youtube'}
               onClick={() => setReferralSource('youtube')}
-            />
-            <SourceOption
-              icon={<div className="w-6 h-6 rounded-lg border-2 border-gray-300 flex items-center justify-center"><FaTv className="w-4 h-4 text-gray-700" /></div>}
-              label={t('referral.tv')}
-              selected={referralSource === 'tv'}
-              onClick={() => setReferralSource('tv')}
-            />
-            <SourceOption
-              icon={<div className="w-6 h-6 rounded-lg bg-black flex items-center justify-center"><FaXTwitter className="w-4 h-4 text-white" /></div>}
-              label={t('referral.x')}
-              selected={referralSource === 'x'}
-              onClick={() => setReferralSource('x')}
             />
             <SourceOption
               icon={<div className="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 flex items-center justify-center"><FaInstagram className="w-4 h-4 text-white" /></div>}
@@ -3024,6 +3079,7 @@ export default function TempNewOnboarding() {
           </div>
           
           <WeightLossChart 
+            goal={selectedGoal}
             labels={{
               yourWeight: t('results.yourWeight'),
               month1: t('results.month1'),

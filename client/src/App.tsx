@@ -519,12 +519,12 @@ function App() {
 
             {/* Redirect authenticated users */}
             <Route path="/">
-              <NavigationRedirect to={user?.hasCompletedOnboarding === false ? "/onboarding" : "/dashboard"} />
+              <NavigationRedirect to={user?.hasCompletedOnboarding === true ? "/dashboard" : "/onboarding"} />
             </Route>
             
             {/* Fallback - redirect any unknown routes for authenticated users */}
             <Route>
-              <NavigationRedirect to="/dashboard" />
+              <NavigationRedirect to={user?.hasCompletedOnboarding === true ? "/dashboard" : "/onboarding"} />
             </Route>
           </>
         ) : (

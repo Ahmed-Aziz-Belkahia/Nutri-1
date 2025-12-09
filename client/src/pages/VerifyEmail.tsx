@@ -101,17 +101,19 @@ export default function VerifyEmail() {
       setIsVerified(true);
       
       // Invalidate user query to trigger re-fetch and auto-login
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      // App.tsx will automatically redirect to /onboarding for new users
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
       
       toast({
         title: t('auth:verifyEmail.success.toastTitle'),
         description: t('auth:verifyEmail.success.toastDescription'),
       });
 
-      // Wait 2 seconds before redirecting to onboarding
+      // Small delay to show success state, then App.tsx routing will handle redirect
       setTimeout(() => {
-        setLocation('/onboarding');
-      }, 2000);
+        // Force a route change - App.tsx will redirect to correct destination
+        setLocation('/');
+      }, 1500);
 
     } catch (error) {
       console.error('Verification error:', error);
