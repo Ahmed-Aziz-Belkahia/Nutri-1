@@ -327,6 +327,8 @@ export default function IngredientsAnalysis() {
       await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all() });
       await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.created() });
       await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.saved() });
+      // Invalidate dashboard's ingredient-generated recipes query
+      await queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.ingredientRecipes() });
       // Also invalidate the old-style keys for backwards compatibility
       await queryClient.invalidateQueries({ queryKey: ["/api/recipes", "created"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/recipes", "saved"] });

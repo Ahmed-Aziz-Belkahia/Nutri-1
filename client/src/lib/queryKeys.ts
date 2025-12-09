@@ -21,6 +21,7 @@ export const queryKeys = {
     totals: (date: string) => ['food-logs', 'totals', date] as const,
     scanned: () => ['food-logs', 'scanned'] as const,
     scannedToday: () => ['food-logs', 'scanned', 'today'] as const,
+    ingredientRecipes: () => ['foodLogs', 'ingredientRecipes'] as const,
   },
   
   // Recipes
@@ -30,6 +31,7 @@ export const queryKeys = {
       ['recipes', 'list', filters] as const,
     created: () => ['recipes', 'created'] as const,
     saved: () => ['recipes', 'saved'] as const,
+    ingredientGenerated: () => ['recipes', 'ingredient-generated'] as const,
     byId: (id: number) => ['recipes', 'id', id] as const,
     foodLog: (id: number) => ['recipes', 'food-log', id] as const,
   },

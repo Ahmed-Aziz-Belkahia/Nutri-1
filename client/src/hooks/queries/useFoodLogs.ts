@@ -101,7 +101,7 @@ export function useScannedMealsToday(): UseQueryResult<FoodLog[]> {
 // Get ingredient-generated recipes
 export function useIngredientGeneratedRecipes(): UseQueryResult<FoodLog[]> {
   return useQuery({
-    queryKey: ['foodLogs', 'ingredientRecipes'],
+    queryKey: queryKeys.foodLogs.ingredientRecipes(),
     queryFn: async () => {
       const response = await fetch('/api/food-logs/ingredient-recipes?limit=20', {
         credentials: 'include'
