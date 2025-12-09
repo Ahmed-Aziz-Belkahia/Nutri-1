@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 type AnalysisState = 'detecting' | 'analyzing' | 'confirming' | 'generating' | 'finalizing' | 'complete' | 'error';
 
@@ -322,9 +323,13 @@ export default function IngredientsAnalysis() {
 
       console.log('[IngredientsAnalysis] Saved recipes:', savedRecipes);
 
-      // Invalidate recipe queries to refresh the Recipes page
-      await queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      await queryClient.invalidateQueries({ queryKey: ['/api/recipes'] });
+      // Invalidate recipe queries to refresh the Recipes page using proper query keys
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.created() });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.saved() });
+      // Also invalidate the old-style keys for backwards compatibility
+      await queryClient.invalidateQueries({ queryKey: ["/api/recipes", "created"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/recipes", "saved"] });
       console.log('[IngredientsAnalysis] Invalidated recipe queries');
 
       // Store both original and saved recipes
