@@ -10,21 +10,33 @@ const openai = new OpenAI({
 
 // Dietary preferences type definition
 interface DietaryPreferences {
-  allergies?: string;
-  dietaryRestrictions?: string;
+  allergies?: string | string[];
+  dietaryRestrictions?: string | string[];
   mealBudget?: string;
   experienceLevel?: string;
+}
+
+// Helper to convert array or string to string
+function toStringValue(value: string | string[] | undefined): string {
+  if (!value) return '';
+  if (Array.isArray(value)) {
+    return value.filter(v => v && v.trim()).join(', ');
+  }
+  return value;
 }
 
 // Helper function to build dietary constraint prompts
 function buildDietaryPromptSection(prefs: DietaryPreferences): string {
   const sections: string[] = [];
   
-  if (prefs.allergies && prefs.allergies.trim()) {
-    sections.push(`ALLERGIES (CRITICAL - MUST AVOID): ${prefs.allergies}`);
+  const allergiesStr = toStringValue(prefs.allergies);
+  const restrictionsStr = toStringValue(prefs.dietaryRestrictions);
+  
+  if (allergiesStr) {
+    sections.push(`ALLERGIES (CRITICAL - MUST AVOID): ${allergiesStr}`);
   }
-  if (prefs.dietaryRestrictions && prefs.dietaryRestrictions.trim()) {
-    sections.push(`Dietary Restrictions: ${prefs.dietaryRestrictions}`);
+  if (restrictionsStr) {
+    sections.push(`Dietary Restrictions: ${restrictionsStr}`);
   }
   if (prefs.mealBudget && prefs.mealBudget.trim()) {
     sections.push(`Budget Preference: ${prefs.mealBudget}`);
@@ -38,13 +50,14 @@ function buildDietaryPromptSection(prefs: DietaryPreferences): string {
 
 // Helper function to build safety warnings for allergies
 function buildSafetyWarnings(prefs: DietaryPreferences): string {
-  if (!prefs.allergies || !prefs.allergies.trim()) {
+  const allergiesStr = toStringValue(prefs.allergies);
+  if (!allergiesStr) {
     return '';
   }
   
   return `
 CRITICAL SAFETY REQUIREMENTS:
-The user has the following ALLERGIES: ${prefs.allergies}
+The user has the following ALLERGIES: ${allergiesStr}
 - NEVER include any ingredient containing these allergens
 - NEVER suggest recipes that contain these allergens
 - NEVER include hidden sources of these allergens
