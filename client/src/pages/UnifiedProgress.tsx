@@ -70,15 +70,31 @@ export default function UnifiedProgress() {
     const age = (userProfile?.age as number) ?? 30;
 
     try {
-      const analysis = await analyzeBody(latestPhoto.photoUrl, weight, height, gender, age);
+      // Convert the photo URL to base64 for the API
+      const imageBase64 = await fetchImageAsBase64(latestPhoto.photoUrl);
+      
+      const analysis = await analyzeBody(imageBase64, weight, height, gender, age);
       if (analysis?.bodyFatPercentage) {
         await updateProfileWithBodyFat(analysis.bodyFatPercentage, analysis.bodyType);
         refetchUserProfile();
         toast({ title: "Analysis Complete", description: `Body fat: ${analysis.bodyFatPercentage}%, Type: ${analysis.bodyType}` });
       }
     } catch (error) {
+      console.error('Body analysis error:', error);
       toast({ title: "Analysis Failed", description: "Unable to analyze. Please try again.", variant: "destructive" });
     }
+  };
+
+  // Helper function to fetch an image URL and convert to base64
+  const fetchImageAsBase64 = async (imageUrl: string): Promise<string> => {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   };
 
   const currentWeight = userProfile?.currentWeight ? parseFloat(userProfile.currentWeight as any) : undefined;
