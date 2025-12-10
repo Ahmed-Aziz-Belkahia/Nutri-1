@@ -60,6 +60,9 @@ export default function CookingMode() {
   const sessionTimerRef = useRef<NodeJS.Timeout>();
   const timerUpdateRef = useRef<NodeJS.Timeout>();
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
+  
+  // Check if running in native app - fullscreen API doesn't work in WebViews
+  const isNativeApp = typeof window !== 'undefined' && (window as any).isNativeApp === true;
 
   // Fetch recipe using custom hook
   const { data: recipe, isLoading } = useRecipeById(Number(id), isFoodLog);
@@ -630,12 +633,15 @@ export default function CookingMode() {
             >
               {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
             </button>
-            <button
-              onClick={toggleFullscreen}
-              className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
-            >
-              {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
-            </button>
+            {/* Hide fullscreen button in native app - WebView is already fullscreen */}
+            {!isNativeApp && (
+              <button
+                onClick={toggleFullscreen}
+                className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-600 transition-colors"
+              >
+                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+              </button>
+            )}
           </div>
         </div>
         
