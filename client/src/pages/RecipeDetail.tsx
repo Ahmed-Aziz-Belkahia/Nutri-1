@@ -302,24 +302,6 @@ export default function RecipeDetail() {
             {/* Ingredients Tab */}
             {activeTab === 'ingredients' && (
               <div className="space-y-4">
-                {/* Quick Component Cards - Show top 3 ingredients with calories */}
-                {displayComponents.length > 0 && (
-                  <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {displayComponents.map((comp, index) => (
-                      <div
-                        key={index}
-                        className="flex-shrink-0 bg-white/70 backdrop-blur-sm rounded-2xl p-4 min-w-[110px] border border-white/60 shadow-sm"
-                      >
-                        <p className="font-semibold text-gray-900 text-sm">{comp.name}</p>
-                        <p className="text-xs text-gray-500 mt-1">{comp.servingSize || `${comp.quantity}`}</p>
-                        {comp.calories > 0 && (
-                          <p className="text-xs text-[#26A8FF] font-medium mt-2">{comp.calories} kcal</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 {/* Full Ingredient List */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
@@ -427,6 +409,24 @@ export default function RecipeDetail() {
                     <p className="text-sm text-gray-500">{recipe.nutritionInfo?.calories || 0} {t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
                   </div>
                 </div>
+
+                {/* Quick Component Cards - Ingredients with calories */}
+                {displayComponents.length > 0 && (
+                  <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {displayComponents.map((comp, index) => (
+                      <div
+                        key={index}
+                        className="flex-shrink-0 bg-white/70 backdrop-blur-sm rounded-2xl p-4 min-w-[110px] border border-white/60 shadow-sm"
+                      >
+                        <p className="font-semibold text-gray-900 text-sm">{comp.name}</p>
+                        <p className="text-xs text-gray-500 mt-1">{comp.servingSize || `${comp.quantity}`}</p>
+                        {comp.calories > 0 && (
+                          <p className="text-xs text-[#26A8FF] font-medium mt-2">{comp.calories} kcal</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 
                 {/* Macros with Progress Bars */}
                 <div className="grid grid-cols-2 gap-4">
