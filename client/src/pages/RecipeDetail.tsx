@@ -230,7 +230,7 @@ export default function RecipeDetail() {
 
       {/* Floating Recipe Card */}
       <div className="px-4 -mt-16 relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-5 border border-white/50 shadow-xl">
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-5 border border-white/60 shadow-xl">
           <h1 className="text-xl font-bold text-gray-900 mb-2">
             {recipe.name.replace(/\s*\(Day \d+\)\s*$/i, '')}
           </h1>
@@ -276,9 +276,9 @@ export default function RecipeDetail() {
 
       {/* Main Content Card */}
       <div className="px-4 mt-4 relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/50 shadow-lg">
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/60 shadow-lg">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-100/50 bg-white/50">
             {(['ingredients', 'instructions', 'nutrition'] as const).map((tab) => (
               <button
                 key={tab}
@@ -308,7 +308,7 @@ export default function RecipeDetail() {
                     {displayComponents.map((comp, index) => (
                       <div
                         key={index}
-                        className="flex-shrink-0 bg-white/90 backdrop-blur rounded-2xl p-4 min-w-[110px] border border-gray-200 shadow-sm"
+                        className="flex-shrink-0 bg-white/70 backdrop-blur-sm rounded-2xl p-4 min-w-[110px] border border-white/60 shadow-sm"
                       >
                         <p className="font-semibold text-gray-900 text-sm">{comp.name}</p>
                         <p className="text-xs text-gray-500 mt-1">{comp.servingSize || `${comp.quantity}`}</p>
@@ -337,7 +337,7 @@ export default function RecipeDetail() {
                         className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${
                           checkedIngredients.has(index)
                             ? 'bg-[#26A8FF]/10 border border-[#26A8FF]/30'
-                            : 'bg-white/60 hover:bg-white/80 border border-gray-200'
+                            : 'bg-white/50 hover:bg-white/70 border border-white/60 backdrop-blur-sm'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -417,65 +417,141 @@ export default function RecipeDetail() {
 
             {/* Nutrition Tab */}
             {activeTab === 'nutrition' && (
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 mb-4">{t('common:recipeDetail.nutrition.title')}</h3>
+              <div className="space-y-6">
+                {/* Main Calories Display */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-4xl font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-500">{recipe.nutritionInfo?.calories || 0} {t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
+                  </div>
+                </div>
                 
-                <div className="bg-gradient-to-br from-[#26A8FF]/10 to-[#1A8FE6]/5 rounded-xl p-4 border border-[#26A8FF]/20">
-                  <div className="text-center mb-4">
-                    <p className="text-3xl font-bold text-[#26A8FF]">{recipe.nutritionInfo?.calories || 0}</p>
-                    <p className="text-sm text-gray-500">{t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
+                {/* Macros with Progress Bars */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Protein */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-white/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.protein')}</span>
+                      <span className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full" style={{ width: `${Math.min((recipe.nutritionInfo?.protein || 0) / 50 * 100, 100)}%` }} />
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-orange-500">P</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.protein')}</p>
+                  {/* Carbs */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-white/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.carbs')}</span>
+                      <span className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</span>
                     </div>
-                    
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-green-500">C</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.carbs')}</p>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-purple-400 to-purple-500 rounded-full" style={{ width: `${Math.min((recipe.nutritionInfo?.carbs || 0) / 100 * 100, 100)}%` }} />
                     </div>
-                    
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-red-500">F</span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.fat')}</p>
+                  </div>
+                  
+                  {/* Fat */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-white/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.fat')}</span>
+                      <span className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-red-400 to-red-500 rounded-full" style={{ width: `${Math.min((recipe.nutritionInfo?.fat || 0) / 65 * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  
+                  {/* Fiber */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-3 border border-white/50">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.fiber') || 'Fiber'}</span>
+                      <span className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.fiber || 0}g</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full" style={{ width: `${Math.min((recipe.nutritionInfo?.fiber || 0) / 25 * 100, 100)}%` }} />
                     </div>
                   </div>
                 </div>
 
-                {/* Additional Nutrition Info */}
-                {(recipe.nutritionInfo?.fiber || recipe.nutritionInfo?.sugar || recipe.nutritionInfo?.sodium) && (
-                  <div className="space-y-2">
-                    {recipe.nutritionInfo.fiber && (
-                      <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.fiber')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.fiber}g</span>
+                {/* Micronutrients Section */}
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-3">Micronutrienti</h4>
+                  <div className="grid grid-cols-4 gap-3">
+                    {/* Sodium */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-gray-600">Sg</span>
                       </div>
-                    )}
-                    {recipe.nutritionInfo.sugar && (
-                      <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sugar')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sugar}g</span>
+                      <p className="text-xs font-semibold text-gray-900">{recipe.nutritionInfo?.sodium || 0}mg</p>
+                      <p className="text-[10px] text-gray-500">{t('common:recipeDetail.nutrition.sodium') || 'Sód'}</p>
+                    </div>
+                    
+                    {/* Potassium */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-gray-600">+</span>
                       </div>
-                    )}
-                    {recipe.nutritionInfo.sodium && (
-                      <div className="flex justify-between py-2">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sodium')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sodium}mg</span>
+                      <p className="text-xs font-semibold text-gray-900">300mg</p>
+                      <p className="text-[10px] text-gray-500">Potas</p>
+                    </div>
+                    
+                    {/* Sugar */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-gray-600">◇</span>
                       </div>
-                    )}
+                      <p className="text-xs font-semibold text-gray-900">{recipe.nutritionInfo?.sugar || 0}g</p>
+                      <p className="text-[10px] text-gray-500">{t('common:recipeDetail.nutrition.sugar') || 'Cukier'}</p>
+                    </div>
+                    
+                    {/* Potassium 2 */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-gray-600">K</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-900">80mg</p>
+                      <p className="text-[10px] text-gray-500">Potas</p>
+                    </div>
+                    
+                    {/* Vitamin A */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-orange-600">A</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-900">120µg</p>
+                      <p className="text-[10px] text-gray-500">Witamina A</p>
+                    </div>
+                    
+                    {/* Vitamin C */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-yellow-600">C</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-900">25mg</p>
+                      <p className="text-[10px] text-gray-500">Witamina C</p>
+                    </div>
+                    
+                    {/* Calcium */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-gray-600">Ca</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-900">80mg</p>
+                      <p className="text-[10px] text-gray-500">Wapń</p>
+                    </div>
+                    
+                    {/* Iron */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/50 text-center">
+                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-1">
+                        <span className="text-xs font-bold text-red-600">Fe</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-900">2.5mg</p>
+                      <p className="text-[10px] text-gray-500">Żelazo</p>
+                    </div>
                   </div>
-                )}
+                </div>
 
                 {/* Components Breakdown - if available from AI */}
                 {components.length > 0 && (
@@ -483,7 +559,7 @@ export default function RecipeDetail() {
                     <h4 className="font-semibold text-gray-900 mb-3">{t('common:recipeDetail.nutrition.breakdown') || 'Nutrition Breakdown'}</h4>
                     <div className="space-y-2">
                       {components.map((comp, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-gray-200">
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/60 backdrop-blur-sm rounded-xl border border-white/50">
                           <div>
                             <p className="text-sm font-medium text-gray-900">{comp.name}</p>
                             <p className="text-xs text-gray-500">{comp.servingSize}</p>
