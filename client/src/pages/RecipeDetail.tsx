@@ -10,6 +10,24 @@ interface Ingredient {
   quantity: number | string;
   unit: string;
   calories?: number;
+  servingSize?: string;
+}
+
+interface Component {
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  servingSize: string;
+  quantity: number;
+  details?: {
+    type?: string;
+    preparation?: string;
+    texture?: string;
+    color?: string;
+    estimatedWeight?: string;
+  };
 }
 
 interface NutritionInfo {
@@ -34,6 +52,7 @@ interface Recipe {
   ingredients: string | Ingredient[];
   instructions: string | string[];
   nutritionInfo?: NutritionInfo;
+  components?: Component[];
   tags?: string[];
   isSaved?: boolean;
 }
@@ -69,6 +88,20 @@ export default function RecipeDetail() {
       }
     }
     return recipe.ingredients;
+  })();
+
+  // Parse components (from AI food recognition)
+  const components: Component[] = (() => {
+    if (!recipe?.components) return [];
+    
+    if (typeof recipe.components === 'string') {
+      try {
+        return JSON.parse(recipe.components);
+      } catch {
+        return [];
+      }
+    }
+    return recipe.components;
   })();
 
   // Parse instructions
@@ -124,7 +157,7 @@ export default function RecipeDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen gradient-bg flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#1a3a4a] to-[#0d2030] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-[#26A8FF]"></div>
       </div>
     );
@@ -132,16 +165,29 @@ export default function RecipeDetail() {
 
   if (!recipe) {
     return (
-      <div className="min-h-screen gradient-bg flex items-center justify-center">
-        <p className="text-gray-500">{t('common:recipeDetail.notFound')}</p>
+      <div className="min-h-screen bg-gradient-to-b from-[#1a3a4a] to-[#0d2030] flex items-center justify-center">
+        <p className="text-gray-400">{t('common:recipeDetail.notFound')}</p>
       </div>
     );
   }
 
+  // Get display components - either from components array or create from ingredients
+  const displayComponents = components.length > 0 
+    ? components.slice(0, 3) 
+    : ingredients.slice(0, 3).map(ing => ({
+        name: typeof ing === 'string' ? ing : ing.name,
+        calories: typeof ing === 'object' && ing.calories ? ing.calories : 0,
+        servingSize: typeof ing === 'object' && ing.quantity ? `${ing.quantity} ${ing.unit || ''}`.trim() : '',
+        quantity: 1,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+      }));
+
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a3a4a] to-[#0d2030] pb-24">
       {/* Hero Section with Image */}
-      <div className="relative w-full h-80 bg-gray-100 overflow-hidden">
+      <div className="relative w-full h-72">
         {recipe.imageUrl ? (
           <img 
             src={recipe.imageUrl} 
@@ -149,86 +195,85 @@ export default function RecipeDetail() {
             className="absolute inset-0 w-full h-full object-cover"
           />
         ) : (
-          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
-            <ChefHat className="w-20 h-20 text-[#26A8FF]/20" />
+          <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#2a5a6a] to-[#1a3a4a] flex items-center justify-center">
+            <ChefHat className="w-20 h-20 text-white/20" />
           </div>
         )}
-        
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         
         {/* Top Navigation */}
         <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
           <button
             onClick={() => navigate('/recipes')}
-            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
+            className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-800" />
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
           
           <div className="flex gap-2">
             <button
               onClick={handleSaveRecipe}
-              className={`w-10 h-10 ${isSaved ? 'bg-[#26A8FF]' : 'bg-white/90'} backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-colors`}
+              className={`w-10 h-10 ${isSaved ? 'bg-[#26A8FF]' : 'bg-white/20'} backdrop-blur-md rounded-full flex items-center justify-center transition-colors`}
             >
-              <Heart className={`w-5 h-5 ${isSaved ? 'text-white fill-white' : 'text-gray-800'}`} />
+              <Heart className={`w-5 h-5 ${isSaved ? 'text-white fill-white' : 'text-white'}`} />
             </button>
-            <button className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg">
-              <Share2 className="w-5 h-5 text-gray-800" />
+            <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+              <Share2 className="w-5 h-5 text-white" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Recipe Content */}
-      <div className="max-w-md mx-auto px-5 -mt-8 relative z-10">
-        {/* Recipe Title Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+      {/* Floating Recipe Card */}
+      <div className="px-4 -mt-16 relative z-10">
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-5 border border-white/20 shadow-2xl">
+          <h1 className="text-xl font-bold text-white mb-2">
             {recipe.name.replace(/\s*\(Day \d+\)\s*$/i, '')}
           </h1>
           
           {recipe.description && (
-            <p className="text-gray-600 text-sm mb-4">{recipe.description}</p>
+            <p className="text-gray-300 text-sm mb-4 line-clamp-2">{recipe.description}</p>
           )}
           
-          {/* Recipe Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Recipe Stats Row */}
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#26A8FF]/20 rounded-full flex items-center justify-center">
                 <Clock className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.time')}</p>
-                <p className="text-sm font-semibold text-gray-900">{totalTime || 30} {t('common:recipeDetail.stats.min')}</p>
+                <p className="text-xs text-gray-400">{t('common:recipeDetail.stats.time')}</p>
+                <p className="text-sm font-semibold text-white">{totalTime || 30} {t('common:recipeDetail.stats.min')}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#26A8FF]/20 rounded-full flex items-center justify-center">
                 <Users className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.servings')}</p>
-                <p className="text-sm font-semibold text-gray-900">{recipe.servings || 1}</p>
+                <p className="text-xs text-gray-400">{t('common:recipeDetail.stats.servings')}</p>
+                <p className="text-sm font-semibold text-white">{recipe.servings || 1}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-[#26A8FF]/20 rounded-full flex items-center justify-center">
                 <Flame className="w-4 h-4 text-[#26A8FF]" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">{t('common:recipeDetail.stats.calories')}</p>
-                <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
+                <p className="text-xs text-gray-400">{t('common:recipeDetail.stats.calories')}</p>
+                <p className="text-sm font-semibold text-white">{recipe.nutritionInfo?.calories || 0}</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div className="flex border-b border-gray-100">
+      {/* Main Content Card */}
+      <div className="px-4 mt-4">
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/20">
+          {/* Tabs */}
+          <div className="flex border-b border-white/10">
             {(['ingredients', 'instructions', 'nutrition'] as const).map((tab) => (
               <button
                 key={tab}
@@ -236,7 +281,7 @@ export default function RecipeDetail() {
                 className={`flex-1 py-3 px-4 text-sm font-medium transition-all relative ${
                   activeTab === tab
                     ? 'text-[#26A8FF]'
-                    : 'text-gray-500 hover:text-gray-700'
+                    : 'text-gray-400 hover:text-gray-300'
                 }`}
               >
                 {t(`common:recipeDetail.tabs.${tab}`)}
@@ -247,50 +292,74 @@ export default function RecipeDetail() {
             ))}
           </div>
 
+          {/* Tab Content */}
           <div className="p-5">
             {/* Ingredients Tab */}
             {activeTab === 'ingredients' && (
-              <div className="space-y-2">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-gray-900">{t('common:recipeDetail.ingredients.title')}</h3>
-                  <span className="text-xs text-gray-500">
-                    {checkedIngredients.size}/{ingredients.length} {t('common:recipeDetail.ingredients.checked')}
-                  </span>
-                </div>
-                
-                {ingredients.map((ingredient, index) => (
-                  <button
-                    key={index}
-                    onClick={() => toggleIngredient(index)}
-                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${
-                      checkedIngredients.has(index)
-                        ? 'bg-blue-50 border border-[#26A8FF]/20'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        checkedIngredients.has(index)
-                          ? 'bg-[#26A8FF] border-[#26A8FF]'
-                          : 'border-gray-300'
-                      }`}>
-                        {checkedIngredients.has(index) && (
-                          <Check className="w-3 h-3 text-white" />
+              <div className="space-y-4">
+                {/* Quick Component Cards - Show top 3 ingredients with calories */}
+                {displayComponents.length > 0 && (
+                  <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                    {displayComponents.map((comp, index) => (
+                      <div
+                        key={index}
+                        className="flex-shrink-0 bg-white/5 backdrop-blur rounded-2xl p-3 min-w-[100px] border border-white/10"
+                      >
+                        <p className="font-semibold text-white text-sm">{comp.name}</p>
+                        <p className="text-xs text-gray-400">{comp.servingSize || `${comp.quantity}`}</p>
+                        {comp.calories > 0 && (
+                          <p className="text-xs text-[#26A8FF] mt-1">{comp.calories} kcal</p>
                         )}
                       </div>
-                      <span className={`text-sm ${
-                        checkedIngredients.has(index) ? 'line-through text-gray-400' : 'text-gray-700'
-                      }`}>
-                        {typeof ingredient === 'string' ? ingredient : ingredient.name}
-                      </span>
-                    </div>
-                    {typeof ingredient !== 'string' && ingredient.quantity && (
-                      <span className="text-xs text-gray-500">
-                        {ingredient.quantity} {ingredient.unit}
-                      </span>
-                    )}
-                  </button>
-                ))}
+                    ))}
+                  </div>
+                )}
+
+                {/* Full Ingredient List */}
+                <div>
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="font-semibold text-white">{t('common:recipeDetail.ingredients.title')}</h3>
+                    <span className="text-xs text-gray-400">
+                      {checkedIngredients.size}/{ingredients.length} {t('common:recipeDetail.ingredients.checked')}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {ingredients.map((ingredient, index) => (
+                      <button
+                        key={index}
+                        onClick={() => toggleIngredient(index)}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${
+                          checkedIngredients.has(index)
+                            ? 'bg-[#26A8FF]/20 border border-[#26A8FF]/30'
+                            : 'bg-white/5 hover:bg-white/10 border border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            checkedIngredients.has(index)
+                              ? 'bg-[#26A8FF] border-[#26A8FF]'
+                              : 'border-gray-500'
+                          }`}>
+                            {checkedIngredients.has(index) && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                          <span className={`text-sm ${
+                            checkedIngredients.has(index) ? 'line-through text-gray-500' : 'text-white'
+                          }`}>
+                            {typeof ingredient === 'string' ? ingredient : ingredient.name}
+                          </span>
+                        </div>
+                        {typeof ingredient !== 'string' && ingredient.quantity && (
+                          <span className="text-xs text-gray-400">
+                            {ingredient.quantity} {ingredient.unit}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -298,8 +367,8 @@ export default function RecipeDetail() {
             {activeTab === 'instructions' && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-gray-900">{t('common:recipeDetail.instructions.title')}</h3>
-                  <span className="text-xs text-gray-500">
+                  <h3 className="font-semibold text-white">{t('common:recipeDetail.instructions.title')}</h3>
+                  <span className="text-xs text-gray-400">
                     {t('common:recipeDetail.instructions.stepOf', { current: currentInstructionStep + 1, total: instructions.length })}
                   </span>
                 </div>
@@ -315,18 +384,18 @@ export default function RecipeDetail() {
                     <div className={`absolute left-0 top-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold ${
                       index <= currentInstructionStep
                         ? 'bg-[#26A8FF] text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        : 'bg-white/10 text-gray-400'
                     }`}>
                       {index <= currentInstructionStep ? <Check className="w-4 h-4" /> : index + 1}
                     </div>
                     
                     {index < instructions.length - 1 && (
                       <div className={`absolute left-3.5 top-7 bottom-0 w-0.5 ${
-                        index < currentInstructionStep ? 'bg-[#26A8FF]' : 'bg-gray-200'
+                        index < currentInstructionStep ? 'bg-[#26A8FF]' : 'bg-white/10'
                       }`} />
                     )}
                     
-                    <p className="text-sm text-gray-700">{instruction}</p>
+                    <p className="text-sm text-gray-300">{instruction}</p>
                   </div>
                 ))}
                 
@@ -344,37 +413,37 @@ export default function RecipeDetail() {
             {/* Nutrition Tab */}
             {activeTab === 'nutrition' && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 mb-4">{t('common:recipeDetail.nutrition.title')}</h3>
+                <h3 className="font-semibold text-white mb-4">{t('common:recipeDetail.nutrition.title')}</h3>
                 
-                <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-4 border border-blue-100">
+                <div className="bg-gradient-to-br from-[#26A8FF]/20 to-[#1A8FE6]/10 rounded-xl p-4 border border-[#26A8FF]/20">
                   <div className="text-center mb-4">
                     <p className="text-3xl font-bold text-[#26A8FF]">{recipe.nutritionInfo?.calories || 0}</p>
-                    <p className="text-sm text-gray-500">{t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
+                    <p className="text-sm text-gray-400">{t('common:recipeDetail.nutrition.caloriesPerServing')}</p>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-orange-500">P</span>
+                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <span className="text-lg font-bold text-orange-400">P</span>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.protein')}</p>
+                      <p className="text-sm font-semibold text-white">{recipe.nutritionInfo?.protein || 0}g</p>
+                      <p className="text-xs text-gray-400">{t('common:recipeDetail.nutrition.protein')}</p>
                     </div>
                     
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-green-500">C</span>
+                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <span className="text-lg font-bold text-green-400">C</span>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.carbs')}</p>
+                      <p className="text-sm font-semibold text-white">{recipe.nutritionInfo?.carbs || 0}g</p>
+                      <p className="text-xs text-gray-400">{t('common:recipeDetail.nutrition.carbs')}</p>
                     </div>
                     
                     <div className="text-center">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-sm">
-                        <span className="text-lg font-bold text-red-500">F</span>
+                      <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <span className="text-lg font-bold text-red-400">F</span>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
-                      <p className="text-xs text-gray-500">{t('common:recipeDetail.nutrition.fat')}</p>
+                      <p className="text-sm font-semibold text-white">{recipe.nutritionInfo?.fat || 0}g</p>
+                      <p className="text-xs text-gray-400">{t('common:recipeDetail.nutrition.fat')}</p>
                     </div>
                   </div>
                 </div>
@@ -383,23 +452,44 @@ export default function RecipeDetail() {
                 {(recipe.nutritionInfo?.fiber || recipe.nutritionInfo?.sugar || recipe.nutritionInfo?.sodium) && (
                   <div className="space-y-2">
                     {recipe.nutritionInfo.fiber && (
-                      <div className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.fiber')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.fiber}g</span>
+                      <div className="flex justify-between py-2 border-b border-white/10">
+                        <span className="text-sm text-gray-400">{t('common:recipeDetail.nutrition.fiber')}</span>
+                        <span className="text-sm font-semibold text-white">{recipe.nutritionInfo.fiber}g</span>
                       </div>
                     )}
                     {recipe.nutritionInfo.sugar && (
-                      <div className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sugar')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sugar}g</span>
+                      <div className="flex justify-between py-2 border-b border-white/10">
+                        <span className="text-sm text-gray-400">{t('common:recipeDetail.nutrition.sugar')}</span>
+                        <span className="text-sm font-semibold text-white">{recipe.nutritionInfo.sugar}g</span>
                       </div>
                     )}
                     {recipe.nutritionInfo.sodium && (
                       <div className="flex justify-between py-2">
-                        <span className="text-sm text-gray-600">{t('common:recipeDetail.nutrition.sodium')}</span>
-                        <span className="text-sm font-semibold text-gray-900">{recipe.nutritionInfo.sodium}mg</span>
+                        <span className="text-sm text-gray-400">{t('common:recipeDetail.nutrition.sodium')}</span>
+                        <span className="text-sm font-semibold text-white">{recipe.nutritionInfo.sodium}mg</span>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* Components Breakdown - if available from AI */}
+                {components.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-white mb-3">{t('common:recipeDetail.nutrition.breakdown') || 'Nutrition Breakdown'}</h4>
+                    <div className="space-y-2">
+                      {components.map((comp, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10">
+                          <div>
+                            <p className="text-sm font-medium text-white">{comp.name}</p>
+                            <p className="text-xs text-gray-400">{comp.servingSize}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-semibold text-[#26A8FF]">{comp.calories} kcal</p>
+                            <p className="text-xs text-gray-500">P:{comp.protein}g C:{comp.carbs}g F:{comp.fat}g</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
