@@ -1609,9 +1609,9 @@
       "min": "min"
     },
     "tabs": {
+      "overview": "Przegląd",
       "ingredients": "Składniki",
-      "instructions": "Instrukcje",
-      "nutrition": "Odżywianie"
+      "instructions": "Instrukcje"
     },
     "ingredients": {
       "title": "Składniki",

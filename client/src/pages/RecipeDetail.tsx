@@ -63,7 +63,7 @@ export default function RecipeDetail() {
   const [location, navigate] = useLocation();
   const isFoodLog = location.includes('/food-log/');
   const recipeId = id;
-  const [activeTab, setActiveTab] = useState<'ingredients' | 'instructions' | 'nutrition'>('ingredients');
+  const [activeTab, setActiveTab] = useState<'overview' | 'ingredients' | 'instructions'>('overview');
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [currentInstructionStep, setCurrentInstructionStep] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
@@ -279,7 +279,7 @@ export default function RecipeDetail() {
         <div className="bg-white/70 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/60 shadow-lg">
           {/* Tabs */}
           <div className="flex border-b border-gray-100/50 bg-white/50">
-            {(['ingredients', 'instructions', 'nutrition'] as const).map((tab) => (
+            {(['overview', 'ingredients', 'instructions'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -397,8 +397,8 @@ export default function RecipeDetail() {
               </div>
             )}
 
-            {/* Nutrition Tab */}
-            {activeTab === 'nutrition' && (
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
               <div className="space-y-6">
                 {/* Main Calories Display */}
                 <div className="flex items-center justify-between">

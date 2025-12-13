@@ -1169,9 +1169,9 @@
       "min": "دقيقة"
     },
     "tabs": {
+      "overview": "نظرة عامة",
       "ingredients": "المكونات",
-      "instructions": "التعليمات",
-      "nutrition": "القيم الغذائية"
+      "instructions": "التعليمات"
     },
     "ingredients": {
       "title": "المكونات",
