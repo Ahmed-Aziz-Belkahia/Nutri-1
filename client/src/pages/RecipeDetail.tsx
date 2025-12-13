@@ -591,68 +591,73 @@ export default function RecipeDetail() {
             <div className="p-4">
               <div 
                 ref={shareCardRef}
-                className="bg-gradient-to-br from-[#f0f7fa] to-[#e8f4f8] rounded-2xl p-5 relative overflow-hidden"
+                className="bg-gradient-to-br from-[#f0f7fa] to-[#e8f4f8] rounded-2xl p-3 relative overflow-hidden"
               >
                 {/* Decorative circles */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#26A8FF]/20 rounded-full blur-2xl" />
-                <div className="absolute bottom-0 left-0 w-20 h-20 bg-[#1A8FE6]/15 rounded-full blur-2xl" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-[#26A8FF]/20 rounded-full blur-2xl" />
+                <div className="absolute bottom-0 left-0 w-16 h-16 bg-[#1A8FE6]/15 rounded-full blur-2xl" />
                 
-                {/* Meal Image */}
+                {/* Content */}
                 <div className="relative z-10">
-                  {recipe.imageUrl ? (
-                    <img 
-                      src={recipe.imageUrl} 
-                      alt={recipe.name}
-                      className="w-full h-40 object-cover rounded-xl mb-4"
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
-                    <div className="w-full h-40 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-xl mb-4 flex items-center justify-center">
-                      <ChefHat className="w-16 h-16 text-white/50" />
-                    </div>
-                  )}
-                  
-                  {/* Meal Name */}
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">
-                    {recipe.name.replace(/\s*\(Day \d+\)\s*$/i, '')}
-                  </h4>
-                  
-                  {/* Nutrition Grid */}
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
-                      <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
-                      <p className="text-xs text-gray-500">kcal</p>
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
-                      <div className="w-5 h-5 bg-blue-500 rounded-full mx-auto mb-1 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">P</span>
+                  {/* Meal Image with Title Overlay */}
+                  <div className="relative rounded-xl overflow-hidden mb-3">
+                    {recipe.imageUrl ? (
+                      <img 
+                        src={recipe.imageUrl} 
+                        alt={recipe.name}
+                        className="w-full h-32 object-cover"
+                        crossOrigin="anonymous"
+                      />
+                    ) : (
+                      <div className="w-full h-32 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] flex items-center justify-center">
+                        <ChefHat className="w-12 h-12 text-white/50" />
                       </div>
-                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
-                      <p className="text-xs text-gray-500">Protein</p>
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
-                      <div className="w-5 h-5 bg-amber-500 rounded-full mx-auto mb-1 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">C</span>
+                    )}
+                    
+                    {/* Title Overlay at bottom right */}
+                    <div className="absolute bottom-0 right-0 left-0">
+                      <div className="bg-white/70 backdrop-blur-md px-3 py-2">
+                        <h4 className="text-sm font-bold text-gray-900 text-right truncate">
+                          {recipe.name.replace(/\s*\(Day \d+\)\s*$/i, '')}
+                        </h4>
                       </div>
-                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
-                      <p className="text-xs text-gray-500">Carbs</p>
-                    </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
-                      <div className="w-5 h-5 bg-pink-500 rounded-full mx-auto mb-1 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">F</span>
-                      </div>
-                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
-                      <p className="text-xs text-gray-500">Fat</p>
                     </div>
                   </div>
                   
-                  {/* Branding */}
-                  <div className="mt-4 flex items-center justify-center gap-2 opacity-60">
-                    <div className="w-5 h-5 bg-[#26A8FF] rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">N</span>
+                  {/* Nutrition Grid - Compact */}
+                  <div className="grid grid-cols-4 gap-1.5 mb-3">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
+                      <Flame className="w-4 h-4 text-orange-500 mx-auto mb-0.5" />
+                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
+                      <p className="text-[10px] text-gray-500">kcal</p>
                     </div>
-                    <span className="text-xs font-medium text-gray-600">Made with NutriAI</span>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
+                      <div className="w-4 h-4 bg-blue-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">P</span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
+                      <p className="text-[10px] text-gray-500">Protein</p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
+                      <div className="w-4 h-4 bg-amber-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">C</span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
+                      <p className="text-[10px] text-gray-500">Carbs</p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
+                      <div className="w-4 h-4 bg-pink-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">F</span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
+                      <p className="text-[10px] text-gray-500">Fat</p>
+                    </div>
+                  </div>
+                  
+                  {/* Branding with Logo */}
+                  <div className="flex items-center justify-center gap-1.5 opacity-70">
+                    <img src="/logo.png" alt="NutriAI" className="w-4 h-4 object-contain" />
+                    <span className="text-[10px] font-medium text-gray-600">Made with NutriAI</span>
                   </div>
                 </div>
               </div>
