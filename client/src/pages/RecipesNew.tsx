@@ -76,48 +76,35 @@ export default function RecipesNew() {
   const { data: allRecipes = [], isLoading: allLoading } = useScannedMeals();
 
   return (
-    <BaseLayout showHeader={false}>
-      {/* Custom Header with Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 -mx-5 px-5">
-        <div className="py-4">
-          {/* Title */}
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">{t('common:recipesNew.title')}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              {t('common:recipesNew.subtitle')}
-            </p>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleTabChange('recipes')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-                activeTab === 'recipes'
-                  ? 'bg-[#26A8FF] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Book className="w-4 h-4" />
-              <span>{t('common:recipesNew.tabs.recipes')}</span>
-            </button>
-            <button
-              onClick={() => handleTabChange('meal-plan')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-                activeTab === 'meal-plan'
-                  ? 'bg-[#26A8FF] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Calendar className="w-4 h-4" />
-              <span>{t('common:recipesNew.tabs.mealPlan')}</span>
-            </button>
-          </div>
-        </div>
+    <BaseLayout>
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => handleTabChange('recipes')}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+            activeTab === 'recipes'
+              ? 'bg-[#26A8FF] text-white shadow-sm'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          <Book className="w-4 h-4" />
+          <span>{t('common:recipesNew.tabs.recipes')}</span>
+        </button>
+        <button
+          onClick={() => handleTabChange('meal-plan')}
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+            activeTab === 'meal-plan'
+              ? 'bg-[#26A8FF] text-white shadow-sm'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>{t('common:recipesNew.tabs.mealPlan')}</span>
+        </button>
       </div>
 
       {/* Content */}
-      <div className="py-6 space-y-6">
+      <div className="space-y-6">
         {activeTab === 'recipes' ? (
           <>
             {/* Scan Ingredients CTA Card - Dashboard Style */}
