@@ -556,7 +556,7 @@ export default function Recipes() {
   }
 
   return (
-    <BaseLayout onRefresh={handleRefresh} showHeader={false}>
+    <BaseLayout onRefresh={handleRefresh}>
       <motion.main
         variants={containerVariants}
         initial="hidden"
