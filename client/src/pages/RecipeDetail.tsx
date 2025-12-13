@@ -506,10 +506,10 @@ export default function RecipeDetail() {
       {/* Floating Start Cooking Button - Glassmorphism Design */}
       <button
         onClick={() => navigate(isFoodLog ? `/cooking/food-log/${recipeId}` : `/cooking/${recipeId}`)}
-        className="fixed bottom-24 right-5 w-16 h-16 bg-white/70 backdrop-blur-xl border border-white/60 text-[#26A8FF] rounded-full flex items-center justify-center shadow-lg hover:scale-110 hover:bg-white/90 transition-all duration-300 z-50 group"
+        className="fixed bottom-24 right-5 w-16 h-16 rounded-full flex items-center justify-center hover:scale-110 transition-all duration-300 z-50 group"
       >
-        <div className="w-12 h-12 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-full flex items-center justify-center shadow-md">
-          <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+        <div className="w-14 h-14 bg-[#26A8FF]/40 backdrop-blur-md rounded-full flex items-center justify-center border border-[#26A8FF]/30 shadow-lg">
+          <Play className="w-7 h-7 text-[#26A8FF] ml-0.5" fill="#26A8FF" />
         </div>
         <span className="absolute -top-12 right-0 bg-white/80 backdrop-blur-lg text-gray-800 text-sm px-3 py-1.5 rounded-xl border border-white/60 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
           {t('common:recipeDetail.startCooking')}
