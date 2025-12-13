@@ -600,7 +600,7 @@ export default function RecipeDetail() {
                 {/* Content */}
                 <div className="relative z-10">
                   {/* Meal Image with Title Overlay */}
-                  <div className="relative rounded-xl overflow-hidden mb-3">
+                  <div className="relative rounded-t-xl overflow-hidden mb-3">
                     {recipe.imageUrl ? (
                       <img 
                         src={recipe.imageUrl} 
@@ -624,33 +624,33 @@ export default function RecipeDetail() {
                     </div>
                   </div>
                   
-                  {/* Nutrition Grid - Compact */}
-                  <div className="grid grid-cols-4 gap-1.5 mb-3">
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
-                      <Flame className="w-4 h-4 text-orange-500 mx-auto mb-0.5" />
-                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
-                      <p className="text-[10px] text-gray-500">kcal</p>
+                  {/* Nutrition Row - Compact Horizontal Layout */}
+                  <div className="flex items-center justify-between bg-white/60 backdrop-blur-sm px-3 py-2 mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Flame className="w-3.5 h-3.5 text-orange-500" />
+                      <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</span>
+                      <span className="text-[10px] text-gray-500">kcal</span>
                     </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
-                      <div className="w-4 h-4 bg-blue-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">P</span>
+                    <div className="w-px h-4 bg-gray-300" />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[7px] font-bold">P</span>
                       </div>
-                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
-                      <p className="text-[10px] text-gray-500">Protein</p>
+                      <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</span>
                     </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
-                      <div className="w-4 h-4 bg-amber-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">C</span>
+                    <div className="w-px h-4 bg-gray-300" />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-amber-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[7px] font-bold">C</span>
                       </div>
-                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
-                      <p className="text-[10px] text-gray-500">Carbs</p>
+                      <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</span>
                     </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-lg p-2 text-center border border-white/60">
-                      <div className="w-4 h-4 bg-pink-500 rounded-full mx-auto mb-0.5 flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">F</span>
+                    <div className="w-px h-4 bg-gray-300" />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-pink-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[7px] font-bold">F</span>
                       </div>
-                      <p className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
-                      <p className="text-[10px] text-gray-500">Fat</p>
+                      <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</span>
                     </div>
                   </div>
                   
