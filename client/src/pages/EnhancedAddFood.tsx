@@ -179,8 +179,13 @@ export default function EnhancedAddFood() {
         description: `Added ${data.name} to your food log`,
       });
       
+      // Redirect to the recipe detail page for this food log
       setTimeout(() => {
-        setLocation('/dashboard');
+        if (result.id) {
+          setLocation(`/recipes/food-log/${result.id}`);
+        } else {
+          setLocation('/dashboard');
+        }
       }, 1000);
       
     } catch (error) {
