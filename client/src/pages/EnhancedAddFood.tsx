@@ -134,6 +134,7 @@ export default function EnhancedAddFood() {
         fat: parseFloat(data.fat),
         image: capturedImage || null,
         date: format(new Date(), 'yyyy-MM-dd'), // Use local timezone date
+        healthScore: detectedFood?.healthScore || null, // Include health score from API analysis
         components: [{
           name: data.name,
           calories: parseFloat(data.calories),
@@ -294,6 +295,7 @@ export default function EnhancedAddFood() {
           fat: result.fat || 0,
           quantity: 1,
           unit: "serving",
+          healthScore: result.healthScore || null,
         };
       } catch (apiError) {
         console.error('API error:', apiError);
