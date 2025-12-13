@@ -503,13 +503,15 @@ export default function RecipeDetail() {
 
       <Navbar />
 
-      {/* Floating Start Cooking Button */}
+      {/* Floating Start Cooking Button - Glassmorphism Design */}
       <button
         onClick={() => navigate(isFoodLog ? `/cooking/food-log/${recipeId}` : `/cooking/${recipeId}`)}
-        className="fixed bottom-24 right-5 w-16 h-16 bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-50 group"
+        className="fixed bottom-24 right-5 w-16 h-16 bg-white/70 backdrop-blur-xl border border-white/60 text-[#26A8FF] rounded-full flex items-center justify-center shadow-lg hover:scale-110 hover:bg-white/90 transition-all duration-300 z-50 group"
       >
-        <Play className="w-8 h-8 ml-1" />
-        <span className="absolute -top-12 right-0 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+        <div className="w-12 h-12 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-full flex items-center justify-center shadow-md">
+          <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+        </div>
+        <span className="absolute -top-12 right-0 bg-white/80 backdrop-blur-lg text-gray-800 text-sm px-3 py-1.5 rounded-xl border border-white/60 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
           {t('common:recipeDetail.startCooking')}
         </span>
       </button>
