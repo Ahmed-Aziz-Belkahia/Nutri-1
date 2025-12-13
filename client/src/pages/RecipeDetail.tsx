@@ -652,6 +652,15 @@ export default function RecipeDetail() {
                       </div>
                       <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</span>
                     </div>
+                    {recipe.healthScore && (
+                      <>
+                        <div className="w-px h-4 bg-gray-300" />
+                        <div className="flex items-center gap-1">
+                          <Heart className="w-3.5 h-3.5 text-red-500" fill="#ef4444" />
+                          <span className="text-xs font-bold text-gray-900">{recipe.healthScore}/10</span>
+                        </div>
+                      </>
+                    )}
                   </div>
                   
                   {/* Branding with Logo */}
