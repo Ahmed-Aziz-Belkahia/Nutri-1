@@ -116,7 +116,6 @@ export const foodLogs = sqliteTable("food_logs", {
   mealType: text("meal_type"), // 'breakfast', 'lunch', 'dinner', 'snack'
   difficulty: text("difficulty"), // 'easy', 'medium', 'hard'
   tags: text("tags", { mode: 'json' }).$type<string[]>(), // ['vegetarian', 'low-carb', etc.]
-  healthScore: integer("health_score"), // 1-10 health rating from AI
 });
 
 export const insertFoodLogSchema = createInsertSchema(foodLogs);

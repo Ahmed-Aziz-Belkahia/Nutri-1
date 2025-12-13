@@ -1764,9 +1764,7 @@ export function registerRoutes(app: Express): Server {
         cuisineType: log.cuisineType || null,
         mealType: log.mealType || null,
         source: 'scanned',
-        isSaved: false,
-        healthScore: log.healthScore || null,
-        components: log.components || []
+        isSaved: false
       };
 
       res.json(recipeData);
@@ -4678,7 +4676,7 @@ export function registerRoutes(app: Express): Server {
         name, calories, protein, carbs, fat, image, date, components, isAnalyzing,
         // Recipe fields
         description, ingredients, instructions, prepTime, cookTime, servings,
-        source, isRecipe, cuisineType, mealType, difficulty, tags, healthScore
+        source, isRecipe, cuisineType, mealType, difficulty, tags
       } = req.body;
       console.log('[Food Logs API] Processing food log request:', {
         userId: req.user!.id,
@@ -4887,7 +4885,6 @@ export function registerRoutes(app: Express): Server {
           mealType: mealType || null,
           difficulty: difficulty || null,
           tags: tags || null,
-          healthScore: healthScore || null,
         })
         .returning();
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play, X, Download } from 'lucide-react';
+import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play, X, Download, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '@/components/Navbar';
 import { useRecipeById } from '@/hooks/queries/useRecipes';
@@ -56,6 +56,7 @@ interface Recipe {
   components?: Component[];
   tags?: string[];
   isSaved?: boolean;
+  healthScore?: number;
 }
 
 export default function RecipeDetail() {
@@ -652,16 +653,23 @@ export default function RecipeDetail() {
                       </div>
                       <span className="text-xs font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</span>
                     </div>
-                    {recipe.healthScore && (
-                      <>
-                        <div className="w-px h-4 bg-gray-300" />
-                        <div className="flex items-center gap-1">
-                          <Heart className="w-3.5 h-3.5 text-red-500" fill="#ef4444" />
-                          <span className="text-xs font-bold text-gray-900">{recipe.healthScore}/10</span>
-                        </div>
-                      </>
-                    )}
                   </div>
+                  
+                  {/* Health Score */}
+                  {recipe.healthScore !== undefined && (
+                    <div className="flex items-center justify-center gap-2 bg-white/60 backdrop-blur-sm px-3 py-1.5 mb-2">
+                      <span className="text-[10px] text-gray-500">Health Score</span>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                          <Star
+                            key={score}
+                            className={`w-3 h-3 ${score <= (recipe.healthScore || 0) ? 'text-green-500 fill-green-500' : 'text-gray-300'}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-bold text-green-600">{recipe.healthScore}/10</span>
+                    </div>
+                  )}
                   
                   {/* Branding with Logo */}
                   <div className="flex items-center justify-center gap-1.5 opacity-70">
