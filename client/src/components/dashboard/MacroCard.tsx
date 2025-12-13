@@ -51,8 +51,16 @@ export default function MacroCard({
 
   // Helper function to get progress circle color
   const getProgressColor = (percentage: number, baseColors: { base: string, saturated: string }) => {
-    if (percentage >= 75) return baseColors.saturated;
+    // At high percentages, use white for better contrast against saturated background
+    if (percentage >= 75) return '#ffffff';
     return baseColors.base;
+  };
+
+  // Helper function to get progress circle track color
+  const getProgressTrackColor = (percentage: number) => {
+    // At high percentages, use semi-transparent white for better contrast
+    if (percentage >= 75) return 'rgba(255, 255, 255, 0.3)';
+    return 'rgba(0, 0, 0, 0.1)';
   };
 
   // Helper function to determine text color based on percentage
@@ -166,6 +174,7 @@ export default function MacroCard({
   // Dynamic colors based on percentage
   const backgroundColor = getBackgroundColor(currentMacro.percentage, currentMacro.backgroundColors);
   const progressColor = getProgressColor(currentMacro.percentage, currentMacro.progressColors);
+  const progressTrackColor = getProgressTrackColor(currentMacro.percentage);
   const textColor = getTextColor(currentMacro.percentage);
   const secondaryTextColor = getSecondaryTextColor(currentMacro.percentage);
   const dotColor = currentMacro.percentage >= 75 ? '#ffffff' : '#000000';
@@ -229,7 +238,13 @@ export default function MacroCard({
 
           <div className="progress-circle-container">
             <svg className="progress-circle-svg">
-              <circle className="progress-circle-bg" cx="40" cy="40" r="34" />
+              <circle 
+                className="progress-circle-bg" 
+                cx="40" 
+                cy="40" 
+                r="34"
+                style={{ stroke: progressTrackColor }}
+              />
               <circle 
                 className="progress-circle-fg" 
                 cx="40" 
