@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play } from 'lucide-react';
+import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play, X, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Navbar from '@/components/Navbar';
 import { useRecipeById } from '@/hooks/queries/useRecipes';
+import { toPng } from 'html-to-image';
 
 interface Ingredient {
   name: string;
@@ -67,6 +68,9 @@ export default function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
   const [currentInstructionStep, setCurrentInstructionStep] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Fetch recipe details using custom hook
   const { data: recipeData, isLoading } = useRecipeById(Number(recipeId), isFoodLog);
@@ -151,6 +155,55 @@ export default function RecipeDetail() {
     }
   };
 
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
+
+  const generateAndShareImage = async () => {
+    if (!shareCardRef.current) return;
+    
+    setIsGeneratingImage(true);
+    try {
+      const dataUrl = await toPng(shareCardRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#f0f7fa'
+      });
+
+      // Check if Web Share API is available and supports files
+      if (navigator.share && navigator.canShare) {
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `${recipe.name.replace(/[^a-zA-Z0-9]/g, '_')}.png`, { type: 'image/png' });
+        
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: recipe.name,
+            text: `Check out this meal: ${recipe.name}`
+          });
+        } else {
+          // Fallback: download the image
+          downloadImage(dataUrl);
+        }
+      } else {
+        // Fallback: download the image
+        downloadImage(dataUrl);
+      }
+    } catch (error) {
+      console.error('Error generating/sharing image:', error);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
+  const downloadImage = (dataUrl: string) => {
+    const link = document.createElement('a');
+    link.download = `${recipe.name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
   useEffect(() => {
     setIsSaved(recipe?.isSaved || false);
   }, [recipe]);
@@ -221,7 +274,10 @@ export default function RecipeDetail() {
             >
               <Heart className={`w-5 h-5 ${isSaved ? 'text-white fill-white' : 'text-white'}`} />
             </button>
-            <button className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+            <button 
+              onClick={handleShare}
+              className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
+            >
               <Share2 className="w-5 h-5 text-white" />
             </button>
           </div>
@@ -515,6 +571,116 @@ export default function RecipeDetail() {
           {t('common:recipeDetail.startCooking')}
         </span>
       </button>
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl border border-white/60">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Share Meal</h3>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Share Card Preview */}
+            <div className="p-4">
+              <div 
+                ref={shareCardRef}
+                className="bg-gradient-to-br from-[#f0f7fa] to-[#e8f4f8] rounded-2xl p-5 relative overflow-hidden"
+              >
+                {/* Decorative circles */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-[#26A8FF]/20 rounded-full blur-2xl" />
+                <div className="absolute bottom-0 left-0 w-20 h-20 bg-[#1A8FE6]/15 rounded-full blur-2xl" />
+                
+                {/* Meal Image */}
+                <div className="relative z-10">
+                  {recipe.imageUrl ? (
+                    <img 
+                      src={recipe.imageUrl} 
+                      alt={recipe.name}
+                      className="w-full h-40 object-cover rounded-xl mb-4"
+                      crossOrigin="anonymous"
+                    />
+                  ) : (
+                    <div className="w-full h-40 bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] rounded-xl mb-4 flex items-center justify-center">
+                      <ChefHat className="w-16 h-16 text-white/50" />
+                    </div>
+                  )}
+                  
+                  {/* Meal Name */}
+                  <h4 className="text-lg font-bold text-gray-900 mb-3">
+                    {recipe.name.replace(/\s*\(Day \d+\)\s*$/i, '')}
+                  </h4>
+                  
+                  {/* Nutrition Grid */}
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
+                      <Flame className="w-5 h-5 text-orange-500 mx-auto mb-1" />
+                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.calories || 0}</p>
+                      <p className="text-xs text-gray-500">kcal</p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
+                      <div className="w-5 h-5 bg-blue-500 rounded-full mx-auto mb-1 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">P</span>
+                      </div>
+                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.protein || 0}g</p>
+                      <p className="text-xs text-gray-500">Protein</p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
+                      <div className="w-5 h-5 bg-amber-500 rounded-full mx-auto mb-1 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">C</span>
+                      </div>
+                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.carbs || 0}g</p>
+                      <p className="text-xs text-gray-500">Carbs</p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 text-center border border-white/60">
+                      <div className="w-5 h-5 bg-pink-500 rounded-full mx-auto mb-1 flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">F</span>
+                      </div>
+                      <p className="text-sm font-bold text-gray-900">{recipe.nutritionInfo?.fat || 0}g</p>
+                      <p className="text-xs text-gray-500">Fat</p>
+                    </div>
+                  </div>
+                  
+                  {/* Branding */}
+                  <div className="mt-4 flex items-center justify-center gap-2 opacity-60">
+                    <div className="w-5 h-5 bg-[#26A8FF] rounded-full flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">N</span>
+                    </div>
+                    <span className="text-xs font-medium text-gray-600">Made with NutriAI</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Share Button */}
+            <div className="p-4 pt-0">
+              <button
+                onClick={generateAndShareImage}
+                disabled={isGeneratingImage}
+                className="w-full py-3 bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] text-white font-semibold rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isGeneratingImage ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-5 h-5" />
+                    <span>Share Image</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
