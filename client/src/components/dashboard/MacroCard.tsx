@@ -58,9 +58,10 @@ export default function MacroCard({
 
   // Helper function to get progress circle track color
   const getProgressTrackColor = (percentage: number) => {
-    // At high percentages, use semi-transparent white for better contrast
-    if (percentage >= 75) return 'rgba(255, 255, 255, 0.3)';
-    return 'rgba(0, 0, 0, 0.1)';
+    // Use higher contrast track color at all levels
+    if (percentage >= 75) return 'rgba(255, 255, 255, 0.4)';
+    if (percentage >= 50) return 'rgba(255, 255, 255, 0.5)';
+    return 'rgba(255, 255, 255, 0.7)';
   };
 
   // Helper function to determine text color based on percentage
