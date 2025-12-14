@@ -58,7 +58,7 @@ export default function MealAnalysis() {
       const storedResult = sessionStorage.getItem('lastAnalyzedFoodId');
       if (storedResult && hasAnalyzed.current) {
         console.log('[MealAnalysis] Found previous analysis result, redirecting to:', storedResult);
-        setLocation(`/meal/${storedResult}`);
+        setLocation(`/recipes/food-log/${storedResult}`);
         return;
       }
       
@@ -147,9 +147,9 @@ export default function MealAnalysis() {
           console.log('[MealAnalysis] Extracted foodId:', foodId);
           
           if (foodId) {
-            console.log('[MealAnalysis] Redirecting to /meal/' + foodId);
+            console.log('[MealAnalysis] Redirecting to /recipes/food-log/' + foodId);
             sessionStorage.removeItem('lastAnalyzedFoodId'); // Clean up after redirect
-            setLocation(`/meal/${foodId}`);
+            setLocation(`/recipes/food-log/${foodId}`);
           } else {
             console.log('[MealAnalysis] No foodId found, redirecting to dashboard');
             setLocation('/dashboard');
