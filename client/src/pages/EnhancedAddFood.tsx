@@ -198,36 +198,83 @@ export default function EnhancedAddFood() {
     }
   };
 
-  // Handle file selection for upload
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle file selection for upload (gallery)
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
     
     setIsAnalyzing(true);
+    const animationStartTime = Date.now();
     
     const reader = new FileReader();
     reader.onload = async () => {
       if (typeof reader.result === 'string') {
         setCapturedImage(reader.result);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Mock detected food
-        const mockFoodData = {
-          name: "Apple",
-          calories: 95,
-          protein: 0.5,
-          carbs: 25,
-          fat: 0.3,
+        // Default food data
+        let foodData = {
+          name: "Food Item",
+          calories: 100,
+          protein: 0,
+          carbs: 0,
+          fat: 0,
           quantity: 1,
-          unit: "medium",
+          unit: "serving",
         };
         
-        setDetectedFood(mockFoodData);
+        try {
+          // Get the base64 data without the prefix
+          const imageData = reader.result.replace(/^data:image\/[a-z]+;base64,/, '');
+          
+          // Call the vision API to analyze the food image
+          const response = await fetch('/api/vision/food-recognition', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              imageData,
+              format: file.type.split('/')[1] || 'jpeg'
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          
+          const result = await response.json();
+          
+          // Use the API result instead of default data
+          foodData = {
+            name: result.name || "Food Item",
+            calories: result.calories || 100,
+            protein: result.protein || 0,
+            carbs: result.carbs || 0,
+            fat: result.fat || 0,
+            quantity: 1,
+            unit: "serving",
+          };
+        } catch (apiError) {
+          console.error('API error:', apiError);
+          toast({
+            variant: "destructive",
+            title: t('addFood.errors.analysisError'),
+            description: t('addFood.errors.tryAgain'),
+          });
+        }
+        
+        // Ensure animation shows for at least 3 seconds
+        const timePassed = Date.now() - animationStartTime;
+        const remainingTime = Math.max(0, 3000 - timePassed);
+        
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+        
+        setDetectedFood(foodData);
         
         // Auto-fill the form
-        Object.entries(mockFoodData).forEach(([key, value]) => {
+        Object.entries(foodData).forEach(([key, value]) => {
           form.setValue(key as keyof ManualFoodForm, String(value));
         });
         
@@ -236,6 +283,9 @@ export default function EnhancedAddFood() {
       }
     };
     reader.readAsDataURL(file);
+    
+    // Reset the input so the same file can be selected again
+    event.target.value = '';
   };
 
   // Capture image from webcam
