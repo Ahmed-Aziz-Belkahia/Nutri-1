@@ -2,6 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'wouter';
+import { Calendar, ChevronRight } from 'lucide-react';
 import CalendarSelector from '@/components/dashboard/CalendarSelector';
 import MealPlanSection from '@/components/dashboard/MealPlanSection';
 import { useAllMealPlans } from '@/hooks/queries/useMealPlans';
@@ -76,6 +78,7 @@ function getDaysWithBuffer(): Day[] {
 
 export default function MealPlanTab() {
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
   const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
   const [allDays] = useState(getDaysWithBuffer());
   const queryClient = useQueryClient();
@@ -187,6 +190,23 @@ export default function MealPlanTab() {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* View Full Plan Button */}
+      <button
+        onClick={() => setLocation("/meal-plan/view")}
+        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-[#0CC5BA]/10 to-blue-500/10 rounded-2xl border border-[#0CC5BA]/20 hover:from-[#0CC5BA]/20 hover:to-blue-500/20 transition-all"
+      >
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/25">
+            <Calendar className="w-5 h-5 text-white" />
+          </div>
+          <div className="text-left">
+            <p className="text-gray-900 font-semibold text-sm">View Full Meal Plan</p>
+            <p className="text-gray-500 text-xs">See your complete weekly plan</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-[#0CC5BA]" />
+      </button>
+
       {/* Calendar Section */}
       <CalendarSelector
         allDays={allDays}
