@@ -864,6 +864,23 @@ export default function Recipes() {
                 animate={{ opacity: 1, y: 0 }}
                 className="card mb-6"
               >
+                {/* View Full Plan Button */}
+                <button
+                  onClick={() => setLocation("/meal-plan/view")}
+                  className="w-full mb-4 flex items-center justify-between p-4 bg-gradient-to-r from-[#0CC5BA]/10 to-blue-500/10 rounded-2xl border border-[#0CC5BA]/20 hover:from-[#0CC5BA]/20 hover:to-blue-500/20 transition-all"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/25">
+                      <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-gray-900 font-semibold text-sm">View Full Meal Plan</p>
+                      <p className="text-gray-500 text-xs">See your complete weekly plan</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-[#0CC5BA]" />
+                </button>
+
                 {/* Calendar Date Selector */}
                 <div className="mb-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
