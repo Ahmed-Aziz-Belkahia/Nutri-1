@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import BaseLayout from "@/components/layouts/BaseLayout";
@@ -7,7 +7,7 @@ import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
 import MealPlanTab from "@/components/recipes/MealPlanTab";
 import { Book, Calendar, Camera, Sparkles, Clock, ChefHat } from "lucide-react";
-import { useScannedMealsToday, useScannedMeals } from "@/hooks/queries/useFoodLogs";
+import { useScannedMealsToday, useScannedMeals, useIngredientGeneratedRecipes } from "@/hooks/queries/useFoodLogs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -72,8 +72,27 @@ export default function RecipesNew() {
   // Fetch today's scanned recipes using custom hook
   const { data: todaysRecipes = [], isLoading: todaysLoading } = useScannedMealsToday();
 
-  // Fetch all recipes using custom hook
-  const { data: allRecipes = [], isLoading: allLoading } = useScannedMeals();
+  // Fetch all scanned recipes using custom hook
+  const { data: scannedRecipes = [], isLoading: scannedLoading } = useScannedMeals();
+
+  // Fetch ingredient-generated recipes
+  const { data: ingredientRecipes = [], isLoading: ingredientLoading } = useIngredientGeneratedRecipes();
+
+  // Combine all recipes (scanned + ingredient-generated)
+  const allRecipes = useMemo(() => {
+    // Transform ingredient recipes to match the expected format
+    const transformedIngredientRecipes = ingredientRecipes.map((recipe: any) => ({
+      ...recipe,
+      image: recipe.imageUrl || recipe.image,
+      // Mark as ingredient-generated for potential UI differentiation
+      isIngredientGenerated: true,
+    }));
+    
+    // Combine and sort by newest first (by id descending)
+    return [...scannedRecipes, ...transformedIngredientRecipes].sort((a, b) => b.id - a.id);
+  }, [scannedRecipes, ingredientRecipes]);
+
+  const allLoading = scannedLoading || ingredientLoading;
 
   return (
     <BaseLayout>
