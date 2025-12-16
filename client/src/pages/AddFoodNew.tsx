@@ -161,6 +161,17 @@ export default function AddFoodNew() {
     checkCameraPermission();
   }, [activeTab]);
 
+  // Auto-open file picker when switching to gallery tab (if no images loaded yet)
+  useEffect(() => {
+    if (activeTab === "gallery" && galleryImages.length === 0 && galleryInputRef.current) {
+      // Small delay to ensure the tab has switched and ref is available
+      const timer = setTimeout(() => {
+        galleryInputRef.current?.click();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab, galleryImages.length]);
+
   const requestCameraPermission = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
