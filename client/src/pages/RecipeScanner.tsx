@@ -536,49 +536,53 @@ export default function RecipeScanner() {
   // Manual entry view
   const renderManualView = () => {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/30 to-white overflow-auto">
+      <div className="absolute inset-0 gradient-bg overflow-auto">
         <div className="min-h-full flex flex-col" style={{ paddingTop: '120px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
           <div className="flex-1 px-5">
-            <div className="max-w-md mx-auto space-y-6">
-              {/* AI Analysis Card */}
+            <div className="max-w-md mx-auto space-y-5">
+              
+              {/* AI Recipe Generator Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
+                className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-lg border border-white/60 overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-[#26A8FF]/5 to-[#1A8FE6]/5 px-6 py-5 border-b border-gray-100">
+                <div className="px-5 py-4 border-b border-gray-100/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] flex items-center justify-center shadow-md">
-                      <Sparkles className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#26A8FF] to-[#0CC5BA] flex items-center justify-center shadow-lg shadow-[#26A8FF]/20">
+                      <ChefHat className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{t('common:recipeScanner.manual.title')}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{t('common:recipeScanner.manual.subtitle')}</p>
+                      <p className="text-xs text-gray-500">{t('common:recipeScanner.manual.subtitle')}</p>
                     </div>
                   </div>
                 </div>
                 
                 {/* Card Body */}
-                <div className="p-6">
+                <div className="p-5">
                   <form onSubmit={textForm.handleSubmit(onTextSubmit)} className="space-y-4">
                     <div>
-                      <Textarea
-                        placeholder={t('common:recipeScanner.manual.placeholder')}
-                        {...textForm.register("ingredients")}
-                        rows={5}
-                        className="w-full rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
-                      />
-                      <div className="mt-2 text-xs text-gray-400 bg-gray-50 px-3 py-2 rounded-full inline-block">
-                        {t('common:recipeScanner.manual.hint')}
+                      <div className="relative">
+                        <Textarea
+                          placeholder={t('common:recipeScanner.manual.placeholder')}
+                          {...textForm.register("ingredients")}
+                          rows={5}
+                          className="w-full rounded-2xl bg-white/80 border border-gray-200/60 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
+                        />
+                      </div>
+                      <div className="mt-3 flex items-center gap-2 text-xs text-gray-500 bg-white/50 px-3 py-2 rounded-xl">
+                        <Sparkles className="w-3.5 h-3.5 text-[#26A8FF]" />
+                        <span>{t('common:recipeScanner.manual.hint')}</span>
                       </div>
                     </div>
                     
                     <Button
                       type="submit"
                       disabled={isAnalyzing}
-                      className="w-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] hover:shadow-xl disabled:opacity-50 text-white rounded-full h-13 font-semibold transition-all text-base"
+                      className="w-full bg-gradient-to-r from-[#26A8FF] to-[#0CC5BA] hover:opacity-90 disabled:opacity-50 text-white rounded-2xl h-13 font-semibold transition-all text-base shadow-lg shadow-[#26A8FF]/20"
                     >
                       {isAnalyzing ? (
                         <>
@@ -587,7 +591,7 @@ export default function RecipeScanner() {
                         </>
                       ) : (
                         <>
-                          <ChefHat className="mr-2 h-5 w-5" />
+                          <Sparkles className="mr-2 h-5 w-5" />
                           {t('common:recipeScanner.manual.generateButton')}
                         </>
                       )}
@@ -596,36 +600,53 @@ export default function RecipeScanner() {
                 </div>
               </motion.div>
 
-              {/* Info Card */}
+              {/* How It Works Card */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-6 border border-blue-100"
+                className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-lg border border-white/60 overflow-hidden"
               >
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#26A8FF] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-5 h-5 text-white" />
+                {/* Card Header */}
+                <div className="px-5 py-4 border-b border-gray-100/50">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-md">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <h4 className="font-bold text-gray-900">{t('common:recipeScanner.manual.howItWorks.title')}</h4>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-2">{t('common:recipeScanner.manual.howItWorks.title')}</h4>
-                    <ul className="space-y-2 text-sm text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>{t('common:recipeScanner.manual.howItWorks.step1')}</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>{t('common:recipeScanner.manual.howItWorks.step2')}</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#26A8FF] font-bold mt-0.5">•</span>
-                        <span>{t('common:recipeScanner.manual.howItWorks.step3')}</span>
-                      </li>
-                    </ul>
+                </div>
+                
+                {/* Card Body */}
+                <div className="p-5">
+                  <div className="space-y-4">
+                    {/* Step 1 */}
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#26A8FF]/20 to-[#0CC5BA]/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#26A8FF] font-bold text-sm">1</span>
+                      </div>
+                      <p className="text-sm text-gray-700 pt-1">{t('common:recipeScanner.manual.howItWorks.step1')}</p>
+                    </div>
+                    
+                    {/* Step 2 */}
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#26A8FF]/20 to-[#0CC5BA]/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#26A8FF] font-bold text-sm">2</span>
+                      </div>
+                      <p className="text-sm text-gray-700 pt-1">{t('common:recipeScanner.manual.howItWorks.step2')}</p>
+                    </div>
+                    
+                    {/* Step 3 */}
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#26A8FF]/20 to-[#0CC5BA]/20 flex items-center justify-center flex-shrink-0">
+                        <span className="text-[#26A8FF] font-bold text-sm">3</span>
+                      </div>
+                      <p className="text-sm text-gray-700 pt-1">{t('common:recipeScanner.manual.howItWorks.step3')}</p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
+              
             </div>
           </div>
         </div>
