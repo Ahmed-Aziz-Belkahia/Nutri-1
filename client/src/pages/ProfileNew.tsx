@@ -1065,9 +1065,9 @@ export default function Profile() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
+              className="fixed inset-0 flex items-center justify-center z-[1003] px-4 pointer-events-none"
             >
-              <div className="w-full max-w-md">
+              <div className="w-full max-w-md pointer-events-auto">
                 <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
                   <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-blue-500 px-6 py-8 text-white">
                     <button
