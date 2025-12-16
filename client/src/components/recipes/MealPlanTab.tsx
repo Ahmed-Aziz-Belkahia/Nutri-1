@@ -193,10 +193,10 @@ export default function MealPlanTab() {
       {/* View Full Plan Button */}
       <button
         onClick={() => setLocation("/meal-plan/view")}
-        className="w-full flex items-center justify-between p-4 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm hover:bg-white/80 transition-all"
+        className="w-full flex items-center justify-between p-4 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm hover:bg-white/90 hover:shadow-md transition-all"
       >
         <div className="flex items-center space-x-3">
-          <div className="w-11 h-11 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/30">
+          <div className="w-11 h-11 bg-gradient-to-br from-[#0CC5BA] to-[#26A8FF] rounded-2xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/30">
             <Calendar className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">
