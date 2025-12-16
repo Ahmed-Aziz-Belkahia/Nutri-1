@@ -436,8 +436,8 @@ export default function RecipeScanner() {
   // Gallery view
   const renderGalleryView = () => {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/30 to-white overflow-auto">
-        <div className="min-h-full flex flex-col" style={{ paddingTop: '120px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
+      <div className="absolute inset-0 gradient-bg overflow-auto">
+        <div className="min-h-full flex flex-col" style={{ paddingTop: '200px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
           <div className="flex-1 px-5">
             <div className="max-w-4xl mx-auto">
               {/* Header */}
@@ -537,7 +537,7 @@ export default function RecipeScanner() {
   const renderManualView = () => {
     return (
       <div className="absolute inset-0 gradient-bg overflow-auto">
-        <div className="min-h-full flex flex-col" style={{ paddingTop: '120px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
+        <div className="min-h-full flex flex-col" style={{ paddingTop: '200px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
           <div className="flex-1 px-5">
             <div className="max-w-md mx-auto space-y-5">
               
