@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Webcam from 'react-webcam';
-import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3 } from "lucide-react";
+import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3, Check, Flame } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText, analyzeFoodImage } from '@/lib/vision';
 import { useTranslation } from 'react-i18next';
@@ -644,32 +644,33 @@ export default function AddFoodNew() {
   // Manual entry view - Clean and organized
   const renderManualView = () => {
     return (
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-50/30 to-white overflow-auto">
+      <div className="absolute inset-0 gradient-bg overflow-auto">
         <div className="min-h-full flex flex-col" style={{ paddingTop: '120px', paddingBottom: 'max(24px, env(safe-area-inset-bottom, 24px))' }}>
           <div className="flex-1 px-5">
-            <div className="max-w-md mx-auto space-y-6">
+            <div className="max-w-md mx-auto space-y-5">
+              
               {/* AI Analysis Card */}
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
+                className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-lg border border-white/60 overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-[#26A8FF]/5 to-[#1A8FE6]/5 px-6 py-5 border-b border-gray-100">
+                <div className="px-5 py-4 border-b border-gray-100/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#26A8FF] to-[#1A8FE6] flex items-center justify-center shadow-md">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#26A8FF] to-[#0CC5BA] flex items-center justify-center shadow-lg shadow-[#26A8FF]/20">
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{t('common:addFood.aiAnalysis.title')}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{t('common:addFood.aiAnalysis.subtitle')}</p>
+                      <p className="text-xs text-gray-500">{t('common:addFood.aiAnalysis.subtitle')}</p>
                     </div>
                   </div>
                 </div>
                 
                 {/* Card Body */}
-                <div className="p-6">
+                <div className="p-5">
                   <Form {...textForm}>
                     <form onSubmit={textForm.handleSubmit(onTextSubmit)} className="space-y-4">
                       <FormField
@@ -682,12 +683,9 @@ export default function AddFoodNew() {
                                 <textarea
                                   placeholder={t('common:addFood.aiAnalysis.placeholder')}
                                   {...field}
-                                  rows={5}
-                                  className="w-full rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
+                                  rows={4}
+                                  className="w-full rounded-2xl bg-white/80 border border-gray-200/60 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 p-4 resize-none transition-all text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
                                 />
-                                <div className="absolute bottom-3 right-3 text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-                                  {t('common:addFood.aiAnalysis.hint')}
-                                </div>
                               </div>
                             </FormControl>
                             <FormMessage />
@@ -698,7 +696,7 @@ export default function AddFoodNew() {
                       <Button
                         type="submit"
                         disabled={isAnalyzing}
-                        className="w-full bg-gradient-to-r from-[#26A8FF] to-[#1A8FE6] hover:shadow-xl disabled:opacity-50 text-white rounded-full h-13 font-semibold transition-all text-base"
+                        className="w-full bg-gradient-to-r from-[#26A8FF] to-[#0CC5BA] hover:opacity-90 disabled:opacity-50 text-white rounded-2xl h-12 font-semibold transition-all text-base shadow-lg shadow-[#26A8FF]/20"
                       >
                         {isAnalyzing ? (
                           <>
@@ -718,12 +716,12 @@ export default function AddFoodNew() {
               </motion.div>
 
               {/* Divider with "OR" */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-                <div className="px-3 py-1.5 bg-gray-100 rounded-full">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{t('common:addFood.manualEntry.orLabel')}</span>
+              <div className="flex items-center gap-4 py-1">
+                <div className="flex-1 h-px bg-gray-300/50" />
+                <div className="px-4 py-1.5 bg-white/60 backdrop-blur-sm rounded-full border border-white/40">
+                  <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('common:addFood.manualEntry.orLabel')}</span>
                 </div>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+                <div className="flex-1 h-px bg-gray-300/50" />
               </div>
 
               {/* Manual Entry Card */}
@@ -731,23 +729,23 @@ export default function AddFoodNew() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden"
+                className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-lg border border-white/60 overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-50/50 px-6 py-5 border-b border-gray-100">
+                <div className="px-5 py-4 border-b border-gray-100/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center shadow-lg">
                       <Edit3 className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{t('common:addFood.manualEntry.title')}</h3>
-                      <p className="text-xs text-gray-500 mt-0.5">{t('common:addFood.manualEntry.subtitle')}</p>
+                      <p className="text-xs text-gray-500">{t('common:addFood.manualEntry.subtitle')}</p>
                     </div>
                   </div>
                 </div>
                 
                 {/* Card Body */}
-                <div className="p-6">
+                <div className="p-5">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                       {/* Food Name */}
@@ -756,12 +754,12 @@ export default function AddFoodNew() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-sm font-bold text-gray-700 mb-2 block">{t('common:addFood.manualEntry.foodName')}</FormLabel>
+                            <FormLabel className="text-sm font-semibold text-gray-700 mb-2 block">{t('common:addFood.manualEntry.foodName')}</FormLabel>
                             <FormControl>
                               <Input 
                                 placeholder={t('common:addFood.manualEntry.foodNamePlaceholder')} 
                                 {...field} 
-                                className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all text-base" 
+                                className="rounded-2xl bg-white/80 border border-gray-200/60 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all text-base" 
                               />
                             </FormControl>
                             <FormMessage />
@@ -769,101 +767,131 @@ export default function AddFoodNew() {
                         )}
                       />
                       
-                      {/* Nutrition Grid */}
-                      <div className="space-y-4">
-                        <p className="text-sm font-bold text-gray-700">{t('common:addFood.manualEntry.nutritionInfo')}</p>
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name="calories"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.calories')}</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input 
-                                      type="number" 
-                                      step="1" 
-                                      min="0" 
-                                      placeholder={t('common:addFood.manualEntry.placeholder')}
-                                      {...field} 
-                                      className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-10 text-base" 
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.kcal')}</span>
+                      {/* Nutrition Grid - Improved Design */}
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-gray-700">{t('common:addFood.manualEntry.nutritionInfo')}</p>
+                        
+                        {/* Calories - Full Width with Icon */}
+                        <FormField
+                          control={form.control}
+                          name="calories"
+                          render={({ field }) => (
+                            <FormItem>
+                              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-4 border border-orange-100/50">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-md">
+                                    <Flame className="w-5 h-5 text-white" />
                                   </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
+                                  <div className="flex-1">
+                                    <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.calories')}</FormLabel>
+                                    <FormControl>
+                                      <div className="relative mt-1">
+                                        <Input 
+                                          type="number" 
+                                          step="1" 
+                                          min="0" 
+                                          placeholder="0"
+                                          {...field} 
+                                          className="rounded-xl bg-white/90 border-0 focus:ring-2 focus:ring-orange-300 h-10 transition-all pr-12 text-lg font-semibold" 
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">{t('common:addFood.manualEntry.kcal')}</span>
+                                      </div>
+                                    </FormControl>
+                                  </div>
+                                </div>
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        {/* Macros Grid */}
+                        <div className="grid grid-cols-3 gap-3">
+                          {/* Protein */}
                           <FormField
                             control={form.control}
                             name="protein"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.protein')}</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input 
-                                      type="number" 
-                                      step="0.1" 
-                                      min="0" 
-                                      placeholder={t('common:addFood.manualEntry.placeholder')}
-                                      {...field} 
-                                      className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
+                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-3 border border-blue-100/50 text-center">
+                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-md mx-auto mb-2">
+                                    <span className="text-white text-xs font-bold">P</span>
                                   </div>
-                                </FormControl>
+                                  <FormLabel className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">{t('common:addFood.manualEntry.protein')}</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Input 
+                                        type="number" 
+                                        step="0.1" 
+                                        min="0" 
+                                        placeholder="0"
+                                        {...field} 
+                                        className="rounded-xl bg-white/90 border-0 focus:ring-2 focus:ring-blue-300 h-9 transition-all text-center text-base font-semibold px-2" 
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <span className="text-[10px] text-gray-400 font-medium mt-1 block">{t('common:addFood.manualEntry.grams')}</span>
+                                </div>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
                           
+                          {/* Carbs */}
                           <FormField
                             control={form.control}
                             name="carbs"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.carbs')}</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input 
-                                      type="number" 
-                                      step="0.1" 
-                                      min="0" 
-                                      placeholder={t('common:addFood.manualEntry.placeholder')}
-                                      {...field} 
-                                      className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
+                                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-3 border border-green-100/50 text-center">
+                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-md mx-auto mb-2">
+                                    <span className="text-white text-xs font-bold">C</span>
                                   </div>
-                                </FormControl>
+                                  <FormLabel className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">{t('common:addFood.manualEntry.carbs')}</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Input 
+                                        type="number" 
+                                        step="0.1" 
+                                        min="0" 
+                                        placeholder="0"
+                                        {...field} 
+                                        className="rounded-xl bg-white/90 border-0 focus:ring-2 focus:ring-green-300 h-9 transition-all text-center text-base font-semibold px-2" 
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <span className="text-[10px] text-gray-400 font-medium mt-1 block">{t('common:addFood.manualEntry.grams')}</span>
+                                </div>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
                           
+                          {/* Fat */}
                           <FormField
                             control={form.control}
                             name="fat"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{t('common:addFood.manualEntry.fat')}</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Input 
-                                      type="number" 
-                                      step="0.1" 
-                                      min="0" 
-                                      placeholder={t('common:addFood.manualEntry.placeholder')}
-                                      {...field} 
-                                      className="rounded-xl border-2 border-gray-200 focus:border-[#26A8FF] focus:ring-4 focus:ring-[#26A8FF]/10 h-12 transition-all pr-8 text-base" 
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">{t('common:addFood.manualEntry.grams')}</span>
+                                <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl p-3 border border-yellow-100/50 text-center">
+                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-md mx-auto mb-2">
+                                    <span className="text-white text-xs font-bold">F</span>
                                   </div>
-                                </FormControl>
+                                  <FormLabel className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide block mb-1">{t('common:addFood.manualEntry.fat')}</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <Input 
+                                        type="number" 
+                                        step="0.1" 
+                                        min="0" 
+                                        placeholder="0"
+                                        {...field} 
+                                        className="rounded-xl bg-white/90 border-0 focus:ring-2 focus:ring-yellow-300 h-9 transition-all text-center text-base font-semibold px-2" 
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <span className="text-[10px] text-gray-400 font-medium mt-1 block">{t('common:addFood.manualEntry.grams')}</span>
+                                </div>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -874,7 +902,7 @@ export default function AddFoodNew() {
                       <Button
                         type="submit"
                         disabled={isAnalyzing}
-                        className="w-full bg-gray-900 hover:bg-gray-800 disabled:opacity-50 text-white rounded-full h-13 font-semibold transition-all text-base shadow-lg"
+                        className="w-full bg-gradient-to-r from-gray-800 to-gray-900 hover:opacity-90 disabled:opacity-50 text-white rounded-2xl h-12 font-semibold transition-all text-base shadow-lg"
                       >
                         {isAnalyzing ? (
                           <>
@@ -882,7 +910,10 @@ export default function AddFoodNew() {
                             {t('common:addFood.manualEntry.saving')}
                           </>
                         ) : (
-                          t('common:addFood.manualEntry.addButton')
+                          <>
+                            <Check className="mr-2 h-5 w-5" />
+                            {t('common:addFood.manualEntry.addButton')}
+                          </>
                         )}
                       </Button>
                     </form>
