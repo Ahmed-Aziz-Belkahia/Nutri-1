@@ -300,7 +300,7 @@ export default function MealPlanningQuiz() {
         { value: "omnivore", label: "Omnivore", emoji: "🍽️" },
         { value: "vegetarian", label: "Vegetarian", emoji: "🥗" },
         { value: "vegan", label: "Vegan", emoji: "🌱" },
-        { value: "keto", label: "Ketogenic", emoji: "🥑" },
+        { value: "keto", label: "Keto", emoji: "🥑" },
         { value: "paleo", label: "Paleo", emoji: "🍖" },
         { value: "mediterranean", label: "Mediterranean", emoji: "🫒" },
       ];
@@ -310,49 +310,37 @@ export default function MealPlanningQuiz() {
           control={control}
           name="dietaryType"
           render={({ field }) => (
-            <div className="space-y-3">
-              {options.map((option) => (
-                <motion.div
-                  key={option.value}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => field.onChange(option.value)}
-                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                    field.value === option.value
-                      ? 'bg-gradient-to-r from-[#0CC5BA]/20 to-[#0CC5BA]/10 border-2 border-[#0CC5BA] shadow-lg shadow-[#0CC5BA]/20'
-                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{option.emoji}</span>
-                    <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                {options.map((option) => (
+                  <motion.div
+                    key={option.value}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => field.onChange(option.value)}
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       field.value === option.value
-                        ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                        : 'border-gray-300'
-                    }`}>
+                        ? 'bg-gradient-to-r from-[#0CC5BA]/20 to-[#0CC5BA]/10 border-2 border-[#0CC5BA]'
+                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{option.emoji}</span>
+                      <span className="text-sm font-medium text-gray-800">{option.label}</span>
                       {field.value === option.value && (
-                        <Check className="w-4 h-4 text-white" />
+                        <Check className="w-4 h-4 text-[#0CC5BA] ml-auto" />
                       )}
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
               
               {/* Custom Input */}
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="text-xs text-gray-500">or enter custom</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                </div>
-                <Input
-                  placeholder="Enter custom diet type..."
-                  value={options.some(opt => opt.value === field.value) ? '' : field.value}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  className="rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white/70 backdrop-blur-xl"
-                />
-              </div>
+              <Input
+                placeholder="Or enter custom..."
+                value={options.some(opt => opt.value === field.value) ? '' : field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                className="rounded-xl border border-gray-200 focus:border-[#0CC5BA] bg-white/70 text-sm h-10"
+              />
             </div>
           )}
         />
@@ -366,34 +354,34 @@ export default function MealPlanningQuiz() {
           control={control}
           name="calorieTarget"
           render={({ field }) => (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* Current Macros Card */}
               {userPreferences && (
-                <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 overflow-hidden">
-                  <div className="p-5">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Your Current Macro Goals</h4>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="rounded-2xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-4 text-center border border-purple-500/20">
-                        <div className="text-2xl font-bold text-purple-600">{userPreferences.caloriesGoal || 2000}</div>
-                        <div className="text-xs font-medium text-gray-600 mt-1">Calories</div>
+                <div className="rounded-2xl bg-white/70 backdrop-blur-xl shadow-md border border-white/60 overflow-hidden">
+                  <div className="p-3">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-2 text-center">Current Macros</h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-2 text-center border border-purple-500/20">
+                        <div className="text-lg font-bold text-purple-600">{userPreferences.caloriesGoal || 2000}</div>
+                        <div className="text-[10px] font-medium text-gray-600">kcal</div>
                       </div>
-                      <div className="rounded-2xl bg-gradient-to-br from-pink-500/10 to-pink-500/5 p-4 text-center border border-pink-500/20">
-                        <div className="text-2xl font-bold text-pink-600">
+                      <div className="rounded-xl bg-gradient-to-br from-pink-500/10 to-pink-500/5 p-2 text-center border border-pink-500/20">
+                        <div className="text-lg font-bold text-pink-600">
                           {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.proteinGoal || 30) / 100) / 4)}g
                         </div>
-                        <div className="text-xs font-medium text-gray-600 mt-1">Protein</div>
+                        <div className="text-[10px] font-medium text-gray-600">Protein</div>
                       </div>
-                      <div className="rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 p-4 text-center border border-emerald-500/20">
-                        <div className="text-2xl font-bold text-emerald-600">
+                      <div className="rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 p-2 text-center border border-emerald-500/20">
+                        <div className="text-lg font-bold text-emerald-600">
                           {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.carbsGoal || 40) / 100) / 4)}g
                         </div>
-                        <div className="text-xs font-medium text-gray-600 mt-1">Carbs</div>
+                        <div className="text-[10px] font-medium text-gray-600">Carbs</div>
                       </div>
-                      <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-4 text-center border border-amber-500/20">
-                        <div className="text-2xl font-bold text-amber-600">
+                      <div className="rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-2 text-center border border-amber-500/20">
+                        <div className="text-lg font-bold text-amber-600">
                           {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.fatGoal || 30) / 100) / 9)}g
                         </div>
-                        <div className="text-xs font-medium text-gray-600 mt-1">Fat</div>
+                        <div className="text-[10px] font-medium text-gray-600">Fat</div>
                       </div>
                     </div>
                   </div>
@@ -401,54 +389,48 @@ export default function MealPlanningQuiz() {
               )}
               
               {/* Calorie Input */}
-              <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 p-6">
-                <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Adjust Your Calorie Target</h4>
-                
-                {/* Quick Adjust Buttons */}
-                <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="rounded-2xl bg-white/70 backdrop-blur-xl shadow-md border border-white/60 p-4">
+                <div className="flex items-center justify-center gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     type="button"
                     onClick={() => field.onChange(Math.max(1000, (field.value || 2000) - 100))}
-                    className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shadow-md"
+                    className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
                   >
-                    <Minus className="w-5 h-5 text-gray-600" />
+                    <Minus className="w-4 h-4 text-gray-600" />
                   </motion.button>
                   
-                  <div className="relative flex-1 max-w-[200px]">
+                  <div className="relative">
                     <Input
                       type="number"
                       value={field.value}
                       onChange={(e) => field.onChange(parseInt(e.target.value) || 2000)}
-                      className="text-center text-2xl font-bold py-4 rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white"
+                      className="text-center text-xl font-bold py-2 w-32 rounded-xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white"
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">kcal</div>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">kcal</div>
                   </div>
                   
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     type="button"
                     onClick={() => field.onChange(Math.min(5000, (field.value || 2000) + 100))}
-                    className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shadow-md"
+                    className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
                   >
-                    <Plus className="w-5 h-5 text-gray-600" />
+                    <Plus className="w-4 h-4 text-gray-600" />
                   </motion.button>
                 </div>
                 
                 {/* Quick Presets */}
-                <div className="grid grid-cols-3 gap-2">
-                  {[1500, 2000, 2500].map((cal) => (
+                <div className="grid grid-cols-4 gap-2 mt-3">
+                  {[1500, 1800, 2000, 2500].map((cal) => (
                     <motion.button
                       key={cal}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="button"
                       onClick={() => field.onChange(cal)}
-                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                      className={`py-1.5 rounded-lg text-xs font-medium transition-all ${
                         field.value === cal
-                          ? 'bg-[#0CC5BA] text-white shadow-lg'
+                          ? 'bg-[#0CC5BA] text-white'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -484,45 +466,33 @@ export default function MealPlanningQuiz() {
           control={control}
           name="healthGoals"
           render={({ field }) => (
-            <div className="space-y-4">
+            <div className="space-y-2">
               {/* Current Goal from Profile */}
               {currentGoal && (
-                <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 p-5">
-                  <div className="text-center mb-4">
-                    <span className="text-sm text-gray-500">Your current health goal:</span>
-                    <div className="mt-2 inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-[#0CC5BA]/20 to-[#26A8FF]/20 border border-[#0CC5BA]/30">
-                      <span className="text-lg font-bold text-[#0CC5BA]">{goalLabels[currentGoal]}</span>
+                <div className="rounded-2xl bg-white/70 backdrop-blur-xl shadow-md border border-white/60 p-3 mb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Current:</span>
+                      <span className="text-sm font-bold text-[#0CC5BA]">{goalLabels[currentGoal]}</span>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       type="button"
                       onClick={() => field.onChange(currentGoal)}
-                      className={`py-3 px-4 rounded-2xl font-medium transition-all ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         field.value === currentGoal
-                          ? 'bg-gradient-to-r from-[#0CC5BA] to-[#0AA59C] text-white shadow-lg'
+                          ? 'bg-[#0CC5BA] text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      Keep This
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      type="button"
-                      onClick={() => field.onChange('')}
-                      className="py-3 px-4 rounded-2xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
-                    >
-                      Change
+                      Keep
                     </motion.button>
                   </div>
                 </div>
               )}
 
-              {/* Options */}
-              <div className="space-y-3">
+              {/* Options - Grid */}
+              <div className="grid grid-cols-2 gap-2">
                 {[
                   { value: "lose_weight", label: "Lose Weight", emoji: "⬇️" },
                   { value: "gain_muscle", label: "Gain Muscle", emoji: "💪" },
@@ -531,44 +501,32 @@ export default function MealPlanningQuiz() {
                 ].map((option) => (
                   <motion.div
                     key={option.value}
-                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => field.onChange(option.value)}
-                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       field.value === option.value
-                        ? 'bg-gradient-to-r from-[#26A8FF]/20 to-[#26A8FF]/10 border-2 border-[#26A8FF] shadow-lg shadow-[#26A8FF]/20'
-                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                        ? 'bg-gradient-to-r from-[#26A8FF]/20 to-[#26A8FF]/10 border-2 border-[#26A8FF]'
+                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl">{option.emoji}</span>
-                      <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        field.value === option.value
-                          ? 'border-[#26A8FF] bg-[#26A8FF]'
-                          : 'border-gray-300'
-                      }`}>
-                        {field.value === option.value && <Check className="w-4 h-4 text-white" />}
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{option.emoji}</span>
+                      <span className="text-sm font-medium text-gray-800">{option.label}</span>
+                      {field.value === option.value && (
+                        <Check className="w-4 h-4 text-[#26A8FF] ml-auto" />
+                      )}
                     </div>
                   </motion.div>
                 ))}
               </div>
 
               {/* Custom Input */}
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="text-xs text-gray-500">or enter custom</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                </div>
-                <Input
-                  placeholder="Enter your own health goal..."
-                  value={['lose_weight', 'gain_muscle', 'maintain', 'improve_health'].includes(field.value as string) ? '' : (field.value as string)}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  className="rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] bg-white/70 backdrop-blur-xl"
-                />
-              </div>
+              <Input
+                placeholder="Or enter custom goal..."
+                value={['lose_weight', 'gain_muscle', 'maintain', 'improve_health'].includes(field.value as string) ? '' : (field.value as string)}
+                onChange={(e) => field.onChange(e.target.value)}
+                className="rounded-xl border border-gray-200 focus:border-[#26A8FF] bg-white/70 text-sm h-10"
+              />
             </div>
           )}
         />
@@ -582,54 +540,44 @@ export default function MealPlanningQuiz() {
           control={control}
           name="cuisinePreferences"
           render={({ field }) => (
-            <div className="space-y-3">
-              {[
-                { value: "italian", label: "Italian", emoji: "🍝" },
-                { value: "asian", label: "Asian", emoji: "🍜" },
-                { value: "mediterranean", label: "Mediterranean", emoji: "🥙" },
-                { value: "mexican", label: "Mexican", emoji: "🌮" },
-                { value: "american", label: "American", emoji: "🍔" },
-                { value: "indian", label: "Indian", emoji: "🍛" },
-              ].map((option) => (
-                <motion.div
-                  key={option.value}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => field.onChange(option.value)}
-                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                    field.value === option.value
-                      ? 'bg-gradient-to-r from-[#A855F7]/20 to-[#A855F7]/10 border-2 border-[#A855F7] shadow-lg shadow-[#A855F7]/20'
-                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">{option.emoji}</span>
-                    <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: "italian", label: "Italian", emoji: "🍝" },
+                  { value: "asian", label: "Asian", emoji: "🍜" },
+                  { value: "mediterranean", label: "Mediterranean", emoji: "🥙" },
+                  { value: "mexican", label: "Mexican", emoji: "🌮" },
+                  { value: "american", label: "American", emoji: "🍔" },
+                  { value: "indian", label: "Indian", emoji: "🍛" },
+                ].map((option) => (
+                  <motion.div
+                    key={option.value}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => field.onChange(option.value)}
+                    className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       field.value === option.value
-                        ? 'border-[#A855F7] bg-[#A855F7]'
-                        : 'border-gray-300'
-                    }`}>
-                      {field.value === option.value && <Check className="w-4 h-4 text-white" />}
+                        ? 'bg-gradient-to-r from-[#A855F7]/20 to-[#A855F7]/10 border-2 border-[#A855F7]'
+                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{option.emoji}</span>
+                      <span className="text-sm font-medium text-gray-800">{option.label}</span>
+                      {field.value === option.value && (
+                        <Check className="w-4 h-4 text-[#A855F7] ml-auto" />
+                      )}
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
 
               {/* Custom Input */}
-              <div className="pt-2">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                  <span className="text-xs text-gray-500">or enter custom</span>
-                  <div className="flex-1 h-px bg-gray-200"></div>
-                </div>
-                <Input
-                  placeholder="Enter your favorite cuisine..."
-                  value={['italian', 'asian', 'mediterranean', 'mexican', 'american', 'indian'].includes(field.value as string) ? '' : (field.value as string)}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  className="rounded-2xl border-2 border-gray-200 focus:border-[#A855F7] bg-white/70 backdrop-blur-xl"
-                />
-              </div>
+              <Input
+                placeholder="Or enter custom cuisine..."
+                value={['italian', 'asian', 'mediterranean', 'mexican', 'american', 'indian'].includes(field.value as string) ? '' : (field.value as string)}
+                onChange={(e) => field.onChange(e.target.value)}
+                className="rounded-xl border border-gray-200 focus:border-[#A855F7] bg-white/70 text-sm h-10"
+              />
             </div>
           )}
         />
@@ -653,86 +601,71 @@ export default function MealPlanningQuiz() {
             };
 
             return (
-              <div className="space-y-3">
-                {[
-                  { value: "lactose", label: "Lactose Intolerance", emoji: "🥛" },
-                  { value: "gluten", label: "Gluten Free", emoji: "🌾" },
-                  { value: "nuts", label: "Nut Allergy", emoji: "🥜" },
-                  { value: "shellfish", label: "Shellfish Allergy", emoji: "🦐" },
-                  { value: "eggs", label: "Egg Allergy", emoji: "🥚" },
-                  { value: "soy", label: "Soy Allergy", emoji: "🫘" },
-                ].map((option) => (
-                  <motion.div
-                    key={option.value}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => toggleAllergy(option.value)}
-                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                      selectedAllergies.includes(option.value)
-                        ? 'bg-gradient-to-r from-[#F59E0B]/20 to-[#F59E0B]/10 border-2 border-[#F59E0B] shadow-lg shadow-[#F59E0B]/20'
-                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl">{option.emoji}</span>
-                      <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "lactose", label: "Lactose", emoji: "🥛" },
+                    { value: "gluten", label: "Gluten", emoji: "🌾" },
+                    { value: "nuts", label: "Nuts", emoji: "🥜" },
+                    { value: "shellfish", label: "Shellfish", emoji: "🦐" },
+                    { value: "eggs", label: "Eggs", emoji: "🥚" },
+                    { value: "soy", label: "Soy", emoji: "🫘" },
+                  ].map((option) => (
+                    <motion.div
+                      key={option.value}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => toggleAllergy(option.value)}
+                      className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                         selectedAllergies.includes(option.value)
-                          ? 'border-[#F59E0B] bg-[#F59E0B]'
-                          : 'border-gray-300'
-                      }`}>
-                        {selectedAllergies.includes(option.value) && <Check className="w-4 h-4 text-white" />}
+                          ? 'bg-gradient-to-r from-[#F59E0B]/20 to-[#F59E0B]/10 border-2 border-[#F59E0B]'
+                          : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{option.emoji}</span>
+                        <span className="text-sm font-medium text-gray-800">{option.label}</span>
+                        {selectedAllergies.includes(option.value) && (
+                          <Check className="w-4 h-4 text-[#F59E0B] ml-auto" />
+                        )}
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
+                </div>
 
                 {/* None Option */}
                 <motion.div
-                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => field.onChange([])}
-                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                  className={`p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                     selectedAllergies.length === 0
-                      ? 'bg-gradient-to-r from-green-500/20 to-green-500/10 border-2 border-green-500 shadow-lg shadow-green-500/20'
-                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                      ? 'bg-gradient-to-r from-green-500/20 to-green-500/10 border-2 border-green-500'
+                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200'
                   }`}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl">✅</span>
-                    <span className="flex-1 font-semibold text-gray-800">No Allergies</span>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                      selectedAllergies.length === 0
-                        ? 'border-green-500 bg-green-500'
-                        : 'border-gray-300'
-                    }`}>
-                      {selectedAllergies.length === 0 && <Check className="w-4 h-4 text-white" />}
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">✅</span>
+                    <span className="text-sm font-medium text-gray-800">No Allergies</span>
+                    {selectedAllergies.length === 0 && (
+                      <Check className="w-4 h-4 text-green-500 ml-auto" />
+                    )}
                   </div>
                 </motion.div>
 
                 {/* Custom Input */}
-                <div className="pt-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex-1 h-px bg-gray-200"></div>
-                    <span className="text-xs text-gray-500">or enter custom</span>
-                    <div className="flex-1 h-px bg-gray-200"></div>
-                  </div>
-                  <Input
-                    placeholder="Enter other allergies (press Enter to add)..."
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const value = (e.target as HTMLInputElement).value.trim();
-                        if (value && !selectedAllergies.includes(value)) {
-                          field.onChange([...selectedAllergies, value]);
-                          (e.target as HTMLInputElement).value = '';
-                        }
+                <Input
+                  placeholder="Or enter other allergies..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const value = (e.target as HTMLInputElement).value.trim();
+                      if (value && !selectedAllergies.includes(value)) {
+                        field.onChange([...selectedAllergies, value]);
+                        (e.target as HTMLInputElement).value = '';
                       }
-                    }}
-                    className="rounded-2xl border-2 border-gray-200 focus:border-[#F59E0B] bg-white/70 backdrop-blur-xl"
-                  />
-                </div>
+                    }
+                  }}
+                  className="rounded-xl border border-gray-200 focus:border-[#F59E0B] bg-white/70 text-sm h-10"
+                />
               </div>
             );
           }}
@@ -748,37 +681,36 @@ export default function MealPlanningQuiz() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex flex-col">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/60">
-        <div className="px-4 py-4 max-w-lg mx-auto">
+        <div className="px-4 py-3 max-w-lg mx-auto">
           {/* Back button and step counter */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <motion.button
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleBack}
-              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center transition-all"
+              className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center"
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-4 h-4 text-gray-600" />
             </motion.button>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {questions.map((_, idx) => (
                 <div
                   key={idx}
-                  className={`h-2 rounded-full transition-all ${
+                  className={`h-1.5 rounded-full transition-all ${
                     idx === currentStep
-                      ? 'w-8 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF]'
+                      ? 'w-6 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF]'
                       : idx < currentStep
-                      ? 'w-2 bg-[#0CC5BA]'
-                      : 'w-2 bg-gray-200'
+                      ? 'w-1.5 bg-[#0CC5BA]'
+                      : 'w-1.5 bg-gray-200'
                   }`}
                 />
               ))}
             </div>
             
-            <div className="text-sm font-medium text-gray-500">
+            <div className="text-xs font-medium text-gray-500">
               {currentStep + 1}/{questions.length}
             </div>
           </div>
@@ -786,63 +718,58 @@ export default function MealPlanningQuiz() {
       </div>
 
       {/* Question Content */}
-      <div className="px-4 py-6 max-w-lg mx-auto">
+      <div className="flex-1 px-4 py-4 max-w-lg mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
           >
             {/* Question Header */}
-            <div className="text-center mb-6">
-              <div className={`w-16 h-16 mx-auto mb-4 rounded-3xl bg-gradient-to-br ${currentQuestion.gradient} flex items-center justify-center shadow-lg`}>
+            <div className="text-center mb-4">
+              <div className={`w-12 h-12 mx-auto mb-3 rounded-2xl bg-gradient-to-br ${currentQuestion.gradient} flex items-center justify-center shadow-md`}>
                 <div className="text-white">
                   {currentQuestion.icon}
                 </div>
               </div>
               
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-xl font-bold text-gray-900 mb-1">
                 {currentQuestion.title}
               </h1>
-              <p className="text-gray-500">
+              <p className="text-sm text-gray-500">
                 {currentQuestion.description}
               </p>
             </div>
 
             {/* Question Options */}
-            <div className="mb-8">
+            <div className="mb-4">
               {renderQuestionContent()}
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
 
-        {/* Navigation Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="pb-8"
+      {/* Navigation Button - Fixed at bottom */}
+      <div className="sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-white/60 px-4 py-3 max-w-lg mx-auto w-full">
+        <Button
+          onClick={handleNext}
+          disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
+          className="w-full h-12 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:opacity-90 text-white rounded-xl text-base font-semibold shadow-lg shadow-[#0CC5BA]/30 transition-all disabled:opacity-50"
         >
-          <Button
-            onClick={handleNext}
-            disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
-            className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:opacity-90 text-white rounded-2xl text-lg font-semibold shadow-lg shadow-[#0CC5BA]/30 transition-all disabled:opacity-50"
-          >
-            {isLastStep ? (
-              <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Creating...' : 'Create My Meal Plan'}
-              </>
-            ) : (
-              <>
-                Continue
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </Button>
-        </motion.div>
+          {isLastStep ? (
+            <>
+              <Sparkles className="w-4 h-4 mr-2" />
+              {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Creating...' : 'Create Meal Plan'}
+            </>
+          ) : (
+            <>
+              Continue
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );
