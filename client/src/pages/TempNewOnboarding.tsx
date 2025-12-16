@@ -75,7 +75,7 @@ const staggerItem = {
 // Logo Component with animation
 const Logo = () => (
   <motion.div 
-    className="flex justify-center mt-2 mb-4"
+    className="flex justify-center mt-4 mb-6"
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
@@ -83,7 +83,7 @@ const Logo = () => (
     <img 
       src="/nutri-ai-logo.png" 
       alt="NutriAI" 
-      className="h-14"
+      className="h-16 sm:h-20"
     />
   </motion.div>
 );
@@ -91,12 +91,12 @@ const Logo = () => (
 // Phone Mockup Component with animation
 const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
   <motion.div 
-    className="flex items-center justify-center my-2"
+    className="flex items-center justify-center my-4 flex-1"
     initial={{ opacity: 0, y: 20, scale: 0.95 }}
     animate={{ opacity: 1, y: 0, scale: 1 }}
     transition={{ duration: 0.5, delay: 0.2, type: "spring", stiffness: 120 }}
   >
-    <div className="relative" style={{ maxWidth: '140px', width: '100%' }}>
+    <div className="relative w-[45vw] max-w-[200px] min-w-[140px]">
       <motion.img 
         src={imageSrc} 
         alt="NutriAI App" 
@@ -111,17 +111,17 @@ const PhoneMockup = ({ imageSrc }: { imageSrc: string }) => (
 // Heading Component with animation
 const Heading = ({ title, subtitle }: { title: string; subtitle?: string }) => (
   <motion.div 
-    className="text-center mb-4"
+    className="text-center mb-6"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay: 0.3 }}
   >
-    <h1 className="text-2xl font-bold text-[#1E293B] leading-tight">
+    <h1 className="text-2xl sm:text-3xl font-bold text-[#1E293B] leading-tight">
       {title}
     </h1>
     {subtitle && (
       <motion.h2 
-        className="text-2xl font-bold text-[#1E293B] leading-tight"
+        className="text-2xl sm:text-3xl font-bold text-[#1E293B] leading-tight mt-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.5 }}
@@ -184,14 +184,14 @@ const HomeIndicator = () => (
 
 // Onboarding Layout Container
 const OnboardingLayout = ({ children, showLanguageSelector = true }: { children: React.ReactNode; showLanguageSelector?: boolean }) => (
-  <div className="min-h-screen bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-6 py-4 relative">
+  <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-5 sm:px-8 py-6 relative">
     {/* Language selector at top right (RTL-aware) */}
     {showLanguageSelector && (
       <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-50">
         <OnboardingLanguageSelector />
       </div>
     )}
-    <div className="flex-1 flex flex-col max-w-md w-full mx-auto">
+    <div className="flex-1 flex flex-col max-w-lg w-full mx-auto">
       {children}
     </div>
   </div>
@@ -2233,7 +2233,7 @@ export default function TempNewOnboarding() {
           title={t('welcome.title')} 
           subtitle={t('welcome.subtitle')} 
         />
-        <div className="space-y-2 mb-4">
+        <div className="space-y-3 mt-auto mb-4">
           <PrimaryButton onClick={() => navigate('/auth')}>
             {t('common.getStarted')}
           </PrimaryButton>
