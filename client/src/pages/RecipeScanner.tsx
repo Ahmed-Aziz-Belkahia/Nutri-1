@@ -686,7 +686,7 @@ export default function RecipeScanner() {
               className={`flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                 activeTab === "photo"
                   ? "bg-white text-gray-900 shadow-md"
-                  : "text-white/90"
+                  : "text-gray-600 hover:text-gray-800"
               }`}
               whileTap={{ scale: 0.97 }}
             >
@@ -703,7 +703,7 @@ export default function RecipeScanner() {
                   ? "bg-white text-gray-900 shadow-md"
                   : activeTab === "photo"
                     ? "text-white/90"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-600 hover:text-gray-800"
               }`}
               whileTap={{ scale: 0.97 }}
             >
@@ -720,7 +720,7 @@ export default function RecipeScanner() {
                   ? "bg-white text-gray-900 shadow-md"
                   : activeTab === "photo"
                     ? "text-white/90"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-gray-600 hover:text-gray-800"
               }`}
               whileTap={{ scale: 0.97 }}
             >
