@@ -170,21 +170,12 @@ const SignInLink = ({ onClick, alreadyHaveAccountText, signInText }: { onClick: 
   </motion.div>
 );
 
-// Home Indicator Component
-const HomeIndicator = () => (
-  <motion.div 
-    className="flex justify-center pb-1 mt-auto"
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3, delay: 0.5 }}
-  >
-    <div className="w-32 h-1 rounded-full bg-[#1E293B]/20"></div>
-  </motion.div>
-);
+// Home Indicator Component - removed for fullscreen experience
+const HomeIndicator = () => null;
 
 // Onboarding Layout Container
 const OnboardingLayout = ({ children, showLanguageSelector = true }: { children: React.ReactNode; showLanguageSelector?: boolean }) => (
-  <div className="min-h-screen min-h-[100dvh] bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-5 sm:px-8 py-6 relative">
+  <div className="fixed inset-0 bg-gradient-to-b from-[#E8F5FF] to-white flex flex-col px-5 sm:px-8 py-6 overflow-y-auto">
     {/* Language selector at top right (RTL-aware) */}
     {showLanguageSelector && (
       <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-50">
