@@ -271,7 +271,7 @@ export default function UnifiedProgress() {
                   </div>
                   <div className="rounded-2xl p-4 bg-gradient-to-br from-[#26A8FF]/10 to-[#1E96E8]/5 border border-[#26A8FF]/20">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyType')}</p>
-                    <p className="text-2xl font-bold capitalize text-[#26A8FF]">{userProfile.bodyType || '—'}</p>
+                    <p className="text-lg font-bold capitalize text-[#26A8FF]">{userProfile.bodyType || '—'}</p>
                   </div>
                 </div>
               ) : null}
