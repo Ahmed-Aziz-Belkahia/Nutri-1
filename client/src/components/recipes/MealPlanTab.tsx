@@ -193,10 +193,10 @@ export default function MealPlanTab() {
       {/* View Full Plan Button */}
       <button
         onClick={() => setLocation("/meal-plan/view")}
-        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-[#0CC5BA]/10 to-blue-500/10 rounded-2xl border border-[#0CC5BA]/20 hover:from-[#0CC5BA]/20 hover:to-blue-500/20 transition-all"
+        className="w-full flex items-center justify-between p-4 bg-white/70 backdrop-blur-xl rounded-2xl border border-white/60 shadow-sm hover:bg-white/80 transition-all"
       >
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/25">
+          <div className="w-11 h-11 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/30">
             <Calendar className="w-5 h-5 text-white" />
           </div>
           <div className="text-left">
@@ -204,7 +204,9 @@ export default function MealPlanTab() {
             <p className="text-gray-500 text-xs">See your complete weekly plan</p>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5 text-[#0CC5BA]" />
+        <div className="w-8 h-8 bg-gray-100 rounded-xl flex items-center justify-center">
+          <ChevronRight className="w-4 h-4 text-gray-500" />
+        </div>
       </button>
 
       {/* Calendar Section */}
