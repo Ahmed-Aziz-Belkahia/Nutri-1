@@ -163,28 +163,35 @@ export default function RecipeScanner() {
     }
   };
 
-  // Handle multiple gallery images selection
+  // Handle gallery image selection - immediately start scanning
   const handleGalleryImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
+    // Take the first file and immediately start scanning
+    const file = files[0];
+    setIsAnalyzing(true);
+    
     try {
-      const imagePromises = Array.from(files).map(file => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
       
-      const images = await Promise.all(imagePromises);
-      setGalleryImages(images);
+      // Convert to WebP for optimization
+      const optimizedImage = await convertToWebP(base64, 0.8);
+      
+      // Store image and navigate to analysis page
+      localStorage.setItem('analyzingIngredientsImage', optimizedImage);
+      setLocation("/ingredients-analysis");
     } catch (error) {
-      console.error('Gallery images upload error:', error);
+      console.error('Gallery upload error:', error);
+      setIsAnalyzing(false);
       toast({
         title: "Error",
-        description: "Failed to load gallery images",
+        description: "Failed to process image",
         variant: "destructive",
       });
     }
@@ -520,12 +527,11 @@ export default function RecipeScanner() {
           </div>
         </div>
 
-        {/* Hidden Gallery Input - Multiple Selection */}
+        {/* Hidden Gallery Input - Single Selection for immediate scanning */}
         <input
           type="file"
           ref={galleryInputRef}
           accept="image/*"
-          multiple
           className="hidden"
           onChange={handleGalleryImagesUpload}
         />
