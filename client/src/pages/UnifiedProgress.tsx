@@ -41,9 +41,12 @@ export default function UnifiedProgress() {
       reader.onload = async () => {
         const dataURL = reader.result as string;
         await uploadPhoto(dataURL, 'latest');
-        toast({ title: "Success", description: "Photo uploaded successfully" });
+        toast({ title: "Success", description: "Photo uploaded. Starting analysis..." });
         setUploadingPhoto(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
+        
+        // Auto-start body analysis with the uploaded image
+        await analyzeUploadedImage(dataURL);
       };
       reader.onerror = () => {
         toast({ title: "Error", description: "Failed to read photo", variant: "destructive" });
@@ -54,6 +57,26 @@ export default function UnifiedProgress() {
       toast({ title: "Error", description: "Failed to upload photo", variant: "destructive" });
       setUploadingPhoto(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Analyze a newly uploaded image directly
+  const analyzeUploadedImage = async (imageBase64: string) => {
+    const weight = currentWeight || 70;
+    const height = (userProfile?.height as number) ?? 170;
+    const gender = (userProfile?.gender as 'male' | 'female') || 'male';
+    const age = (userProfile?.age as number) ?? 30;
+
+    try {
+      const analysis = await analyzeBody(imageBase64, weight, height, gender, age);
+      if (analysis?.bodyFatPercentage) {
+        await updateProfileWithBodyFat(analysis.bodyFatPercentage, analysis.bodyType);
+        refetchUserProfile();
+        toast({ title: "Analysis Complete", description: `Body fat: ${analysis.bodyFatPercentage}%, Type: ${analysis.bodyType}` });
+      }
+    } catch (error) {
+      console.error('Body analysis error:', error);
+      toast({ title: "Analysis Failed", description: "Unable to analyze. Please try again.", variant: "destructive" });
     }
   };
 
