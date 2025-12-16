@@ -115,36 +115,38 @@ export default function UnifiedProgress() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div
-            className="card rounded-[28px] p-5 space-y-4"
-            style={{
-              background: 'linear-gradient(135deg, rgba(12, 197, 186, 0.08) 0%, rgba(12, 197, 186, 0.02) 100%)',
-              border: '1px solid rgba(12, 197, 186, 0.12)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
-            }}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(135deg, #0CC5BA 0%, #0AA59C 100%)' }}>
-                <Scale className="h-5 w-5 text-white" />
+          <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 overflow-hidden">
+            {/* Card Header */}
+            <div className="px-5 py-4 border-b border-gray-100/50">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0CC5BA] to-[#0AA59C] flex items-center justify-center shadow-lg shadow-[#0CC5BA]/20">
+                  <Scale className="h-5 w-5 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{t('common:unifiedProgress.weightStats.title')}</h2>
               </div>
-              <h2 className="text-xl font-bold">{t('common:unifiedProgress.weightStats.title')}</h2>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.current')}</p>
-                <p className="text-2xl font-bold text-[#0CC5BA]">{currentWeight ? `${currentWeight.toFixed(1)} kg` : '—'}</p>
-              </div>
-              <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.goal')}</p>
-                <p className="text-2xl font-bold text-[#26A8FF]">{goalWeight ? `${goalWeight.toFixed(1)} kg` : '—'}</p>
-              </div>
-              <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.progress')}</p>
-                <p className="text-2xl font-bold">{weightChange !== 0 ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)} kg` : '—'}</p>
-              </div>
-              <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.weightStats.remaining')}</p>
-                <p className="text-2xl font-bold">{remainingWeight !== 0 ? `${Math.abs(remainingWeight).toFixed(1)} kg` : '—'}</p>
+            
+            {/* Card Body */}
+            <div className="p-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-[#0CC5BA]/10 to-[#0AA59C]/5 border border-[#0CC5BA]/20">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.weightStats.current')}</p>
+                  <p className="text-2xl font-bold text-[#0CC5BA]">{currentWeight ? `${currentWeight.toFixed(1)} kg` : '—'}</p>
+                </div>
+                <div className="rounded-2xl p-4 bg-gradient-to-br from-[#26A8FF]/10 to-[#1E96E8]/5 border border-[#26A8FF]/20">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.weightStats.goal')}</p>
+                  <p className="text-2xl font-bold text-[#26A8FF]">{goalWeight ? `${goalWeight.toFixed(1)} kg` : '—'}</p>
+                </div>
+                <div className="rounded-2xl p-4 bg-white/80 border border-gray-100">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.weightStats.progress')}</p>
+                  <p className={`text-2xl font-bold ${weightChange > 0 ? 'text-orange-500' : weightChange < 0 ? 'text-green-500' : 'text-gray-400'}`}>
+                    {weightChange !== 0 ? `${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)} kg` : '—'}
+                  </p>
+                </div>
+                <div className="rounded-2xl p-4 bg-white/80 border border-gray-100">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.weightStats.remaining')}</p>
+                  <p className="text-2xl font-bold text-gray-700">{remainingWeight !== 0 ? `${Math.abs(remainingWeight).toFixed(1)} kg` : '—'}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -165,19 +167,18 @@ export default function UnifiedProgress() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
         >
-          <div className="card rounded-2xl bg-white shadow-lg overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(135deg, #26A8FF 0%, #1E96E8 100%)' }}>
+          <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100/50">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#26A8FF] to-[#1E96E8] flex items-center justify-center shadow-lg shadow-[#26A8FF]/20">
                   <Camera className="h-5 w-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold">{t('common:unifiedProgress.progressPhotos.title')}</h2>
+                <h2 className="text-lg font-bold text-gray-900">{t('common:unifiedProgress.progressPhotos.title')}</h2>
               </div>
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="rounded-2xl hover:opacity-90"
-                style={{ background: 'linear-gradient(135deg, #26A8FF 0%, #1E96E8 100%)' }}
+                className="rounded-xl bg-gradient-to-r from-[#26A8FF] to-[#1E96E8] hover:opacity-90 shadow-md"
                 size="sm"
               >
                 {uploadingPhoto ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
@@ -185,16 +186,16 @@ export default function UnifiedProgress() {
             </div>
 
             {photos && photos.length > 0 ? (
-              <div className="p-5 space-y-3">
-                <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100">
+              <div className="p-4 space-y-3">
+                <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100 shadow-inner">
                   <img
                     src={photos[currentPhotoIndex].photoUrl}
                     alt="Progress photo"
                     className="w-full h-full object-cover"
                   />
                   <div
-                    className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-sm font-medium text-white"
-                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(10px)' }}
+                    className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-sm font-medium text-white backdrop-blur-md"
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
                   >
                     {new Date(photos[currentPhotoIndex].createdAt).toLocaleDateString()}
                   </div>
@@ -202,13 +203,13 @@ export default function UnifiedProgress() {
                     <>
                       <button
                         onClick={prevPhoto}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
                       >
                         <ChevronLeft className="h-5 w-5 text-gray-800" />
                       </button>
                       <button
                         onClick={nextPhoto}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-all"
                       >
                         <ChevronRight className="h-5 w-5 text-gray-800" />
                       </button>
@@ -224,7 +225,7 @@ export default function UnifiedProgress() {
                         style={{
                           width: idx === currentPhotoIndex ? '24px' : '8px',
                           height: '8px',
-                          backgroundColor: idx === currentPhotoIndex ? '#26A8FF' : 'rgba(0, 0, 0, 0.2)'
+                          backgroundColor: idx === currentPhotoIndex ? '#26A8FF' : 'rgba(0, 0, 0, 0.15)'
                         }}
                       />
                     ))}
@@ -233,8 +234,10 @@ export default function UnifiedProgress() {
               </div>
             ) : (
               <div className="p-8 text-center">
-                <Camera className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-600">{t('common:unifiedProgress.progressPhotos.noPhotos')}</p>
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#26A8FF]/10 to-[#1E96E8]/10 flex items-center justify-center mx-auto mb-3">
+                  <Camera className="h-8 w-8 text-[#26A8FF]" />
+                </div>
+                <p className="text-gray-700 font-medium">{t('common:unifiedProgress.progressPhotos.noPhotos')}</p>
                 <p className="text-sm text-gray-500 mt-1">{t('common:unifiedProgress.progressPhotos.uploadFirst')}</p>
               </div>
             )}
@@ -247,59 +250,59 @@ export default function UnifiedProgress() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <div
-            className="card rounded-[28px] p-5 space-y-4"
-            style={{
-              background: 'linear-gradient(135deg, rgba(38, 168, 255, 0.08) 0%, rgba(38, 168, 255, 0.02) 100%)',
-              border: '1px solid rgba(38, 168, 255, 0.12)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
-            }}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-2.5 rounded-2xl" style={{ background: 'linear-gradient(135deg, #26A8FF 0%, #1E96E8 100%)' }}>
-                <Activity className="h-5 w-5 text-white" />
+          <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 overflow-hidden">
+            {/* Card Header */}
+            <div className="px-5 py-4 border-b border-gray-100/50">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0CC5BA] to-[#0AA59C] flex items-center justify-center shadow-lg shadow-[#0CC5BA]/20">
+                  <Activity className="h-5 w-5 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{t('common:unifiedProgress.bodyAnalysis.title')}</h2>
               </div>
-              <h2 className="text-xl font-bold">{t('common:unifiedProgress.bodyAnalysis.title')}</h2>
             </div>
 
-            {userProfile?.bodyFatPercentage ? (
-              <div className="grid grid-cols-2 gap-3">
-                <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                  <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyFat')}</p>
-                  <p className="text-2xl font-bold text-[#0CC5BA]">{userProfile.bodyFatPercentage}%</p>
+            {/* Card Body */}
+            <div className="p-5 space-y-4">
+              {userProfile?.bodyFatPercentage ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl p-4 bg-gradient-to-br from-[#0CC5BA]/10 to-[#0AA59C]/5 border border-[#0CC5BA]/20">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyFat')}</p>
+                    <p className="text-2xl font-bold text-[#0CC5BA]">{userProfile.bodyFatPercentage}%</p>
+                  </div>
+                  <div className="rounded-2xl p-4 bg-gradient-to-br from-[#26A8FF]/10 to-[#1E96E8]/5 border border-[#26A8FF]/20">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyType')}</p>
+                    <p className="text-2xl font-bold capitalize text-[#26A8FF]">{userProfile.bodyType || '—'}</p>
+                  </div>
                 </div>
-                <div className="card rounded-2xl p-4" style={{ backgroundColor: 'white', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)' }}>
-                  <p className="text-sm text-gray-600 mb-1">{t('common:unifiedProgress.bodyAnalysis.bodyType')}</p>
-                  <p className="text-2xl font-bold capitalize text-[#26A8FF]">{userProfile.bodyType || '—'}</p>
-                </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            <Button
-              onClick={handleAnalyze}
-              disabled={!photos || photos.length === 0 || isAnalysisLoading}
-              className="w-full rounded-2xl hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, #0CC5BA 0%, #0AA59C 100%)' }}
-            >
-              {isAnalysisLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t('common:unifiedProgress.bodyAnalysis.analyzing')}
-                </>
-              ) : (
-                <>
-                  <Activity className="h-4 w-4 mr-2" />
-                  {t('common:unifiedProgress.bodyAnalysis.analyzeLatest')}
-                </>
+              <Button
+                onClick={handleAnalyze}
+                disabled={!photos || photos.length === 0 || isAnalysisLoading}
+                className="w-full rounded-2xl h-12 bg-gradient-to-r from-[#0CC5BA] to-[#0AA59C] hover:opacity-90 shadow-lg shadow-[#0CC5BA]/20 text-base font-semibold"
+              >
+                {isAnalysisLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    {t('common:unifiedProgress.bodyAnalysis.analyzing')}
+                  </>
+                ) : (
+                  <>
+                    <Activity className="h-5 w-5 mr-2" />
+                    {t('common:unifiedProgress.bodyAnalysis.analyzeLatest')}
+                  </>
+                )}
+              </Button>
+
+              {(!photos || photos.length === 0) && (
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-[#26A8FF]/5 border border-[#26A8FF]/10">
+                  <div className="w-8 h-8 rounded-full bg-[#26A8FF]/10 flex items-center justify-center flex-shrink-0">
+                    <Info className="h-4 w-4 text-[#26A8FF]" />
+                  </div>
+                  <p className="text-sm text-gray-600">{t('common:unifiedProgress.bodyAnalysis.uploadPrompt')}</p>
+                </div>
               )}
-            </Button>
-
-            {(!photos || photos.length === 0) && (
-              <div className="flex items-start gap-2 p-3 rounded-2xl bg-[#26A8FF]/5 border border-[#26A8FF]/10">
-                <Info className="h-5 w-5 text-[#26A8FF] flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-gray-700">{t('common:unifiedProgress.bodyAnalysis.uploadPrompt')}</p>
-              </div>
-            )}
+            </div>
           </div>
         </motion.div>
 
