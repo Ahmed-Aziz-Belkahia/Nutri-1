@@ -25,6 +25,11 @@ export default function UnifiedProgress() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Sort photos by date - newest first
+  const sortedPhotos = photos ? [...photos].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  ) : [];
+
   const handleRefresh = usePullToRefresh([
     "/api/progress-photos",
     "/api/weight-logs",
@@ -81,7 +86,7 @@ export default function UnifiedProgress() {
   };
 
   const handleAnalyze = async () => {
-    const latestPhoto = photos?.[0];
+    const latestPhoto = sortedPhotos[0];
     if (!latestPhoto) {
       toast({ title: "No Photo", description: "Please upload a photo first", variant: "destructive" });
       return;
@@ -126,8 +131,8 @@ export default function UnifiedProgress() {
   const weightChange = startWeight && currentWeight ? currentWeight - startWeight : 0;
   const remainingWeight = currentWeight && goalWeight ? currentWeight - goalWeight : 0;
 
-  const nextPhoto = () => photos && photos.length > 0 && setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
-  const prevPhoto = () => photos && photos.length > 0 && setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+  const nextPhoto = () => sortedPhotos.length > 0 && setCurrentPhotoIndex((prev) => (prev + 1) % sortedPhotos.length);
+  const prevPhoto = () => sortedPhotos.length > 0 && setCurrentPhotoIndex((prev) => (prev - 1 + sortedPhotos.length) % sortedPhotos.length);
 
   return (
     <BaseLayout onRefresh={handleRefresh}>
@@ -208,11 +213,11 @@ export default function UnifiedProgress() {
               </Button>
             </div>
 
-            {photos && photos.length > 0 ? (
+            {sortedPhotos.length > 0 ? (
               <div className="p-4 space-y-3">
                 <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-gray-100 shadow-inner">
                   <img
-                    src={photos[currentPhotoIndex].photoUrl}
+                    src={sortedPhotos[currentPhotoIndex]?.photoUrl}
                     alt="Progress photo"
                     className="w-full h-full object-cover"
                   />
@@ -220,9 +225,9 @@ export default function UnifiedProgress() {
                     className="absolute top-3 left-3 px-3 py-1.5 rounded-full text-sm font-medium text-white backdrop-blur-md"
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
                   >
-                    {new Date(photos[currentPhotoIndex].createdAt).toLocaleDateString()}
+                    {new Date(sortedPhotos[currentPhotoIndex]?.createdAt).toLocaleDateString()}
                   </div>
-                  {photos.length > 1 && (
+                  {sortedPhotos.length > 1 && (
                     <>
                       <button
                         onClick={prevPhoto}
@@ -239,9 +244,9 @@ export default function UnifiedProgress() {
                     </>
                   )}
                 </div>
-                {photos.length > 1 && (
+                {sortedPhotos.length > 1 && (
                   <div className="flex justify-center gap-2">
-                    {photos.map((_, idx) => (
+                    {sortedPhotos.map((_, idx) => (
                       <div
                         key={idx}
                         className="rounded-full transition-all"
