@@ -6,32 +6,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowLeft, 
   ArrowRight, 
-  Heart, 
-  Activity, 
   Utensils, 
-  Clock,
-  Apple,
-  Globe,
-  DollarSign,
-  Pizza,
-  ChefHat,
-  Flame,
-  Dumbbell,
-  Salad,
-  Loader2,
-  Sparkles,
-  CheckCircle,
-  Check,
   Target,
-  Zap,
+  Globe,
+  ChefHat,
+  Sparkles,
+  Check,
   Plus,
-  Minus
+  Minus,
+  Flame
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import MealPlanGenerationProgress from "@/components/MealPlanGenerationProgress";
@@ -39,7 +26,6 @@ import MealPlanGenerationProgress from "@/components/MealPlanGenerationProgress"
 // Form types
 interface MealPlanPreferencesForm {
   dietaryType: string;
-  // Allow both string and array for flexibility with UI components using text input or multi-select
   healthGoals: string | string[];
   activityLevel: string;
   calorieTarget: number;
@@ -57,58 +43,46 @@ interface MealPlanPreferencesForm {
   specialRequirements?: string;
 }
 
-const getQuestions = (t: Function) => [
+const getQuestions = () => [
   {
     id: "dietaryType",
-    title: "What is your eating style?",
+    title: "What's your eating style?",
     description: "Choose your preferred diet type",
     type: "select",
     icon: <Utensils className="w-6 h-6" />,
-    color: "from-green-400 to-emerald-600"
+    gradient: "from-[#0CC5BA] to-[#0AA59C]"
   },
   {
     id: "healthGoals",
     title: "What are your health goals?",
-    description: "Lub dodaj własne, aby było bardziej spersonalizowane",
+    description: "Or add your own for personalization",
     type: "select_with_input",
     icon: <Target className="w-6 h-6" />,
-    color: "from-blue-400 to-cyan-600",
-    popularOptions: [
-      { value: "schudnąć", label: "Schudnąć" },
-      { value: "przytyć_mięśnie", label: "Przytyć mięśnie" }
-    ]
+    gradient: "from-[#26A8FF] to-[#1E96E8]"
   },
   {
     id: "calorieTarget",
-    title: "Dzienne zapotrzebowanie kaloryczne",
-    description: "Ile kalorii dziennie?",
+    title: "Daily Calorie Target",
+    description: "How many calories per day?",
     type: "number",
-    icon: <Activity className="w-6 h-6" />,
-    color: "from-purple-400 to-purple-600"
+    icon: <Flame className="w-6 h-6" />,
+    gradient: "from-[#FF6B6B] to-[#EE5A5A]"
   },
   {
     id: "cuisinePreferences",
-    title: "Ulubione kuchnie",
-    description: "Lub dodaj własne, aby było bardziej spersonalizowane",
+    title: "Favorite Cuisines",
+    description: "Or add your own for personalization",
     type: "select_with_input",
     icon: <Globe className="w-6 h-6" />,
-    color: "from-pink-400 to-rose-600",
-    popularOptions: [
-      { value: "włoska", label: "Włoska" },
-      { value: "azjatycka", label: "Azjatycka" }
-    ]
+    gradient: "from-[#A855F7] to-[#9333EA]"
   },
   {
     id: "allergies",
-    title: "Alergie lub ograniczenia",
-    description: "Lub dodaj własne, aby było bardziej spersonalizowane",
+    title: "Allergies or Restrictions",
+    description: "Select all that apply",
     type: "select_with_input",
     icon: <ChefHat className="w-6 h-6" />,
-    color: "from-indigo-400 to-blue-600",
-    popularOptions: [
-      { value: "nietolerancja_laktozy", label: "Nietolerancja laktozy" },
-      { value: "bezglutenowe", label: "Bezglutenowe" }
-    ]
+    gradient: "from-[#F59E0B] to-[#D97706]"
   }
 ];
 
@@ -132,17 +106,17 @@ export default function MealPlanningQuiz() {
     retry: false
   });
 
-  const { control, register, handleSubmit, setValue, watch, formState: { errors } } = useForm<MealPlanPreferencesForm>({
+  const { control, handleSubmit, setValue, watch } = useForm<MealPlanPreferencesForm>({
     defaultValues: {
       dietaryType: "omnivore",
-  healthGoals: "schudnąć",
+      healthGoals: "lose_weight",
       activityLevel: "moderate",
       calorieTarget: 2000,
       mealsPerDay: 3,
       allergies: [],
       maxCookingTime: 60,
       budgetPreference: "medium",
-  cuisinePreferences: "polskie",
+      cuisinePreferences: "italian",
       preferredIngredients: [],
       excludedIngredients: [],
       cookingSkillLevel: "intermediate",
@@ -161,28 +135,15 @@ export default function MealPlanningQuiz() {
     }
   }, [userPreferences, setValue]);
 
-  const questions = getQuestions(t);
+  const questions = getQuestions();
   const currentQuestion = questions[currentStep];
   const isLastStep = currentStep === questions.length - 1;
-  const progress = ((currentStep + 1) / questions.length) * 100;
 
   const handleNext = () => {
-    console.log('[Meal Plan Quiz] handleNext called', {
-      isLastStep,
-      isPending: saveMealPlanPreferences.isPending,
-      isGeneratingMealPlan,
-      isSubmittingRef: isSubmittingRef.current,
-      currentStep,
-      questionsLength: questions.length
-    });
-    
     if (isLastStep) {
-      // Prevent multiple submissions
       if (saveMealPlanPreferences.isPending || isGeneratingMealPlan || isSubmittingRef.current) {
-        console.log('[Meal Plan Quiz] Submission blocked - already in progress');
         return;
       }
-      console.log('[Meal Plan Quiz] Calling handleSubmit(onSubmit)');
       handleSubmit(onSubmit)();
     } else {
       setCurrentStep(currentStep + 1);
@@ -199,19 +160,13 @@ export default function MealPlanningQuiz() {
 
   const saveMealPlanPreferences = useMutation({
     mutationFn: async (data: MealPlanPreferencesForm) => {
-      console.log('[Meal Plan Quiz] mutationFn called with data:', data);
-      
-      // Prevent double submission
       if (isSubmittingRef.current) {
-        console.log('[Meal Plan Quiz] Already submitting, ignoring duplicate request');
         throw new Error('Already submitting');
       }
       
       isSubmittingRef.current = true;
-      console.log('[Meal Plan Quiz] isSubmittingRef set to true');
       
       try {
-        console.log('[Meal Plan Quiz] Saving dietary preferences...');
         const preferencesResponse = await fetch("/api/user/dietary-preferences", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -224,10 +179,8 @@ export default function MealPlanningQuiz() {
         }
 
         const preferences = await preferencesResponse.json();
-        console.log('[Meal Plan Quiz] Preferences saved successfully');
         setIsGeneratingMealPlan(true);
 
-        console.log('[Meal Plan Quiz] Requesting meal plan generation...');
         const mealPlanResponse = await fetch("/api/meal-plans", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -237,11 +190,8 @@ export default function MealPlanningQuiz() {
 
         if (!mealPlanResponse.ok) {
           const errorData = await mealPlanResponse.json();
-          console.log('[Meal Plan Quiz] Meal plan request failed:', errorData);
           
-          // If generation is already in progress (409), just show progress screen
           if (mealPlanResponse.status === 409) {
-            console.log('Meal plan generation already in progress, showing progress...');
             return { preferences, mealPlan: { alreadyInProgress: true } };
           }
           
@@ -249,65 +199,43 @@ export default function MealPlanningQuiz() {
         }
 
         const mealPlan = await mealPlanResponse.json();
-        console.log('[Meal Plan Quiz] Meal plan created successfully');
         return { preferences, mealPlan };
       } catch (error) {
-        console.error("[Meal Plan Quiz] Meal plan creation error:", error);
         setIsGeneratingMealPlan(false);
         isSubmittingRef.current = false;
         throw error;
       }
     },
-    onSuccess: async (data) => {
-      console.log('[Meal Plan Quiz] onSuccess triggered', { data });
-      // Keep progress screen visible during polling
+    onSuccess: async () => {
       isSubmittingRef.current = false;
       
-      console.log('[Meal Plan Quiz] Invalidating queries...');
-      // Invalidate queries
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/today"] }),
         queryClient.invalidateQueries({ queryKey: ["/api/meal-plans/all"] })
       ]);
-      console.log('[Meal Plan Quiz] Queries invalidated');
       
-      // Poll for meal plans to be ready (max 30 seconds)
-      console.log('[Meal Plan Quiz] Polling for meal plans...');
       let attempts = 0;
-      const maxAttempts = 15; // 15 attempts x 2 seconds = 30 seconds max
+      const maxAttempts = 15;
       let plansReady = false;
       
       while (attempts < maxAttempts && !plansReady) {
         attempts++;
-        console.log(`[Meal Plan Quiz] Poll attempt ${attempts}/${maxAttempts}`);
-        
-        // Wait 2 seconds between attempts
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Try fetching meal plans
         try {
           const response = await fetch('/api/meal-plans/all', { credentials: 'include' });
           if (response.ok) {
             const data = await response.json();
-            console.log(`[Meal Plan Quiz] Poll ${attempts}: Got ${data.plans?.length || 0} plans`);
-            
             if (data.plans && data.plans.length > 0) {
               plansReady = true;
-              console.log('[Meal Plan Quiz] Meal plans are ready!');
               break;
             }
           }
         } catch (error) {
-          console.error(`[Meal Plan Quiz] Poll ${attempts} failed:`, error);
+          console.error('Poll failed:', error);
         }
       }
       
-      if (!plansReady) {
-        console.warn('[Meal Plan Quiz] Timed out waiting for meal plans, navigating anyway...');
-      }
-      
-      // Final refetch to populate cache
-      console.log('[Meal Plan Quiz] Final refetch...');
       await queryClient.refetchQueries({ 
         queryKey: ["/api/meal-plans/all"],
         type: 'active'
@@ -318,8 +246,6 @@ export default function MealPlanningQuiz() {
         description: "Your meal plan has been created!",
       });
       
-      console.log('[Meal Plan Quiz] Navigating to meal-plan/view...');
-      // Hide progress screen and navigate
       setIsGeneratingMealPlan(false);
       setLocation("/meal-plan/view");
     },
@@ -328,10 +254,7 @@ export default function MealPlanningQuiz() {
       isSubmittingRef.current = false;
       const errorMessage = error instanceof Error ? error.message : "Failed to save preferences";
       
-      // Don't show error toast for duplicate submission
-      if (errorMessage === 'Already submitting') {
-        return;
-      }
+      if (errorMessage === 'Already submitting') return;
       
       toast({
         variant: "destructive",
@@ -342,7 +265,6 @@ export default function MealPlanningQuiz() {
   });
 
   const onSubmit = async (data: MealPlanPreferencesForm) => {
-    console.log('[Meal Plan Quiz] onSubmit called with data:', data);
     await saveMealPlanPreferences.mutateAsync(data);
   };
 
@@ -350,737 +272,475 @@ export default function MealPlanningQuiz() {
     const questionId = currentQuestion.id;
     const formValues = watch();
     
-    let isValid = true;
     switch (questionId) {
       case "dietaryType":
-        isValid = !!formValues.dietaryType;
-        break;
+        return !!formValues.dietaryType;
       case "healthGoals":
-        isValid = !!formValues.healthGoals && (
+        return !!formValues.healthGoals && (
           (typeof formValues.healthGoals === 'string' && formValues.healthGoals.trim().length > 0) ||
           (Array.isArray(formValues.healthGoals) && formValues.healthGoals.length > 0)
         );
-        break;
       case "calorieTarget":
-        isValid = !!formValues.calorieTarget && formValues.calorieTarget > 0;
-        break;
+        return !!formValues.calorieTarget && formValues.calorieTarget > 0;
       case "cuisinePreferences":
-        isValid = !!formValues.cuisinePreferences && typeof formValues.cuisinePreferences === 'string' && formValues.cuisinePreferences.trim().length > 0;
-        break;
+        return !!formValues.cuisinePreferences && typeof formValues.cuisinePreferences === 'string' && formValues.cuisinePreferences.trim().length > 0;
       case "allergies":
-        isValid = true; // Optional field
-        break;
+        return true;
       default:
-        isValid = true;
+        return true;
     }
-    
-    console.log('[Meal Plan Quiz] isCurrentStepValid', {
-      questionId,
-      isValid,
-      formValue: formValues[questionId as keyof typeof formValues]
-    });
-    
-    return isValid;
   };
 
   const renderQuestionContent = () => {
     const questionId = currentQuestion.id;
 
-    switch (currentQuestion.type) {
-      case "select":
-        if (questionId === "dietaryType") {
-          const popularOptions = [
-            { value: "omnivore", label: "Omniwor", description: "Jem wszystko" },
-            { value: "vegetarian", label: "Vegetarian", description: "No meat" },
-            { value: "vegan", label: "Vegan", description: "Plant-based only" },
-            { value: "keto", label: "Ketogenic", description: "Low carb" },
-            { value: "paleo", label: "Paleo", description: "Natural products" },
-            { value: "mediterranean", label: "Mediterranean", description: "Healthy fats" },
-          ];
+    // Diet Type Selection
+    if (questionId === "dietaryType") {
+      const options = [
+        { value: "omnivore", label: "Omnivore", emoji: "🍽️" },
+        { value: "vegetarian", label: "Vegetarian", emoji: "🥗" },
+        { value: "vegan", label: "Vegan", emoji: "🌱" },
+        { value: "keto", label: "Ketogenic", emoji: "🥑" },
+        { value: "paleo", label: "Paleo", emoji: "🍖" },
+        { value: "mediterranean", label: "Mediterranean", emoji: "🫒" },
+      ];
 
-          return (
-            <Controller
-              control={control}
-              name="dietaryType"
-              render={({ field }) => (
-                <div className="space-y-4">
-                  {/* Popular Options as Tags */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Popularne opcje:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {popularOptions.map((option) => (
-                        <motion.button
-                          key={option.value}
-                          type="button"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => field.onChange(field.value === option.value ? '' : option.value)}
-                          className={`relative px-4 py-2 rounded-2xl text-sm font-semibold transition-all duration-300 transform ${
-                            field.value === option.value
-                              ? 'bg-gradient-to-r from-[#0CC5BA] to-[#0CBACC] text-white shadow-lg shadow-[#0CC5BA]/30'
-                              : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-300 hover:shadow-md'
-                          }`}
-                        >
-                          <span className="relative z-10">{option.label}</span>
-                          {field.value === option.value && (
-                            <motion.div
-                              layoutId="activeTag"
-                              className="absolute inset-0 bg-gradient-to-r from-[#0CC5BA] to-[#0CBACC] rounded-2xl"
-                              initial={false}
-                              transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                            />
-                          )}
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Custom Input */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Lub wpisz własną opcję:</h4>
-                    <div className="relative">
-                      <Input
-                        placeholder="Np. bezglutenowa, diabetyczna, sportowa..."
-                        value={popularOptions.some(opt => opt.value === field.value) ? '' : field.value}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        className="w-full px-4 py-3 text-sm rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] focus:ring-2 focus:ring-[#0CC5BA]/20 bg-white shadow-sm hover:shadow-md transition-all duration-200 font-medium placeholder:text-gray-400"
-                      />
-                      {!popularOptions.some(opt => opt.value === field.value) && field.value && (
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#0CC5BA]/5 to-[#0CBACC]/5 pointer-events-none" />
+      return (
+        <Controller
+          control={control}
+          name="dietaryType"
+          render={({ field }) => (
+            <div className="space-y-3">
+              {options.map((option) => (
+                <motion.div
+                  key={option.value}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => field.onChange(option.value)}
+                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    field.value === option.value
+                      ? 'bg-gradient-to-r from-[#0CC5BA]/20 to-[#0CC5BA]/10 border-2 border-[#0CC5BA] shadow-lg shadow-[#0CC5BA]/20'
+                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{option.emoji}</span>
+                    <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                      field.value === option.value
+                        ? 'border-[#0CC5BA] bg-[#0CC5BA]'
+                        : 'border-gray-300'
+                    }`}>
+                      {field.value === option.value && (
+                        <Check className="w-4 h-4 text-white" />
                       )}
                     </div>
                   </div>
+                </motion.div>
+              ))}
+              
+              {/* Custom Input */}
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <span className="text-xs text-gray-500">or enter custom</span>
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
+                <Input
+                  placeholder="Enter custom diet type..."
+                  value={options.some(opt => opt.value === field.value) ? '' : field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white/70 backdrop-blur-xl"
+                />
+              </div>
+            </div>
+          )}
+        />
+      );
+    }
+
+    // Calorie Target
+    if (questionId === "calorieTarget") {
+      return (
+        <Controller
+          control={control}
+          name="calorieTarget"
+          render={({ field }) => (
+            <div className="space-y-6">
+              {/* Current Macros Card */}
+              {userPreferences && (
+                <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 overflow-hidden">
+                  <div className="p-5">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Your Current Macro Goals</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl bg-gradient-to-br from-purple-500/10 to-purple-500/5 p-4 text-center border border-purple-500/20">
+                        <div className="text-2xl font-bold text-purple-600">{userPreferences.caloriesGoal || 2000}</div>
+                        <div className="text-xs font-medium text-gray-600 mt-1">Calories</div>
+                      </div>
+                      <div className="rounded-2xl bg-gradient-to-br from-pink-500/10 to-pink-500/5 p-4 text-center border border-pink-500/20">
+                        <div className="text-2xl font-bold text-pink-600">
+                          {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.proteinGoal || 30) / 100) / 4)}g
+                        </div>
+                        <div className="text-xs font-medium text-gray-600 mt-1">Protein</div>
+                      </div>
+                      <div className="rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 p-4 text-center border border-emerald-500/20">
+                        <div className="text-2xl font-bold text-emerald-600">
+                          {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.carbsGoal || 40) / 100) / 4)}g
+                        </div>
+                        <div className="text-xs font-medium text-gray-600 mt-1">Carbs</div>
+                      </div>
+                      <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-500/5 p-4 text-center border border-amber-500/20">
+                        <div className="text-2xl font-bold text-amber-600">
+                          {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.fatGoal || 30) / 100) / 9)}g
+                        </div>
+                        <div className="text-xs font-medium text-gray-600 mt-1">Fat</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
-            />
-          );
-        }
-
-  if (questionId === "activityLevel") {
-          const options = [
-            { value: "sedentary", label: "Sedentary", description: "Little to no exercise" },
-            { value: "moderate", label: "Moderate", description: "Regular exercise" },
-            { value: "active", label: "Active", description: "Very active lifestyle" },
-          ];
-
-          return (
-            <Controller
-              control={control}
-              name="activityLevel"
-              render={({ field }) => (
-                <div className="grid grid-cols-1 gap-3">
-                  {options.map((option) => (
-                    <motion.div
-                      key={option.value}
+              
+              {/* Calorie Input */}
+              <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 p-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Adjust Your Calorie Target</h4>
+                
+                {/* Quick Adjust Buttons */}
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    type="button"
+                    onClick={() => field.onChange(Math.max(1000, (field.value || 2000) - 100))}
+                    className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shadow-md"
+                  >
+                    <Minus className="w-5 h-5 text-gray-600" />
+                  </motion.button>
+                  
+                  <div className="relative flex-1 max-w-[200px]">
+                    <Input
+                      type="number"
+                      value={field.value}
+                      onChange={(e) => field.onChange(parseInt(e.target.value) || 2000)}
+                      className="text-center text-2xl font-bold py-4 rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white"
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">kcal</div>
+                  </div>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    type="button"
+                    onClick={() => field.onChange(Math.min(5000, (field.value || 2000) + 100))}
+                    className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors shadow-md"
+                  >
+                    <Plus className="w-5 h-5 text-gray-600" />
+                  </motion.button>
+                </div>
+                
+                {/* Quick Presets */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[1500, 2000, 2500].map((cal) => (
+                    <motion.button
+                      key={cal}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => field.onChange(option.value)}
-                      className={`p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
-                        field.value === option.value
-                          ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                      type="button"
+                      onClick={() => field.onChange(cal)}
+                      className={`py-2 px-3 rounded-xl text-sm font-medium transition-all ${
+                        field.value === cal
+                          ? 'bg-[#0CC5BA] text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
-                          <p className="text-sm text-gray-500">{option.description}</p>
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          field.value === option.value
-                            ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                            : 'border-gray-300'
-                        }`}>
-                          {field.value === option.value && (
-                            <Check className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
+                      {cal}
+                    </motion.button>
                   ))}
                 </div>
-              )}
-            />
-          );
-        }
+              </div>
+            </div>
+          )}
+        />
+      );
+    }
 
-    if (questionId === "cookingSkillLevel") {
-          const options = [
-            { value: "beginner", label: "Beginner", description: "Simple recipes" },
-            { value: "intermediate", label: "Intermediate", description: "Most cooking methods" },
-          ];
+    // Health Goals
+    if (questionId === "healthGoals") {
+      const currentGoal = userPreferences ? (
+        parseFloat(userPreferences.goalWeight || "0") > parseFloat(userPreferences.currentWeight || "0")
+          ? "gain_weight"
+          : parseFloat(userPreferences.goalWeight || "0") < parseFloat(userPreferences.currentWeight || "0")
+          ? "lose_weight"
+          : "maintain"
+      ) : null;
 
-          return (
-            <Controller
-              control={control}
-              name="cookingSkillLevel"
-              render={({ field }) => (
-                <div className="grid grid-cols-1 gap-3">
-                  {options.map((option) => (
-                    <motion.div
-                      key={option.value}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => field.onChange(option.value)}
-                      className={`p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
-                        field.value === option.value
-                          ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
-                          <p className="text-sm text-gray-500">{option.description}</p>
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                          field.value === option.value
-                            ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                            : 'border-gray-300'
-                        }`}>
-                          {field.value === option.value && (
-                            <Check className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            />
-          );
-        }
-        break;
-
-      case "multiselect":
-        if (questionId === "healthGoals") {
-          const options = [
-            { value: "weight_loss", label: "Weight Loss", description: "Lose weight healthily" },
-            { value: "muscle_gain", label: "Muscle Gain", description: "Build lean muscle" },
-            { value: "maintenance", label: "Maintenance", description: "Maintain current weight" },
-          ];
-
-          return (
-            <Controller
-              control={control}
-              name="healthGoals"
-              render={({ field }) => (
-                <div className="grid grid-cols-1 gap-3">
-                  {options.map((option) => {
-        const values = Array.isArray(field.value) ? field.value : [];
-        const isSelected = values.includes(option.value);
-                    
-                    return (
-                      <motion.div
-                        key={option.value}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-          const currentValues = Array.isArray(field.value) ? field.value : [];
-                          if (isSelected) {
-                            field.onChange(currentValues.filter(v => v !== option.value));
-                          } else {
-                            field.onChange([...currentValues, option.value]);
-                          }
-                        }}
-                        className={`p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
-                          isSelected
-                            ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
-                            <p className="text-sm text-gray-500">{option.description}</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            isSelected
-                              ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                              : 'border-gray-300'
-                          }`}>
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-            />
-          );
-        }
-
-        if (questionId === "cuisinePreferences") {
-          const options = [
-            { value: "italian", label: "Italian", description: "Pizza, pasta, risotto" },
-            { value: "american", label: "American", description: "Classic comfort food" },
-            { value: "asian", label: "Asian", description: "Stir-fries, rice, noodles" },
-            { value: "mediterranean", label: "Mediterranean", description: "Healthy, fresh, olive oil" },
-          ];
+      const goalLabels: { [key: string]: string } = {
+        gain_weight: "Gain Weight",
+        lose_weight: "Lose Weight",
+        maintain: "Maintain Weight"
+      };
 
       return (
-            <Controller
-              control={control}
-              name="cuisinePreferences"
-              render={({ field }) => (
-                <div className="grid grid-cols-1 gap-3">
-                  {options.map((option) => {
-        const values = Array.isArray(field.value) ? field.value : [];
-        const isSelected = values.includes(option.value);
-                    
-                    return (
-                      <motion.div
-                        key={option.value}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-          const currentValues = Array.isArray(field.value) ? field.value : [];
-                          if (isSelected) {
-                            field.onChange(currentValues.filter(v => v !== option.value));
-                          } else {
-                            field.onChange([...currentValues, option.value]);
-                          }
-                        }}
-                        className={`p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
-                          isSelected
-                            ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
-                            <p className="text-sm text-gray-500">{option.description}</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            isSelected
-                              ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                              : 'border-gray-300'
-                          }`}>
-                            {isSelected && (
-                              <Check className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              )}
-            />
-          );
-        }
-        break;
-
-      case "counter":
-        if (questionId === "mealsPerDay") {
-          return (
-            <Controller
-              control={control}
-              name="mealsPerDay"
-              render={({ field }) => (
-                <div className="text-center space-y-6">
-                  <div className="bg-gradient-to-br from-[#0CC5BA]/10 to-blue-500/10 rounded-3xl p-8">
-                    <div className="text-6xl font-bold text-[#0CC5BA] mb-2">
-                      {field.value}
+        <Controller
+          control={control}
+          name="healthGoals"
+          render={({ field }) => (
+            <div className="space-y-4">
+              {/* Current Goal from Profile */}
+              {currentGoal && (
+                <div className="rounded-3xl bg-white/70 backdrop-blur-xl shadow-lg border border-white/60 p-5">
+                  <div className="text-center mb-4">
+                    <span className="text-sm text-gray-500">Your current health goal:</span>
+                    <div className="mt-2 inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-[#0CC5BA]/20 to-[#26A8FF]/20 border border-[#0CC5BA]/30">
+                      <span className="text-lg font-bold text-[#0CC5BA]">{goalLabels[currentGoal]}</span>
                     </div>
-                    <div className="text-gray-600 text-lg">meals per day</div>
                   </div>
-                  
-                  <div className="flex items-center justify-center gap-6">
+                  <div className="grid grid-cols-2 gap-3">
                     <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       type="button"
-                      onClick={() => field.onChange(Math.max(1, field.value - 1))}
-                      className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                      disabled={field.value <= 1}
-                    >
-                      <Minus className="w-5 h-5 text-gray-600" />
-                    </motion.button>
-                    
-                    <div className="flex-1 max-w-xs">
-                      <div className="grid grid-cols-6 gap-2">
-                        {[1, 2, 3, 4, 5, 6].map(count => (
-                          <motion.button
-                            key={count}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            type="button"
-                            onClick={() => field.onChange(count)}
-                            className={`aspect-square rounded-2xl text-sm font-medium transition-all duration-200 ${
-                              field.value === count
-                                ? 'bg-[#0CC5BA] text-white shadow-lg'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
-                          >
-                            {count}
-                          </motion.button>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      type="button"
-                      onClick={() => field.onChange(Math.min(6, field.value + 1))}
-                      className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-                      disabled={field.value >= 6}
-                    >
-                      <Plus className="w-5 h-5 text-gray-600" />
-                    </motion.button>
-                  </div>
-                  
-                  <div className="text-sm text-gray-500 space-y-1">
-                    {field.value >= 1 && <div>✓ Breakfast, Lunch, Dinner</div>}
-                    {field.value >= 4 && <div>✓ + Morning Snack</div>}
-                    {field.value >= 5 && <div>✓ + Afternoon Snack</div>}
-                    {field.value >= 6 && <div>✓ + Evening Snack</div>}
-                  </div>
-                </div>
-              )}
-            />
-          );
-        }
-        break;
-
-      case "select_with_input":
-    if (questionId === "healthGoals") {
-          // Get current weight goal from user preferences
-          const getCurrentWeightGoal = () => {
-            if (!userPreferences) return null;
-            
-            // Check current vs goal weight to determine the correct goal
-            const currentWeight = parseFloat(userPreferences.currentWeight || "0");
-            const goalWeight = parseFloat(userPreferences.goalWeight || "0");
-            
-            if (goalWeight > currentWeight) {
-              return "przytyć";
-            } else if (goalWeight < currentWeight) {
-              return "schudnąć";
-            } else {
-              return "utrzymać obecną wagę";
-            }
-          };
-
-          const currentGoal = getCurrentWeightGoal();
-
-          return (
-            <Controller
-              control={control}
-      // Cast dynamic name to satisfy RHF generic constraints
-      name={questionId as keyof MealPlanPreferencesForm as any}
-              render={({ field }) => {
-                const [agreed, setAgreed] = useState(false);
-                const [customGoal, setCustomGoal] = useState("");
-
-                return (
-                  <div className="space-y-4">
-                    {/* Current Goal Display */}
-                    {currentGoal && (
-                      <div className="bg-white rounded-3xl p-6 border-2 border-gray-100 shadow-lg">
-                        <div className="text-center mb-5">
-                          <h4 className="text-sm font-medium text-gray-500 mb-3">
-                            Your current health goal:
-                          </h4>
-                          <div className="inline-flex items-center px-6 py-4 bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CBACC]/10 rounded-2xl border-2 border-[#0CC5BA]/20">
-                            <span className="text-xl font-semibold text-[#0CC5BA]">{currentGoal}</span>
-                          </div>
-                        </div>
-                        
-                        <div className="flex gap-4">
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="button"
-                            onClick={() => {
-                              setAgreed(true);
-                              field.onChange(currentGoal);
-                            }}
-                            className={`flex-1 py-4 px-4 rounded-2xl font-medium transition-all duration-200 ${
-                              agreed && !customGoal
-                                ? 'bg-gradient-to-r from-[#0CC5BA] to-[#0CBACC] text-white border-2 border-transparent shadow-lg shadow-[#0CC5BA]/20'
-                                : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#0CC5BA]/30 hover:bg-gray-50'
-                            }`}
-                          >
-                            <span>Zgadzam się</span>
-                          </motion.button>
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="button"
-                            onClick={() => {
-                              setAgreed(false);
-                              setCustomGoal("");
-                            }}
-                            className={`flex-1 py-4 px-4 rounded-2xl font-medium transition-all duration-200 ${
-                              !agreed || customGoal
-                                ? 'bg-white text-gray-700 border-2 border-gray-300 hover:border-[#0CC5BA]/30 hover:bg-gray-50'
-                                : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#0CC5BA]/30 hover:bg-gray-50'
-                            }`}
-                          >
-                            <span>Zmienię</span>
-                          </motion.button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Custom Goal Input */}
-                    {(!agreed || !currentGoal) && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-4"
-                      >
-                        <div className="relative">
-                          <Input
-                            value={customGoal}
-                            onChange={(e) => {
-                              setCustomGoal(e.target.value);
-                              field.onChange(e.target.value);
-                            }}
-                            placeholder="Wpisz swój cel zdrowotny..."
-                            className="text-base p-4 rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] focus:ring-2 focus:ring-[#0CC5BA]/20 bg-white placeholder:text-gray-400 transition-all duration-200"
-                          />
-                        </div>
-                        {customGoal && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="p-4 bg-gradient-to-r from-[#0CC5BA]/5 to-[#0CBACC]/5 border-2 border-[#0CC5BA]/20 rounded-2xl"
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-[#0CC5BA] flex items-center justify-center mt-0.5">
-                                <span className="text-white text-xs font-medium">✓</span>
-                              </div>
-                              <div>
-                                <div className="text-sm font-medium text-gray-700 mb-1">Nowy cel zdrowotny:</div>
-                                <div className="text-base text-gray-900 font-medium">"{customGoal}"</div>
-                              </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    )}
-                  </div>
-                );
-              }}
-            />
-          );
-        }
-
-        // Original logic for other select_with_input questions
-    const popularOptions = currentQuestion.popularOptions || [] as Array<{ value: string; label: string }>;
-        return (
-          <Controller
-            control={control}
-      // Cast dynamic name
-      name={questionId as keyof MealPlanPreferencesForm as any}
-            render={({ field }) => {
-              const [customValue, setCustomValue] = useState("");
-              const [selectedType, setSelectedType] = useState("popular"); // "popular" or "custom"
-              
-              const handlePopularSelect = (value: string) => {
-                setSelectedType("popular");
-                field.onChange(value);
-                setCustomValue("");
-              };
-              
-              const handleCustomInput = (value: string) => {
-                setSelectedType("custom");
-                setCustomValue(value);
-                field.onChange(value);
-              };
-              
-              return (
-                <div className="space-y-4">
-                  {/* Popular Options */}
-                  <div className="grid grid-cols-1 gap-3">
-                    {popularOptions.map((option) => (
-                      <motion.div
-                        key={option.value}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handlePopularSelect(option.value)}
-                        className={`p-4 rounded-3xl border-2 cursor-pointer transition-all duration-300 ${
-                          selectedType === "popular" && field.value === option.value
-                            ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-800 text-lg">{option.label}</h3>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            selectedType === "popular" && field.value === option.value
-                              ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                              : 'border-gray-300'
-                          }`}>
-                            {selectedType === "popular" && field.value === option.value && (
-                              <Check className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  
-                  {/* Custom Input */}
-                  <div className="relative mt-6">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className="flex-1 h-px bg-gray-200"></div>
-                      <span className="px-4 text-sm font-medium text-gray-500 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-                        {currentQuestion.description}
-                      </span>
-                      <div className="flex-1 h-px bg-gray-200"></div>
-                    </div>
-                    <motion.div
-                      whileHover={{ scale: 1.01 }}
-                      className={`p-4 rounded-3xl border-2 transition-all duration-300 ${
-                        selectedType === "custom" && customValue
-                          ? 'border-[#0CC5BA] bg-gradient-to-r from-[#0CC5BA]/10 to-[#0CC5BA]/5 shadow-lg'
-                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                      onClick={() => field.onChange(currentGoal)}
+                      className={`py-3 px-4 rounded-2xl font-medium transition-all ${
+                        field.value === currentGoal
+                          ? 'bg-gradient-to-r from-[#0CC5BA] to-[#0AA59C] text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <Input
-                            value={customValue}
-                            onChange={(e) => handleCustomInput(e.target.value)}
-                            placeholder="Wpisz swoją spersonalizowaną odpowiedź tutaj..."
-                            className="border-0 p-0 text-base font-medium text-gray-800 placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
-                          />
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                          selectedType === "custom" && customValue
-                            ? 'border-[#0CC5BA] bg-[#0CC5BA]'
-                            : 'border-gray-300'
-                        }`}>
-                          {selectedType === "custom" && customValue && (
-                            <Check className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </div>
-              );
-            }}
-          />
-        );
-
-      case "text":
-        return (
-          <Controller
-            control={control}
-            name={questionId as keyof MealPlanPreferencesForm as any}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder={currentQuestion.description}
-                className="text-base p-4 rounded-xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white"
-              />
-            )}
-          />
-        );
-
-      case "number":
-        if (questionId === "calorieTarget") {
-          return (
-            <Controller
-              control={control}
-              name={questionId as keyof MealPlanPreferencesForm as any}
-              render={({ field }) => (
-                <div className="space-y-4">
-                  {/* Current Macro Goals */}
-                  {userPreferences && (
-                    <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-3xl p-5 border border-gray-200/50 shadow-lg shadow-gray-100/30">
-                      <h4 className="text-sm font-semibold text-gray-700 mb-4 text-center">Your current macro goals:</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-2xl p-3 text-center border border-purple-500/20">
-                          <div className="text-xl font-bold text-purple-600 mb-1">{userPreferences.caloriesGoal || 2000}</div>
-                          <div className="text-xs font-medium text-gray-600">Calories</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-pink-500/10 to-pink-500/5 rounded-2xl p-3 text-center border border-pink-500/20">
-                          <div className="text-xl font-bold text-pink-600 mb-1">
-                            {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.proteinGoal || 30) / 100) / 4)}g
-                          </div>
-                          <div className="text-xs font-medium text-gray-600">Protein</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 rounded-2xl p-3 text-center border border-emerald-500/20">
-                          <div className="text-xl font-bold text-emerald-600 mb-1">
-                            {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.carbsGoal || 40) / 100) / 4)}g
-                          </div>
-                          <div className="text-xs font-medium text-gray-600">Carbs</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-2xl p-3 text-center border border-amber-500/20">
-                          <div className="text-xl font-bold text-amber-600 mb-1">
-                            {Math.round(((userPreferences.caloriesGoal || 2000) * (userPreferences.fatGoal || 30) / 100) / 9)}g
-                          </div>
-                          <div className="text-xs font-medium text-gray-600">Fat</div>
-                        </div>
-                      </div>
-                      
-                      {/* Weight Goal Explanation */}
-                      <div className="mt-4 p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-                        <div className="text-xs font-medium text-blue-800 text-center">
-                          {userPreferences.weightGoal === 'gain' || userPreferences.goalWeight > userPreferences.currentWeight ? (
-                            <span>To gain weight, eat more protein (builds muscle) and increase calories!</span>
-                          ) : userPreferences.weightGoal === 'loss' || userPreferences.goalWeight < userPreferences.currentWeight ? (
-                            <span>To lose weight, maintain high protein intake (protects muscle) and reduce calories!</span>
-                          ) : (
-                            <span>To maintain weight, keep balanced macros and stable calories!</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Calorie Input */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 text-center">Dostosuj cele kaloryczne:</h4>
-                    <div className="relative">
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder={userPreferences?.caloriesGoal?.toString() || "2000"}
-                        className="text-lg font-semibold p-4 rounded-2xl border-2 border-gray-200 focus:border-[#0CC5BA] focus:ring-2 focus:ring-[#0CC5BA]/20 bg-white text-center shadow-sm hover:shadow-md transition-all duration-200"
-                      />
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm font-medium text-gray-400">
-                        kcal
-                      </div>
-                    </div>
+                      Keep This
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="button"
+                      onClick={() => field.onChange('')}
+                      className="py-3 px-4 rounded-2xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
+                    >
+                      Change
+                    </motion.button>
                   </div>
                 </div>
               )}
-            />
-          );
-        }
-        
-        return (
-          <Controller
-            control={control}
-            name={questionId as keyof MealPlanPreferencesForm as any}
-            render={({ field }) => (
-              <Input
-                {...field}
-                type="number"
-                placeholder="2000"
-                className="text-base p-4 rounded-xl border-2 border-gray-200 focus:border-[#0CC5BA] bg-white text-center"
-              />
-            )}
-          />
-        );
 
-      default:
-        return null;
+              {/* Options */}
+              <div className="space-y-3">
+                {[
+                  { value: "lose_weight", label: "Lose Weight", emoji: "⬇️" },
+                  { value: "gain_muscle", label: "Gain Muscle", emoji: "💪" },
+                  { value: "maintain", label: "Maintain", emoji: "⚖️" },
+                  { value: "improve_health", label: "Improve Health", emoji: "❤️" },
+                ].map((option) => (
+                  <motion.div
+                    key={option.value}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => field.onChange(option.value)}
+                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                      field.value === option.value
+                        ? 'bg-gradient-to-r from-[#26A8FF]/20 to-[#26A8FF]/10 border-2 border-[#26A8FF] shadow-lg shadow-[#26A8FF]/20'
+                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{option.emoji}</span>
+                      <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        field.value === option.value
+                          ? 'border-[#26A8FF] bg-[#26A8FF]'
+                          : 'border-gray-300'
+                      }`}>
+                        {field.value === option.value && <Check className="w-4 h-4 text-white" />}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Custom Input */}
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <span className="text-xs text-gray-500">or enter custom</span>
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
+                <Input
+                  placeholder="Enter your own health goal..."
+                  value={['lose_weight', 'gain_muscle', 'maintain', 'improve_health'].includes(field.value as string) ? '' : (field.value as string)}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="rounded-2xl border-2 border-gray-200 focus:border-[#26A8FF] bg-white/70 backdrop-blur-xl"
+                />
+              </div>
+            </div>
+          )}
+        />
+      );
     }
+
+    // Cuisine Preferences
+    if (questionId === "cuisinePreferences") {
+      return (
+        <Controller
+          control={control}
+          name="cuisinePreferences"
+          render={({ field }) => (
+            <div className="space-y-3">
+              {[
+                { value: "italian", label: "Italian", emoji: "🍝" },
+                { value: "asian", label: "Asian", emoji: "🍜" },
+                { value: "mediterranean", label: "Mediterranean", emoji: "🥙" },
+                { value: "mexican", label: "Mexican", emoji: "🌮" },
+                { value: "american", label: "American", emoji: "🍔" },
+                { value: "indian", label: "Indian", emoji: "🍛" },
+              ].map((option) => (
+                <motion.div
+                  key={option.value}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => field.onChange(option.value)}
+                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    field.value === option.value
+                      ? 'bg-gradient-to-r from-[#A855F7]/20 to-[#A855F7]/10 border-2 border-[#A855F7] shadow-lg shadow-[#A855F7]/20'
+                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{option.emoji}</span>
+                    <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      field.value === option.value
+                        ? 'border-[#A855F7] bg-[#A855F7]'
+                        : 'border-gray-300'
+                    }`}>
+                      {field.value === option.value && <Check className="w-4 h-4 text-white" />}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Custom Input */}
+              <div className="pt-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                  <span className="text-xs text-gray-500">or enter custom</span>
+                  <div className="flex-1 h-px bg-gray-200"></div>
+                </div>
+                <Input
+                  placeholder="Enter your favorite cuisine..."
+                  value={['italian', 'asian', 'mediterranean', 'mexican', 'american', 'indian'].includes(field.value as string) ? '' : (field.value as string)}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  className="rounded-2xl border-2 border-gray-200 focus:border-[#A855F7] bg-white/70 backdrop-blur-xl"
+                />
+              </div>
+            </div>
+          )}
+        />
+      );
+    }
+
+    // Allergies
+    if (questionId === "allergies") {
+      return (
+        <Controller
+          control={control}
+          name="allergies"
+          render={({ field }) => {
+            const selectedAllergies = Array.isArray(field.value) ? field.value : [];
+            const toggleAllergy = (value: string) => {
+              if (selectedAllergies.includes(value)) {
+                field.onChange(selectedAllergies.filter(v => v !== value));
+              } else {
+                field.onChange([...selectedAllergies, value]);
+              }
+            };
+
+            return (
+              <div className="space-y-3">
+                {[
+                  { value: "lactose", label: "Lactose Intolerance", emoji: "🥛" },
+                  { value: "gluten", label: "Gluten Free", emoji: "🌾" },
+                  { value: "nuts", label: "Nut Allergy", emoji: "🥜" },
+                  { value: "shellfish", label: "Shellfish Allergy", emoji: "🦐" },
+                  { value: "eggs", label: "Egg Allergy", emoji: "🥚" },
+                  { value: "soy", label: "Soy Allergy", emoji: "🫘" },
+                ].map((option) => (
+                  <motion.div
+                    key={option.value}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => toggleAllergy(option.value)}
+                    className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                      selectedAllergies.includes(option.value)
+                        ? 'bg-gradient-to-r from-[#F59E0B]/20 to-[#F59E0B]/10 border-2 border-[#F59E0B] shadow-lg shadow-[#F59E0B]/20'
+                        : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{option.emoji}</span>
+                      <span className="flex-1 font-semibold text-gray-800">{option.label}</span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                        selectedAllergies.includes(option.value)
+                          ? 'border-[#F59E0B] bg-[#F59E0B]'
+                          : 'border-gray-300'
+                      }`}>
+                        {selectedAllergies.includes(option.value) && <Check className="w-4 h-4 text-white" />}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {/* None Option */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => field.onChange([])}
+                  className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    selectedAllergies.length === 0
+                      ? 'bg-gradient-to-r from-green-500/20 to-green-500/10 border-2 border-green-500 shadow-lg shadow-green-500/20'
+                      : 'bg-white/70 backdrop-blur-xl border border-white/60 hover:border-gray-200 shadow-md'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">✅</span>
+                    <span className="flex-1 font-semibold text-gray-800">No Allergies</span>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      selectedAllergies.length === 0
+                        ? 'border-green-500 bg-green-500'
+                        : 'border-gray-300'
+                    }`}>
+                      {selectedAllergies.length === 0 && <Check className="w-4 h-4 text-white" />}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Custom Input */}
+                <div className="pt-2">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                    <span className="text-xs text-gray-500">or enter custom</span>
+                    <div className="flex-1 h-px bg-gray-200"></div>
+                  </div>
+                  <Input
+                    placeholder="Enter other allergies (press Enter to add)..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const value = (e.target as HTMLInputElement).value.trim();
+                        if (value && !selectedAllergies.includes(value)) {
+                          field.onChange([...selectedAllergies, value]);
+                          (e.target as HTMLInputElement).value = '';
+                        }
+                      }
+                    }}
+                    className="rounded-2xl border-2 border-gray-200 focus:border-[#F59E0B] bg-white/70 backdrop-blur-xl"
+                  />
+                </div>
+              </div>
+            );
+          }}
+        />
+      );
+    }
+
+    return null;
   };
 
   if (isGeneratingMealPlan) {
@@ -1088,102 +748,101 @@ export default function MealPlanningQuiz() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       {/* Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0CC5BA]/5 to-blue-500/5" />
-        <div className="relative px-6 py-4">
-          <div className="max-w-lg mx-auto">
-            {/* Back button and progress */}
-            <div className="flex items-center justify-between mb-4">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleBack}
-                className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center transition-all duration-200"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </motion.button>
-              
-              <div className="text-sm font-medium text-gray-500">
-                {currentStep + 1} z {questions.length}
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-              <motion.div
-                className="bg-gradient-to-r from-[#0CC5BA] to-blue-500 h-2 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-
-            {/* Question header */}
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="text-center mb-4"
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/60">
+        <div className="px-4 py-4 max-w-lg mx-auto">
+          {/* Back button and step counter */}
+          <div className="flex items-center justify-between mb-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleBack}
+              className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg flex items-center justify-center transition-all"
             >
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r ${currentQuestion.color} flex items-center justify-center shadow-lg`}>
-                <div className="text-white">
-                  {currentQuestion.icon}
-                </div>
-              </div>
-              
-              <h1 className="text-xl font-bold text-gray-800 mb-2">
-                {currentQuestion.title}
-              </h1>
-              <p className="text-gray-600 text-sm">
-                {currentQuestion.description}
-              </p>
-            </motion.div>
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </motion.button>
+            
+            <div className="flex items-center gap-2">
+              {questions.map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === currentStep
+                      ? 'w-8 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF]'
+                      : idx < currentStep
+                      ? 'w-2 bg-[#0CC5BA]'
+                      : 'w-2 bg-gray-200'
+                  }`}
+                />
+              ))}
+            </div>
+            
+            <div className="text-sm font-medium text-gray-500">
+              {currentStep + 1}/{questions.length}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-6 pb-6">
-        <div className="max-w-lg mx-auto">
+      {/* Question Content */}
+      <div className="px-4 py-6 max-w-lg mx-auto">
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-transparent mb-6"
           >
-            {renderQuestionContent()}
-          </motion.div>
+            {/* Question Header */}
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 mx-auto mb-4 rounded-3xl bg-gradient-to-br ${currentQuestion.gradient} flex items-center justify-center shadow-lg`}>
+                <div className="text-white">
+                  {currentQuestion.icon}
+                </div>
+              </div>
+              
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {currentQuestion.title}
+              </h1>
+              <p className="text-gray-500">
+                {currentQuestion.description}
+              </p>
+            </div>
 
-          {/* Navigation buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Button
-              onClick={handleNext}
-              disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
-              className="w-full bg-gradient-to-r from-[#0CC5BA] to-blue-500 hover:from-[#0CC5BA]/90 hover:to-blue-500/90 text-white py-3 rounded-2xl text-base font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLastStep ? (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Tworzę...' : 'Stwórz Mój Plan Żywieniowy'}
-                </>
-              ) : (
-                <>
-                  Dalej
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
+            {/* Question Options */}
+            <div className="mb-8">
+              {renderQuestionContent()}
+            </div>
           </motion.div>
-        </div>
+        </AnimatePresence>
+
+        {/* Navigation Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="pb-8"
+        >
+          <Button
+            onClick={handleNext}
+            disabled={!isCurrentStepValid() || saveMealPlanPreferences.isPending || isGeneratingMealPlan}
+            className="w-full h-14 bg-gradient-to-r from-[#0CC5BA] to-[#26A8FF] hover:opacity-90 text-white rounded-2xl text-lg font-semibold shadow-lg shadow-[#0CC5BA]/30 transition-all disabled:opacity-50"
+          >
+            {isLastStep ? (
+              <>
+                <Sparkles className="w-5 h-5 mr-2" />
+                {saveMealPlanPreferences.isPending || isGeneratingMealPlan ? 'Creating...' : 'Create My Meal Plan'}
+              </>
+            ) : (
+              <>
+                Continue
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </>
+            )}
+          </Button>
+        </motion.div>
       </div>
     </div>
   );
