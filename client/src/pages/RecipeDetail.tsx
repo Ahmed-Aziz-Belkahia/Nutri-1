@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useLocation } from 'wouter';
-import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play, X, Download, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Clock, Users, ChefHat, Flame, Heart, Share2, Check, Play, X, Download, Star, Edit3, Save, Plus, Trash2, Loader2, Camera, Upload } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import Navbar from '@/components/Navbar';
 import { useRecipeById } from '@/hooks/queries/useRecipes';
+import { useToast } from '@/hooks/use-toast';
 import { toPng } from 'html-to-image';
 
 interface Ingredient {
@@ -72,9 +75,36 @@ export default function RecipeDetail() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Edit mode state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editData, setEditData] = useState({
+    name: '',
+    description: '',
+    imageUrl: '',
+    prepTime: 15,
+    cookTime: 30,
+    servings: 1,
+    calories: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    fiber: 0,
+    mealType: '',
+    cuisineType: '',
+    difficulty: 'easy',
+    ingredients: [] as Ingredient[],
+    instructions: [] as string[],
+    components: [] as Component[],
+    tags: [] as string[]
+  });
 
   // Fetch recipe details using custom hook
-  const { data: recipeData, isLoading } = useRecipeById(Number(recipeId), isFoodLog);
+  const { data: recipeData, isLoading, refetch } = useRecipeById(Number(recipeId), isFoodLog);
   const recipe = recipeData as any; // Cast to support additional properties
 
   // Parse ingredients
@@ -209,6 +239,201 @@ export default function RecipeDetail() {
     setIsSaved(recipe?.isSaved || false);
   }, [recipe]);
 
+  // Initialize edit data when opening edit modal
+  const openEditModal = () => {
+    if (!recipe) return;
+    
+    setEditData({
+      name: recipe.name || '',
+      description: recipe.description || '',
+      imageUrl: recipe.imageUrl || '',
+      prepTime: recipe.prepTime || 15,
+      cookTime: recipe.cookTime || 30,
+      servings: recipe.servings || 1,
+      calories: recipe.nutritionInfo?.calories || recipe.calories || 0,
+      protein: recipe.nutritionInfo?.protein || recipe.protein || 0,
+      carbs: recipe.nutritionInfo?.carbs || recipe.carbs || 0,
+      fat: recipe.nutritionInfo?.fat || recipe.fat || 0,
+      fiber: recipe.nutritionInfo?.fiber || 0,
+      mealType: recipe.mealType || '',
+      cuisineType: recipe.cuisineType || '',
+      difficulty: recipe.difficulty || 'easy',
+      ingredients: ingredients.map(ing => ({
+        name: typeof ing === 'string' ? ing : ing.name,
+        quantity: typeof ing === 'string' ? '' : ing.quantity,
+        unit: typeof ing === 'string' ? '' : ing.unit,
+        calories: typeof ing === 'object' ? ing.calories : undefined
+      })),
+      instructions: [...instructions],
+      components: [...components],
+      tags: recipe.tags || []
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle image upload
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setEditData(prev => ({ ...prev, imageUrl: base64 }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Add new ingredient
+  const addIngredient = () => {
+    setEditData(prev => ({
+      ...prev,
+      ingredients: [...prev.ingredients, { name: '', quantity: '', unit: '' }]
+    }));
+  };
+
+  // Remove ingredient
+  const removeIngredient = (index: number) => {
+    setEditData(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Update ingredient
+  const updateIngredient = (index: number, field: string, value: any) => {
+    setEditData(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.map((ing, i) => 
+        i === index ? { ...ing, [field]: value } : ing
+      )
+    }));
+  };
+
+  // Add new instruction
+  const addInstruction = () => {
+    setEditData(prev => ({
+      ...prev,
+      instructions: [...prev.instructions, '']
+    }));
+  };
+
+  // Remove instruction
+  const removeInstruction = (index: number) => {
+    setEditData(prev => ({
+      ...prev,
+      instructions: prev.instructions.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Update instruction
+  const updateInstruction = (index: number, value: string) => {
+    setEditData(prev => ({
+      ...prev,
+      instructions: prev.instructions.map((inst, i) => 
+        i === index ? value : inst
+      )
+    }));
+  };
+
+  // Add new component
+  const addComponent = () => {
+    setEditData(prev => ({
+      ...prev,
+      components: [...prev.components, { 
+        name: '', 
+        calories: 0, 
+        protein: 0, 
+        carbs: 0, 
+        fat: 0, 
+        servingSize: '', 
+        quantity: 1 
+      }]
+    }));
+  };
+
+  // Remove component
+  const removeComponent = (index: number) => {
+    setEditData(prev => ({
+      ...prev,
+      components: prev.components.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Update component
+  const updateComponent = (index: number, field: string, value: any) => {
+    setEditData(prev => ({
+      ...prev,
+      components: prev.components.map((comp, i) => 
+        i === index ? { ...comp, [field]: value } : comp
+      )
+    }));
+  };
+
+  // Save changes
+  const saveChanges = async () => {
+    if (!isFoodLog) {
+      toast({
+        title: "Cannot Edit",
+        description: "Only food logs can be edited directly",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch(`/api/food-logs/${recipeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: editData.name,
+          description: editData.description,
+          imageUrl: editData.imageUrl,
+          prepTime: editData.prepTime,
+          cookTime: editData.cookTime,
+          servings: editData.servings,
+          calories: editData.calories,
+          protein: editData.protein,
+          carbs: editData.carbs,
+          fat: editData.fat,
+          mealType: editData.mealType,
+          cuisineType: editData.cuisineType,
+          difficulty: editData.difficulty,
+          ingredients: editData.ingredients,
+          instructions: editData.instructions,
+          components: editData.components,
+          tags: editData.tags
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update');
+      }
+
+      toast({
+        title: "Saved!",
+        description: "Your changes have been saved successfully"
+      });
+
+      // Refresh the data
+      await refetch();
+      await queryClient.invalidateQueries({ queryKey: ['/api/food-logs'] });
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save changes. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f0f7fa] flex items-center justify-center">
@@ -269,6 +494,14 @@ export default function RecipeDetail() {
           </button>
           
           <div className="flex gap-2">
+            {isFoodLog && (
+              <button
+                onClick={openEditModal}
+                className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-colors hover:bg-white/30"
+              >
+                <Edit3 className="w-5 h-5 text-white" />
+              </button>
+            )}
             <button
               onClick={handleSaveRecipe}
               className={`w-10 h-10 ${isSaved ? 'bg-[#26A8FF]' : 'bg-white/20'} backdrop-blur-md rounded-full flex items-center justify-center transition-colors`}
@@ -703,6 +936,439 @@ export default function RecipeDetail() {
           </div>
         </div>
       )}
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {showEditModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] flex items-end sm:items-center justify-center"
+            onClick={() => setShowEditModal(false)}
+          >
+            <motion.div
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: "100%", opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full sm:max-w-lg max-h-[90vh] bg-gradient-to-b from-white/95 to-gray-50/95 backdrop-blur-2xl rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl border border-white/60"
+            >
+              {/* Modal Header */}
+              <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl px-5 py-4 border-b border-gray-100/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#0CC5BA] to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-[#0CC5BA]/30">
+                    <Edit3 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Edit Meal</h2>
+                    <p className="text-xs text-gray-500">Update meal details</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="w-9 h-9 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Modal Content - Scrollable */}
+              <div className="overflow-y-auto max-h-[calc(90vh-140px)] px-5 py-5 space-y-6">
+                {/* Image Section */}
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-[#0CC5BA]" />
+                    Meal Image
+                  </label>
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative h-40 bg-gradient-to-br from-gray-100 to-gray-50 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden cursor-pointer hover:border-[#0CC5BA]/50 transition-colors group"
+                  >
+                    {editData.imageUrl ? (
+                      <>
+                        <img 
+                          src={editData.imageUrl} 
+                          alt="Meal" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Upload className="w-8 h-8 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                        <Upload className="w-10 h-10 mb-2" />
+                        <p className="text-sm font-medium">Click to upload image</p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Name & Description */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 block mb-2">Meal Name</label>
+                    <input
+                      type="text"
+                      value={editData.name}
+                      onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30 focus:border-[#0CC5BA]"
+                      placeholder="Enter meal name"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 block mb-2">Description</label>
+                    <textarea
+                      value={editData.description}
+                      onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={3}
+                      className="w-full bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl px-4 py-3 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30 focus:border-[#0CC5BA] resize-none"
+                      placeholder="Describe your meal..."
+                    />
+                  </div>
+                </div>
+
+                {/* Time & Servings */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 block mb-1.5 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      Prep Time
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={editData.prepTime}
+                        onChange={(e) => setEditData(prev => ({ ...prev, prepTime: parseInt(e.target.value) || 0 }))}
+                        className="w-full bg-white/80 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">min</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 block mb-1.5 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      Cook Time
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={editData.cookTime}
+                        onChange={(e) => setEditData(prev => ({ ...prev, cookTime: parseInt(e.target.value) || 0 }))}
+                        className="w-full bg-white/80 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">min</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 block mb-1.5 flex items-center gap-1">
+                      <Users className="w-3.5 h-3.5" />
+                      Servings
+                    </label>
+                    <input
+                      type="number"
+                      value={editData.servings}
+                      onChange={(e) => setEditData(prev => ({ ...prev, servings: parseInt(e.target.value) || 1 }))}
+                      className="w-full bg-white/80 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                    />
+                  </div>
+                </div>
+
+                {/* Nutrition Info */}
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-orange-500" />
+                    Nutrition Information
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-3 border border-orange-100">
+                      <label className="text-[10px] font-bold text-orange-600 uppercase tracking-wider">Calories</label>
+                      <input
+                        type="number"
+                        value={editData.calories}
+                        onChange={(e) => setEditData(prev => ({ ...prev, calories: parseFloat(e.target.value) || 0 }))}
+                        className="w-full bg-white/70 border-0 rounded-lg px-2 py-1.5 mt-1 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-orange-300"
+                      />
+                    </div>
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-3 border border-blue-100">
+                      <label className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Protein (g)</label>
+                      <input
+                        type="number"
+                        value={editData.protein}
+                        onChange={(e) => setEditData(prev => ({ ...prev, protein: parseFloat(e.target.value) || 0 }))}
+                        className="w-full bg-white/70 border-0 rounded-lg px-2 py-1.5 mt-1 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      />
+                    </div>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-3 border border-purple-100">
+                      <label className="text-[10px] font-bold text-purple-600 uppercase tracking-wider">Carbs (g)</label>
+                      <input
+                        type="number"
+                        value={editData.carbs}
+                        onChange={(e) => setEditData(prev => ({ ...prev, carbs: parseFloat(e.target.value) || 0 }))}
+                        className="w-full bg-white/70 border-0 rounded-lg px-2 py-1.5 mt-1 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-purple-300"
+                      />
+                    </div>
+                    <div className="bg-gradient-to-br from-pink-50 to-pink-100/50 rounded-xl p-3 border border-pink-100">
+                      <label className="text-[10px] font-bold text-pink-600 uppercase tracking-wider">Fat (g)</label>
+                      <input
+                        type="number"
+                        value={editData.fat}
+                        onChange={(e) => setEditData(prev => ({ ...prev, fat: parseFloat(e.target.value) || 0 }))}
+                        className="w-full bg-white/70 border-0 rounded-lg px-2 py-1.5 mt-1 text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-pink-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meal Type & Cuisine */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 block mb-2">Meal Type</label>
+                    <select
+                      value={editData.mealType}
+                      onChange={(e) => setEditData(prev => ({ ...prev, mealType: e.target.value }))}
+                      className="w-full bg-white/80 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                    >
+                      <option value="">Select type</option>
+                      <option value="breakfast">Breakfast</option>
+                      <option value="lunch">Lunch</option>
+                      <option value="dinner">Dinner</option>
+                      <option value="snack">Snack</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-semibold text-gray-700 block mb-2">Difficulty</label>
+                    <select
+                      value={editData.difficulty}
+                      onChange={(e) => setEditData(prev => ({ ...prev, difficulty: e.target.value }))}
+                      className="w-full bg-white/80 border border-gray-200 rounded-xl px-3 py-2.5 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Components Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <ChefHat className="w-4 h-4 text-[#0CC5BA]" />
+                      Food Components
+                    </label>
+                    <button
+                      onClick={addComponent}
+                      className="text-xs font-semibold text-[#0CC5BA] flex items-center gap-1 hover:text-[#0CC5BA]/80"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Component
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {editData.components.map((comp, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white/80 backdrop-blur-sm rounded-xl p-3 border border-gray-100 space-y-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={comp.name}
+                            onChange={(e) => updateComponent(index, 'name', e.target.value)}
+                            placeholder="Component name"
+                            className="flex-1 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                          />
+                          <button
+                            onClick={() => removeComponent(index)}
+                            className="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-100"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-2">
+                          <input
+                            type="number"
+                            value={comp.calories}
+                            onChange={(e) => updateComponent(index, 'calories', parseFloat(e.target.value) || 0)}
+                            placeholder="Cal"
+                            className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                          />
+                          <input
+                            type="number"
+                            value={comp.protein}
+                            onChange={(e) => updateComponent(index, 'protein', parseFloat(e.target.value) || 0)}
+                            placeholder="P"
+                            className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                          />
+                          <input
+                            type="number"
+                            value={comp.carbs}
+                            onChange={(e) => updateComponent(index, 'carbs', parseFloat(e.target.value) || 0)}
+                            placeholder="C"
+                            className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                          />
+                          <input
+                            type="number"
+                            value={comp.fat}
+                            onChange={(e) => updateComponent(index, 'fat', parseFloat(e.target.value) || 0)}
+                            placeholder="F"
+                            className="bg-gray-50 border border-gray-100 rounded-lg px-2 py-1.5 text-xs text-center focus:outline-none"
+                          />
+                        </div>
+                      </motion.div>
+                    ))}
+                    {editData.components.length === 0 && (
+                      <p className="text-center text-gray-400 text-sm py-4">No components added yet</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Ingredients Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      🥗 Ingredients
+                    </label>
+                    <button
+                      onClick={addIngredient}
+                      className="text-xs font-semibold text-[#0CC5BA] flex items-center gap-1 hover:text-[#0CC5BA]/80"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Ingredient
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {editData.ingredients.map((ing, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-2"
+                      >
+                        <input
+                          type="text"
+                          value={ing.quantity}
+                          onChange={(e) => updateIngredient(index, 'quantity', e.target.value)}
+                          placeholder="Qty"
+                          className="w-16 bg-white/80 border border-gray-200 rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                        />
+                        <input
+                          type="text"
+                          value={ing.unit}
+                          onChange={(e) => updateIngredient(index, 'unit', e.target.value)}
+                          placeholder="Unit"
+                          className="w-16 bg-white/80 border border-gray-200 rounded-lg px-2 py-2 text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                        />
+                        <input
+                          type="text"
+                          value={ing.name}
+                          onChange={(e) => updateIngredient(index, 'name', e.target.value)}
+                          placeholder="Ingredient name"
+                          className="flex-1 bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30"
+                        />
+                        <button
+                          onClick={() => removeIngredient(index)}
+                          className="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-100"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </motion.div>
+                    ))}
+                    {editData.ingredients.length === 0 && (
+                      <p className="text-center text-gray-400 text-sm py-4">No ingredients added yet</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Instructions Section */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      📋 Instructions
+                    </label>
+                    <button
+                      onClick={addInstruction}
+                      className="text-xs font-semibold text-[#0CC5BA] flex items-center gap-1 hover:text-[#0CC5BA]/80"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Step
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {editData.instructions.map((inst, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-start gap-2"
+                      >
+                        <div className="w-6 h-6 bg-[#0CC5BA] text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-2">
+                          {index + 1}
+                        </div>
+                        <textarea
+                          value={inst}
+                          onChange={(e) => updateInstruction(index, e.target.value)}
+                          placeholder={`Step ${index + 1}...`}
+                          rows={2}
+                          className="flex-1 bg-white/80 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0CC5BA]/30 resize-none"
+                        />
+                        <button
+                          onClick={() => removeInstruction(index)}
+                          className="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center hover:bg-red-100 flex-shrink-0 mt-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </motion.div>
+                    ))}
+                    {editData.instructions.length === 0 && (
+                      <p className="text-center text-gray-400 text-sm py-4">No instructions added yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="sticky bottom-0 bg-white/90 backdrop-blur-xl px-5 py-4 border-t border-gray-100/50 flex gap-3">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 py-3.5 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveChanges}
+                  disabled={isSaving || !editData.name}
+                  className="flex-1 py-3.5 bg-gradient-to-r from-[#0CC5BA] to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-[#0CC5BA]/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:shadow-xl transition-all"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

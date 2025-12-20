@@ -5055,13 +5055,33 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: 'Food log not found or access denied' });
       }
 
-      const { name, calories, protein, carbs, fat, components } = req.body;
+      const { 
+        name, 
+        calories, 
+        protein, 
+        carbs, 
+        fat, 
+        components,
+        description,
+        ingredients,
+        instructions,
+        prepTime,
+        cookTime,
+        servings,
+        imageUrl,
+        mealType,
+        cuisineType,
+        difficulty,
+        tags
+      } = req.body;
       
       console.log('[Food Logs API] Updating food log:', {
         logId,
         userId: req.user!.id,
         name,
-        hasComponents: Array.isArray(components)
+        hasComponents: Array.isArray(components),
+        hasIngredients: Array.isArray(ingredients),
+        hasInstructions: Array.isArray(instructions)
       });
 
       // Ensure required fields are present
@@ -5072,17 +5092,33 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      // Build update object with all provided fields
+      const updateData: Record<string, any> = {
+        name,
+        calories: parseFloat(calories) || 0,
+        protein: parseFloat(protein) || 0,
+        carbs: parseFloat(carbs) || 0,
+        fat: parseFloat(fat) || 0,
+      };
+
+      // Only update optional fields if they are provided
+      if (components !== undefined) updateData.components = components;
+      if (description !== undefined) updateData.description = description;
+      if (ingredients !== undefined) updateData.ingredients = ingredients;
+      if (instructions !== undefined) updateData.instructions = instructions;
+      if (prepTime !== undefined) updateData.prepTime = parseInt(prepTime) || null;
+      if (cookTime !== undefined) updateData.cookTime = parseInt(cookTime) || null;
+      if (servings !== undefined) updateData.servings = parseInt(servings) || 1;
+      if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
+      if (mealType !== undefined) updateData.mealType = mealType;
+      if (cuisineType !== undefined) updateData.cuisineType = cuisineType;
+      if (difficulty !== undefined) updateData.difficulty = difficulty;
+      if (tags !== undefined) updateData.tags = tags;
+
       // Update the food log
       const [updatedLog] = await db
         .update(foodLogs)
-        .set({
-          name,
-          calories: calories.toString(),
-          protein: protein.toString(),
-          carbs: carbs.toString(),
-          fat: fat.toString(),
-          components: components || existingLog.components
-        })
+        .set(updateData)
         .where(eq(foodLogs.id, logId))
         .returning();
 
