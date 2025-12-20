@@ -6158,7 +6158,9 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
       const { 
         height, 
-        weight, 
+        weight,
+        currentWeight, // Support both weight and currentWeight
+        age,
         goalWeight, 
         bodyFatPercentage, 
         bodyType,
@@ -6169,6 +6171,9 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         weightGoal,
         activityLevel
       } = req.body;
+      
+      // Use currentWeight if weight is not provided
+      const weightValue = weight !== undefined ? weight : currentWeight;
       
       console.log("Received profile update request:", req.body);
       
@@ -6181,11 +6186,19 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       }
       
       // Validate weight (typical range 20-500 kg)
-      if (weight !== undefined && 
-          (isNaN(Number(weight)) || 
-           Number(weight) < 20 || 
-           Number(weight) > 500)) {
+      if (weightValue !== undefined && 
+          (isNaN(Number(weightValue)) || 
+           Number(weightValue) < 20 || 
+           Number(weightValue) > 500)) {
         return res.status(400).json({ error: "Weight must be a number between 20 and 500 kg" });
+      }
+      
+      // Validate age (typical range 1-120 years)
+      if (age !== undefined && 
+          (isNaN(Number(age)) || 
+           Number(age) < 1 || 
+           Number(age) > 120)) {
+        return res.status(400).json({ error: "Age must be a number between 1 and 120 years" });
       }
       
       // Body fat percentage validation removed - column doesn't exist yet
@@ -6231,7 +6244,8 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
 
       // Determine final values for height and weight
       const finalHeight = height !== undefined ? Number(height) : Number(preferences[0].height);
-      const finalWeight = weight !== undefined ? Number(weight) : Number(preferences[0].currentWeight);
+      const finalWeight = weightValue !== undefined ? Number(weightValue) : Number(preferences[0].currentWeight);
+      const finalAge = age !== undefined ? Number(age) : Number(preferences[0].age);
       const finalWeightGoal = weightGoal !== undefined ? weightGoal : preferences[0].weightGoal;
       const finalActivityLevel = activityLevel !== undefined ? activityLevel : preferences[0].activityLevel;
       
@@ -6241,21 +6255,21 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
       let finalCarbsPercentage = carbsPercentage;
       let finalFatPercentage = fatPercentage;
       
-      const needsRecalculation = (height !== undefined || weight !== undefined || 
-                                   activityLevel !== undefined || weightGoal !== undefined) && 
+      const needsRecalculation = (height !== undefined || weightValue !== undefined || 
+                                   activityLevel !== undefined || weightGoal !== undefined ||
+                                   age !== undefined) && 
                                   caloriesGoal === undefined;
       
       if (needsRecalculation) {
-        // Height, weight, activity level, or weight goal changed - recalculate calories
-        const age = preferences[0].age || 30;
+        // Height, weight, activity level, age, or weight goal changed - recalculate calories
         const gender = preferences[0].gender || 'male';
         
-        console.log("Recalculating calories due to height/weight change:", {
-          age, finalWeight, finalHeight, finalActivityLevel, finalWeightGoal, gender
+        console.log("Recalculating calories due to height/weight/age change:", {
+          finalAge, finalWeight, finalHeight, finalActivityLevel, finalWeightGoal, gender
         });
         
         finalCalories = calculateDailyCaloriesServer(
-          age,
+          finalAge,
           finalWeight,
           finalHeight,
           finalActivityLevel || 'moderate',
@@ -6283,6 +6297,7 @@ Odpowiedz tylko treścią wiadomości w języku polskim.`;
         .set({
           height: finalHeight,
           currentWeight: finalWeight,
+          age: finalAge,
           goalWeight: goalWeight !== undefined ? goalWeight : preferences[0].goalWeight,
           // Add nutrition goal fields (stored as percentages)
           caloriesGoal: finalCalories,

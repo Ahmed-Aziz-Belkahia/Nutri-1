@@ -64,6 +64,7 @@ export default function Profile() {
   const [activityLevel, setActivityLevel] = useState<string>(profile?.activityLevel || 'Moderate');
   
   const [metricsDialogOpen, setMetricsDialogOpen] = useState(false);
+  const [metricsLoading, setMetricsLoading] = useState(false);
   const [height, setHeight] = useState<string>(profile?.height?.toString() || '170');
   const [currentWeight, setCurrentWeight] = useState<string>(profile?.currentWeight?.toString() || '70');
   const [age, setAge] = useState<string>(profile?.age?.toString() || '25');
@@ -1058,118 +1059,169 @@ export default function Profile() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1002]"
-              onClick={() => setMetricsDialogOpen(false)}
+              onClick={() => !metricsLoading && setMetricsDialogOpen(false)}
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-0 flex items-center justify-center z-[1003] px-4 pointer-events-none"
+              className="fixed inset-0 flex items-center justify-center z-[1003] px-4"
             >
-              <div className="w-full max-w-md pointer-events-auto">
-                <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-                  <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-blue-500 px-6 py-8 text-white">
+              <div className="w-full max-w-sm">
+                <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+                  {/* Header */}
+                  <div className="relative bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary)] to-blue-500 px-6 py-6 text-white">
                     <button
-                      onClick={() => setMetricsDialogOpen(false)}
-                      className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+                      onClick={() => !metricsLoading && setMetricsDialogOpen(false)}
+                      disabled={metricsLoading}
+                      className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors disabled:opacity-50"
                     >
                       <X className="w-4 h-4" />
                     </button>
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                       <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
                         transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
                       >
-                        <Ruler className="w-8 h-8 text-white" />
+                        <Ruler className="w-7 h-7 text-white" />
                       </motion.div>
                     </div>
-                    <h3 className="text-2xl font-bold text-center mb-2">Edit Body Metrics</h3>
-                    <p className="text-white/90 text-center text-sm">Update your physical measurements</p>
+                    <h3 className="text-xl font-bold text-center">Edit Body Metrics</h3>
+                    <p className="text-white/80 text-center text-sm mt-1">Update your physical measurements</p>
                   </div>
-                  <div className="px-6 py-6">
-                    <div className="space-y-5">
-                      <div className="space-y-2">
-                        <Label htmlFor="height" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Ruler className="w-4 h-4 text-[var(--color-primary)]" />
-                          Height (cm)
-                        </Label>
-                        <Input 
-                          id="height"
-                          type="number"
-                          min="1"
-                          value={height}
-                          onChange={(e) => setHeight(e.target.value)}
-                          className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          placeholder="Enter your height"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="currentWeight" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Scale className="w-4 h-4 text-[var(--color-primary)]" />
-                          Current Weight (kg)
-                        </Label>
-                        <Input 
-                          id="currentWeight"
-                          type="number"
-                          min="1"
-                          step="0.1"
-                          value={currentWeight}
-                          onChange={(e) => setCurrentWeight(e.target.value)}
-                          className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          placeholder="Enter your current weight"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="age" className="text-gray-700 font-medium flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-[var(--color-primary)]" />
-                          Age (years)
-                        </Label>
-                        <Input 
-                          id="age"
-                          type="number"
-                          min="1"
-                          max="120"
-                          value={age}
-                          onChange={(e) => setAge(e.target.value)}
-                          className="h-12 rounded-xl border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          placeholder="Enter your age"
-                        />
-                      </div>
+                  
+                  {/* Form Fields */}
+                  <div className="px-5 py-5 space-y-4">
+                    {/* Height */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="height" className="text-gray-600 text-sm font-medium flex items-center gap-2">
+                        <Ruler className="w-4 h-4 text-[var(--color-primary)]" />
+                        Height (cm)
+                      </Label>
+                      <Input 
+                        id="height"
+                        type="number"
+                        min="50"
+                        max="300"
+                        inputMode="numeric"
+                        value={height}
+                        onChange={(e) => setHeight(e.target.value)}
+                        disabled={metricsLoading}
+                        className="h-12 rounded-xl bg-gray-50/80 border-gray-200 focus:border-[var(--color-primary)] focus:ring-[var(--color-primary)] focus:bg-white transition-colors text-base font-medium"
+                        placeholder="e.g., 175"
+                      />
+                    </div>
+                    
+                    {/* Weight */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="currentWeight" className="text-gray-600 text-sm font-medium flex items-center gap-2">
+                        <Scale className="w-4 h-4 text-blue-500" />
+                        Current Weight (kg)
+                      </Label>
+                      <Input 
+                        id="currentWeight"
+                        type="number"
+                        min="20"
+                        max="500"
+                        step="0.1"
+                        inputMode="decimal"
+                        value={currentWeight}
+                        onChange={(e) => setCurrentWeight(e.target.value)}
+                        disabled={metricsLoading}
+                        className="h-12 rounded-xl bg-gray-50/80 border-gray-200 focus:border-blue-500 focus:ring-blue-500 focus:bg-white transition-colors text-base font-medium"
+                        placeholder="e.g., 70"
+                      />
+                    </div>
+                    
+                    {/* Age */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="age" className="text-gray-600 text-sm font-medium flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-purple-500" />
+                        Age (years)
+                      </Label>
+                      <Input 
+                        id="age"
+                        type="number"
+                        min="1"
+                        max="120"
+                        inputMode="numeric"
+                        value={age}
+                        onChange={(e) => setAge(e.target.value)}
+                        disabled={metricsLoading}
+                        className="h-12 rounded-xl bg-gray-50/80 border-gray-200 focus:border-purple-500 focus:ring-purple-500 focus:bg-white transition-colors text-base font-medium"
+                        placeholder="e.g., 25"
+                      />
                     </div>
                   </div>
-                  <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                  
+                  {/* Action Buttons */}
+                  <div className="px-5 pb-5 pt-2">
                     <div className="flex gap-3">
                       <button
                         onClick={() => setMetricsDialogOpen(false)}
-                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 transition-all text-base"
+                        disabled={metricsLoading}
+                        className="flex-1 px-4 py-3.5 rounded-xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 transition-all text-base disabled:opacity-50"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={async () => {
+                          // Validate inputs
+                          const heightNum = parseFloat(height);
+                          const weightNum = parseFloat(currentWeight);
+                          const ageNum = parseInt(age);
+                          
+                          if (isNaN(heightNum) || heightNum < 50 || heightNum > 300) {
+                            toast({ variant: "destructive", title: "Invalid height", description: "Please enter a valid height between 50-300 cm." });
+                            return;
+                          }
+                          if (isNaN(weightNum) || weightNum < 20 || weightNum > 500) {
+                            toast({ variant: "destructive", title: "Invalid weight", description: "Please enter a valid weight between 20-500 kg." });
+                            return;
+                          }
+                          if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+                            toast({ variant: "destructive", title: "Invalid age", description: "Please enter a valid age between 1-120 years." });
+                            return;
+                          }
+                          
+                          setMetricsLoading(true);
                           try {
                             const response = await fetch('/api/user/profile', {
                               method: 'PUT',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({
-                                height: parseFloat(height),
-                                currentWeight: parseFloat(currentWeight),
-                                age: parseInt(age)
+                                height: heightNum,
+                                currentWeight: weightNum,
+                                age: ageNum
                               }),
                             });
-                            if (!response.ok) throw new Error('Failed to update metrics');
+                            if (!response.ok) {
+                              const errorData = await response.json().catch(() => ({}));
+                              throw new Error(errorData.message || 'Failed to update metrics');
+                            }
                             await refetchProfile();
-                            toast({ title: "Metrics updated", description: "Your body metrics have been updated." });
+                            toast({ title: "✓ Metrics updated", description: "Your body metrics have been saved successfully." });
                             setMetricsDialogOpen(false);
                           } catch (error) {
-                            toast({ variant: "destructive", title: "Error", description: "Failed to update metrics. Please try again." });
+                            console.error('Error updating metrics:', error);
+                            toast({ variant: "destructive", title: "Error", description: error instanceof Error ? error.message : "Failed to update metrics. Please try again." });
+                          } finally {
+                            setMetricsLoading(false);
                           }
                         }}
-                        className="flex-1 px-6 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-primary)] to-blue-500 hover:from-[var(--color-primary)]/90 hover:to-blue-500/90 active:scale-95 transition-all shadow-lg shadow-[var(--color-primary)]/30 text-base"
+                        disabled={metricsLoading}
+                        className="flex-1 px-4 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-primary)] to-blue-500 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[var(--color-primary)]/25 text-base disabled:opacity-70 flex items-center justify-center gap-2"
                       >
-                        Save Changes
+                        {metricsLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          'Save Changes'
+                        )}
                       </button>
                     </div>
                   </div>
