@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 // Load environment variables
 dotenv.config();
 
-// Configure Nodemailer transporter for Hostinger SMTP
+// Configure Nodemailer transporter for Hostinger SMTP with connection pooling
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
   port: 465,
@@ -15,17 +15,93 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: 'support@nutriai.pl',
     pass: '7|Pwm5qY?U'
-  }
+  },
+  // Connection pooling to avoid "too many AUTH commands"
+  pool: true,
+  maxConnections: 3,
+  maxMessages: 100,
+  rateDelta: 2000, // 2 seconds between emails
+  rateLimit: 5, // max 5 emails per rateDelta
+  // Connection settings
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 60000
 });
 
-// Verify transporter configuration
+// Track if transporter is verified
+let transporterVerified = false;
+
+// Verify transporter configuration (only once at startup)
 transporter.verify((error, success) => {
   if (error) {
     console.error('❌ SMTP Configuration Error:', error);
+    transporterVerified = false;
   } else {
-    console.log('✅ SMTP Server ready to send emails');
+    console.log('✅ SMTP Server ready to send emails (pooled connection)');
+    transporterVerified = true;
   }
 });
+
+// Email queue to prevent rate limiting
+interface EmailJob {
+  to: string;
+  subject: string;
+  html: string;
+  retries: number;
+  resolve: (value: void) => void;
+  reject: (reason: any) => void;
+}
+
+const emailQueue: EmailJob[] = [];
+let isProcessingQueue = false;
+
+// Process email queue with delays between emails
+const processEmailQueue = async () => {
+  if (isProcessingQueue || emailQueue.length === 0) return;
+  
+  isProcessingQueue = true;
+  
+  while (emailQueue.length > 0) {
+    const job = emailQueue.shift()!;
+    
+    try {
+      const info = await transporter.sendMail({
+        from: '"NutriAI Support" <support@nutriai.pl>',
+        to: job.to,
+        subject: job.subject,
+        html: job.html
+      });
+      
+      console.log(`✅ Email sent to ${job.to}: ${info.messageId}`);
+      job.resolve();
+    } catch (error: any) {
+      console.error(`❌ Error sending email to ${job.to}:`, error.message);
+      
+      // Check if it's a rate limit error - retry with backoff
+      if (error.message?.includes('Ratelimit') || error.message?.includes('too many AUTH') || error.responseCode === 450 || error.responseCode === 451) {
+        if (job.retries < 3) {
+          console.log(`🔄 Retrying email to ${job.to} (attempt ${job.retries + 1}/3) after delay...`);
+          job.retries++;
+          emailQueue.push(job); // Re-add to queue
+          // Wait longer before next attempt (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 5000 * Math.pow(2, job.retries)));
+        } else {
+          console.error(`❌ Max retries reached for email to ${job.to}`);
+          job.reject(new Error('Failed to send email after max retries'));
+        }
+      } else {
+        job.reject(error);
+      }
+    }
+    
+    // Delay between emails to prevent rate limiting (1 second)
+    if (emailQueue.length > 0) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  
+  isProcessingQueue = false;
+};
 
 /**
  * Reads an HTML template file and compiles it with Handlebars
@@ -47,7 +123,7 @@ const compileTemplate = (templatePath: string, context: object): string => {
 };
 
 /**
- * Sends an email using Nodemailer
+ * Sends an email using Nodemailer with queue and retry logic
  * @param to Recipient email address
  * @param subject Email subject
  * @param html HTML content of the email
@@ -58,19 +134,19 @@ export const sendEmail = async (
   subject: string,
   html: string
 ): Promise<void> => {
-  try {
-    const info = await transporter.sendMail({
-      from: '"NutriAI Support" <support@nutriai.pl>',
+  return new Promise((resolve, reject) => {
+    emailQueue.push({
       to,
       subject,
-      html
+      html,
+      retries: 0,
+      resolve,
+      reject
     });
     
-    console.log(`✅ Email sent to ${to}: ${info.messageId}`);
-  } catch (error) {
-    console.error('❌ Error sending email:', error);
-    throw new Error('Failed to send email');
-  }
+    // Start processing queue if not already running
+    processEmailQueue();
+  });
 };
 
 /**
