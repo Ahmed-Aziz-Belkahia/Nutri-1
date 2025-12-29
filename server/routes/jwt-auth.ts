@@ -44,9 +44,12 @@ const registerLimiter = rateLimit({
   message: { error: 'Too many registration attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, ipKeyGenerator: false }, // Disable IP validation
   keyGenerator: (req: Request) => {
-    // Rate limit by IP + email combo
-    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+    // Rate limit by email only (works better with proxies/load balancers)
+    const email = req.body?.email?.toLowerCase() || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    return `register-${email}-${ip}`;
   },
   skip: (req: Request) => !req.body?.email // Skip if no email provided
 });
@@ -58,8 +61,11 @@ const verifyCodeLimiter = rateLimit({
   message: { error: 'Too many verification attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, ipKeyGenerator: false },
   keyGenerator: (req: Request) => {
-    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+    const email = req.body?.email?.toLowerCase() || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    return `verify-${email}-${ip}`;
   }
 });
 
@@ -70,6 +76,7 @@ const loginLimiter = rateLimit({
   message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // Password reset: 3 attempts per email per hour
@@ -79,8 +86,11 @@ const passwordResetLimiter = rateLimit({
   message: { error: 'Too many password reset requests. Please try again in an hour.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, ipKeyGenerator: false },
   keyGenerator: (req: Request) => {
-    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+    const email = req.body?.email?.toLowerCase() || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    return `reset-${email}-${ip}`;
   }
 });
 
@@ -91,8 +101,11 @@ const resendCodeLimiter = rateLimit({
   message: { error: 'Please wait before requesting another verification code.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, ipKeyGenerator: false },
   keyGenerator: (req: Request) => {
-    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+    const email = req.body?.email?.toLowerCase() || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+    return `resend-${email}-${ip}`;
   }
 });
 
