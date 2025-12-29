@@ -1,6 +1,7 @@
-import { Router, Response } from 'express';
+import { Router, Response, Request, NextFunction } from 'express';
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import rateLimit from 'express-rate-limit';
 import { db } from '@db';
 import { users, userNutritionPreferences, refreshTokens, userTokenLimits, pendingRegistrations } from '@db/schema';
 import { eq } from 'drizzle-orm';
@@ -34,6 +35,66 @@ import {
 
 const router = Router();
 const scryptAsync = promisify(scrypt);
+
+// Rate limiters to prevent abuse
+// Registration: 3 attempts per email per 15 minutes
+const registerLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3, // 3 attempts per window
+  message: { error: 'Too many registration attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    // Rate limit by IP + email combo
+    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+  },
+  skip: (req: Request) => !req.body?.email // Skip if no email provided
+});
+
+// Verification code: 5 attempts per email per 15 minutes
+const verifyCodeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per window
+  message: { error: 'Too many verification attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+  }
+});
+
+// Login: 10 attempts per IP per 15 minutes  
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 attempts per window
+  message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Password reset: 3 attempts per email per hour
+const passwordResetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // 3 attempts per window
+  message: { error: 'Too many password reset requests. Please try again in an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+  }
+});
+
+// Resend code: 2 attempts per email per 5 minutes
+const resendCodeLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 2, // 2 attempts per window
+  message: { error: 'Please wait before requesting another verification code.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => {
+    return `${req.ip}-${req.body?.email?.toLowerCase() || 'unknown'}`;
+  }
+});
 
 // Password hashing utilities
 const crypto = {
@@ -73,7 +134,7 @@ const crypto = {
  * POST /api/auth/register
  * Register a new user with JWT authentication
  */
-router.post('/register', async (req, res: Response) => {
+router.post('/register', registerLimiter, async (req, res: Response) => {
   try {
     console.log('[JWT Auth] Registration request:', req.body.email);
     const { email, password, profile } = req.body;
@@ -153,7 +214,7 @@ router.post('/register', async (req, res: Response) => {
  * POST /api/auth/verify-email-code
  * Verify email with code and complete registration
  */
-router.post('/verify-email-code', async (req, res: Response) => {
+router.post('/verify-email-code', verifyCodeLimiter, async (req, res: Response) => {
   try {
     const { email, code } = req.body;
 
@@ -314,7 +375,7 @@ router.post('/verify-email-code', async (req, res: Response) => {
  * POST /api/auth/resend-verification-code
  * Resend verification code for pending registration
  */
-router.post('/resend-verification-code', async (req, res: Response) => {
+router.post('/resend-verification-code', resendCodeLimiter, async (req, res: Response) => {
   try {
     const { email } = req.body;
 
@@ -371,7 +432,7 @@ router.post('/resend-verification-code', async (req, res: Response) => {
  * POST /api/auth/login
  * Login user with JWT authentication
  */
-router.post('/login', async (req, res: Response) => {
+router.post('/login', loginLimiter, async (req, res: Response) => {
   try {
     console.log('[JWT Auth] Login request:', req.body.email);
     const { email, password } = req.body;
@@ -626,7 +687,7 @@ router.post('/verify', requireAuth, async (req: AuthRequest, res: Response) => {
  * POST /api/auth/forgot-password
  * Request password reset
  */
-router.post('/forgot-password', async (req, res: Response) => {
+router.post('/forgot-password', passwordResetLimiter, async (req, res: Response) => {
   try {
     const { email } = req.body;
 
@@ -671,7 +732,7 @@ router.post('/forgot-password', async (req, res: Response) => {
  * POST /api/auth/verify-reset-code
  * Verify reset code without changing password
  */
-router.post('/verify-reset-code', async (req, res: Response) => {
+router.post('/verify-reset-code', verifyCodeLimiter, async (req, res: Response) => {
   try {
     const { code } = req.body;
 
@@ -706,7 +767,7 @@ router.post('/verify-reset-code', async (req, res: Response) => {
  * POST /api/auth/reset-password
  * Reset password with verification code
  */
-router.post('/reset-password', async (req, res: Response) => {
+router.post('/reset-password', verifyCodeLimiter, async (req, res: Response) => {
   try {
     const { code, newPassword } = req.body;
 
