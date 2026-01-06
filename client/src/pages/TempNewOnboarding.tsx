@@ -1357,23 +1357,27 @@ const WeightSlider = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const pixelsPerUnit = 20; // 20 pixels per kg (matching OnboardingQuiz)
-  const CAL = 0; // No calibration offset needed
-  const totalUnits = Math.ceil(max - min) + 1;
+  const pixelsPerUnit = 20; // 20 pixels per kg
+  const totalUnits = max - min + 1;
+  const contentWidth = totalUnits * pixelsPerUnit;
   
   // Scroll to selected value on mount and when value changes externally
   useEffect(() => {
     if (scrollRef.current && !isDragging) {
-      const scrollPosition = (value - min) * pixelsPerUnit;
-      scrollRef.current.scrollLeft = scrollPosition;
+      const containerWidth = scrollRef.current.offsetWidth;
+      const scrollPosition = (value - min) * pixelsPerUnit - containerWidth / 2 + pixelsPerUnit / 2;
+      scrollRef.current.scrollLeft = Math.max(0, scrollPosition);
     }
   }, [value, min, isDragging]);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     
+    const containerWidth = scrollRef.current.offsetWidth;
     const scrollLeft = scrollRef.current.scrollLeft;
-    const newValue = min + scrollLeft / pixelsPerUnit;
+    // Calculate value based on what's at the center of the container
+    const centerOffset = scrollLeft + containerWidth / 2 - pixelsPerUnit / 2;
+    const newValue = min + centerOffset / pixelsPerUnit;
     const roundedValue = Math.round(newValue);
     const clampedValue = Math.max(min, Math.min(max, roundedValue));
     
@@ -1435,8 +1439,9 @@ const WeightSlider = ({
           <div 
             className="flex items-end h-16 select-none relative"
             style={{ 
-              paddingLeft: '50vw',
-              paddingRight: '50vw'
+              width: `calc(${contentWidth}px + 100%)`,
+              paddingLeft: 'calc(50% - 10px)',
+              paddingRight: 'calc(50% - 10px)'
             }}
           >
             {Array.from({ length: totalUnits }, (_, i) => {
