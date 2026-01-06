@@ -11,6 +11,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import jwtAuthRoutes from './routes/jwt-auth';
+import monitoringRoutes from './routes/monitoring';
 // Google OAuth temporarily disabled
 // import googleAuthRoutes from './routes/google-auth';
 // import passport from './auth/passport-google';
@@ -175,6 +176,10 @@ async function initializeApp() {
     // Register JWT authentication routes
     app.use('/api/auth', jwtAuthRoutes);
     log("✅ JWT authentication routes registered");
+
+    // Register monitoring routes
+    app.use('/api/monitoring', monitoringRoutes);
+    log("✅ Monitoring routes registered");
 
     // Google OAuth temporarily disabled
     // app.use('/api/auth', googleAuthRoutes);
