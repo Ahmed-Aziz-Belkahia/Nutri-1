@@ -2125,10 +2125,20 @@ export default function TempNewOnboarding() {
   const lbsOptions = Array.from({ length: 351 }, (_, i) => 70 + i); // 70-420 lbs
   const kgOptions = Array.from({ length: 161 }, (_, i) => 30 + i); // 30-190 kg
 
-  // Birth date options
+  // Birth date options - translated months
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    t('birthDate.months.january'),
+    t('birthDate.months.february'),
+    t('birthDate.months.march'),
+    t('birthDate.months.april'),
+    t('birthDate.months.may'),
+    t('birthDate.months.june'),
+    t('birthDate.months.july'),
+    t('birthDate.months.august'),
+    t('birthDate.months.september'),
+    t('birthDate.months.october'),
+    t('birthDate.months.november'),
+    t('birthDate.months.december')
   ];
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
   const currentYear = new Date().getFullYear();
