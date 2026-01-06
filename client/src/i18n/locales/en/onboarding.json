@@ -28,7 +28,7 @@
     "subtitle": "This will be used to calibrate your custom plan.",
     "male": "Male",
     "female": "Female",
-    "other": "Other"
+    "other": "Rather not say"
   },
   "heightWeight": {
     "title": "Height & weight",
