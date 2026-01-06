@@ -65,11 +65,27 @@ const processEmailQueue = async () => {
     const job = emailQueue.shift()!;
     
     try {
+      // Generate plain text version from HTML for better deliverability
+      const plainText = job.html
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
       const info = await transporter.sendMail({
-        from: '"NutriAI Support" <support@nutriai.pl>',
+        from: '"NutriAI" <support@nutriai.pl>',
         to: job.to,
         subject: job.subject,
-        html: job.html
+        html: job.html,
+        text: plainText, // Plain text version for spam filters
+        headers: {
+          'X-Priority': '3', // Normal priority
+          'X-Mailer': 'NutriAI Mailer',
+          'List-Unsubscribe': '<mailto:unsubscribe@nutriai.pl>',
+          'Precedence': 'bulk'
+        },
+        replyTo: 'support@nutriai.pl'
       });
       
       console.log(`✅ Email sent to ${job.to}: ${info.messageId}`);
@@ -197,135 +213,70 @@ export const sendVerificationCodeEmail = async (
   code: string
 ): Promise<void> => {
   try {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Verify Your Email</title>
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-          }
-          .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #ffffff;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%);
-            padding: 40px;
-            text-align: center;
-          }
-          .header h1 {
-            color: #ffffff;
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-          }
-          .content {
-            padding: 40px;
-          }
-          .greeting {
-            font-size: 18px;
-            color: #1f1f1e;
-            margin-bottom: 20px;
-          }
-          .message {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 16px;
-          }
-          .code-container {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px dashed #0CC5BA;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            margin: 30px 0;
-          }
-          .code-label {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          }
-          .code {
-            font-size: 48px;
-            font-weight: 700;
-            color: #0CC5BA;
-            letter-spacing: 8px;
-            font-family: 'Courier New', monospace;
-          }
-          .warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-            color: #856404;
-            font-size: 14px;
-          }
-          .footer {
-            background: #f8f9fa;
-            padding: 30px;
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-          }
-          .footer-link {
-            color: #0CC5BA;
-            text-decoration: none;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>✉️ Verify Your Email</h1>
-          </div>
-          <div class="content">
-            <div class="greeting">Welcome to NutriAI!</div>
-            <div class="message">
-              Thank you for signing up. To complete your registration and start your nutrition journey, 
-              please verify your email address using the code below:
-            </div>
-            <div class="code-container">
-              <div class="code-label">Your Verification Code</div>
-              <div class="code">${code}</div>
-            </div>
-            <div class="message">
-              This code will expire in <strong>15 minutes</strong> for security reasons.
-            </div>
-            <div class="warning">
-              <strong>⚠️ Important:</strong> If you didn't create an account with NutriAI, 
-              please ignore this email.
-            </div>
-          </div>
-          <div class="footer">
-            <p>Need help? Contact us at <a href="mailto:support@nutriai.pl" class="footer-link">support@nutriai.pl</a></p>
-            <p style="color: #999; font-size: 12px; margin-top: 20px;">
-              © 2025 NutriAI. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    // Professional HTML email template optimized for deliverability
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Email Verification - NutriAI</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%); padding: 32px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Email Verification</h1>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Welcome to NutriAI!</p>
+              <p style="margin: 0 0 30px; color: #666666; font-size: 15px; line-height: 1.6;">Thank you for signing up. To complete your registration and start your nutrition journey, please use the verification code below:</p>
+              
+              <!-- Code Box -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="center" style="padding: 30px 20px; background-color: #f8fafa; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <p style="margin: 0 0 12px; color: #888888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Verification Code</p>
+                    <p style="margin: 0; font-size: 36px; font-weight: 700; color: #0CC5BA; letter-spacing: 6px; font-family: 'Courier New', Courier, monospace;">${code}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 30px 0 0; color: #666666; font-size: 14px; line-height: 1.6;">This code will expire in 15 minutes for security reasons.</p>
+              <p style="margin: 20px 0 0; color: #888888; font-size: 13px; line-height: 1.6;">If you did not create an account with NutriAI, you can safely ignore this email.</p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 24px 40px; border-top: 1px solid #eeeeee;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="text-align: center;">
+                    <p style="margin: 0 0 8px; color: #666666; font-size: 13px;">Need help? Contact us at <a href="mailto:support@nutriai.pl" style="color: #0CC5BA; text-decoration: none;">support@nutriai.pl</a></p>
+                    <p style="margin: 0; color: #999999; font-size: 11px;">NutriAI - Nutrition Tracking Application</p>
+                    <p style="margin: 8px 0 0; color: #bbbbbb; font-size: 10px;">nutriai.online</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
     
     await sendEmail(
       email,
-      'Verify Your Email - NutriAI',
+      'Your NutriAI Verification Code',
       html
     );
   } catch (error) {
@@ -345,135 +296,70 @@ export const sendPasswordResetEmail = async (
   code: string
 ): Promise<void> => {
   try {
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reset Your Password</title>
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-          }
-          .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #ffffff;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          }
-          .header {
-            background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%);
-            padding: 40px;
-            text-align: center;
-          }
-          .header h1 {
-            color: #ffffff;
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-          }
-          .content {
-            padding: 40px;
-          }
-          .greeting {
-            font-size: 18px;
-            color: #1f1f1e;
-            margin-bottom: 20px;
-          }
-          .message {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 16px;
-          }
-          .code-container {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border: 2px dashed #0CC5BA;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            margin: 30px 0;
-          }
-          .code-label {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-          }
-          .code {
-            font-size: 48px;
-            font-weight: 700;
-            color: #0CC5BA;
-            letter-spacing: 8px;
-            font-family: 'Courier New', monospace;
-          }
-          .warning {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-            color: #856404;
-            font-size: 14px;
-          }
-          .footer {
-            background: #f8f9fa;
-            padding: 30px;
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-          }
-          .footer-link {
-            color: #0CC5BA;
-            text-decoration: none;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🔐 Password Reset</h1>
-          </div>
-          <div class="content">
-            <div class="greeting">Hello!</div>
-            <div class="message">
-              You requested to reset your password for your NutriAI account. 
-              Use the verification code below to complete the process:
-            </div>
-            <div class="code-container">
-              <div class="code-label">Your Verification Code</div>
-              <div class="code">${code}</div>
-            </div>
-            <div class="message">
-              This code will expire in <strong>15 minutes</strong> for security reasons.
-            </div>
-            <div class="warning">
-              <strong>⚠️ Important:</strong> If you didn't request a password reset, 
-              please ignore this email and your password will remain unchanged.
-            </div>
-          </div>
-          <div class="footer">
-            <p>Need help? Contact us at <a href="mailto:support@nutriai.pl" class="footer-link">support@nutriai.pl</a></p>
-            <p style="color: #999; font-size: 12px; margin-top: 20px;">
-              © 2025 NutriAI. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    // Professional HTML email template optimized for deliverability
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Password Reset - NutriAI</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%); padding: 32px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Password Reset</h1>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Hello!</p>
+              <p style="margin: 0 0 30px; color: #666666; font-size: 15px; line-height: 1.6;">You requested to reset your password for your NutriAI account. Use the verification code below to complete the process:</p>
+              
+              <!-- Code Box -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="center" style="padding: 30px 20px; background-color: #f8fafa; border: 1px solid #e0e0e0; border-radius: 8px;">
+                    <p style="margin: 0 0 12px; color: #888888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Reset Code</p>
+                    <p style="margin: 0; font-size: 36px; font-weight: 700; color: #0CC5BA; letter-spacing: 6px; font-family: 'Courier New', Courier, monospace;">${code}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 30px 0 0; color: #666666; font-size: 14px; line-height: 1.6;">This code will expire in 15 minutes for security reasons.</p>
+              <p style="margin: 20px 0 0; color: #888888; font-size: 13px; line-height: 1.6;">If you did not request a password reset, you can safely ignore this email and your password will remain unchanged.</p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 24px 40px; border-top: 1px solid #eeeeee;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="text-align: center;">
+                    <p style="margin: 0 0 8px; color: #666666; font-size: 13px;">Need help? Contact us at <a href="mailto:support@nutriai.pl" style="color: #0CC5BA; text-decoration: none;">support@nutriai.pl</a></p>
+                    <p style="margin: 0; color: #999999; font-size: 11px;">NutriAI - Nutrition Tracking Application</p>
+                    <p style="margin: 8px 0 0; color: #bbbbbb; font-size: 10px;">nutriai.online</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
     
     await sendEmail(
       email,
-      'Reset Your Password - NutriAI',
+      'Your NutriAI Password Reset Code',
       html
     );
   } catch (error) {
