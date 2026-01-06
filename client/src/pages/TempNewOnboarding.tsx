@@ -2149,18 +2149,19 @@ export default function TempNewOnboarding() {
     const current = isMetric ? weightKg : weightLbs;
     if (selectedGoal === 'lose') {
       return {
-        min: isMetric ? Math.max(30, current - 50) : Math.max(70, current - 110),
+        min: isMetric ? Math.max(30, current - 80) : Math.max(70, current - 180),
         max: current
       };
     } else if (selectedGoal === 'gain') {
       return {
         min: current,
-        max: isMetric ? Math.min(190, current + 50) : Math.min(420, current + 110)
+        max: isMetric ? Math.min(200, current + 80) : Math.min(440, current + 180)
       };
     } else {
+      // Maintain: allow small adjustments both ways
       return {
-        min: isMetric ? Math.max(30, current - 10) : Math.max(70, current - 20),
-        max: isMetric ? Math.min(190, current + 10) : Math.min(420, current + 20)
+        min: isMetric ? Math.max(30, current - 20) : Math.max(70, current - 45),
+        max: isMetric ? Math.min(200, current + 20) : Math.min(440, current + 45)
       };
     }
   };
