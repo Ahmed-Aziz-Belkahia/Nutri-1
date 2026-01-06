@@ -61,13 +61,13 @@ export function OnboardingLanguageSelector() {
               onClick={() => setIsOpen(false)}
             />
             
-            {/* Dropdown menu */}
+            {/* Dropdown menu - RTL aware positioning */}
             <motion.div
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute top-full mt-2 right-0 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50"
+              className="absolute top-full mt-2 ltr:right-0 rtl:left-0 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50"
             >
               <div className="flex gap-1 p-2">
                 {AVAILABLE_LANGUAGES.map((language) => {
