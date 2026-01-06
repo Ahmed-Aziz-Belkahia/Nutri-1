@@ -375,28 +375,100 @@ export const sendPasswordResetEmail = async (
  */
 export const sendWelcomeEmail = async (email: string, name: string | null = null): Promise<void> => {
   try {
-    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.APP_URL || 'https://app.nutriai.online';
+    const userName = name || 'there';
     
-    // If template file doesn't exist or there's an error, use a simple HTML string
-    let html = '';
-    try {
-      html = compileTemplate('welcome.html', { 
-        appLink: appUrl,
-        name: name || 'User' 
-      });
-    } catch (err) {
-      console.log('Using fallback welcome email template');
-      html = `
-        <h1>Welcome to NutriAI!</h1>
-        <p>Hi ${name || 'User'},</p>
-        <p>Thank you for joining NutriAI. We're excited to help you on your nutrition journey!</p>
-        <p><a href="${appUrl}">Click here to get started</a></p>
-      `;
-    }
+    // Professional HTML email template optimized for deliverability
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Welcome to NutriAI</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%); padding: 32px 40px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Welcome to NutriAI</h1>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Hi ${userName},</p>
+              <p style="margin: 0 0 24px; color: #666666; font-size: 15px; line-height: 1.6;">Thank you for joining NutriAI! Your account is now active and you're ready to begin your personalized nutrition journey.</p>
+              
+              <p style="margin: 0 0 16px; color: #333333; font-size: 15px; font-weight: 600;">Here's what you can do with NutriAI:</p>
+              
+              <!-- Features -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 12px 16px; background-color: #f8fafa; border-left: 3px solid #0CC5BA; margin-bottom: 8px;">
+                    <p style="margin: 0 0 4px; color: #333333; font-size: 14px; font-weight: 600;">AI Meal Planning</p>
+                    <p style="margin: 0; color: #666666; font-size: 13px;">Get personalized meal plans tailored to your goals and preferences.</p>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 12px 16px; background-color: #f8fafa; border-left: 3px solid #26A8FF; margin-bottom: 8px;">
+                    <p style="margin: 0 0 4px; color: #333333; font-size: 14px; font-weight: 600;">Food Scanner</p>
+                    <p style="margin: 0; color: #666666; font-size: 13px;">Track meals instantly by scanning your food with AI recognition.</p>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 12px 16px; background-color: #f8fafa; border-left: 3px solid #0CC5BA; margin-bottom: 8px;">
+                    <p style="margin: 0 0 4px; color: #333333; font-size: 14px; font-weight: 600;">Progress Tracking</p>
+                    <p style="margin: 0; color: #666666; font-size: 13px;">Monitor your nutrition habits with intuitive visual dashboards.</p>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- CTA Button -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="center" style="padding: 16px 0;">
+                    <a href="${appUrl}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #0CC5BA 0%, #26A8FF 100%); color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 8px;">Get Started</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 24px 0 0; color: #666666; font-size: 14px; line-height: 1.6;">If you have any questions, feel free to reach out to us at any time.</p>
+              <p style="margin: 16px 0 0; color: #333333; font-size: 14px;">Best regards,<br>The NutriAI Team</p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 24px 40px; border-top: 1px solid #eeeeee;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="text-align: center;">
+                    <p style="margin: 0 0 8px; color: #666666; font-size: 13px;">Need help? Contact us at <a href="mailto:support@nutriai.pl" style="color: #0CC5BA; text-decoration: none;">support@nutriai.pl</a></p>
+                    <p style="margin: 0; color: #999999; font-size: 11px;">NutriAI - Nutrition Tracking Application</p>
+                    <p style="margin: 8px 0 0; color: #bbbbbb; font-size: 10px;">nutriai.online</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
     
     await sendEmail(
       email,
-      'Welcome to NutriAI - Your Journey Begins!',
+      'Welcome to NutriAI',
       html
     );
   } catch (error) {
