@@ -1433,11 +1433,10 @@ const WeightSlider = ({
           style={{ scrollbarWidth: 'none' }}
         >
           <div 
-            className="flex items-end h-16 select-none"
+            className="flex items-end h-16 select-none relative"
             style={{ 
-              width: `${(totalUnits + 2) * pixelsPerUnit}px`,
-              paddingLeft: 'calc(50% - 10px)',
-              paddingRight: 'calc(50% + 10px)'
+              paddingLeft: '50vw',
+              paddingRight: '50vw'
             }}
           >
             {Array.from({ length: totalUnits }, (_, i) => {
