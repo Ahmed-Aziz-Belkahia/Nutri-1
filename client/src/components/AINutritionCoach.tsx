@@ -186,8 +186,8 @@ const MessageBubble = ({ message, isLast }: { message: Message; isLast: boolean 
       <div
         className={`max-w-[75%] px-4 py-3 rounded-2xl ${
           isUser
-            ? 'bg-emerald-500 text-white rounded-br-sm'
-            : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+            ? 'bg-emerald-500 text-white rounded-bl-sm'
+            : 'bg-gray-100 text-gray-800 rounded-br-sm'
         }`}
         style={{
           boxShadow: isUser 
