@@ -38,7 +38,7 @@ export default function StreakCard() {
 
   if (isLoading) {
     return (
-      <div className="bg-orange-100 rounded-xl py-2.5 animate-pulse w-full">
+      <div className="bg-[#26A8FF]/10 rounded-xl py-2.5 animate-pulse w-full">
         <div className="h-5 bg-gray-200 rounded mx-4" />
       </div>
     );
@@ -66,7 +66,7 @@ export default function StreakCard() {
       >
         <div
           onClick={() => setShowDetails(true)}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl py-2.5 cursor-pointer shadow-sm active:scale-[0.99] transition-transform flex items-center justify-between w-full"
+          className="bg-gradient-to-r from-[#0E95A7] to-[#26A8FF] rounded-xl py-2.5 cursor-pointer shadow-sm active:scale-[0.99] transition-transform flex items-center justify-between w-full"
         >
           {/* Left: Flame + Streak count */}
           <div className="flex items-center gap-2 pl-4">
@@ -131,7 +131,7 @@ export default function StreakCard() {
                 
                 {/* Streak Display */}
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-200">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0E95A7] to-[#26A8FF] flex items-center justify-center shadow-lg shadow-[#26A8FF]/30">
                     <Flame className="w-8 h-8 text-white" />
                   </div>
                   <div>
@@ -158,7 +158,7 @@ export default function StreakCard() {
                 <div className="flex justify-between">
                   <div className="text-center flex-1">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                      <Trophy className="w-4 h-4 text-amber-500" />
+                      <Trophy className="w-4 h-4 text-[#0E95A7]" />
                       <span className="text-xl font-bold text-gray-900">{longestStreak}</span>
                     </div>
                     <p className="text-xs text-gray-400">{t('streak.longest', 'Best')}</p>
@@ -198,7 +198,7 @@ export default function StreakCard() {
                       <div
                         className={`w-full aspect-square max-w-[40px] rounded-xl flex items-center justify-center transition-all ${
                           logged
-                            ? 'bg-gradient-to-br from-orange-500 to-amber-500 shadow-sm'
+                            ? 'bg-gradient-to-br from-[#0E95A7] to-[#26A8FF] shadow-sm'
                             : 'bg-gray-100'
                         }`}
                       >
@@ -233,7 +233,7 @@ export default function StreakCard() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="text-lg font-bold text-orange-500">{Math.round(progressToNext)}%</span>
+                        <span className="text-lg font-bold text-[#0E95A7]">{Math.round(progressToNext)}%</span>
                       </div>
                     </div>
                     {/* Progress bar */}
@@ -242,7 +242,7 @@ export default function StreakCard() {
                         initial={{ width: 0 }}
                         animate={{ width: `${progressToNext}%` }}
                         transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
+                        className="h-full bg-gradient-to-r from-[#0E95A7] to-[#26A8FF] rounded-full"
                       />
                     </div>
                   </div>
@@ -261,10 +261,10 @@ export default function StreakCard() {
                       {streakMilestones.filter(m => m.achieved).map((m) => (
                         <div
                           key={m.milestone}
-                          className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200 flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-full bg-gradient-to-r from-[#0E95A7]/10 to-[#26A8FF]/10 border border-[#26A8FF]/30 flex items-center gap-1.5"
                         >
                           <span className="text-sm">{m.emoji}</span>
-                          <span className="text-xs font-medium text-orange-700">{m.milestone}d</span>
+                          <span className="text-xs font-medium text-[#0E95A7]">{m.milestone}d</span>
                         </div>
                       ))}
                     </div>
