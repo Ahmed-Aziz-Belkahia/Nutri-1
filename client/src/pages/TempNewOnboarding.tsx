@@ -2508,6 +2508,16 @@ export default function TempNewOnboarding() {
     const currentWeight = isMetric ? weightKg : weightLbs;
     const goalLabel = getGoalLabel();
     
+    // Debug logging - remove after fixing
+    console.log('DEBUG DESIRED WEIGHT STEP:', {
+      isMetric,
+      weightKg,
+      weightLbs,
+      selectedGoal,
+      range,
+      currentWeight
+    });
+    
     return (
       <OnboardingLayout>
         <BackButton onClick={() => setCurrentStep(4)} />
