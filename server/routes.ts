@@ -54,6 +54,7 @@ import { analyzeFoodText } from "./services/openai";
 import adminRoutes from "./routes/admin";
 import { generateRecipe } from "./services/recipe-generation";
 import { analyzeBodyComposition } from "./services/body-analysis";
+import { handleAICoachMessage } from "./services/ai-coach";
 // Removed slow optimized-meal-plan service, using fast template generator instead
 // Removed budget-first-meal-plan service - using fast template system
 import multer from 'multer';
@@ -304,6 +305,34 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/logout", (req, res) => {
     // Redirect to JWT logout endpoint
     return res.redirect(307, '/api/auth/logout');
+  });
+
+  // AI Nutrition Coach endpoint
+  app.post("/api/ai-coach/message", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const { message, language } = req.body;
+      
+      if (!message || typeof message !== 'string' || !message.trim()) {
+        return res.status(400).json({
+          error: 'Invalid message',
+          message: 'Message is required'
+        });
+      }
+
+      const response = await handleAICoachMessage(
+        req.user!.id,
+        message.trim(),
+        language || 'en'
+      );
+
+      res.json({ response });
+    } catch (error) {
+      console.error('AI Coach error:', error);
+      res.status(500).json({
+        error: 'AI Coach error',
+        message: error instanceof Error ? error.message : 'Failed to process message'
+      });
+    }
   });
 
   // Add food analysis endpoint
