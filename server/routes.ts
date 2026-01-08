@@ -55,6 +55,7 @@ import adminRoutes from "./routes/admin";
 import { generateRecipe } from "./services/recipe-generation";
 import { analyzeBodyComposition } from "./services/body-analysis";
 import { handleAICoachMessage } from "./services/ai-coach";
+import { getStreakData, updateStreakOnLog } from "./services/streak";
 // Removed slow optimized-meal-plan service, using fast template generator instead
 // Removed budget-first-meal-plan service - using fast template system
 import multer from 'multer';
@@ -1706,6 +1707,20 @@ export function registerRoutes(app: Express): Server {
       console.error('Error fetching badges:', error);
       res.status(500).json({
         error: 'Failed to fetch badges',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Get user's streak data
+  app.get("/api/user/streak", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const streakData = await getStreakData(req.user!.id);
+      res.json(streakData);
+    } catch (error) {
+      console.error('Error fetching streak data:', error);
+      res.status(500).json({
+        error: 'Failed to fetch streak data',
         message: error instanceof Error ? error.message : 'Unknown error'
       });
     }

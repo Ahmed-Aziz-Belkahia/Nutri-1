@@ -2045,5 +2045,25 @@
     },
     "markPurchased": "Mark as purchased",
     "markNotPurchased": "Mark as not purchased"
+  },
+  "streak": {
+    "day": "day",
+    "days": "days",
+    "keepGoing": "Keep it going! 🔥",
+    "logToday": "Log a meal to continue!",
+    "toMilestone": "to",
+    "dontBreak": "Don't break your streak!",
+    "scanMeal": "Scan or log a meal to keep your {{count}} day streak",
+    "dayStreak": "Day Streak",
+    "longest": "Longest",
+    "totalDays": "Total Days",
+    "thisWeek": "This Week",
+    "last7Days": "Last 7 Days",
+    "milestones": "Milestones",
+    "daysRequired": "days streak",
+    "startToday": "Start your streak today! Every journey begins with a single step. 🚀",
+    "keepBuilding": "You're building momentum! Keep logging to reach your first week. 💪",
+    "greatProgress": "Amazing progress! You're developing a real habit. 🌟",
+    "legend": "You're a nutrition tracking legend! Keep inspiring yourself! 🏆"
   }
 }

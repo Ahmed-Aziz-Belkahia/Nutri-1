@@ -1791,5 +1791,25 @@
     },
     "markPurchased": "Oznacz jako zakupione",
     "markNotPurchased": "Oznacz jako niezakupione"
+  },
+  "streak": {
+    "day": "dzień",
+    "days": "dni",
+    "keepGoing": "Tak trzymaj! 🔥",
+    "logToday": "Zaloguj posiłek, by kontynuować!",
+    "toMilestone": "do",
+    "dontBreak": "Nie przerwij swojej passy!",
+    "scanMeal": "Zeskanuj lub zaloguj posiłek, by utrzymać {{count}}-dniową passę",
+    "dayStreak": "Dni Passy",
+    "longest": "Najdłuższa",
+    "totalDays": "Łącznie Dni",
+    "thisWeek": "Ten Tydzień",
+    "last7Days": "Ostatnie 7 Dni",
+    "milestones": "Kamienie Milowe",
+    "daysRequired": "dni passy",
+    "startToday": "Rozpocznij swoją passę dzisiaj! Każda podróż zaczyna się od pierwszego kroku. 🚀",
+    "keepBuilding": "Budujesz rozpęd! Kontynuuj logowanie, by osiągnąć pierwszy tydzień. 💪",
+    "greatProgress": "Niesamowity postęp! Wyrabiasz prawdziwy nawyk. 🌟",
+    "legend": "Jesteś legendą śledzenia odżywiania! Inspiruj się dalej! 🏆"
   }
 }

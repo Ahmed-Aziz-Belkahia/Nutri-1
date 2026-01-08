@@ -9,6 +9,7 @@ import MealsSection from "@/components/dashboard/MealsSection";
 import GeneratedRecipesSection from "@/components/dashboard/GeneratedRecipesSection";
 import GroceryList from "@/components/dashboard/GroceryList";
 import MealPlanSection from "@/components/dashboard/MealPlanSection";
+import StreakCard from "@/components/dashboard/StreakCard";
 import { useFoodLogsByDate, useDailyTotals } from "@/hooks/queries/useFoodLogs";
 import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
 import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
@@ -302,6 +303,11 @@ export default function DashboardNew() {
     <BaseLayout>
       {/* Weekly Weight Check-In Prompt */}
       <WeeklyWeightCheckIn />
+      
+      {/* Streak Card - Gamification to drive daily engagement */}
+      <div className="px-4 mb-4">
+        <StreakCard />
+      </div>
       
       {/* Manual Food Processing Screen */}
       {isProcessingManualFood && (
