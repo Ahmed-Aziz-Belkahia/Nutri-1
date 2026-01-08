@@ -65,8 +65,27 @@ The user has the following ALLERGIES: ${allergiesStr}
 - If a recipe cannot be made without the allergen, suggest a different recipe entirely`;
 }
 
+// Language code to full name mapping
+const languageNames: Record<string, string> = {
+  'en': 'English',
+  'fr': 'French',
+  'pl': 'Polish',
+  'es': 'Spanish',
+  'ar': 'Arabic'
+};
+
+// Helper function to build language instruction for AI prompts
+function buildLanguageInstruction(languageCode?: string): string {
+  if (!languageCode || languageCode === 'en') {
+    return ''; // Default English, no special instruction needed
+  }
+  
+  const languageName = languageNames[languageCode] || 'English';
+  return `\n\nLANGUAGE REQUIREMENT: Return ALL text values (names, descriptions, ingredients, instructions, food names, meal names) in ${languageName}. Keep all JSON keys in English - only translate the VALUES.`;
+}
+
 // Food recognition from image
-export async function recognizeFoodFromImage(base64Image: string, userId?: number): Promise<{
+export async function recognizeFoodFromImage(base64Image: string, userId?: number, language?: string): Promise<{
   foods: Array<{
     name: string;
     confidence: number;
@@ -74,6 +93,7 @@ export async function recognizeFoodFromImage(base64Image: string, userId?: numbe
     preparation?: string;
   }>;
 }> {
+  const languageInstruction = buildLanguageInstruction(language);
   const startTime = Date.now();
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -83,7 +103,7 @@ export async function recognizeFoodFromImage(base64Image: string, userId?: numbe
         content: [
           {
             type: "text",
-            text: "Analyze this food image and identify all food items present. For each item, provide the name, confidence level (0-1), estimated portion/weight if visible, and preparation method if apparent. Return as JSON with format: { foods: [{ name: string, confidence: number, estimated_weight?: string, preparation?: string }] }"
+            text: `Analyze this food image and identify all food items present. For each item, provide the name, confidence level (0-1), estimated portion/weight if visible, and preparation method if apparent. Return as JSON with format: { foods: [{ name: string, confidence: number, estimated_weight?: string, preparation?: string }] }${languageInstruction}`
           },
           {
             type: "image_url",
@@ -107,7 +127,7 @@ export async function recognizeFoodFromImage(base64Image: string, userId?: numbe
 }
 
 // Text-based food analysis
-export async function analyzeFoodText(foodDescription: string, userId?: number): Promise<{
+export async function analyzeFoodText(foodDescription: string, userId?: number, language?: string): Promise<{
   name: string;
   calories: number;
   protein: number;
@@ -130,6 +150,7 @@ export async function analyzeFoodText(foodDescription: string, userId?: number):
   }>;
 }> {
   console.log(`[Food Text Analysis] Analyzing text: "${foodDescription}"`);
+  const languageInstruction = buildLanguageInstruction(language);
   
   try {
     // Check API key
@@ -187,7 +208,7 @@ export async function analyzeFoodText(foodDescription: string, userId?: number):
           1. For the main "name" field, create a descriptive and specific meal name that accurately describes the food, NOT "Overall food description" or generic names
           2. For example, use "Grilled Chicken with Brown Rice" or "Turkey Sandwich with Avocado" instead of "Overall food description"
           3. Make sure all numeric values are actual numbers (not strings) and all fields are present
-          4. Be very specific and detailed with the component names
+          4. Be very specific and detailed with the component names${languageInstruction}
           `
         }
       ],
@@ -273,7 +294,7 @@ export async function analyzeNutrition(foodItems: Array<{
   name: string;
   quantity?: number;
   unit?: string;
-}>, userId?: number): Promise<{
+}>, userId?: number, language?: string): Promise<{
   calories: number;
   protein: number;
   carbs: number;
@@ -294,6 +315,7 @@ export async function analyzeNutrition(foodItems: Array<{
   const itemsDescription = foodItems.map(item => 
     `${item.quantity || 1} ${item.unit || 'serving'} of ${item.name}`
   ).join(', ');
+  const languageInstruction = buildLanguageInstruction(language);
 
   const startTime = Date.now();
   const response = await openai.chat.completions.create({
@@ -305,7 +327,7 @@ export async function analyzeNutrition(foodItems: Array<{
       },
       {
         role: "user",
-        content: `Analyze the nutritional content of: ${itemsDescription}. Return detailed macronutrients and per-component breakdown.`
+        content: `Analyze the nutritional content of: ${itemsDescription}. Return detailed macronutrients and per-component breakdown.${languageInstruction}`
       }
     ],
     response_format: { type: "json_object" }
@@ -331,7 +353,7 @@ export async function generateMealPlan(preferences: {
   userAllergies?: string[]; // Additional allergies from onboarding
   experienceLevel?: string;
   mealBudget?: string;
-}, userId?: number): Promise<{
+}, userId?: number, language?: string): Promise<{
   meals: {
     breakfast: Array<{ name: string; calories: number }>;
     lunch: Array<{ name: string; calories: number }>;
@@ -343,6 +365,7 @@ export async function generateMealPlan(preferences: {
   // Combine allergies from preferences and user onboarding
   const allAllergies = [...(preferences.allergies || []), ...(preferences.userAllergies || [])];
   const uniqueAllergies = [...new Set(allAllergies)];
+  const languageInstruction = buildLanguageInstruction(language);
   
   // Build dietary safety prompts
   let dietarySafetyPrompt = '';
@@ -393,7 +416,7 @@ ${preferences.dietaryRestrictions && preferences.dietaryRestrictions.length > 0 
 ${uniqueAllergies.length > 0 ? `
           ⚠️ ALLERGY ALERT: Do NOT include any of these allergens: ${uniqueAllergies.join(', ')}` : ''}
           
-          Return the meal plan in JSON format with breakfast, lunch, dinner, optional snacks, and calorie counts.`
+          Return the meal plan in JSON format with breakfast, lunch, dinner, optional snacks, and calorie counts.${languageInstruction}`
       }
     ],
     response_format: { type: "json_object" }
@@ -444,11 +467,10 @@ export async function generateMealPlanWithRecipes(preferences: {
   }>;
   totalCalories: number;
 }> {
-  // Determine language for meal plan generation - FORCE ENGLISH
-  const language = 'en'; // Always use English
-  const isPolish = false; // Never use Polish
+  // Use the language preference passed in
+  const languageInstruction = buildLanguageInstruction(preferences.language);
   
-  console.log(`Generating meal plan in English language`);
+  console.log(`Generating meal plan with language: ${preferences.language || 'en'}`);
   
   // Ensure arrays are properly formatted
   const allergies = Array.isArray(preferences.allergies) ? preferences.allergies : [];
@@ -465,7 +487,7 @@ export async function generateMealPlanWithRecipes(preferences: {
     messages: [
       {
         role: "system",
-        content: `You are a nutrition expert creating simple, quick meal plans. Create meal plans in English.
+        content: `You are a nutrition expert creating simple, quick meal plans.
 
 ${safetyWarnings}
 
@@ -508,7 +530,7 @@ Other guidelines:
           ${preferences.mealsPerDay >= 3 ? '- 1 dinner' : ''}
           ${preferences.mealsPerDay >= 4 ? '- 1 snack' : ''}
           
-          JSON format: {"meals": [{"name": "Meal Name", "mealType": "breakfast/lunch/dinner/snack", "recipe": {"ingredients": ["ingredient1", "ingredient2"], "instructions": ["step1", "step2"], "prepTime": 15, "nutritionInfo": {"calories": 400, "protein": 20, "carbs": 30, "fat": 10}}}], "totalCalories": ${preferences.calorieTarget}}`
+          JSON format: {"meals": [{"name": "Meal Name", "mealType": "breakfast/lunch/dinner/snack", "recipe": {"ingredients": ["ingredient1", "ingredient2"], "instructions": ["step1", "step2"], "prepTime": 15, "nutritionInfo": {"calories": 400, "protein": 20, "carbs": 30, "fat": 10}}}], "totalCalories": ${preferences.calorieTarget}}${languageInstruction}`
       }
     ],
     response_format: { type: "json_object" }
@@ -609,6 +631,7 @@ export async function generateMonthlyMealPlan(preferences: {
   // Build dietary constraints from user preferences
   const dietaryConstraints = userDietaryPreferences ? buildDietaryPromptSection(userDietaryPreferences) : '';
   const safetyWarnings = userDietaryPreferences ? buildSafetyWarnings(userDietaryPreferences) : '';
+  const languageInstruction = buildLanguageInstruction(preferences.language);
   
   // Calculate how many days to generate based on the duration
   const requestedDays = preferences.duration === '3days' ? 3 : 
@@ -726,7 +749,7 @@ export async function generateMonthlyMealPlan(preferences: {
         }, timeoutDuration);
       });
       
-      console.log(`Generating monthly meal plan batch in English language`);
+      console.log(`Generating monthly meal plan batch with language: ${preferences.language || 'en'}`);
       
       // Create the actual API request promise
       const requestPromise = openai.chat.completions.create({
@@ -751,7 +774,7 @@ Follow these non-negotiable rules:
 10) Your response must be in valid JSON format with a specific structure
 11) IMPORTANT: Return your JSON response with a top-level key named "plan" containing the array of days`
           },
-          { role: "user", content: prompt + "\n\nPlease respond in valid JSON format." }
+          { role: "user", content: prompt + languageInstruction + "\n\nPlease respond in valid JSON format." }
         ],
         response_format: { type: "json_object" }
       });
@@ -1392,7 +1415,7 @@ export async function suggestRecipe(ingredients: string[], userId?: number, diet
   allergies?: string[];
   experienceLevel?: string;
   mealBudget?: string;
-}): Promise<{
+}, language?: string): Promise<{
   name: string;
   ingredients: string[];
   instructions: string[];
@@ -1406,6 +1429,7 @@ export async function suggestRecipe(ingredients: string[], userId?: number, diet
   // Build dietary restrictions prompt additions
   const hasAllergies = dietaryPreferences?.allergies && dietaryPreferences.allergies.length > 0;
   const hasRestrictions = dietaryPreferences?.dietaryRestrictions && dietaryPreferences.dietaryRestrictions.length > 0;
+  const languageInstruction = buildLanguageInstruction(language);
   
   let dietaryPromptAdditions = '';
   if (hasAllergies) {
@@ -1448,7 +1472,7 @@ IMPORTANT INSTRUCTION FORMAT: Write cooking instructions as coherent paragraphs 
 4. Include timing and visual cues
 5. Avoid numbered/bulleted lists that separate related actions
         
-Include complete recipe details and nutritional information.`
+Include complete recipe details and nutritional information.${languageInstruction}`
       }
     ],
     response_format: { type: "json_object" }

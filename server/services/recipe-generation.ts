@@ -211,6 +211,18 @@ export async function generateRecipe(
       ? `- Cooking experience: ${preferences.experienceLevel}`
       : '';
 
+    // Build language instruction for localized response
+    const languageNames: Record<string, string> = {
+      'en': 'English',
+      'fr': 'French',
+      'pl': 'Polish',
+      'es': 'Spanish',
+      'ar': 'Arabic'
+    };
+    const languageInstruction = preferences.language && preferences.language !== 'en'
+      ? `\n\nLANGUAGE REQUIREMENT: Return ALL text values (recipe names, descriptions, ingredients, instructions) in ${languageNames[preferences.language] || 'English'}. Keep all JSON keys in English - only translate the VALUES.`
+      : '';
+
     const systemPrompt = `You are a professional chef and culinary instructor specializing in creating detailed, easy-to-follow recipes. 
 Consider these specific preferences:
 - Difficulty level: ${preferences.difficulty}
@@ -221,7 +233,7 @@ ${preferences.notes ? `- Preparation notes: ${preferences.notes}` : ''}
 ${dietaryRestrictionsText}
 ${allergiesText}
 ${budgetText}
-${experienceText}
+${experienceText}${languageInstruction}
 
 ${preferences.allergies && preferences.allergies.length > 0 ? `
 CRITICAL SAFETY REQUIREMENT:

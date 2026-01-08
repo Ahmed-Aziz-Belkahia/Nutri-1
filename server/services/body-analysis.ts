@@ -94,11 +94,24 @@ export async function analyzeBodyComposition(
   height: number,
   gender: 'male' | 'female' = 'male',
   age: number = 30,
-  userId?: number
+  userId?: number,
+  language?: string
 ): Promise<BodyAnalysis> {
   try {
     // Calculate BMI for reference
     const bmi = weight / Math.pow(height / 100, 2);
+
+    // Build language instruction for localized response
+    const languageNames: Record<string, string> = {
+      'en': 'English',
+      'fr': 'French',
+      'pl': 'Polish',
+      'es': 'Spanish',
+      'ar': 'Arabic'
+    };
+    const languageInstruction = language && language !== 'en'
+      ? `\n\nLANGUAGE REQUIREMENT: Return ALL text values (bodyType, muscleMass, bodyCompositionNotes, improvementSuggestions) in ${languageNames[language] || 'English'}. Keep all JSON keys in English - only translate the VALUES.`
+      : '';
 
     // Prompt engineering for better results
     const systemPrompt = `
@@ -145,7 +158,7 @@ export async function analyzeBodyComposition(
       - muscleMass: General assessment of typical muscle mass ("Low", "Moderate", or "High")
       - bodyCompositionNotes: Brief notes on general body composition patterns
       - improvementSuggestions: Array of 2-3 general suggestions applicable to this body type
-      - confidence: Confidence level in assessment (number between 0-100)
+      - confidence: Confidence level in assessment (number between 0-100)${languageInstruction}
     `;
 
     // Check if image is valid

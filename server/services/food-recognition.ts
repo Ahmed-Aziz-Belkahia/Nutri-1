@@ -6,6 +6,22 @@ import { db } from '@db';
 import { userNutritionPreferences } from '@db/schema';
 import { eq } from 'drizzle-orm';
 
+// Language mapping for AI responses
+const languageNames: Record<string, string> = {
+  'en': 'English',
+  'fr': 'French',
+  'pl': 'Polish',
+  'es': 'Spanish',
+  'ar': 'Arabic'
+};
+
+// Build language instruction for AI prompts
+function buildLanguageInstruction(languageCode?: string): string {
+  if (!languageCode || languageCode === 'en') return '';
+  const languageName = languageNames[languageCode] || 'English';
+  return `\n\nLANGUAGE REQUIREMENT: Return ALL text values (food names, descriptions, ingredients, instructions, component names, cuisine types, tags, dietary flags) in ${languageName}. Keep all JSON keys in English - only translate the VALUES.`;
+}
+
 // Dietary preferences interface
 interface UserDietaryProfile {
   allergies?: string;
@@ -122,7 +138,7 @@ const FoodAnalysisSchema = z.object({
 
 export type FoodAnalysis = z.infer<typeof FoodAnalysisSchema>;
 
-async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', userId?: number, dietaryProfile?: UserDietaryProfile | null): Promise<FoodAnalysis> {
+async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', userId?: number, dietaryProfile?: UserDietaryProfile | null, language?: string): Promise<FoodAnalysis> {
   try {
     if (!process.env.OPENAI_API_KEY) {
       console.error('[Food Recognition] OpenAI API key not configured');
@@ -130,10 +146,13 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', u
     }
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    console.log(`[Food Recognition] Starting image analysis with format: ${format}...`);
+    console.log(`[Food Recognition] Starting image analysis with format: ${format}, language: ${language || 'en'}...`);
     
     // Build dietary warnings if user has dietary restrictions
     const dietaryWarnings = buildDietaryWarnings(dietaryProfile || null);
+    
+    // Build language instruction for localized response
+    const languageInstruction = buildLanguageInstruction(language);
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const startTime = Date.now();
@@ -142,7 +161,7 @@ async function analyzeWithOpenAI(imageBase64: string, format: string = 'jpeg', u
       messages: [
         {
           role: "system",
-          content: `You are a precise food analysis system that ALWAYS breaks down food products into separate components with detailed information. Additionally, you identify recognizable recipes and generate cooking instructions. Respond with structured JSON data in English.
+          content: `You are a precise food analysis system that ALWAYS breaks down food products into separate components with detailed information. Additionally, you identify recognizable recipes and generate cooking instructions. Respond with structured JSON data.
 
 KEY ACCURACY GUIDELINES:
 1. Be conservative with calorie estimates - use USDA database standards
@@ -150,7 +169,7 @@ KEY ACCURACY GUIDELINES:
 3. Account for cooking methods (fried adds fat, grilled is leaner)
 4. Identify hidden calories (sauces, oils, butter)
 5. Rate your confidence honestly based on image clarity and food visibility
-${dietaryWarnings}`
+${dietaryWarnings}${languageInstruction}`
         },
         {
           role: "user",
@@ -359,7 +378,7 @@ function isValidImageFormat(base64String: string): boolean {
   }
 }
 
-export async function analyzeFoodImage(imageBase64: string, userId?: number): Promise<FoodAnalysis> {
+export async function analyzeFoodImage(imageBase64: string, userId?: number, language?: string): Promise<FoodAnalysis> {
   try {
     console.log('[Food Recognition] Starting image analysis...');
 
@@ -436,7 +455,7 @@ export async function analyzeFoodImage(imageBase64: string, userId?: number): Pr
       }
     }
     
-    const result = await analyzeWithOpenAI(base64Data, format, userId, dietaryProfile);
+    const result = await analyzeWithOpenAI(base64Data, format, userId, dietaryProfile, language);
     console.log('[Food Recognition] Analysis result:', JSON.stringify(result, null, 2));
 
     return result;
@@ -557,7 +576,7 @@ async function generateRecipeSuggestions(ingredients: any[], userId?: number): P
   }
 }
 
-export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?: number): Promise<{
+export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?: number, language?: string): Promise<{
   ingredients: any[];
   recipes?: any;
   confidence?: number;
@@ -594,7 +613,7 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?:
       }
     }
     
-    console.log(`[Recipe Analysis] Detected image format: ${format}`);
+    console.log(`[Recipe Analysis] Detected image format: ${format}, language: ${language || 'en'}`);
 
     // Validate base64 string
     try {
@@ -621,6 +640,9 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?:
     const allergenSection = dietaryProfile?.allergies?.trim() 
       ? `\n\nALLERGEN ALERT: User is allergic to: ${dietaryProfile.allergies}\nIf any ingredient may contain or be related to these allergens, add "allergenRisk": true to that ingredient.`
       : '';
+    
+    // Build language instruction
+    const languageInstruction = buildLanguageInstruction(language);
 
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
     const startTime = Date.now();
@@ -629,7 +651,7 @@ export async function analyzeIngredientsWithOpenAI(imageBase64: string, userId?:
       messages: [
         {
           role: "system",
-          content: `You are a precise ingredient analysis system that identifies individual ingredients from food images. Be thorough and accurate.${allergenSection}`
+          content: `You are a precise ingredient analysis system that identifies individual ingredients from food images. Be thorough and accurate.${allergenSection}${languageInstruction}`
         },
         {
           role: "user",

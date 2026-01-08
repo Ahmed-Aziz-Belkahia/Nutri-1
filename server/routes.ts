@@ -317,10 +317,16 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      // Get user's preferred language
+      const userProfile = await db.query.users.findFirst({
+        where: eq(users.id, req.user!.id)
+      });
+      const language = userProfile?.preferred_language || 'en';
+
       try {
         // Use OpenAI for food analysis
         console.log('Analyzing food with OpenAI...');
-        const result = await analyzeFoodImage(image);
+        const result = await analyzeFoodImage(image, req.user!.id, language);
         console.log('OpenAI food analysis complete');
         res.json(result);
       } catch (analyzeError) {
@@ -368,9 +374,15 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      // Get user's preferred language
+      const userProfile = await db.query.users.findFirst({
+        where: eq(users.id, req.user!.id)
+      });
+      const language = userProfile?.preferred_language || 'en';
+
       try {
         console.log('Analyzing food text with OpenAI...', text);
-        const result = await analyzeFoodText(text);
+        const result = await analyzeFoodText(text, req.user!.id, language);
         console.log('OpenAI food text analysis complete, result:', JSON.stringify(result, null, 2));
         
         // Validate result before returning
@@ -433,6 +445,12 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      // Get user's preferred language
+      const userProfile = await db.query.users.findFirst({
+        where: eq(users.id, req.user!.id)
+      });
+      const language = userProfile?.preferred_language || 'en';
+
       // Clean up base64 string if needed
       let base64Image = image;
       if (base64Image.includes('data:image/')) {
@@ -440,7 +458,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       // Call the ingredient analysis service
-      const result = await analyzeIngredientsWithOpenAI(base64Image);
+      const result = await analyzeIngredientsWithOpenAI(base64Image, req.user!.id, language);
       console.log('Ingredient analysis result:', result);
 
       res.json(result);
@@ -895,8 +913,14 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: 'Missing required fields. Please provide at least one ingredient.' });
       }
 
+      // Get user's preferred language
+      const userProfile = await db.query.users.findFirst({
+        where: eq(users.id, req.user!.id)
+      });
+      const language = userProfile?.preferred_language || 'en';
+
       // Call the OpenAI recipe generation service
-  const generatedRecipe = await generateRecipe(ingredients, { difficulty: 'Medium', timeNeeded: 30, flavor: 'Mixed' });
+  const generatedRecipe = await generateRecipe(ingredients, { difficulty: 'Medium', timeNeeded: 30, flavor: 'Mixed', language });
 
       // Return the generated recipe without saving
       res.json({
@@ -962,8 +986,8 @@ export function registerRoutes(app: Express): Server {
         experienceLevel
       });
       
-      // Extract language preference, defaulting to Polish
-      const language = 'pl';
+      // Get user's preferred language
+      const language = userProfileResult?.preferred_language || 'en';
       console.log(`User language preference for recipes: ${language}`);
       
       // Map the client preferences to what the API expects, including user's dietary preferences
@@ -1593,13 +1617,21 @@ export function registerRoutes(app: Express): Server {
       // Set cache control headers
       res.set('Cache-Control', 'private, max-age=3600');
 
+      // Get user's preferred language
+      const userProfile = await db.query.users.findFirst({
+        where: eq(users.id, req.user!.id)
+      });
+      const language = userProfile?.preferred_language || 'en';
+
       // Call the body composition analysis service
       const result = await analyzeBodyComposition(
         processedImage, 
         parseFloat(weight), 
         parseFloat(height), 
         gender || 'male',
-        age || 30
+        age || 30,
+        req.user!.id,
+        language
       );
 
       console.log('Body analysis result:', {
@@ -2214,10 +2246,10 @@ export function registerRoutes(app: Express): Server {
         .from(users)
         .where(eq(users.id, req.user!.id));
       
-      // Always use English for meal plan generation
-      const language = 'en';
+      // Use user's preferred language for meal plan generation
+      const language = userProfile[0]?.preferred_language || 'en';
       
-      console.log(`Generating meal plan in English`);
+      console.log(`Generating meal plan in language: ${language}`);
       
       // Determine duration in days first
       const durationDays = mealPlanDuration === '3days' ? 3 :
@@ -2353,7 +2385,7 @@ export function registerRoutes(app: Express): Server {
             healthGoals: currentPrefs.healthGoals,
             cuisinePreferences: currentPrefs.cuisinePreferences,
             cookingSkillLevel: currentPrefs.cookingSkillLevel,
-            language: 'en' // Always use English
+            language: language // Use user's preferred language
           }, req.user!.id, userDietaryProfile);
           
           dailyPlans.push({
