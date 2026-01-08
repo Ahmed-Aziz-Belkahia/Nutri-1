@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import ProfileHeader from "@/components/dashboard/ProfileHeader";
 import MobileMenu from "@/components/dashboard/MobileMenu";
 import PullToRefresh from "@/components/PullToRefresh";
+import AINutritionCoach from "@/components/AINutritionCoach";
 
 interface BaseLayoutProps {
   children: ReactNode;
@@ -52,6 +53,9 @@ export default function BaseLayout({
           {children}
         </div>
 
+        {/* AI Coach - rendered after Navbar so it appears above it */}
+        <AINutritionCoach />
+        
         <Navbar />
       </div>
     </div>

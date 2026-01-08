@@ -86,7 +86,6 @@ import TempNewOnboarding from "./pages/TempNewOnboarding";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { initializeWebViewOptimizations } from "./lib/webviewOptimizations";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
-import AINutritionCoach from "./components/AINutritionCoach";
 
 
 
@@ -556,9 +555,6 @@ function App() {
         </Switch>
       </div>
     </div>
-    
-    {/* AI Nutrition Coach - floating chat bubble for authenticated users */}
-    {user && <AINutritionCoach />}
     
     {/* Show bottom navigation for authenticated users on main pages - Outside main container */}
     {showBottomNav && <BottomNav />}
