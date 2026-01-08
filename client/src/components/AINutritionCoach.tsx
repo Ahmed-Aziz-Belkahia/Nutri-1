@@ -25,11 +25,11 @@ const TypingIndicator = () => (
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
   >
-    <div className="flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-2">
+    <div className="flex items-center gap-1 bg-gray-100 rounded-2xl px-4 py-2">
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-2 h-2 bg-emerald-400 rounded-full"
+          className="w-2 h-2 bg-emerald-500 rounded-full"
           animate={{
             y: [0, -6, 0],
             opacity: [0.5, 1, 0.5]
@@ -187,16 +187,16 @@ const MessageBubble = ({ message, isLast }: { message: Message; isLast: boolean 
         className={`max-w-[75%] px-4 py-3 rounded-2xl ${
           isUser
             ? 'bg-emerald-500 text-white rounded-br-sm'
-            : 'bg-white/10 backdrop-blur-sm text-white rounded-bl-sm'
+            : 'bg-gray-100 text-gray-800 rounded-bl-sm'
         }`}
         style={{
           boxShadow: isUser 
             ? '0 2px 10px rgba(16, 185, 129, 0.3)'
-            : '0 2px 10px rgba(0, 0, 0, 0.1)'
+            : '0 2px 8px rgba(0, 0, 0, 0.08)'
         }}
       >
         <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-        <p className={`text-xs mt-1 ${isUser ? 'text-emerald-100' : 'text-white/50'}`}>
+        <p className={`text-xs mt-1 ${isUser ? 'text-emerald-100' : 'text-gray-400'}`}>
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
       </div>
@@ -222,7 +222,7 @@ const QuickActions = ({
       <motion.button
         key={index}
         onClick={() => onSelect(action.message)}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-xs font-medium hover:bg-white/20 transition-colors"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-gray-100 text-gray-700 text-xs font-medium hover:bg-gray-200 transition-colors"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ opacity: 0, x: -10 }}
@@ -410,7 +410,7 @@ export const AINutritionCoach: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
               onClick={() => setIsOpen(false)}
             />
             
@@ -420,16 +420,15 @@ export const AINutritionCoach: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 100, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 z-[101] max-h-[85vh] flex flex-col bg-white"
               style={{
-                background: 'linear-gradient(180deg, rgba(17, 24, 39, 0.98) 0%, rgba(17, 24, 39, 0.99) 100%)',
                 borderTopLeftRadius: '24px',
                 borderTopRightRadius: '24px',
-                boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.15)'
               }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <motion.div 
                     className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center"
@@ -441,16 +440,16 @@ export const AINutritionCoach: React.FC = () => {
                     <span className="text-lg">🥗</span>
                   </motion.div>
                   <div>
-                    <h3 className="text-white font-semibold">
+                    <h3 className="text-gray-800 font-semibold">
                       {t('aiCoach.title', 'NutriAI Coach')}
                     </h3>
                     <div className="flex items-center gap-1.5">
                       <motion.div 
-                        className="w-2 h-2 rounded-full bg-emerald-400"
+                        className="w-2 h-2 rounded-full bg-emerald-500"
                         animate={{ opacity: [1, 0.5, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity }}
                       />
-                      <span className="text-xs text-white/60">
+                      <span className="text-xs text-gray-500">
                         {t('aiCoach.status', 'Online • Ready to help')}
                       </span>
                     </div>
@@ -460,7 +459,7 @@ export const AINutritionCoach: React.FC = () => {
                 <motion.button
                   onClick={() => setIsOpen(false)}
                   aria-label={t('aiCoach.close', 'Close chat')}
-                  className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors"
+                  className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -472,7 +471,7 @@ export const AINutritionCoach: React.FC = () => {
               
               {/* Messages Area */}
               <div 
-                className="flex-1 overflow-y-auto px-4 py-4 min-h-[300px] max-h-[50vh]"
+                className="flex-1 overflow-y-auto px-4 py-4 min-h-[300px] max-h-[50vh] bg-gray-50"
                 role="log"
                 aria-live="polite"
                 aria-label={t('aiCoach.messagesArea', 'Chat messages')}
@@ -498,7 +497,7 @@ export const AINutritionCoach: React.FC = () => {
               {/* Input Area - with safe area for iOS */}
               <form 
                 onSubmit={handleSubmit}
-                className="px-4 pt-3 border-t border-white/10"
+                className="px-4 pt-3 border-t border-gray-100"
                 style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
               >
                 <div className="flex items-center gap-3">
@@ -509,7 +508,7 @@ export const AINutritionCoach: React.FC = () => {
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       placeholder={t('aiCoach.placeholder', 'Ask me anything about nutrition...')}
-                      className="w-full px-4 py-3 rounded-full bg-white/10 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                      className="w-full px-4 py-3 rounded-full bg-gray-100 text-gray-800 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                       disabled={isTyping}
                     />
                   </div>
