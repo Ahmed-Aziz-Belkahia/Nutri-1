@@ -38,8 +38,8 @@ export default function StreakCard() {
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 animate-pulse">
-        <div className="h-16 bg-gray-200 rounded-xl" />
+      <div className="bg-orange-100 rounded-full px-3 py-1.5 animate-pulse inline-flex">
+        <div className="h-4 w-16 bg-gray-200 rounded" />
       </div>
     );
   }
@@ -59,104 +59,42 @@ export default function StreakCard() {
 
   return (
     <>
-      {/* Main Streak Card */}
+      {/* Main Streak Card - Pill/Badge Style */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="inline-flex"
       >
         <div
           onClick={() => setShowDetails(true)}
-          className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-2xl p-4 cursor-pointer shadow-lg shadow-orange-200/50 active:scale-[0.98] transition-transform"
+          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-full px-3 py-1.5 cursor-pointer shadow-sm active:scale-95 transition-transform flex items-center gap-2"
         >
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
-
-          <div className="relative flex items-center justify-between">
-            {/* Left: Streak count */}
-            <div className="flex items-center gap-3">
-              <motion.div
-                animate={currentStreak > 0 ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center"
-              >
-                <Flame className={`w-8 h-8 ${currentStreak > 0 ? 'text-white' : 'text-white/60'}`} />
-              </motion.div>
-              <div>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">{currentStreak}</span>
-                  <span className="text-white/80 text-sm font-medium">
-                    {currentStreak === 1 ? t('streak.day', 'day') : t('streak.days', 'days')}
-                  </span>
-                </div>
-                <p className="text-white/80 text-xs font-medium">
-                  {todayLogged 
-                    ? t('streak.keepGoing', "Keep it going! 🔥") 
-                    : t('streak.logToday', "Log a meal to continue!")}
-                </p>
-              </div>
-            </div>
-
-            {/* Right: Weekly dots + arrow */}
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {weeklyProgress.map((logged, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      logged 
-                        ? 'bg-white shadow-sm' 
-                        : 'bg-white/30'
-                    }`}
-                  />
-                ))}
-              </div>
-              <ChevronRight className="w-5 h-5 text-white/60" />
-            </div>
+          {/* Flame icon */}
+          <motion.div
+            animate={currentStreak > 0 ? { scale: [1, 1.15, 1] } : {}}
+            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          >
+            <Flame className={`w-4 h-4 ${currentStreak > 0 ? 'text-white' : 'text-white/60'}`} />
+          </motion.div>
+          
+          {/* Streak count */}
+          <span className="text-sm font-bold text-white">{currentStreak}</span>
+          
+          {/* Weekly dots */}
+          <div className="flex gap-0.5 ml-1">
+            {weeklyProgress.map((logged, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full ${logged ? 'bg-white' : 'bg-white/40'}`}
+              />
+            ))}
           </div>
-
-          {/* Progress bar to next milestone */}
-          {nextMilestone && (
-            <div className="mt-3 relative">
-              <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressToNext}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className="h-full bg-white rounded-full"
-                />
-              </div>
-              <p className="text-white/70 text-[10px] mt-1 text-right">
-                {nextMilestone.emoji} {currentStreak}/{nextMilestone.milestone} {t('streak.toMilestone', 'to')} "{nextMilestone.label}"
-              </p>
-            </div>
+          
+          {/* Status indicator */}
+          {!todayLogged && currentStreak > 0 && (
+            <span className="text-[10px] text-white/80">!</span>
           )}
         </div>
-
-        {/* Urgent CTA if streak at risk */}
-        {!todayLogged && currentStreak > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-2 bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3"
-          >
-            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <Zap className="w-4 h-4 text-red-500" />
-            </div>
-            <div className="flex-1">
-              <p className="text-red-700 text-sm font-medium">
-                {t('streak.dontBreak', "Don't break your streak!")}
-              </p>
-              <p className="text-red-500 text-xs">
-                {t('streak.scanMeal', 'Scan or log a meal to keep your {{count}} day streak', { count: currentStreak })}
-              </p>
-            </div>
-          </motion.div>
-        )}
       </motion.div>
 
       {/* Details Modal */}

@@ -18,6 +18,8 @@ interface Recipe {
   cuisineType?: string;
   mealType?: string;
   servings?: number;
+  isIngredientGenerated?: boolean;
+  source?: string;
 }
 
 interface AllRecipesSectionProps {
@@ -92,8 +94,13 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
     }
   });
 
-  const handleRecipeClick = (recipeId: number) => {
-    setLocation(`/recipes/food-log/${recipeId}`);
+  const handleRecipeClick = (recipe: Recipe) => {
+    // Ingredient-generated recipes are in the recipes table, scanned meals are in food_logs
+    if (recipe.isIngredientGenerated || recipe.source === 'ingredient_generation') {
+      setLocation(`/recipes/${recipe.id}`);
+    } else {
+      setLocation(`/recipes/food-log/${recipe.id}`);
+    }
   };
 
   if (isLoading) {
@@ -230,7 +237,7 @@ export default function AllRecipesSection({ recipes, isLoading }: AllRecipesSect
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              onClick={() => handleRecipeClick(recipe.id)}
+              onClick={() => handleRecipeClick(recipe)}
             />
           ))}
         </div>
