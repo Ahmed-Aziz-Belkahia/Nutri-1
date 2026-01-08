@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Flame, Trophy, Calendar, ChevronRight, X, Zap, Target, Star } from "lucide-react";
+import { Flame, Trophy, Calendar, ChevronRight, X, Target, Check } from "lucide-react";
 
 interface StreakData {
   currentStreak: number;
@@ -32,14 +32,14 @@ export default function StreakCard() {
       if (!res.ok) throw new Error("Failed to fetch streak");
       return res.json();
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 60000,
     staleTime: 30000,
   });
 
   if (isLoading) {
     return (
-      <div className="bg-orange-100 rounded-xl px-4 py-2.5 animate-pulse w-full">
-        <div className="h-5 bg-gray-200 rounded" />
+      <div className="bg-orange-100 rounded-xl py-2.5 animate-pulse w-full">
+        <div className="h-5 bg-gray-200 rounded mx-4" />
       </div>
     );
   }
@@ -50,7 +50,6 @@ export default function StreakCard() {
 
   // Find next milestone
   const nextMilestone = streakMilestones.find((m) => !m.achieved);
-  const lastAchieved = [...streakMilestones].reverse().find((m) => m.achieved);
 
   // Calculate progress to next milestone
   const progressToNext = nextMilestone
@@ -67,10 +66,10 @@ export default function StreakCard() {
       >
         <div
           onClick={() => setShowDetails(true)}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl px-4 py-2.5 cursor-pointer shadow-sm active:scale-[0.99] transition-transform flex items-center justify-between w-full"
+          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl py-2.5 cursor-pointer shadow-sm active:scale-[0.99] transition-transform flex items-center justify-between w-full"
         >
           {/* Left: Flame + Streak count */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pl-4">
             <motion.div
               animate={currentStreak > 0 ? { scale: [1, 1.15, 1] } : {}}
               transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
@@ -89,7 +88,7 @@ export default function StreakCard() {
           </div>
           
           {/* Right: Weekly dots + arrow */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pr-4">
             <div className="flex gap-1">
               {weeklyProgress.map((logged, i) => (
                 <div
@@ -103,161 +102,175 @@ export default function StreakCard() {
         </div>
       </motion.div>
 
-      {/* Details Modal */}
+      {/* Professional Details Modal */}
       <AnimatePresence>
         {showDetails && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
             onClick={() => setShowDetails(false)}
           >
             <motion.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl"
+              className="bg-white rounded-2xl w-[calc(100%-32px)] max-w-sm mx-4 shadow-2xl overflow-hidden"
             >
-              {/* Header */}
-              <div className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 p-6 rounded-t-3xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              {/* Minimal Header */}
+              <div className="relative px-5 pt-5 pb-4">
                 <button
                   onClick={() => setShowDetails(false)}
-                  className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center"
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-4 h-4 text-gray-500" />
                 </button>
                 
-                <div className="relative text-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-3 flex items-center justify-center"
-                  >
-                    <Flame className="w-12 h-12 text-white" />
-                  </motion.div>
-                  <h2 className="text-4xl font-bold text-white">{currentStreak}</h2>
-                  <p className="text-white/80 font-medium">
-                    {t('streak.dayStreak', 'Day Streak')} {currentStreak > 0 && '🔥'}
-                  </p>
+                {/* Streak Display */}
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg shadow-orange-200">
+                    <Flame className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-bold text-gray-900">{currentStreak}</span>
+                      <span className="text-gray-500 text-sm font-medium">
+                        {currentStreak === 1 ? t('streak.day', 'day') : t('streak.days', 'days')}
+                      </span>
+                    </div>
+                    <p className="text-gray-500 text-sm">
+                      {todayLogged 
+                        ? t('streak.keepGoing', "You're on fire! 🔥")
+                        : t('streak.logToday', 'Log a meal to continue')}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="p-6">
-                <div className="grid grid-cols-3 gap-3 mb-6">
-                  <div className="bg-orange-50 rounded-xl p-3 text-center">
-                    <Trophy className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-                    <p className="text-lg font-bold text-gray-800">{longestStreak}</p>
-                    <p className="text-xs text-gray-500">{t('streak.longest', 'Longest')}</p>
+              {/* Divider */}
+              <div className="h-px bg-gray-100 mx-5" />
+
+              {/* Stats Row */}
+              <div className="px-5 py-4">
+                <div className="flex justify-between">
+                  <div className="text-center flex-1">
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <Trophy className="w-4 h-4 text-amber-500" />
+                      <span className="text-xl font-bold text-gray-900">{longestStreak}</span>
+                    </div>
+                    <p className="text-xs text-gray-400">{t('streak.longest', 'Best')}</p>
                   </div>
-                  <div className="bg-emerald-50 rounded-xl p-3 text-center">
-                    <Calendar className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
-                    <p className="text-lg font-bold text-gray-800">{totalDaysLogged}</p>
-                    <p className="text-xs text-gray-500">{t('streak.totalDays', 'Total Days')}</p>
+                  <div className="w-px bg-gray-100" />
+                  <div className="text-center flex-1">
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <Calendar className="w-4 h-4 text-blue-500" />
+                      <span className="text-xl font-bold text-gray-900">{totalDaysLogged}</span>
+                    </div>
+                    <p className="text-xs text-gray-400">{t('streak.totalDays', 'Total')}</p>
                   </div>
-                  <div className="bg-purple-50 rounded-xl p-3 text-center">
-                    <Target className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-                    <p className="text-lg font-bold text-gray-800">
-                      {Math.round((weeklyProgress.filter(Boolean).length / 7) * 100)}%
-                    </p>
-                    <p className="text-xs text-gray-500">{t('streak.thisWeek', 'This Week')}</p>
+                  <div className="w-px bg-gray-100" />
+                  <div className="text-center flex-1">
+                    <div className="flex items-center justify-center gap-1.5 mb-1">
+                      <Target className="w-4 h-4 text-emerald-500" />
+                      <span className="text-xl font-bold text-gray-900">
+                        {weeklyProgress.filter(Boolean).length}/7
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400">{t('streak.thisWeek', 'This Week')}</p>
                   </div>
                 </div>
+              </div>
 
-                {/* Weekly Progress */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    {t('streak.last7Days', 'Last 7 Days')}
-                  </h3>
-                  <div className="flex justify-between">
-                    {weeklyProgress.map((logged, i) => (
-                      <div key={i} className="flex flex-col items-center gap-1">
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: i * 0.05 }}
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                            logged
-                              ? 'bg-gradient-to-br from-orange-400 to-amber-500 shadow-md'
-                              : 'bg-gray-100'
-                          }`}
-                        >
-                          {logged ? (
-                            <Flame className="w-5 h-5 text-white" />
-                          ) : (
-                            <span className="w-2 h-2 bg-gray-300 rounded-full" />
-                          )}
-                        </motion.div>
-                        <span className="text-xs text-gray-400">{DAY_LABELS[i]}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {/* Divider */}
+              <div className="h-px bg-gray-100 mx-5" />
 
-                {/* Milestones */}
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    {t('streak.milestones', 'Milestones')}
-                  </h3>
-                  <div className="space-y-2">
-                    {streakMilestones.slice(0, 5).map((m, i) => (
-                      <motion.div
-                        key={m.milestone}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl ${
-                          m.achieved
-                            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200'
-                            : 'bg-gray-50'
+              {/* Weekly Progress */}
+              <div className="px-5 py-4">
+                <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                  {t('streak.last7Days', 'This Week')}
+                </p>
+                <div className="flex justify-between gap-1">
+                  {weeklyProgress.map((logged, i) => (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                      <div
+                        className={`w-full aspect-square max-w-[40px] rounded-xl flex items-center justify-center transition-all ${
+                          logged
+                            ? 'bg-gradient-to-br from-orange-500 to-amber-500 shadow-sm'
+                            : 'bg-gray-100'
                         }`}
                       >
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${
-                            m.achieved
-                              ? 'bg-gradient-to-br from-orange-400 to-amber-500'
-                              : 'bg-gray-200'
-                          }`}
-                        >
-                          {m.achieved ? m.emoji : '🔒'}
-                        </div>
-                        <div className="flex-1">
-                          <p className={`font-medium ${m.achieved ? 'text-gray-800' : 'text-gray-400'}`}>
-                            {m.label}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {m.milestone} {t('streak.daysRequired', 'days streak')}
-                          </p>
-                        </div>
-                        {m.achieved && (
-                          <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                        {logged ? (
+                          <Check className="w-4 h-4 text-white" />
+                        ) : (
+                          <span className="w-1.5 h-1.5 bg-gray-300 rounded-full" />
                         )}
-                      </motion.div>
-                    ))}
-                  </div>
+                      </div>
+                      <span className="text-[10px] font-medium text-gray-400">{DAY_LABELS[i]}</span>
+                    </div>
+                  ))}
                 </div>
-
-                {/* Motivational message */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200"
-                >
-                  <p className="text-center text-sm text-emerald-700">
-                    {currentStreak === 0 
-                      ? t('streak.startToday', "Start your streak today! Every journey begins with a single step. 🚀")
-                      : currentStreak < 7
-                      ? t('streak.keepBuilding', "You're building momentum! Keep logging to reach your first week. 💪")
-                      : currentStreak < 30
-                      ? t('streak.greatProgress', "Amazing progress! You're developing a real habit. 🌟")
-                      : t('streak.legend', "You're a nutrition tracking legend! Keep inspiring yourself! 🏆")}
-                  </p>
-                </motion.div>
               </div>
+
+              {/* Next Milestone */}
+              {nextMilestone && (
+                <>
+                  <div className="h-px bg-gray-100 mx-5" />
+                  <div className="px-5 py-4">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                      {t('streak.nextMilestone', 'Next Goal')}
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-2xl">
+                        {nextMilestone.emoji}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 text-sm">{nextMilestone.label}</p>
+                        <p className="text-xs text-gray-400">
+                          {nextMilestone.milestone - currentStreak} {t('streak.daysToGo', 'days to go')}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-lg font-bold text-orange-500">{Math.round(progressToNext)}%</span>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progressToNext}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="h-full bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Milestones Achieved */}
+              {streakMilestones.some(m => m.achieved) && (
+                <>
+                  <div className="h-px bg-gray-100 mx-5" />
+                  <div className="px-5 py-4 pb-5">
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+                      {t('streak.achieved', 'Achieved')}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {streakMilestones.filter(m => m.achieved).map((m) => (
+                        <div
+                          key={m.milestone}
+                          className="px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-orange-50 border border-orange-200 flex items-center gap-1.5"
+                        >
+                          <span className="text-sm">{m.emoji}</span>
+                          <span className="text-xs font-medium text-orange-700">{m.milestone}d</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}

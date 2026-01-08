@@ -305,7 +305,7 @@ export default function DashboardNew() {
       <WeeklyWeightCheckIn />
       
       {/* Streak Card - Gamification to drive daily engagement */}
-      <div className="px-4 mb-4">
+      <div className="mb-4">
         <StreakCard />
       </div>
       
