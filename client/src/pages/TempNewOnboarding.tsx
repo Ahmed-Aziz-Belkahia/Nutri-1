@@ -1497,6 +1497,7 @@ const IOSPicker = ({
   const itemHeight = 44;
   const [selectedIndex, setSelectedIndex] = useState(items.indexOf(value));
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const snapCheckRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -1521,26 +1522,46 @@ const IOSPicker = ({
   };
 
   const handleScroll = () => {
-    // Update immediately on scroll
-    updateValueFromScroll();
+    // Update selected index for visual feedback
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const index = Math.round(scrollTop / itemHeight);
+      const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
+      setSelectedIndex(clampedIndex);
+    }
     
-    // Also schedule a delayed update to catch the final snap position
+    // Debounce the actual value update - wait until scroll stops
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
     scrollTimeoutRef.current = setTimeout(() => {
       updateValueFromScroll();
-    }, 150);
+      
+      // Extra check after snap animation completes (snap can take 300-500ms)
+      if (snapCheckRef.current) {
+        clearTimeout(snapCheckRef.current);
+      }
+      snapCheckRef.current = setTimeout(() => {
+        updateValueFromScroll();
+      }, 400);
+    }, 100);
   };
 
-  // Clean up timeout on unmount
+  // Clean up timeouts on unmount
   useEffect(() => {
     return () => {
-      if (scrollTimeoutRef.current) {
-        clearTimeout(scrollTimeoutRef.current);
-      }
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      if (snapCheckRef.current) clearTimeout(snapCheckRef.current);
     };
   }, []);
+
+  // Handle touch/mouse end - schedule updates after snap animation
+  const handleInteractionEnd = () => {
+    // Check multiple times to catch the snap animation
+    setTimeout(updateValueFromScroll, 100);
+    setTimeout(updateValueFromScroll, 300);
+    setTimeout(updateValueFromScroll, 500);
+  };
 
   return (
     <motion.div 
@@ -1552,8 +1573,8 @@ const IOSPicker = ({
       <ul
         ref={containerRef}
         onScroll={handleScroll}
-        onTouchEnd={() => setTimeout(updateValueFromScroll, 200)}
-        onMouseUp={() => setTimeout(updateValueFromScroll, 200)}
+        onTouchEnd={handleInteractionEnd}
+        onMouseUp={handleInteractionEnd}
         className="ios-style-picker__option-list h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide list-none m-0 p-0"
         style={{ 
           paddingTop: `${itemHeight * 2}px`, 
