@@ -7,6 +7,40 @@ import nodemailer from 'nodemailer';
 // Load environment variables
 dotenv.config();
 
+// Per-email rate limiting to prevent abuse
+const emailRateLimits = new Map<string, { count: number; resetTime: number }>();
+const EMAIL_RATE_LIMIT = 3; // Max 3 emails per address
+const EMAIL_RATE_WINDOW = 60 * 60 * 1000; // Per hour
+
+// Clean up expired rate limits every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  emailRateLimits.forEach((limit, email) => {
+    if (now > limit.resetTime) {
+      emailRateLimits.delete(email);
+    }
+  });
+}, 10 * 60 * 1000);
+
+function checkEmailRateLimit(email: string): boolean {
+  const now = Date.now();
+  const normalizedEmail = email.toLowerCase().trim();
+  const limit = emailRateLimits.get(normalizedEmail);
+  
+  if (!limit || now > limit.resetTime) {
+    emailRateLimits.set(normalizedEmail, { count: 1, resetTime: now + EMAIL_RATE_WINDOW });
+    return true;
+  }
+  
+  if (limit.count >= EMAIL_RATE_LIMIT) {
+    console.log(`⚠️ Email rate limit exceeded for ${normalizedEmail} (${limit.count}/${EMAIL_RATE_LIMIT})`);
+    return false;
+  }
+  
+  limit.count++;
+  return true;
+}
+
 // Configure Nodemailer transporter for Hostinger SMTP with connection pooling
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
@@ -18,10 +52,10 @@ const transporter = nodemailer.createTransport({
   },
   // Connection pooling to avoid "too many AUTH commands"
   pool: true,
-  maxConnections: 3,
-  maxMessages: 100,
-  rateDelta: 2000, // 2 seconds between emails
-  rateLimit: 5, // max 5 emails per rateDelta
+  maxConnections: 2,
+  maxMessages: 50,
+  rateDelta: 5000, // 5 seconds between emails (more conservative)
+  rateLimit: 2, // max 2 emails per rateDelta
   // Connection settings
   connectionTimeout: 30000,
   greetingTimeout: 30000,
@@ -110,9 +144,9 @@ const processEmailQueue = async () => {
       }
     }
     
-    // Delay between emails to prevent rate limiting (1 second)
+    // Delay between emails to prevent rate limiting (3 seconds)
     if (emailQueue.length > 0) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
   
@@ -150,6 +184,12 @@ export const sendEmail = async (
   subject: string,
   html: string
 ): Promise<void> => {
+  // Check per-email rate limit first
+  if (!checkEmailRateLimit(to)) {
+    console.log(`🚫 Skipping email to ${to} - rate limit exceeded`);
+    return Promise.resolve(); // Silently skip, don't queue
+  }
+  
   return new Promise((resolve, reject) => {
     emailQueue.push({
       to,
