@@ -38,8 +38,8 @@ export default function StreakCard() {
 
   if (isLoading) {
     return (
-      <div className="bg-orange-100 rounded-full px-3 py-1.5 animate-pulse inline-flex">
-        <div className="h-4 w-16 bg-gray-200 rounded" />
+      <div className="bg-orange-100 rounded-xl px-4 py-2.5 animate-pulse w-full">
+        <div className="h-5 bg-gray-200 rounded" />
       </div>
     );
   }
@@ -59,41 +59,47 @@ export default function StreakCard() {
 
   return (
     <>
-      {/* Main Streak Card - Pill/Badge Style */}
+      {/* Main Streak Card - Full Width Compact Bar */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="inline-flex"
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full"
       >
         <div
           onClick={() => setShowDetails(true)}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-full px-3 py-1.5 cursor-pointer shadow-sm active:scale-95 transition-transform flex items-center gap-2"
+          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl px-4 py-2.5 cursor-pointer shadow-sm active:scale-[0.99] transition-transform flex items-center justify-between w-full"
         >
-          {/* Flame icon */}
-          <motion.div
-            animate={currentStreak > 0 ? { scale: [1, 1.15, 1] } : {}}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-          >
-            <Flame className={`w-4 h-4 ${currentStreak > 0 ? 'text-white' : 'text-white/60'}`} />
-          </motion.div>
-          
-          {/* Streak count */}
-          <span className="text-sm font-bold text-white">{currentStreak}</span>
-          
-          {/* Weekly dots */}
-          <div className="flex gap-0.5 ml-1">
-            {weeklyProgress.map((logged, i) => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full ${logged ? 'bg-white' : 'bg-white/40'}`}
-              />
-            ))}
+          {/* Left: Flame + Streak count */}
+          <div className="flex items-center gap-2">
+            <motion.div
+              animate={currentStreak > 0 ? { scale: [1, 1.15, 1] } : {}}
+              transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <Flame className={`w-5 h-5 ${currentStreak > 0 ? 'text-white' : 'text-white/60'}`} />
+            </motion.div>
+            
+            <span className="text-base font-bold text-white">{currentStreak}</span>
+            <span className="text-white/80 text-xs">
+              {currentStreak === 1 ? t('streak.day', 'day') : t('streak.days', 'days')}
+            </span>
+            
+            {!todayLogged && currentStreak > 0 && (
+              <span className="text-xs text-white/90 ml-1">• {t('streak.logToday', 'Log to continue')}</span>
+            )}
           </div>
           
-          {/* Status indicator */}
-          {!todayLogged && currentStreak > 0 && (
-            <span className="text-[10px] text-white/80">!</span>
-          )}
+          {/* Right: Weekly dots + arrow */}
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              {weeklyProgress.map((logged, i) => (
+                <div
+                  key={i}
+                  className={`w-2 h-2 rounded-full ${logged ? 'bg-white' : 'bg-white/40'}`}
+                />
+              ))}
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/60" />
+          </div>
         </div>
       </motion.div>
 
