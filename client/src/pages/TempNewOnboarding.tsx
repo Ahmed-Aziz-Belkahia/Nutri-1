@@ -1511,20 +1511,14 @@ const IOSPicker = ({
       const index = Math.round(scrollTop / itemHeight);
       const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
       setSelectedIndex(clampedIndex);
-    }
-  };
-
-  // Separate effect to handle value changes with debouncing for smooth animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const newValue = items[selectedIndex];
+      
+      // Update value immediately on scroll (no debounce to avoid losing value on quick Continue click)
+      const newValue = items[clampedIndex];
       if (newValue !== undefined && newValue !== value) {
         onChange(newValue);
       }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [selectedIndex, items, value, onChange]);
+    }
+  };
 
   return (
     <motion.div 
