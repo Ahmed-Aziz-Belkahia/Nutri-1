@@ -2182,31 +2182,15 @@ export default function TempNewOnboarding() {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
-  // Calculate weight ranges for desired weight - logical limits based on goal
+  // Fixed weight ranges for desired weight - no dynamic limits
   const getWeightRange = () => {
-    const current = isMetric ? weightKg : weightLbs;
     const minWeight = isMetric ? 30 : 70;
     const maxWeight = isMetric ? 190 : 420;
     
-    if (selectedGoal === 'lose') {
-      // Can only select weight lower than current
-      return {
-        min: minWeight,
-        max: current
-      };
-    } else if (selectedGoal === 'gain') {
-      // Can only select weight higher than current
-      return {
-        min: current,
-        max: maxWeight
-      };
-    } else {
-      // Maintain - full range allowed
-      return {
-        min: minWeight,
-        max: maxWeight
-      };
-    }
+    return {
+      min: minWeight,
+      max: maxWeight
+    };
   };
 
   // Get goal label
