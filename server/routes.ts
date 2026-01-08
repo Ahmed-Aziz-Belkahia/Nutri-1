@@ -310,7 +310,7 @@ export function registerRoutes(app: Express): Server {
   // AI Nutrition Coach endpoint
   app.post("/api/ai-coach/message", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
-      const { message, language } = req.body;
+      const { message, language, conversationHistory } = req.body;
       
       if (!message || typeof message !== 'string' || !message.trim()) {
         return res.status(400).json({
@@ -319,13 +319,17 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
-      const response = await handleAICoachMessage(
+      const result = await handleAICoachMessage(
         req.user!.id,
         message.trim(),
+        Array.isArray(conversationHistory) ? conversationHistory : [],
         language || 'en'
       );
 
-      res.json({ response });
+      res.json({ 
+        response: result.response,
+        tokensUsed: result.tokensUsed
+      });
     } catch (error) {
       console.error('AI Coach error:', error);
       res.status(500).json({

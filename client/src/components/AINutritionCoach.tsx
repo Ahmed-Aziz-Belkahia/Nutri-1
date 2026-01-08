@@ -55,19 +55,29 @@ const FloatingBubble = ({
   onClick: () => void; 
   unreadCount: number;
   isOpen: boolean;
-}) => (
-  <motion.button
-    onClick={onClick}
-    className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center overflow-hidden"
-    style={{
-      background: 'linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%)',
-      boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)'
-    }}
-    whileHover={{ scale: 1.1 }}
-    whileTap={{ scale: 0.95 }}
-    animate={{
-      scale: isOpen ? 0 : 1,
-      opacity: isOpen ? 0 : 1
+}) => {
+  const handleClick = () => {
+    // Trigger haptic feedback on mobile if available
+    if ('vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+    onClick();
+  };
+
+  return (
+    <motion.button
+      onClick={handleClick}
+      aria-label="Open AI Nutrition Coach chat"
+      className="fixed bottom-24 right-4 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center overflow-hidden"
+      style={{
+        background: 'linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%)',
+        boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)'
+      }}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      animate={{
+        scale: isOpen ? 0 : 1,
+        opacity: isOpen ? 0 : 1
     }}
     transition={{ type: "spring", stiffness: 400, damping: 20 }}
   >
@@ -149,7 +159,8 @@ const FloatingBubble = ({
       )}
     </AnimatePresence>
   </motion.button>
-);
+  );
+};
 
 // Message bubble component
 const MessageBubble = ({ message, isLast }: { message: Message; isLast: boolean }) => {
@@ -258,12 +269,14 @@ export const AINutritionCoach: React.FC = () => {
   }, [isOpen]);
   
   // Initial greeting when first opened
+  const hasInitializedRef = useRef(false);
   useEffect(() => {
-    if (isOpen && messages.length === 0) {
+    if (isOpen && messages.length === 0 && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       const greeting = getTimeBasedGreeting();
       addAssistantMessage(greeting);
     }
-  }, [isOpen]);
+  }, [isOpen, messages.length]);
   
   // Clear unread when opened
   useEffect(() => {
@@ -296,7 +309,7 @@ export const AINutritionCoach: React.FC = () => {
   };
   
   const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || isTyping) return;
     
     // Add user message
     const userMessage: Message = {
@@ -305,11 +318,19 @@ export const AINutritionCoach: React.FC = () => {
       content: content.trim(),
       timestamp: new Date()
     };
-    setMessages(prev => [...prev, userMessage]);
+    
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue('');
     setIsTyping(true);
     
     try {
+      // Build conversation history from messages (excluding the new user message that hasn't been processed yet)
+      const conversationHistory = messages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .slice(-10) // Keep last 10 messages for context
+        .map(m => ({ role: m.role, content: m.content }));
+      
       const response = await fetch('/api/ai-coach/message', {
         method: 'POST',
         headers: {
@@ -318,7 +339,8 @@ export const AINutritionCoach: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({
           message: content.trim(),
-          language: i18n.language
+          language: i18n.language,
+          conversationHistory
         })
       });
       
@@ -328,8 +350,9 @@ export const AINutritionCoach: React.FC = () => {
       
       const data = await response.json();
       
-      // Simulate typing delay for natural feel
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Simulate typing delay for natural feel (based on response length)
+      const typingDelay = Math.min(Math.max(data.response.length * 5, 300), 1500);
+      await new Promise(resolve => setTimeout(resolve, typingDelay));
       
       addAssistantMessage(data.response);
     } catch (error) {
@@ -338,14 +361,20 @@ export const AINutritionCoach: React.FC = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [i18n.language, t]);
+  }, [i18n.language, t, messages, isTyping]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(inputValue);
+    if (inputValue.trim()) {
+      // Blur input to dismiss keyboard on mobile
+      inputRef.current?.blur();
+      sendMessage(inputValue);
+    }
   };
   
   const handleQuickAction = (message: string) => {
+    // Blur input to dismiss keyboard on mobile
+    inputRef.current?.blur();
     sendMessage(message);
   };
 
@@ -446,10 +475,11 @@ export const AINutritionCoach: React.FC = () => {
                 <QuickActions actions={quickActions} onSelect={handleQuickAction} />
               )}
               
-              {/* Input Area */}
+              {/* Input Area - with safe area for iOS */}
               <form 
                 onSubmit={handleSubmit}
-                className="px-4 pb-6 pt-3 border-t border-white/10"
+                className="px-4 pt-3 border-t border-white/10"
+                style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex-1 relative">

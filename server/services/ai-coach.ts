@@ -12,6 +12,28 @@ import { trackOpenAIUsage } from "../utils/token-tracker";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// Simple in-memory rate limiting (per user, max 20 messages per minute)
+const rateLimitMap = new Map<number, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+function checkRateLimit(userId: number): boolean {
+  const now = Date.now();
+  const userLimit = rateLimitMap.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitMap.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+}
+
 interface UserContext {
   profile: {
     name: string;
@@ -232,6 +254,21 @@ export async function handleAICoachMessage(
   language: string = "en"
 ): Promise<{ response: string; tokensUsed: number }> {
   const startTime = Date.now();
+
+  // Check rate limit
+  if (!checkRateLimit(userId)) {
+    const rateLimitMessages: Record<string, string> = {
+      en: "You're sending messages too quickly! Please wait a moment before trying again. 🕐",
+      fr: "Vous envoyez des messages trop rapidement ! Veuillez patienter un moment. 🕐",
+      pl: "Wysyłasz wiadomości zbyt szybko! Poczekaj chwilę przed ponowną próbą. 🕐",
+      es: "¡Estás enviando mensajes demasiado rápido! Por favor espera un momento. 🕐",
+      ar: "أنت ترسل الرسائل بسرعة كبيرة! يرجى الانتظار لحظة قبل المحاولة مرة أخرى. 🕐",
+    };
+    return {
+      response: rateLimitMessages[language] || rateLimitMessages.en,
+      tokensUsed: 0,
+    };
+  }
 
   try {
     // Get full user context
