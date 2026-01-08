@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import BaseLayout from "@/components/layouts/BaseLayout";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
-import MealPlanTab from "@/components/recipes/MealPlanTab";
-import { Book, Calendar, Camera, Sparkles, Clock, ChefHat } from "lucide-react";
+import MealPlanViewContent from "@/components/recipes/MealPlanViewContent";
+import { Book, Calendar, Camera, Sparkles, Clock, ChefHat, Store, ArrowRight } from "lucide-react";
 import { useScannedMealsToday, useScannedMeals, useIngredientGeneratedRecipes } from "@/hooks/queries/useFoodLogs";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -289,6 +289,21 @@ export default function RecipesNew() {
               </div>
             )}
 
+            {/* Marketplace CTA Banner */}
+            <div 
+              onClick={() => navigate('/meal-plan-marketplace')}
+              className="cursor-pointer bg-gradient-to-r from-[#0E95A7]/10 to-[#26A8FF]/10 border border-[#0E95A7]/20 rounded-2xl p-4 flex items-center gap-3 hover:shadow-md transition-all"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-[#0E95A7] to-[#26A8FF] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#0E95A7]/30">
+                <Store className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900">Meal Plan Marketplace</h3>
+                <p className="text-xs text-gray-500">Discover meal plans from chefs around the world</p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-[#0E95A7]" />
+            </div>
+
             {/* All Recipes Section */}
             <AllRecipesSection 
               recipes={allRecipes}
@@ -296,8 +311,8 @@ export default function RecipesNew() {
             />
           </>
         ) : (
-          /* Meal Plan Tab */
-          <MealPlanTab />
+          /* Meal Plan Tab - Using MealPlanViewContent */
+          <MealPlanViewContent showHeader={true} />
         )}
       </div>
     </BaseLayout>

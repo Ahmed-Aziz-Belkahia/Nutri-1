@@ -51,6 +51,8 @@ import SimpleMealPlanningQuiz from "./pages/SimpleMealPlanningQuiz";
 import MealPlanningQuiz from "./pages/MealPlanningQuiz";
 import MealPlanningQuizNew from "./pages/MealPlanningQuizNew";
 import MealPlanView from "./pages/MealPlanView";
+import MealPlanMarketplace from "./pages/MealPlanMarketplace";
+import CreateMealPlan from "./pages/CreateMealPlan";
 
 import MealPlan from "./pages/MealPlan";
 import ShoppingList from "./pages/ShoppingList";
@@ -440,6 +442,18 @@ function App() {
             <Route path="/meal-plan/view">
               <ProtectedRoute>
                 <MealPlanView />
+              </ProtectedRoute>
+            </Route>
+
+            <Route path="/meal-plan-marketplace">
+              <ProtectedRoute>
+                <MealPlanMarketplace />
+              </ProtectedRoute>
+            </Route>
+
+            <Route path="/meal-plan-marketplace/create">
+              <ProtectedRoute>
+                <CreateMealPlan />
               </ProtectedRoute>
             </Route>
 

@@ -6,7 +6,9 @@ import {
   IoReaderOutline, 
   IoReader, 
   IoStatsChartOutline, 
-  IoStatsChart
+  IoStatsChart,
+  IoStorefrontOutline,
+  IoStorefront
 } from "react-icons/io5";
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +41,13 @@ export default function BottomNav() {
       testId: "recipes-nav"
     },
     {
+      path: "/meal-plan-marketplace",
+      label: t('common:navigation.marketplace', 'Market'),
+      icon: IoStorefrontOutline,
+      activeIcon: IoStorefront,
+      testId: "marketplace-nav"
+    },
+    {
       path: "/progress",
       label: t('common:navigation.progress'),
       icon: IoStatsChartOutline,
@@ -50,6 +59,9 @@ export default function BottomNav() {
   const isActive = (path: string) => {
     if (path === "/progress") {
       return location === "/progress" || location === "/progress-new";
+    }
+    if (path === "/meal-plan-marketplace") {
+      return location.startsWith("/meal-plan-marketplace");
     }
     return location === path;
   };
