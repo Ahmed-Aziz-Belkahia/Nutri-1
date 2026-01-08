@@ -24,7 +24,28 @@ const app = express();
 
 // Security headers with helmet
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: [
+        "'self'", 
+        "data:", 
+        "blob:",
+        "https://images.unsplash.com",
+        "https://randomuser.me",
+        "https://ui-avatars.com",
+        "https://*.unsplash.com",
+        "https://source.unsplash.com"
+      ],
+      connectSrc: ["'self'", "https://api.openai.com", "wss:", "ws:"],
+      mediaSrc: ["'self'", "blob:", "data:"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'self'"],
+    },
+  },
   crossOriginEmbedderPolicy: false,
 }));
 
