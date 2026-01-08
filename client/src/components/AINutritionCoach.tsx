@@ -410,7 +410,7 @@ export const AINutritionCoach: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[1001]"
               onClick={() => setIsOpen(false)}
             />
             
@@ -420,7 +420,7 @@ export const AINutritionCoach: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 100, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="fixed bottom-0 left-0 right-0 z-[101] max-h-[85vh] flex flex-col bg-white"
+              className="fixed bottom-0 left-0 right-0 z-[1002] max-h-[85vh] flex flex-col bg-white"
               style={{
                 borderTopLeftRadius: '24px',
                 borderTopRightRadius: '24px',
