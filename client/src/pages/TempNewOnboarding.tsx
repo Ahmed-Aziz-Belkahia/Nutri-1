@@ -1496,8 +1496,18 @@ const IOSPicker = ({
   const containerRef = useRef<HTMLUListElement>(null);
   const itemHeight = 44;
   const [selectedIndex, setSelectedIndex] = useState(items.indexOf(value));
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const snapCheckRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Use refs to avoid stale closures in callbacks
+  const valueRef = useRef(value);
+  const onChangeRef = useRef(onChange);
+  const itemsRef = useRef(items);
+  
+  // Keep refs updated
+  useEffect(() => {
+    valueRef.current = value;
+    onChangeRef.current = onChange;
+    itemsRef.current = items;
+  }, [value, onChange, items]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -1507,60 +1517,51 @@ const IOSPicker = ({
     }
   }, [value, items, itemHeight]);
 
-  // Function to update the value based on current scroll position
+  // Function to update the value based on current scroll position - uses refs to avoid stale closures
   const updateValueFromScroll = () => {
     if (!containerRef.current) return;
     const scrollTop = containerRef.current.scrollTop;
     const index = Math.round(scrollTop / itemHeight);
-    const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
+    const clampedIndex = Math.max(0, Math.min(index, itemsRef.current.length - 1));
     setSelectedIndex(clampedIndex);
     
-    const newValue = items[clampedIndex];
-    if (newValue !== undefined && newValue !== value) {
-      onChange(newValue);
+    const newValue = itemsRef.current[clampedIndex];
+    if (newValue !== undefined && newValue !== valueRef.current) {
+      onChangeRef.current(newValue);
     }
   };
 
-  const handleScroll = () => {
-    // Update selected index for visual feedback
-    if (containerRef.current) {
-      const scrollTop = containerRef.current.scrollTop;
-      const index = Math.round(scrollTop / itemHeight);
-      const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
-      setSelectedIndex(clampedIndex);
-    }
-    
-    // Debounce the actual value update - wait until scroll stops
-    if (scrollTimeoutRef.current) {
-      clearTimeout(scrollTimeoutRef.current);
-    }
-    scrollTimeoutRef.current = setTimeout(() => {
-      updateValueFromScroll();
-      
-      // Extra check after snap animation completes (snap can take 300-500ms)
-      if (snapCheckRef.current) {
-        clearTimeout(snapCheckRef.current);
-      }
-      snapCheckRef.current = setTimeout(() => {
-        updateValueFromScroll();
-      }, 400);
-    }, 100);
-  };
-
-  // Clean up timeouts on unmount
+  // Use scrollend event for precise snap detection (with fallback)
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const handleScrollEnd = () => {
+      updateValueFromScroll();
+    };
+    
+    // Modern browsers support scrollend
+    container.addEventListener('scrollend', handleScrollEnd);
+    
     return () => {
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      if (snapCheckRef.current) clearTimeout(snapCheckRef.current);
+      container.removeEventListener('scrollend', handleScrollEnd);
     };
   }, []);
 
-  // Handle touch/mouse end - schedule updates after snap animation
-  const handleInteractionEnd = () => {
-    // Check multiple times to catch the snap animation
-    setTimeout(updateValueFromScroll, 100);
-    setTimeout(updateValueFromScroll, 300);
-    setTimeout(updateValueFromScroll, 500);
+  const handleScroll = () => {
+    // Update selected index for visual feedback immediately
+    if (containerRef.current) {
+      const scrollTop = containerRef.current.scrollTop;
+      const index = Math.round(scrollTop / itemHeight);
+      const clampedIndex = Math.max(0, Math.min(index, itemsRef.current.length - 1));
+      setSelectedIndex(clampedIndex);
+      
+      // Also update value immediately for browsers that don't support scrollend
+      const newValue = itemsRef.current[clampedIndex];
+      if (newValue !== undefined && newValue !== valueRef.current) {
+        onChangeRef.current(newValue);
+      }
+    }
   };
 
   return (
@@ -1573,8 +1574,6 @@ const IOSPicker = ({
       <ul
         ref={containerRef}
         onScroll={handleScroll}
-        onTouchEnd={handleInteractionEnd}
-        onMouseUp={handleInteractionEnd}
         className="ios-style-picker__option-list h-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide list-none m-0 p-0"
         style={{ 
           paddingTop: `${itemHeight * 2}px`, 
