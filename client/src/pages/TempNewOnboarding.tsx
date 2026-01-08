@@ -2484,10 +2484,10 @@ export default function TempNewOnboarding() {
           <PrimaryButton 
             onClick={() => {
               if (selectedGoal === 'maintain') {
-                // Skip desired weight step - set desired weight to current weight
+                // Skip desired weight and motivational steps - set desired weight to current weight
                 setDesiredWeightKg(weightKg);
                 setDesiredWeightLbs(weightLbs);
-                setCurrentStep(6); // Skip to motivational message
+                setCurrentStep(7); // Skip directly to speed step (which will also skip for maintain)
               } else {
                 setCurrentStep(5);
               }
@@ -2550,17 +2550,13 @@ export default function TempNewOnboarding() {
     );
   }
 
-  // Page 7: Motivational Message
+  // Page 7: Motivational Message (skipped if maintain is selected)
   if (currentStep === 6) {
     const { action, diff, unit, difficulty, color } = getWeightDifference();
     
-    // Back button goes to step 4 if maintain, else step 5
+    // Back button goes to step 5 (desired weight) for lose/gain
     const handleMotivationBack = () => {
-      if (selectedGoal === 'maintain') {
-        setCurrentStep(4);
-      } else {
-        setCurrentStep(5);
-      }
+      setCurrentStep(5);
     };
     
     // Get appropriate message based on difficulty
@@ -2695,7 +2691,7 @@ export default function TempNewOnboarding() {
   if (currentStep === 8) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => selectedGoal === 'maintain' ? setCurrentStep(6) : setCurrentStep(7)} />
+        <BackButton onClick={() => selectedGoal === 'maintain' ? setCurrentStep(4) : setCurrentStep(7)} />
         <ProgressBar current={8} total={18} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
