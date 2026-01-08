@@ -1357,27 +1357,23 @@ const WeightSlider = ({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const pixelsPerUnit = 20; // 20 pixels per kg
-  const totalUnits = max - min + 1;
-  const contentWidth = totalUnits * pixelsPerUnit;
+  const pixelsPerUnit = 20; // 20 pixels per kg (matching OnboardingQuiz)
+  const CAL = -10; // Calibration offset for center alignment
+  const totalUnits = Math.ceil(max - min) + 1;
   
-  // Scroll to selected value on mount and when value changes externally
+  // Scroll to selected value
   useEffect(() => {
     if (scrollRef.current && !isDragging) {
-      const containerWidth = scrollRef.current.offsetWidth;
-      const scrollPosition = (value - min) * pixelsPerUnit - containerWidth / 2 + pixelsPerUnit / 2;
-      scrollRef.current.scrollLeft = Math.max(0, scrollPosition);
+      const scrollPosition = (value - min) * pixelsPerUnit - CAL;
+      scrollRef.current.scrollLeft = scrollPosition;
     }
   }, [value, min, isDragging]);
 
   const handleScroll = () => {
     if (!scrollRef.current) return;
     
-    const containerWidth = scrollRef.current.offsetWidth;
     const scrollLeft = scrollRef.current.scrollLeft;
-    // Calculate value based on what's at the center of the container
-    const centerOffset = scrollLeft + containerWidth / 2 - pixelsPerUnit / 2;
-    const newValue = min + centerOffset / pixelsPerUnit;
+    const newValue = min + (scrollLeft + CAL) / pixelsPerUnit;
     const roundedValue = Math.round(newValue);
     const clampedValue = Math.max(min, Math.min(max, roundedValue));
     
@@ -1437,11 +1433,11 @@ const WeightSlider = ({
           style={{ scrollbarWidth: 'none' }}
         >
           <div 
-            className="flex items-end h-16 select-none relative"
+            className="flex items-end h-16 select-none"
             style={{ 
-              width: `calc(${contentWidth}px + 100%)`,
-              paddingLeft: 'calc(50% - 10px)',
-              paddingRight: 'calc(50% - 10px)'
+              width: `${totalUnits * pixelsPerUnit}px`,
+              paddingLeft: '50%',
+              paddingRight: '50%'
             }}
           >
             {Array.from({ length: totalUnits }, (_, i) => {
@@ -2148,26 +2144,12 @@ export default function TempNewOnboarding() {
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
-  // Calculate weight ranges for desired weight
+  // Calculate weight ranges for desired weight - no restrictions
   const getWeightRange = () => {
-    const current = isMetric ? weightKg : weightLbs;
-    if (selectedGoal === 'lose') {
-      return {
-        min: isMetric ? Math.max(30, current - 80) : Math.max(70, current - 180),
-        max: current
-      };
-    } else if (selectedGoal === 'gain') {
-      return {
-        min: current,
-        max: isMetric ? Math.min(200, current + 80) : Math.min(440, current + 180)
-      };
-    } else {
-      // Maintain: allow small adjustments both ways
-      return {
-        min: isMetric ? Math.max(30, current - 20) : Math.max(70, current - 45),
-        max: isMetric ? Math.min(200, current + 20) : Math.min(440, current + 45)
-      };
-    }
+    return {
+      min: isMetric ? 30 : 70,
+      max: isMetric ? 190 : 420
+    };
   };
 
   // Get goal label
