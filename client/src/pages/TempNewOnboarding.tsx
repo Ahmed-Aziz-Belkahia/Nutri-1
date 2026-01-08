@@ -2482,7 +2482,16 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(5)}
+            onClick={() => {
+              if (selectedGoal === 'maintain') {
+                // Skip desired weight step - set desired weight to current weight
+                setDesiredWeightKg(weightKg);
+                setDesiredWeightLbs(weightLbs);
+                setCurrentStep(6); // Skip to motivational message
+              } else {
+                setCurrentStep(5);
+              }
+            }}
             disabled={!selectedGoal}
           >
             {t('common.continue')}
@@ -2493,7 +2502,7 @@ export default function TempNewOnboarding() {
     );
   }
 
-  // Page 6: Desired Weight
+  // Page 6: Desired Weight (skipped if maintain is selected)
   if (currentStep === 5) {
     const range = getWeightRange();
     const currentWeight = isMetric ? weightKg : weightLbs;
@@ -2545,6 +2554,15 @@ export default function TempNewOnboarding() {
   if (currentStep === 6) {
     const { action, diff, unit, difficulty, color } = getWeightDifference();
     
+    // Back button goes to step 4 if maintain, else step 5
+    const handleMotivationBack = () => {
+      if (selectedGoal === 'maintain') {
+        setCurrentStep(4);
+      } else {
+        setCurrentStep(5);
+      }
+    };
+    
     // Get appropriate message based on difficulty
     const getMessage = () => {
       return t(`motivation.${difficulty}.message`);
@@ -2561,7 +2579,7 @@ export default function TempNewOnboarding() {
     
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(5)} />
+        <BackButton onClick={handleMotivationBack} />
         <ProgressBar current={6} total={18} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
