@@ -16,6 +16,19 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const rateLimitMap = new Map<number, { count: number; resetTime: number }>();
 const RATE_LIMIT_MAX = 20;
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_MESSAGE_LENGTH = 2000; // Prevent abuse with very long messages
+
+// Clean up expired rate limit entries every 5 minutes to prevent memory leak
+setInterval(() => {
+  const now = Date.now();
+  const expiredUsers: number[] = [];
+  rateLimitMap.forEach((limit, userId) => {
+    if (now > limit.resetTime) {
+      expiredUsers.push(userId);
+    }
+  });
+  expiredUsers.forEach(userId => rateLimitMap.delete(userId));
+}, 5 * 60 * 1000);
 
 function checkRateLimit(userId: number): boolean {
   const now = Date.now();
@@ -254,6 +267,21 @@ export async function handleAICoachMessage(
   language: string = "en"
 ): Promise<{ response: string; tokensUsed: number }> {
   const startTime = Date.now();
+
+  // Check message length
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    const lengthErrorMessages: Record<string, string> = {
+      en: "Your message is too long. Please keep it under 2000 characters. ✂️",
+      fr: "Votre message est trop long. Veuillez le limiter à 2000 caractères. ✂️",
+      pl: "Twoja wiadomość jest zbyt długa. Ogranicz ją do 2000 znaków. ✂️",
+      es: "Tu mensaje es demasiado largo. Por favor, limítalo a 2000 caracteres. ✂️",
+      ar: "رسالتك طويلة جدًا. يرجى الاحتفاظ بها أقل من 2000 حرف. ✂️",
+    };
+    return {
+      response: lengthErrorMessages[language] || lengthErrorMessages.en,
+      tokensUsed: 0,
+    };
+  }
 
   // Check rate limit
   if (!checkRateLimit(userId)) {

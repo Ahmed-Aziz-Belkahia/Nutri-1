@@ -324,6 +324,10 @@ export const AINutritionCoach: React.FC = () => {
     setInputValue('');
     setIsTyping(true);
     
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     try {
       // Build conversation history from messages (excluding the new user message that hasn't been processed yet)
       const conversationHistory = messages
@@ -337,12 +341,15 @@ export const AINutritionCoach: React.FC = () => {
           'Content-Type': 'application/json'
         },
         credentials: 'include',
+        signal: controller.signal,
         body: JSON.stringify({
-          message: content.trim(),
+          message: content.trim().slice(0, 2000), // Enforce max length on client too
           language: i18n.language,
           conversationHistory
         })
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to get response');
@@ -356,8 +363,15 @@ export const AINutritionCoach: React.FC = () => {
       
       addAssistantMessage(data.response);
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('AI Coach error:', error);
-      addAssistantMessage(t('aiCoach.errors.generic', "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏"));
+      
+      // Check if it was a timeout/abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        addAssistantMessage(t('aiCoach.errors.timeout', "The request took too long. Please try again with a shorter message. ⏱️"));
+      } else {
+        addAssistantMessage(t('aiCoach.errors.generic', "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🙏"));
+      }
     } finally {
       setIsTyping(false);
     }
@@ -445,6 +459,7 @@ export const AINutritionCoach: React.FC = () => {
                 
                 <motion.button
                   onClick={() => setIsOpen(false)}
+                  aria-label={t('aiCoach.close', 'Close chat')}
                   className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/70 hover:bg-white/20 transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
@@ -456,7 +471,12 @@ export const AINutritionCoach: React.FC = () => {
               </div>
               
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto px-4 py-4 min-h-[300px] max-h-[50vh]">
+              <div 
+                className="flex-1 overflow-y-auto px-4 py-4 min-h-[300px] max-h-[50vh]"
+                role="log"
+                aria-live="polite"
+                aria-label={t('aiCoach.messagesArea', 'Chat messages')}
+              >
                 {messages.map((message, index) => (
                   <MessageBubble 
                     key={message.id} 
