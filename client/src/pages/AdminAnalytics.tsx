@@ -117,8 +117,9 @@ interface UserDetail {
 export default function AdminAnalytics() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const [loading, setLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const [refreshInterval, setRefreshInterval] = useState<5 | 300>(300); // 5 seconds or 300 seconds (5 minutes)
   
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [tokenStats, setTokenStats] = useState<TokenStats | null>(null);
@@ -129,16 +130,15 @@ export default function AdminAnalytics() {
   useEffect(() => {
     loadAnalytics();
     
-    // Auto-refresh every 5 seconds
+    // Auto-refresh based on selected interval
     const interval = setInterval(() => {
       loadAnalytics();
-    }, 5000); // 5 seconds
+    }, refreshInterval * 1000);
     
     return () => clearInterval(interval);
-  }, [timeRange]);
+  }, [timeRange, refreshInterval]);
 
   const loadAnalytics = async () => {
-    setLoading(true);
     try {
       const [usersRes, tokensRes, apiRes, activityRes, allUsersRes] = await Promise.all([
         fetch(`/api/admin/analytics/users`, { credentials: 'include' }),
@@ -197,7 +197,7 @@ export default function AdminAnalytics() {
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
-      setLoading(false);
+      if (isFirstLoad) setIsFirstLoad(false);
     }
   };
 
@@ -215,17 +215,6 @@ export default function AdminAnalytics() {
   };
 
   const COLORS = ['#26A8FF', '#FF6B6B', '#4ECDC4', '#FFE66D', '#A8E6CF', '#FF8B94'];
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#26A8FF] mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading analytics...</p>
-        </div>
-      </div>
-    );
-  }
 
   console.log('Rendering with data:', { userStats, tokenStats, apiStats, activityData });
 
@@ -271,13 +260,19 @@ export default function AdminAnalytics() {
               ))}
             </div>
             
-            {/* Auto-refresh indicator */}
+            {/* Auto-refresh toggle */}
             <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
               <div className="relative">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
               </div>
-              <span className="text-xs font-medium text-green-700">Auto-refresh: 5s</span>
+              <select
+                value={refreshInterval}
+                onChange={(e) => setRefreshInterval(Number(e.target.value) as 5 | 300)}
+                className="text-xs font-medium text-green-700 bg-transparent border-none outline-none cursor-pointer"
+              >
+                <option value={5}>Refresh: 5s</option>
+                <option value={300}>Refresh: 5min</option>
+              </select>
             </div>
           </div>
         </div>
@@ -393,6 +388,7 @@ export default function AdminAnalytics() {
                 fillOpacity={1} 
                 fill="url(#colorUsers)" 
                 name="Active Users"
+                isAnimationActive={isFirstLoad}
               />
               <Area 
                 type="monotone" 
@@ -401,6 +397,7 @@ export default function AdminAnalytics() {
                 fillOpacity={1} 
                 fill="url(#colorRequests)" 
                 name="API Requests"
+                isAnimationActive={isFirstLoad}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -427,6 +424,7 @@ export default function AdminAnalytics() {
                   stroke="#A855F7" 
                   strokeWidth={2}
                   name="Tokens Used"
+                  isAnimationActive={isFirstLoad}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -449,6 +447,7 @@ export default function AdminAnalytics() {
                   dataKey="cost" 
                   fill="#10B981" 
                   name="Cost (USD)"
+                  isAnimationActive={isFirstLoad}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -475,6 +474,7 @@ export default function AdminAnalytics() {
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="count"
+                    isAnimationActive={isFirstLoad}
                   >
                     {apiStats.modelUsage.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
