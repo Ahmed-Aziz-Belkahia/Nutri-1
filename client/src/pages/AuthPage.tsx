@@ -104,6 +104,25 @@ export default function AuthPage() {
     }
   };
 
+  // Fallback for mobile handoff: monitor localStorage for externally injected sessions
+  useEffect(() => {
+    const checkSession = () => {
+      if (localStorage.getItem("nutriai_session_active") === "true") {
+        console.log("[AuthPage] Detected session in storage, navigating...");
+        setLocation('/dashboard'); // Navigation strategy in case polling is stuck
+      }
+    };
+    
+    // Check every second while the page is open
+    const interval = setInterval(checkSession, 1000);
+    window.addEventListener('storage', checkSession);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', checkSession);
+    };
+  }, [setLocation]);
+
   // Clean up Google polling on unmount
   useEffect(() => {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };

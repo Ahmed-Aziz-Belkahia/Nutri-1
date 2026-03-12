@@ -90,7 +90,7 @@ router.get(
         // Deep link back to the mobile app
         // We pass tokens in the URL for the app to capture and inject into WebView cookies
         const hasCompletedOnboarding = user.hasCompletedOnboarding || user.has_completed_onboarding;
-        const deepLink = `nutriai://auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}&onboarding=${hasCompletedOnboarding}`;
+        const deepLink = `nutriai://auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}&userId=${user.id}&onboarding=${hasCompletedOnboarding}`;
         return res.redirect(deepLink);
       }
 
