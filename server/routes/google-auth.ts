@@ -71,9 +71,11 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const user = req.user as any;
+      const state = req.query.state ? JSON.parse(decodeURIComponent(req.query.state as string)) : {};
+      const isMobile = state.platform === 'mobile';
 
       if (!user) {
-        return res.redirect('/auth?error=authentication_failed');
+        return res.redirect(isMobile ? 'nutriai://auth/error' : '/auth?error=authentication_failed');
       }
 
       // Generate JWT tokens (same policy as jwt-auth.ts)
@@ -83,6 +85,14 @@ router.get(
       // Store refresh token in DB
       const { refreshTokenExpiry } = getTokenExpiryDates();
       await storeRefreshToken(user.id, refreshToken, refreshTokenExpiry);
+
+      if (isMobile) {
+        // Deep link back to the mobile app
+        // We pass tokens in the URL for the app to capture and inject into WebView cookies
+        const hasCompletedOnboarding = user.hasCompletedOnboarding || user.has_completed_onboarding;
+        const deepLink = `nutriai://auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}&onboarding=${hasCompletedOnboarding}`;
+        return res.redirect(deepLink);
+      }
 
       const isProduction = process.env.NODE_ENV === 'production';
 
