@@ -259,7 +259,7 @@ router.post('/verify-email-code', verifyCodeLimiter, async (req, res: Response) 
     }
 
     // Parse profile data
-    const profile = pending.profileData ? JSON.parse(pending.profileData) : null;
+    const profile = pending.profileData as any;
 
     // Generate username from email
     const username = email.split('@')[0];
@@ -822,8 +822,7 @@ router.post('/reset-password', verifyCodeLimiter, async (req, res: Response) => 
   } catch (error) {
     console.error('[JWT Auth] Reset password error:', error);
     res.status(500).json({
-      error: 'Password reset failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Password reset failed'
     });
   }
 });
@@ -856,8 +855,7 @@ router.get('/verify-email', async (req, res: Response) => {
   } catch (error) {
     console.error('[JWT Auth] Email verification error:', error);
     res.status(500).json({
-      error: 'Email verification failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Email verification failed'
     });
   }
 });

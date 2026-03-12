@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { calculateDailyCalories, calculateMacros } from "@/lib/nutrition";
-// Google OAuth temporarily disabled
-// import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Loader2, 
@@ -31,6 +29,10 @@ export default function AuthPage() {
     password: '',
     confirmPassword: '',
   });
+
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
@@ -99,6 +101,62 @@ export default function AuthPage() {
     } catch (error) {
       console.error('Error submitting onboarding data:', error);
       return false;
+    }
+  };
+
+  // Clean up Google polling on unmount
+  useEffect(() => {
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []);
+
+  /**
+   * Google Sign-In handler.
+   * Fetches the OAuth URL from the backend and opens it in the system browser.
+   * The system browser (not the WebView) handles Google's auth, then redirects
+   * to /auth/google/success. We poll /api/auth/google/status to detect completion.
+   */
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    setGoogleError(null);
+
+    try {
+      const res = await fetch('/api/auth/google?platform=mobile&return_url=true');
+      const data = await res.json();
+
+      if (!data.success || !data.authUrl) {
+        throw new Error('Failed to get Google auth URL');
+      }
+
+      // Open in system browser — this bypasses the WebView Google block
+      window.open(data.authUrl, '_blank');
+
+      // Poll /api/auth/google/status every 2s to detect when session is set
+      let attempts = 0;
+      const MAX_ATTEMPTS = 60; // 2 minutes maximum
+
+      pollRef.current = setInterval(async () => {
+        attempts++;
+        try {
+          const statusRes = await fetch('/api/auth/google/status', { credentials: 'include' });
+          const status = await statusRes.json();
+
+          if (status.authenticated) {
+            clearInterval(pollRef.current!);
+            // Session is live — navigate to success page to load the user
+            setLocation('/auth/google/success');
+          } else if (attempts >= MAX_ATTEMPTS) {
+            clearInterval(pollRef.current!);
+            setIsGoogleLoading(false);
+            setGoogleError('Sign-in timed out. Please try again.');
+          }
+        } catch {
+          // Ignore network errors during polling
+        }
+      }, 2000);
+    } catch (err) {
+      console.error('[AuthPage] Google sign-in error:', err);
+      setIsGoogleLoading(false);
+      setGoogleError('Failed to start Google sign-in. Please try again.');
     }
   };
 
@@ -333,8 +391,29 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {/* Google Sign In Button - Temporarily commented out for Android implementation */}
-            {/* <GoogleAuthButton mode={isLogin ? 'login' : 'register'} /> */}
+            {/* Google Sign In Button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isGoogleLoading}
+              className="w-full h-12 flex items-center justify-center gap-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-all font-medium text-slate-700 text-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isGoogleLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+              ) : (
+                <svg viewBox="0 0 24 24" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.36c-.22-.66-.35-1.36-.35-2.36s.13-1.7.35-2.36V6.8H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 5.2l3.66-2.84z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.01l3.66 2.84c.87-2.6 3.3-4.47 6.16-4.47z" fill="#EA4335"/>
+                </svg>
+              )}
+              {isGoogleLoading ? 'Opening Google...' : `Continue with Google`}
+            </button>
+
+            {googleError && (
+              <p className="text-xs text-red-500 text-center mt-2">{googleError}</p>
+            )}
 
             {/* Toggle Auth Mode */}
             <div className="text-center">

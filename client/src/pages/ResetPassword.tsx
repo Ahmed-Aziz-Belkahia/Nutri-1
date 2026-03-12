@@ -18,6 +18,7 @@ export default function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState<"code" | "password">("code");
@@ -30,6 +31,14 @@ export default function ResetPassword() {
       setEmail(decodeURIComponent(emailParam));
     }
   }, [location]);
+
+  // Handle resend timer countdown
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,7 +150,7 @@ export default function ResetPassword() {
       });
 
       if (response.ok) {
-        alert("New code sent to your email!");
+        setResendTimer(60);
       } else {
         const data = await response.json();
         setError(data.error || t('auth:forgotPassword.error'));
@@ -285,10 +294,12 @@ export default function ResetPassword() {
                       <button
                         type="button"
                         onClick={handleResendCode}
-                        disabled={isLoading}
+                        disabled={isLoading || resendTimer > 0}
                         className="text-sm text-[#26A8FF] hover:text-[#0CC5BA] transition-colors font-medium disabled:opacity-50"
                       >
-                        {t('auth:resetPassword.verifyCode.resendCode')}
+                        {resendTimer > 0 
+                          ? `${t('auth:resetPassword.verifyCode.resendCode')} (${resendTimer}s)` 
+                          : t('auth:resetPassword.verifyCode.resendCode')}
                       </button>
                     </div>
                   </form>

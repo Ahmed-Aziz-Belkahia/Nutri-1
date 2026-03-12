@@ -17,6 +17,7 @@ export default function VerifyEmail() {
   const [email, setEmail] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -32,6 +33,14 @@ export default function VerifyEmail() {
       setLocation('/auth');
     }
   }, [setLocation]);
+
+  // Handle resend timer countdown
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   const handleCodeChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return; // Only allow digits
@@ -148,6 +157,9 @@ export default function VerifyEmail() {
         title: t('auth:verifyEmail.resendSuccess.toastTitle'),
         description: t('auth:verifyEmail.resendSuccess.toastDescription'),
       });
+
+      // Start 60-second cooldown timer
+      setResendTimer(60);
 
       // Clear the code inputs
       setCode(["", "", "", "", "", ""]);
@@ -288,10 +300,14 @@ export default function VerifyEmail() {
                     </p>
                     <button
                       onClick={handleResendCode}
-                      disabled={isResending}
+                      disabled={isResending || resendTimer > 0}
                       className="text-sm font-semibold text-[#26A8FF] hover:text-[#0CC5BA] transition-colors disabled:opacity-50"
                     >
-                      {isResending ? t('auth:verifyEmail.sending') : t('auth:verifyEmail.resendCode')}
+                      {isResending 
+                        ? t('auth:verifyEmail.sending') 
+                        : resendTimer > 0 
+                          ? `${t('auth:verifyEmail.resendCode')} (${resendTimer}s)` 
+                          : t('auth:verifyEmail.resendCode')}
                     </button>
                   </div>
                 </motion.div>

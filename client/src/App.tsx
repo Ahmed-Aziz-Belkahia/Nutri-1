@@ -29,13 +29,14 @@ import RecipeScanner from "./pages/RecipeScanner";
 import IngredientConfirmation from "./pages/IngredientConfirmation";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import GoogleAuthSuccess from "./pages/GoogleAuthSuccess";
 import RecipeResults from "./pages/RecipeResults";
 import SimpleCookingMode from "./pages/SimpleCookingMode";
 import Privacy from "./pages/Privacy";
 import AllMeals from "./pages/AllMeals";
 import CircularButtonDemo from "./pages/CircularButtonDemo";
 import TealButtonDemo from "./pages/TealButtonDemo";
-// Calendar page removed
 import { useEffect, useState, Suspense, lazy } from "react";
 import { format } from "date-fns";
 import BottomNav from "./components/BottomNav";
@@ -58,7 +59,7 @@ import MealPlan from "./pages/MealPlan";
 import ShoppingList from "./pages/ShoppingList";
 import EnhancedShoppingList from "./pages/EnhancedShoppingList";
 import ImprovedShoppingList from "./pages/ImprovedShoppingList";
-import PremiumShoppingListPage from "./pages/PremiumShoppingListPage";
+import PremiumShoppingList from "./pages/PremiumShoppingListPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import { AdminProtectedRoute } from "./lib/admin-protected-route";
@@ -72,24 +73,14 @@ import OnboardingQuiz from "./pages/OnboardingQuiz";
 import TestLogin from "./pages/TestLogin";
 import DebugLogin from "./pages/DebugLogin";
 
-// Import our new email and password reset pages
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import EmailVerifiedPage from "./pages/EmailVerifiedPage";
-import VerifyEmail from "./pages/VerifyEmail";
-
-// Import our emotional journey pages
+// Auth and Onboarding pages
 import EmotionalLandingPage from "./pages/EmotionalLandingPage";
 import EmotionalPaywall from "./pages/EmotionalPaywall";
-
-// Import VisionBoard page
 import VisionBoard from "./pages/VisionBoard";
 import TempNewOnboarding from "./pages/TempNewOnboarding";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { initializeWebViewOptimizations } from "./lib/webviewOptimizations";
 import { useScrollRestoration } from "@/hooks/use-scroll-restoration";
-
-
 
 // Redirect component for navigation
 function NavigationRedirect({ to }: { to: string }) {
@@ -238,6 +229,7 @@ function App() {
           <Route path="/privacy" component={Privacy} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/auth/google/success" component={GoogleAuthSuccess} />
 
           {user ? (
             // Protected routes for authenticated users
@@ -469,7 +461,7 @@ function App() {
             </Route>
             <Route path="/premium-shopping-list">
               <ProtectedRoute>
-                <PremiumShoppingListPage />
+                <PremiumShoppingList />
               </ProtectedRoute>
             </Route>
             <Route path="/today-meal-plan">
@@ -547,6 +539,8 @@ function App() {
           <>
             <Route path="/auth" component={AuthPage} />
             <Route path="/verify-email" component={VerifyEmail} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset-password" component={ResetPassword} />
             <Route path="/test-login" component={TestLogin} />
             <Route path="/debug-login" component={DebugLogin} />
             <Route path="/emotional-landing" component={EmotionalLandingPage} />
@@ -554,12 +548,6 @@ function App() {
             <Route path="/old-onboarding" component={OnboardingQuiz} />
             <Route path="/" component={TempNewOnboarding} />
             
-            {/* Email verification and password reset routes */}
-            <Route path="/verify-email/:token" component={EmailVerifiedPage} />
-            <Route path="/email-verified" component={EmailVerifiedPage} />
-            <Route path="/forgot-password" component={ForgotPasswordPage} />
-            <Route path="/reset-password/:token" component={ResetPasswordPage} />
-
             {/* Redirect unknown routes to landing */}
             <Route>
               <NavigationRedirect to="/" />

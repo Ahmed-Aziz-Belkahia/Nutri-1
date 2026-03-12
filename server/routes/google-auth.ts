@@ -13,208 +13,115 @@ const router = Router();
 /**
  * Initiate Google OAuth flow
  * GET /api/auth/google
+ *
+ * For WebView apps: call with ?platform=mobile&return_url=true to get the auth URL
+ * and open it in a system browser (Chrome Custom Tabs / SFSafariViewController).
+ * For web browsers: redirects directly to Google.
  */
 router.get('/google', (req: Request, res: Response, next) => {
-  // Check if request is from mobile app
   const platform = req.query.platform as string;
-  const userAgent = req.get('User-Agent') || '';
-  const isMobileApp = platform === 'mobile' || /nutriai-app/i.test(userAgent);
-  
-  // For mobile apps, return the OAuth URL so they can open it in a secure browser
-  // Google blocks OAuth in embedded webviews (Error 403: disallowed_useragent)
+  const isMobileApp = platform === 'mobile';
+
+  // For mobile WebView apps: return the OAuth URL instead of redirecting
+  // Google blocks OAuth in embedded WebViews — the app must open it in system browser
   if (isMobileApp && req.query.return_url === 'true') {
     const callbackUrl = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
     const clientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!clientId) {
+      return res.status(500).json({ error: 'Google OAuth is not configured' });
+    }
+
     const state = encodeURIComponent(JSON.stringify({ platform: 'mobile' }));
-    
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}` +
+
+    const googleAuthUrl =
+      `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${encodeURIComponent(clientId)}` +
       `&redirect_uri=${encodeURIComponent(callbackUrl)}` +
       `&response_type=code` +
       `&scope=${encodeURIComponent('profile email openid')}` +
       `&state=${state}` +
       `&access_type=online`;
-    
-    return res.json({
-      success: true,
-      authUrl: googleAuthUrl,
-      message: 'Open this URL in Chrome Custom Tabs (Android) or SFSafariViewController (iOS)',
-      instructions: 'The mobile app should open this URL in a secure browser component, not a webview'
-    });
+
+    return res.json({ success: true, authUrl: googleAuthUrl });
   }
-  
-  // Pass platform info through state parameter
-  const authenticateOptions: any = {
+
+  // Standard web browser flow — redirect directly to Google
+  passport.authenticate('google', {
     scope: ['profile', 'email'],
     session: false,
-  };
-  
-  if (isMobileApp) {
-    authenticateOptions.state = JSON.stringify({ platform: 'mobile' });
-  }
-  
-  passport.authenticate('google', authenticateOptions)(req, res, next);
+    ...(isMobileApp ? { state: JSON.stringify({ platform: 'mobile' }) } : {}),
+  } as any)(req, res, next);
 });
 
 /**
  * Google OAuth callback
  * GET /api/auth/google/callback
+ *
+ * Google redirects here after the user authenticates.
+ * We set JWT cookies and redirect to /auth/google/success.
+ * Tokens are NEVER passed in the URL for security.
  */
 router.get(
   '/google/callback',
   passport.authenticate('google', {
     session: false,
-    failureRedirect: '/login?error=google_auth_failed',
+    failureRedirect: '/auth?error=google_auth_failed',
   }),
-  (req: Request, res: Response) => {
+  async (req: Request, res: Response) => {
     try {
       const user = req.user as any;
 
       if (!user) {
-        return res.redirect('/login?error=authentication_failed');
+        return res.redirect('/auth?error=authentication_failed');
       }
 
-      // Generate JWT tokens (same as normal login)
+      // Generate JWT tokens (same policy as jwt-auth.ts)
       const accessToken = generateAccessToken(user.id, user.email);
       const refreshToken = generateRefreshToken(user.id, user.email);
 
-      // Store refresh token in database
+      // Store refresh token in DB
       const { refreshTokenExpiry } = getTokenExpiryDates();
-      storeRefreshToken(user.id, refreshToken, refreshTokenExpiry);
+      await storeRefreshToken(user.id, refreshToken, refreshTokenExpiry);
 
-      // Set tokens in HTTP-only cookies
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      // Set access token cookie — 1 day (matching jwt-auth.ts)
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 15 * 60 * 1000 // 15 minutes
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
+      // Set refresh token cookie — 365 days (matching jwt-auth.ts)
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
       });
 
-      // Detect if request came from mobile app
-      const userAgent = req.get('User-Agent') || '';
-      let isMobileApp = /nutriai-app/i.test(userAgent) || req.query.platform === 'mobile';
-      
-      // Also check state parameter
-      if (req.query.state) {
-        try {
-          const state = JSON.parse(req.query.state as string);
-          if (state.platform === 'mobile') {
-            isMobileApp = true;
-          }
-        } catch (e) {
-          // Ignore invalid state
-        }
-      }
-      
-      if (isMobileApp) {
-        // For mobile apps, use custom deep link
-        const deepLink = user.hasCompletedOnboarding 
-          ? 'nutriai://auth/success?onboarding=false'
-          : 'nutriai://auth/success?onboarding=true';
-        
-        // Also include tokens in the deep link (will be picked up by the app)
-        const linkWithTokens = `${deepLink}&access=${encodeURIComponent(accessToken)}&refresh=${encodeURIComponent(refreshToken)}`;
-        
-        return res.redirect(linkWithTokens);
-      }
-
-      // For web browsers
-      // Check if this was opened in a popup
-      const isPopup = req.query.popup === 'true';
-      
-      if (isPopup) {
-        // Send HTML that closes the popup and notifies parent window
-        return res.send(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>Authentication Successful</title>
-            <style>
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-                background: linear-gradient(135deg, #0CC5BA 0%, #0891b2 100%);
-                color: white;
-              }
-              .container {
-                text-align: center;
-                padding: 2rem;
-              }
-              .checkmark {
-                font-size: 48px;
-                margin-bottom: 1rem;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="checkmark">✓</div>
-              <h2>Authentication Successful!</h2>
-              <p>This window will close automatically...</p>
-            </div>
-            <script>
-              // Notify parent window and close
-              if (window.opener) {
-                window.opener.postMessage({ type: 'AUTH_SUCCESS' }, '*');
-              }
-              setTimeout(() => {
-                window.close();
-              }, 1500);
-            </script>
-          </body>
-          </html>
-        `);
-      }
-      
-      // Normal redirect flow
-      if (!user.hasCompletedOnboarding) {
-        return res.redirect('/onboarding');
-      }
-
-      return res.redirect('/dashboard');
+      // Redirect to the success page — cookies are set, frontend will pick them up
+      // Do NOT put tokens in the URL
+      return res.redirect('/auth/google/success');
     } catch (error) {
-      console.error('OAuth callback error:', error);
-      
-      // Check if mobile app
-      const userAgent = req.get('User-Agent') || '';
-      const isMobileApp = /nutriai-app/i.test(userAgent) || req.query.platform === 'mobile';
-      
-      if (isMobileApp) {
-        return res.redirect('nutriai://auth/error?message=callback_failed');
-      }
-      
-      return res.redirect('/login?error=callback_failed');
+      console.error('[Google OAuth] Callback error:', error);
+      return res.redirect('/auth?error=callback_failed');
     }
   }
 );
 
 /**
- * Link Google account to existing user
- * POST /api/auth/link-google
- * Requires existing authentication
+ * Google auth success status
+ * GET /api/auth/google/status
+ *
+ * The frontend polls this after opening the system browser to detect
+ * when the auth flow is complete. Returns ok:true if cookies are set.
  */
-router.post('/link-google', async (req: Request, res: Response) => {
-  try {
-    // This would need to be implemented with proper session handling
-    // For now, we'll return a placeholder
-    res.status(501).json({
-      message: 'Link Google account feature coming soon',
-    });
-  } catch (error) {
-    console.error('Link Google account error:', error);
-    res.status(500).json({ error: 'Failed to link Google account' });
-  }
+router.get('/google/status', (req: Request, res: Response) => {
+  const hasToken = Boolean(req.cookies?.accessToken);
+  res.json({ authenticated: hasToken });
 });
 
 export default router;
