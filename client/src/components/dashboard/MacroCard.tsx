@@ -10,10 +10,10 @@ interface DailyTotals {
 }
 
 interface UserProfile {
-  caloriesGoal?: number;
-  proteinGoal?: number;
-  carbsGoal?: number;
-  fatGoal?: number;
+  caloriesGoal?: number | null;
+  proteinGoal?: number | null;
+  carbsGoal?: number | null;
+  fatGoal?: number | null;
 }
 
 interface MacroCardProps {

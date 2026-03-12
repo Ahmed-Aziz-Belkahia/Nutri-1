@@ -134,4 +134,44 @@ router.get('/google/status', (req: Request, res: Response) => {
   res.json({ authenticated: hasToken });
 });
 
+/**
+ * Google Auth Handoff
+ * POST /api/auth/google/handoff
+ *
+ * For mobile apps: The app captures tokens from the deep link and passes
+ * them to this endpoint to set the HttpOnly cookies in the WebView.
+ */
+router.post('/google/handoff', async (req: Request, res: Response) => {
+  try {
+    const { accessToken, refreshToken } = req.body;
+
+    if (!accessToken || !refreshToken) {
+      return res.status(400).json({ error: 'Tokens are required for handoff' });
+    }
+
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Set access token cookie
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    // Set refresh token cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('[Google OAuth] Handoff error:', error);
+    return res.status(500).json({ error: 'Handoff failed' });
+  }
+});
+
 export default router;

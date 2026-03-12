@@ -117,9 +117,17 @@ export default function AuthPage() {
     const interval = setInterval(checkSession, 1000);
     window.addEventListener('storage', checkSession);
     
+    // Immediate check when returning to the app from the system browser
+    window.addEventListener('focus', checkSession);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') checkSession();
+    });
+    
     return () => {
       clearInterval(interval);
       window.removeEventListener('storage', checkSession);
+      window.removeEventListener('focus', checkSession);
+      window.removeEventListener('visibilitychange', checkSession);
     };
   }, [setLocation]);
 

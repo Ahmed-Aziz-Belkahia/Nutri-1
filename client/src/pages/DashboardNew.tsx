@@ -16,11 +16,13 @@ import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { createInvalidator } from "@/lib/queryUtils";
+import { queryKeys } from "@/lib/queryKeys";
 import { useFoodLog } from "@/hooks/use-food-log";
 import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
-import { Loader2, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, CheckCircle, Sparkles } from "lucide-react";
 import WeeklyWeightCheckIn from "@/components/WeeklyWeightCheckIn";
+import { analyzeFoodImage } from "@/lib/vision";
 
 interface GroceryItem {
   id: number;
@@ -83,6 +85,7 @@ export default function DashboardNew() {
   const [currentMacroIndex, setCurrentMacroIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isProcessingManualFood, setIsProcessingManualFood] = useState(false);
+  const [isAnalyzingFood, setIsAnalyzingFood] = useState(false);
   const [processingStep, setProcessingStep] = useState<string>("");
   const [processingComplete, setProcessingComplete] = useState(false);
 
@@ -231,6 +234,73 @@ export default function DashboardNew() {
     processPendingManualFood();
   }, []); // Only run once on mount
 
+  // Process pending AI food image analysis
+  useEffect(() => {
+    const processPendingAIImage = async () => {
+      const imageData = localStorage.getItem('pendingFoodImage');
+      const pendingName = localStorage.getItem('pendingFoodName');
+      
+      if (!imageData) return;
+
+      try {
+        console.log('[DASHBOARD] Detected pending AI food image, starting analysis...');
+        setIsAnalyzingFood(true);
+        setProcessingStep(t('common:dashboardNew.processing.analyzing'));
+        
+        // Step 1: Analyze image with Vision API
+        const analysisResult = await analyzeFoodImage(imageData);
+        console.log('[DASHBOARD] AI analysis complete:', analysisResult);
+        
+        setProcessingStep(t('common:dashboardNew.processing.adding'));
+        
+        // Step 2: Add to food log
+        const logResult = await addFood({
+          ...analysisResult,
+          isEstimate: true,
+          image: imageData // Store image locally if supported or just keep for this session
+        });
+        
+        console.log('[DASHBOARD] AI food log added successfully:', logResult);
+        setProcessingStep(t('common:dashboardNew.processing.complete'));
+        setProcessingComplete(true);
+        
+        // Clear storage
+        localStorage.removeItem('pendingFoodImage');
+        localStorage.removeItem('pendingFoodName');
+        
+        // Invalidate queries
+        await queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.byDate(selectedDate) });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.foodLogs.totals(selectedDate) });
+        
+        toast({
+          title: t('common:dashboardNew.success.aiTitle'),
+          description: t('common:dashboardNew.success.addedFood', { name: analysisResult.name }),
+        });
+
+        setTimeout(() => {
+          setIsAnalyzingFood(false);
+          setProcessingComplete(false);
+        }, 2000);
+
+      } catch (error) {
+        console.error('[DASHBOARD] AI Analysis Error:', error);
+        localStorage.removeItem('pendingFoodImage');
+        localStorage.removeItem('pendingFoodName');
+        
+        toast({
+          variant: "destructive",
+          title: t('common:dashboardNew.error.aiTitle'),
+          description: error instanceof Error ? error.message : t('common:dashboardNew.error.failedToAnalyze'),
+        });
+        
+        setIsAnalyzingFood(false);
+        setProcessingComplete(false);
+      }
+    };
+
+    processPendingAIImage();
+  }, []); // Only run once on mount
+
   // Auto-scroll carousel every 5 seconds
   useEffect(() => {
     if (isPaused) return;
@@ -309,8 +379,8 @@ export default function DashboardNew() {
         <StreakCard />
       </div>
       
-      {/* Manual Food Processing Screen */}
-      {isProcessingManualFood && (
+      {/* Manual & AI Food Processing Screen */}
+      {(isProcessingManualFood || isAnalyzingFood) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -322,7 +392,7 @@ export default function DashboardNew() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="w-24 h-24 mx-auto mb-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+              className="w-24 h-24 mx-auto mb-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center relative"
             >
               {processingComplete ? (
                 <motion.div
@@ -332,6 +402,20 @@ export default function DashboardNew() {
                 >
                   <CheckCircle className="w-12 h-12 text-white" />
                 </motion.div>
+              ) : isAnalyzingFood ? (
+                <div className="relative">
+                  <Loader2 className="w-12 h-12 text-white animate-spin" />
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 1, 0.5]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <Sparkles className="w-6 h-6 text-yellow-300" />
+                  </motion.div>
+                </div>
               ) : (
                 <Loader2 className="w-12 h-12 text-white animate-spin" />
               )}
@@ -343,7 +427,11 @@ export default function DashboardNew() {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-white mb-4"
             >
-              {processingComplete ? t('common:dashboardNew.processing.added') : t('common:dashboardNew.processing.processing')}
+              {processingComplete 
+                ? t('common:dashboardNew.processing.added') 
+                : isAnalyzingFood 
+                  ? t('common:dashboardNew.processing.aiCooking')
+                  : t('common:dashboardNew.processing.processing')}
             </motion.h2>
 
             <motion.p

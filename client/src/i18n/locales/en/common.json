@@ -404,15 +404,20 @@
       "updating": "Updating nutrition totals...",
       "complete": "Complete!",
       "added": "Added!",
-      "processing": "Processing..."
+      "processing": "Processing...",
+      "analyzing": "Analyzing your photo...",
+      "aiCooking": "AI Chef is cooking..."
     },
     "success": {
       "title": "Success",
+      "aiTitle": "AI Analysis Successful",
       "addedFood": "Added {{name}} to your log"
     },
     "error": {
       "title": "Error",
-      "failedToAdd": "Failed to add food"
+      "aiTitle": "AI Analysis Failed",
+      "failedToAdd": "Failed to add food",
+      "failedToAnalyze": "We couldn't recognize the food in this photo."
     }
   },
   "enhancedDashboard": {

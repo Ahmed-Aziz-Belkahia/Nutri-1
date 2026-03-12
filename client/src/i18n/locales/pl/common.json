@@ -703,15 +703,20 @@
       "updating": "Aktualizowanie sum żywieniowych...",
       "complete": "Gotowe!",
       "added": "Dodano!",
-      "processing": "Przetwarzanie..."
+      "processing": "Przetwarzanie...",
+      "analyzing": "Analizowanie zdjęcia...",
+      "aiCooking": "Szef Kuchni AI gotuje..."
     },
     "success": {
       "title": "Sukces",
+      "aiTitle": "Analiza AI zakończona sukcesem",
       "addedFood": "Dodano {{name}} do dziennika"
     },
     "error": {
       "title": "Błąd",
-      "failedToAdd": "Nie udało się dodać jedzenia"
+      "aiTitle": "Analiza AI nieudana",
+      "failedToAdd": "Nie udało się dodać jedzenia",
+      "failedToAnalyze": "Nie udało się rozpoznać jedzenia na tym zdjęciu."
     }
   },
   "enhancedDashboard": {

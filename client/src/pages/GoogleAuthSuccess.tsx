@@ -21,6 +21,19 @@ export default function GoogleAuthSuccess() {
   useEffect(() => {
     const finishAuth = async () => {
       try {
+        const params = new URLSearchParams(window.location.search);
+        const urlAccessToken = params.get("accessToken");
+        const urlRefreshToken = params.get("refreshToken");
+
+        if (urlAccessToken && urlRefreshToken) {
+          console.log("[GoogleAuthSuccess] Found tokens in URL, performing handoff...");
+          await axios.post("/api/auth/google/handoff", {
+            accessToken: urlAccessToken,
+            refreshToken: urlRefreshToken
+          });
+          console.log("[GoogleAuthSuccess] Handoff successful");
+        }
+
         // Refresh token to ensure the session is valid
         await axios.post("/api/auth/refresh", {}, { withCredentials: true });
 
