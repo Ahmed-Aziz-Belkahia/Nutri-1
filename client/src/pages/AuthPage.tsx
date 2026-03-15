@@ -409,7 +409,7 @@ export default function AuthPage() {
             </form>
 
             {/* Divider */}
-            <div className="relative my-6">
+            <div className="relative my-6 hidden">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-200"></div>
               </div>
@@ -423,7 +423,7 @@ export default function AuthPage() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isGoogleLoading}
-              className="w-full h-12 flex items-center justify-center gap-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-all font-medium text-slate-700 text-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full h-12 hidden flex items-center justify-center gap-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-all font-medium text-slate-700 text-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isGoogleLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
