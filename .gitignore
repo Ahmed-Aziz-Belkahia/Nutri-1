@@ -8,7 +8,12 @@ vite.config.ts.*
 # Database files - should not be committed
 local.db
 local.db-shm
-local.db-wal
+local*.db-wal
+
+# Environment files
+.env
+.env.*
+!.env.example
 local.db.backup*
 *.db
 *.db-shm
