@@ -5,16 +5,39 @@ server/public
 vite.config.ts.*
 *.tar.gz
 
-# Database files - should not be committed
+# Database files
 local.db
 local.db-shm
-local*.db-wal
+local.db-wal
+local.db.backup*
+*.db
+*.db-shm
+*.db-wal
 
 # Environment files
 .env
 .env.*
 !.env.example
-local.db.backup*
-*.db
-*.db-shm
-*.db-wal
+!.env.production
+
+# Credentials (never commit keys)
+credentials/*.json
+!credentials/README.md
+
+# IDE / Editor history
+.history/
+
+# Backups
+backups/
+
+# Logs
+logs/
+
+# Session files
+cookies.txt
+
+# Media files (design assets)
+*.mov
+
+# Build artifacts
+app.zip

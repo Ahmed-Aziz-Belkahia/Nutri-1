@@ -24,30 +24,6 @@ import {
 } from "@db/schema";
 import { eq, desc, and, sql, inArray, gte, lte, or, asc, count, sum, avg, between, isNull, isNotNull } from "drizzle-orm";
 
-// Example user nutrition data for the API
-const exampleUserData = {
-  1: {
-    goal: "lose",
-    caloriesLeft: 750,
-    proteinGoal: 120,
-    carbsGoal: 150,
-    fatGoal: 50
-  },
-  2: {
-    goal: "gain",
-    caloriesLeft: 1200,
-    proteinGoal: 180,
-    carbsGoal: 220,
-    fatGoal: 70
-  },
-  3: {
-    goal: "maintain",
-    caloriesLeft: 450,
-    proteinGoal: 140,
-    carbsGoal: 180,
-    fatGoal: 60
-  }
-};
 import { registerMealPlanRoutes } from "./meal-plans.routes";
 import { analyzeFoodImage, analyzeIngredientsWithOpenAI } from "./services/food-recognition";
 import { analyzeFoodText } from "./services/openai";
@@ -286,21 +262,8 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/auth', authRoutes);
   app.use('/api/admin', adminRoutes);
 
-  // Nutrition tracking data API endpoint
-  app.get('/api/userdata/:userId', (req, res) => {
-    const userId = req.params.userId;
-    
-    // Check if user data exists
-    if (!exampleUserData[userId as unknown as keyof typeof exampleUserData]) {
-      return res.status(404).json({
-        error: 'User not found',
-        message: 'No nutrition data found for the specified user ID'
-      });
-    }
-    
-    // Return the user's nutrition data
-    res.json(exampleUserData[userId as unknown as keyof typeof exampleUserData]);
-  });
+
+
 
   // Add logout endpoint (redirects to JWT logout)
   app.post("/api/logout", (req, res) => {

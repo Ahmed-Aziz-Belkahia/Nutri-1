@@ -1138,7 +1138,6 @@ export default function ProgressPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </div>
     </BaseLayout>
   );
 }

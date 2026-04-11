@@ -27,8 +27,8 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => 
   next();
 };
 
-// Admin routes are now accessible to all authenticated users
-// router.use(isAdmin); // Commented out - no longer restricting to admins
+// Require admin privileges for all routes in this router
+router.use(isAdmin);
 
 // Get all users with detailed stats
 router.get('/users', async (req: AuthRequest, res: Response) => {

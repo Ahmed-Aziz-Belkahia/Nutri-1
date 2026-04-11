@@ -136,7 +136,7 @@ This week marked a significant milestone in the NutriAI application development 
   - Configured authorized JavaScript origins
   - Added authorized redirect URIs for both dev and production
   - Obtained Client ID: `158336525214-qbdhmd1nivd7fsab35lc5mril6nr4ufn.apps.googleusercontent.com`
-  - Secured Client Secret: `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`
+  - Secured Client Secret: `[REDACTED — rotated after audit]`
   - Configured scope permissions (email, profile, openid)
 
 #### Passport.js Google Strategy Implementation

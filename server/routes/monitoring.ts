@@ -7,8 +7,12 @@ import { sql } from 'drizzle-orm';
 
 const router = Router();
 
-// API Key authentication for monitoring endpoints
-const MONITORING_API_KEY = process.env.MONITORING_API_KEY || 'nutriai-monitoring-key-change-in-production';
+// API Key authentication for monitoring endpoints — MUST be set via environment variable
+const MONITORING_API_KEY = process.env.MONITORING_API_KEY;
+
+if (!MONITORING_API_KEY) {
+  console.warn('[Monitoring] WARNING: MONITORING_API_KEY not set. Monitoring endpoints will reject all requests.');
+}
 
 function checkApiKey(req: Request, res: Response, next: Function) {
   const apiKey = req.query.key as string || req.headers['x-api-key'] as string;

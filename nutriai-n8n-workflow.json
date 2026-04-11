@@ -564,7 +564,7 @@
     {
       "parameters": {
         "fromEmail": "NutriAI Monitoring <monitoring@nutriai.pl>",
-        "toEmail": "ahmadazizbelkahia@gmail.com, piotr.boleslaw.szacillo@gmail.com",
+        "toEmail": "admin@nutriai.online",
         "subject": "={{ $json.subject }}",
         "html": "={{ $json.html }}",
         "options": {

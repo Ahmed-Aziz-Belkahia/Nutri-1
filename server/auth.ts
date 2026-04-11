@@ -66,8 +66,13 @@ export function setupAuth(app: Express) {
   const MemoryStore = createMemoryStore(session);
   const isProduction = app.get("env") === "production";
 
+  const sessionSecret = process.env.SESSION_SECRET || process.env.JWT_SECRET;
+  if (!sessionSecret) {
+    throw new Error('FATAL: SESSION_SECRET or JWT_SECRET environment variable must be set.');
+  }
+
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.REPL_ID || "nutri-ai-secret-key-development-12345",
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false, // Don't save empty sessions
     cookie: {
@@ -119,12 +124,10 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user, done) => {
-    console.log("Serializing user:", user.id);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: number, done) => {
-    console.log("Deserializing user ID:", id);
     try {
       const [user] = await db
         .select()
@@ -133,11 +136,9 @@ export function setupAuth(app: Express) {
         .limit(1);
 
       if (!user) {
-        console.log("User not found during deserialization:", id);
         return done(null, false);
       }
 
-      console.log("User found during deserialization:", user.id, user.email);
       return done(null, user);
     } catch (err) {
       console.error("Deserialization error:", err);
@@ -147,7 +148,6 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res) => {
     try {
-      console.log("Registration request:", req.body);
       const { email, password, profile } = req.body;
 
       // Check if user already exists
@@ -182,7 +182,7 @@ export function setupAuth(app: Express) {
         .values(userData)
         .returning();
 
-      console.log("User created:", newUser);
+
 
       // If profile data is provided, create nutrition preferences
       if (profile && newUser) {
@@ -204,7 +204,7 @@ export function setupAuth(app: Express) {
             allergies: profile.allergies || []
           };
 
-          console.log("Creating nutrition preferences:", nutritionPreferencesData);
+
 
           await db
             .insert(userNutritionPreferences)
@@ -288,12 +288,7 @@ export function setupAuth(app: Express) {
             return res.status(500).json({ error: "Failed to save session" });
           }
           
-          // Log successful login information
-          console.log("User logged in successfully:", {
-            userId: user.id,
-            email: user.email,
-            sessionID: req.sessionID
-          });
+
           
           res.json({ 
             ok: true,
@@ -319,11 +314,6 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    console.log("GET /api/user - Session debug:", {
-      sessionID: req.sessionID,
-      user: req.user,
-      session: req.session
-    });
     res.json(req.user);
   });
   

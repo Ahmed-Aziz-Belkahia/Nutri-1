@@ -12,8 +12,8 @@ Successfully implemented Google OAuth 2.0 authentication integrated with the exi
 ### 1. Environment Configuration
 **File**: `.env`
 ```properties
-GOOGLE_CLIENT_ID=158336525214-qbdhmd1nivd7fsab35lc5mril6nr4ufn.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
+GOOGLE_CLIENT_ID=<your-google-client-id>.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
 ```
 

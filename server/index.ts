@@ -26,7 +26,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: [
@@ -59,9 +59,10 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',') 
   : true; // In development, allow all origins
 
-// Add CORS configuration
+// CORS configuration
+const isDevMode = process.env.NODE_ENV !== 'production';
 app.use(cors({
-  origin: true, // Allow all origins in development
+  origin: isDevMode ? true : allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
@@ -210,9 +211,14 @@ async function initializeApp() {
 
     // Error handling middleware
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      console.error("Server error:", err);
       const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
+      // Never expose raw error messages in production
+      const message = process.env.NODE_ENV === 'production' 
+        ? 'Internal Server Error' 
+        : (err.message || 'Internal Server Error');
+      if (status >= 500) {
+        console.error('Server error:', err);
+      }
       res.status(status).json({ message });
     });
 

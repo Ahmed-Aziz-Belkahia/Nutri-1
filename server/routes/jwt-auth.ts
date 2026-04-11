@@ -151,7 +151,6 @@ const crypto = {
  */
 router.post('/register', registerLimiter, async (req, res: Response) => {
   try {
-    console.log('[JWT Auth] Registration request:', req.body.email);
     const { email, password, profile } = req.body;
 
     // Validate input
@@ -188,7 +187,7 @@ router.post('/register', registerLimiter, async (req, res: Response) => {
     const hashedPassword = await crypto.hash(password);
 
     // Generate 6-digit verification code
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(require('crypto').randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     // Store pending registration
@@ -200,14 +199,14 @@ router.post('/register', registerLimiter, async (req, res: Response) => {
       profileData: profile ? JSON.stringify(profile) : null,
     });
 
-    console.log('[JWT Auth] Pending registration created for:', email);
+
 
     // Send verification code email (but don't wait for it or block registration)
     sendVerificationCodeEmail(email, code).catch(error => {
       console.error('[JWT Auth] Failed to send verification email:', error);
     });
 
-    console.log('[JWT Auth] Registration initiated for:', email);
+    console.log('[JWT Auth] Registration initiated, verification code sent');
 
     // Don't create the account yet - they need to verify email first
     res.status(201).json({
@@ -219,8 +218,7 @@ router.post('/register', registerLimiter, async (req, res: Response) => {
   } catch (error) {
     console.error('[JWT Auth] Registration error:', error);
     res.status(500).json({
-      error: 'Registration failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Registration failed'
     });
   }
 });
@@ -413,7 +411,7 @@ router.post('/resend-verification-code', resendCodeLimiter, async (req, res: Res
     }
 
     // Generate new 6-digit verification code
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(require('crypto').randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     // Update pending registration with new code
@@ -449,7 +447,6 @@ router.post('/resend-verification-code', resendCodeLimiter, async (req, res: Res
  */
 router.post('/login', loginLimiter, async (req, res: Response) => {
   try {
-    console.log('[JWT Auth] Login request:', req.body.email);
     const { email, password } = req.body;
 
     // Validate input
@@ -497,7 +494,6 @@ router.post('/login', loginLimiter, async (req, res: Response) => {
       maxAge: 365 * 24 * 60 * 60 * 1000 // 365 days (1 year)
     });
 
-    console.log('[JWT Auth] Login successful for:', email);
 
     res.json({
       ok: true,
@@ -509,16 +505,13 @@ router.post('/login', loginLimiter, async (req, res: Response) => {
         preferredLanguage: user.preferred_language,
         profileImage: user.profileImage,
         isAdmin: user.isAdmin
-      },
-      accessToken,
-      refreshToken
+      }
     });
 
   } catch (error) {
     console.error('[JWT Auth] Login error:', error);
     res.status(500).json({
-      error: 'Login failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      error: 'Login failed'
     });
   }
 });
@@ -822,7 +815,7 @@ router.post('/reset-password', verifyCodeLimiter, async (req, res: Response) => 
   } catch (error) {
     console.error('[JWT Auth] Reset password error:', error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Password reset failed'
+      error: 'Password reset failed'
     });
   }
 });
@@ -855,7 +848,7 @@ router.get('/verify-email', async (req, res: Response) => {
   } catch (error) {
     console.error('[JWT Auth] Email verification error:', error);
     res.status(500).json({
-      error: error instanceof Error ? error.message : 'Email verification failed'
+      error: 'Email verification failed'
     });
   }
 });

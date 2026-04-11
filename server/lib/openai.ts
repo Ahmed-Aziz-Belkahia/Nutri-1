@@ -47,7 +47,7 @@ Return a JSON object with this exact structure:
   ]
 }`;
 
-    console.log('[OpenAI] Sending prompt:', prompt);
+
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -65,12 +65,11 @@ Return a JSON object with this exact structure:
     });
 
     const content = response.choices?.[0]?.message?.content ?? '';
-    console.log('[OpenAI] Raw response:', content);
+
     if (!content || typeof content !== 'string') {
       throw new Error('Empty content from OpenAI');
     }
     const result = JSON.parse(content);
-    console.log('[OpenAI] Parsed result:', result);
     return result;
 
   } catch (error) {

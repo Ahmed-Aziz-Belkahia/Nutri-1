@@ -41,14 +41,14 @@ function checkEmailRateLimit(email: string): boolean {
   return true;
 }
 
-// Configure Nodemailer transporter for Hostinger SMTP with connection pooling
+// Configure Nodemailer transporter for SMTP with connection pooling
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com',
-  port: 465,
+  host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+  port: parseInt(process.env.SMTP_PORT || '465'),
   secure: true, // use SSL
   auth: {
-    user: 'support@nutriai.pl',
-    pass: '7|Pwm5qY?U'
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || ''
   },
   // Connection pooling to avoid "too many AUTH commands"
   pool: true,

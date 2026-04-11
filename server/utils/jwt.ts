@@ -4,9 +4,16 @@ import { db } from '@db';
 import { users, refreshTokens } from '@db/schema';
 import { eq, and, gt, lt } from 'drizzle-orm';
 
-// JWT Configuration
-const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET || 'nutri-ai-access-secret-key-change-in-production';
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET || 'nutri-ai-refresh-secret-key-change-in-production';
+// JWT Configuration — secrets MUST be set via environment variables
+const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET;
+
+if (!ACCESS_TOKEN_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is not set. Cannot start server.');
+}
+if (!REFRESH_TOKEN_SECRET) {
+  throw new Error('FATAL: JWT_REFRESH_SECRET environment variable is not set. Cannot start server.');
+}
 const ACCESS_TOKEN_EXPIRY = '1d'; // 1 day (longer to reduce refresh frequency)
 const REFRESH_TOKEN_EXPIRY = '365d'; // 365 days (1 year for persistent sessions)
 
@@ -248,12 +255,12 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
           email: user.email,
           preferredLanguage: user.preferred_language,
           preferred_language: user.preferred_language,
-          hasCompletedOnboarding: user.has_completed_onboarding,
-          has_completed_onboarding: user.has_completed_onboarding,
-          profileImage: user.profile_image,
-          profile_image: user.profile_image,
-          isAdmin: user.is_admin,
-          is_admin: user.is_admin
+          hasCompletedOnboarding: user.hasCompletedOnboarding,
+          has_completed_onboarding: user.hasCompletedOnboarding,
+          profileImage: user.profileImage,
+          profile_image: user.profileImage,
+          isAdmin: user.isAdmin,
+          is_admin: user.isAdmin
         };
 
         next();
@@ -311,12 +318,12 @@ export function optionalAuth(req: AuthRequest, res: Response, next: NextFunction
             email: user.email,
             preferredLanguage: user.preferred_language,
             preferred_language: user.preferred_language,
-            hasCompletedOnboarding: user.has_completed_onboarding,
-            has_completed_onboarding: user.has_completed_onboarding,
-            profileImage: user.profile_image,
-            profile_image: user.profile_image,
-            isAdmin: user.is_admin,
-            is_admin: user.is_admin
+            hasCompletedOnboarding: user.hasCompletedOnboarding,
+            has_completed_onboarding: user.hasCompletedOnboarding,
+            profileImage: user.profileImage,
+            profile_image: user.profileImage,
+            isAdmin: user.isAdmin,
+            is_admin: user.isAdmin
           };
         }
         next();
