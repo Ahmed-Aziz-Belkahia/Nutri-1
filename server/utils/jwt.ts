@@ -33,7 +33,7 @@ export interface TokenPayload {
 // The authenticated user attached to a request.
 //
 // Two shapes flow through here: requireAuth attaches a narrow projection of
-// the user row, while the Google strategy hands passport a full row. Extending
+// the user row, while the Apple sign-in route works with a full row. Extending
 // Partial<SelectUser> accepts both, while id/email stay required. The snake_case
 // keys are duplicate aliases that requireAuth sets for legacy call sites.
 export interface AuthUser extends Partial<SelectUser> {
@@ -47,8 +47,8 @@ export interface AuthUser extends Partial<SelectUser> {
 
 // Align Express.User with AuthUser so a plain Request stays assignable to
 // AuthRequest. This augmentation previously lived in the now-deleted
-// passport-based server/auth.ts; it is ambient, so removing it broke every
-// handler typed against AuthRequest.
+// server/auth.ts; it is ambient, so removing it broke every handler typed
+// against AuthRequest.
 declare global {
   namespace Express {
     interface User extends AuthUser {}

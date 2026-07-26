@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Webcam from 'react-webcam';
+import { useNativeCamera, captureNativePhoto, captureFeedback, ensureCameraPermission } from '@/lib/camera';
 import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3, Check, Flame } from "lucide-react";
 import { useFoodLog } from '@/hooks/use-food-log';
 import { analyzeFoodText, analyzeFoodImage } from '@/lib/vision';
@@ -129,7 +130,18 @@ export default function AddFoodNew() {
   useEffect(() => {
     const checkCameraPermission = async () => {
       if (activeTab !== "photo") return;
-      
+
+      // Native: the Capacitor plugin owns permissions and presents its own UI,
+      // so there is no inline stream to wait on. Clear the loading state or the
+      // spinner would never resolve (nothing fires onUserMedia).
+      if (useNativeCamera()) {
+        const granted = await ensureCameraPermission();
+        setCameraReady(granted);
+        setCameraLoading(false);
+        setCameraError(granted ? null : "Camera access denied. Please enable camera permissions in Settings.");
+        return;
+      }
+
       try {
         // Check if we have permission without triggering a prompt
         // The Webcam component will handle the actual stream request
@@ -194,10 +206,18 @@ export default function AddFoodNew() {
 
   // Handle image capture
   const handleCapture = async () => {
-    if (!webcamRef.current) return;
-    
     try {
-      const screenshot = webcamRef.current.getScreenshot();
+      // Native uses the system camera UI; the web build keeps <Webcam>.
+      let screenshot: string | null;
+      if (useNativeCamera()) {
+        await captureFeedback();
+        screenshot = await captureNativePhoto('camera');
+        if (!screenshot) return; // user cancelled the native camera
+      } else {
+        if (!webcamRef.current) return;
+        screenshot = webcamRef.current.getScreenshot();
+      }
+
       if (!screenshot) {
         throw new Error("Failed to capture image");
       }
@@ -421,8 +441,9 @@ export default function AddFoodNew() {
   const renderPhotoView = () => {
     return (
       <>
-        {/* Camera Feed */}
-        {cameraReady && (
+        {/* Camera Feed — web only. On native the system camera UI is presented
+            on demand by handleCapture, so there is no inline preview. */}
+        {cameraReady && !useNativeCamera() && (
           <Webcam
             key={webcamKey}
             ref={webcamRef}

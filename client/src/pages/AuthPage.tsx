@@ -14,6 +14,8 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { useLocation, useSearch } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
+import { signInWithApple, isAppleSignInAvailable } from "@/lib/appleAuth";
 import { useTranslation } from "react-i18next";
 
 export default function AuthPage() {
@@ -30,11 +32,11 @@ export default function AuthPage() {
     confirmPassword: '',
   });
 
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [googleError, setGoogleError] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [isAppleLoading, setIsAppleLoading] = useState(false);
+  const [appleError, setAppleError] = useState<string | null>(null);
 
   const { loginMutation, registerMutation } = useAuth();
+  const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
   // Function to submit pending onboarding data
@@ -131,59 +133,26 @@ export default function AuthPage() {
     };
   }, [setLocation]);
 
-  // Clean up Google polling on unmount
-  useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, []);
-
   /**
-   * Google Sign-In handler.
-   * Fetches the OAuth URL from the backend and opens it in the system browser.
-   * The system browser (not the WebView) handles Google's auth, then redirects
-   * to /auth/google/success. We poll /api/auth/google/status to detect completion.
+   * Sign in with Apple. Native-only: Apple's sheet is presented by the plugin,
+   * and the resulting identity token is verified server-side before we accept
+   * any identity from it.
    */
-  const handleGoogleSignIn = async () => {
-    setIsGoogleLoading(true);
-    setGoogleError(null);
+  const handleAppleSignIn = async () => {
+    setIsAppleLoading(true);
+    setAppleError(null);
 
     try {
-      const res = await fetch('/api/auth/google?platform=mobile&return_url=true');
-      const data = await res.json();
-
-      if (!data.success || !data.authUrl) {
-        throw new Error('Failed to get Google auth URL');
-      }
-
-      // Open in system browser — this bypasses the WebView Google block
-      window.open(data.authUrl, '_blank');
-
-      // Poll /api/auth/google/status every 2s to detect when session is set
-      let attempts = 0;
-      const MAX_ATTEMPTS = 60; // 2 minutes maximum
-
-      pollRef.current = setInterval(async () => {
-        attempts++;
-        try {
-          const statusRes = await fetch('/api/auth/google/status', { credentials: 'include' });
-          const status = await statusRes.json();
-
-          if (status.authenticated) {
-            clearInterval(pollRef.current!);
-            // Session is live — navigate to success page to load the user
-            setLocation('/auth/google/success');
-          } else if (attempts >= MAX_ATTEMPTS) {
-            clearInterval(pollRef.current!);
-            setIsGoogleLoading(false);
-            setGoogleError('Sign-in timed out. Please try again.');
-          }
-        } catch {
-          // Ignore network errors during polling
-        }
-      }, 2000);
+      const result = await signInWithApple();
+      if (!result) return; // user dismissed the Apple sheet
+      // The session now exists; let the auth query pick the user up.
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
+      setLocation('/');
     } catch (err) {
-      console.error('[AuthPage] Google sign-in error:', err);
-      setIsGoogleLoading(false);
-      setGoogleError('Failed to start Google sign-in. Please try again.');
+      console.error('[AuthPage] Apple sign-in error:', err);
+      setAppleError(err instanceof Error ? err.message : 'Apple sign-in failed. Please try again.');
+    } finally {
+      setIsAppleLoading(false);
     }
   };
 
@@ -418,28 +387,30 @@ export default function AuthPage() {
               </div>
             </div>
 
-            {/* Google Sign In Button */}
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isGoogleLoading}
-              className="w-full h-12 hidden flex items-center justify-center gap-3 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-all font-medium text-slate-700 text-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isGoogleLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-              ) : (
-                <svg viewBox="0 0 24 24" className="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.36c-.22-.66-.35-1.36-.35-2.36s.13-1.7.35-2.36V6.8H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 5.2l3.66-2.84z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.01l3.66 2.84c.87-2.6 3.3-4.47 6.16-4.47z" fill="#EA4335"/>
-                </svg>
-              )}
-              {isGoogleLoading ? 'Opening Google...' : `Continue with Google`}
-            </button>
+            {/* Sign in with Apple — native only. Apple's Human Interface
+                Guidelines require their official mark and wording, and 4.8
+                requires it be offered at least as prominently as any other
+                third-party sign-in. It is the only social option here. */}
+            {isAppleSignInAvailable() && (
+              <button
+                type="button"
+                onClick={handleAppleSignIn}
+                disabled={isAppleLoading}
+                className="w-full h-12 flex items-center justify-center gap-2.5 rounded-xl bg-black text-white font-medium text-[17px] transition-all active:opacity-80 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isAppleLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-white" />
+                ) : (
+                  <svg viewBox="0 0 384 512" aria-hidden="true" className="h-[19px] w-[19px] fill-white">
+                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+                  </svg>
+                )}
+                {isAppleLoading ? 'Signing in…' : 'Sign in with Apple'}
+              </button>
+            )}
 
-            {googleError && (
-              <p className="text-xs text-red-500 text-center mt-2">{googleError}</p>
+            {appleError && (
+              <p className="text-xs text-red-500 text-center mt-2">{appleError}</p>
             )}
 
             {/* Toggle Auth Mode */}

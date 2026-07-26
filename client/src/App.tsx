@@ -20,7 +20,6 @@ import IngredientConfirmation from "./pages/IngredientConfirmation";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
-import GoogleAuthSuccess from "./pages/GoogleAuthSuccess";
 import RecipeResults from "./pages/RecipeResults";
 import Privacy from "./pages/Privacy";
 import Profile from "./pages/Profile";
@@ -159,7 +158,6 @@ function App() {
           <Route path="/privacy" component={Privacy} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
-          <Route path="/auth/google/success" component={GoogleAuthSuccess} />
 
           {user ? (
             // Protected routes for authenticated users

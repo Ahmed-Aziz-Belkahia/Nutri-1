@@ -8,6 +8,7 @@ import "./index.css";
 // Import i18n configuration
 import "./i18n/config";
 import { installNativeApiInterceptor, loadStoredTokens } from "./lib/nativeApi";
+import { initNativeShell } from "./lib/nativeShell";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
@@ -28,4 +29,6 @@ const app = (
 installNativeApiInterceptor();
 loadStoredTokens().finally(() => {
   createRoot(root).render(app);
+  // After first render, so the splash hides over real content.
+  initNativeShell();
 });

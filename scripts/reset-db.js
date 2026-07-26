@@ -57,9 +57,9 @@ CREATE TABLE users (
   experience_points integer,
   level integer,
   is_admin integer DEFAULT 0,
-  google_id text,
-  google_email text,
-  google_picture text,
+  apple_sub text,
+  apple_email text,
+  is_private_relay_email integer DEFAULT 0,
   auth_provider text DEFAULT 'local',
   email_verified_via text,
   last_login_at integer

@@ -362,6 +362,36 @@ test('AI token quota is enforced, not bypassed', async () => {
   assert.equal(allowed.status, 200, 'request must succeed once quota resets');
 });
 
+test('Sign in with Apple rejects unverified identity tokens', async () => {
+  // The endpoint must never trust a client-supplied token. A forged JWT with a
+  // plausible payload has to fail signature verification against Apple's keys.
+  const forged = [
+    Buffer.from(JSON.stringify({ alg: 'RS256', kid: 'fake' })).toString('base64url'),
+    Buffer.from(
+      JSON.stringify({
+        sub: 'attacker.000',
+        email: 'attacker@example.test',
+        iss: 'https://appleid.apple.com',
+        aud: 'online.nutriai.app',
+        exp: Math.floor(Date.now() / 1000) + 3600
+      })
+    ).toString('base64url'),
+    'not-a-real-signature'
+  ].join('.');
+
+  const res = await api('POST', '/api/auth/apple', { identityToken: forged });
+  assert.equal(res.status, 401, 'a forged identity token must be rejected');
+
+  const missing = await api('POST', '/api/auth/apple', {});
+  assert.equal(missing.status, 400, 'a missing identity token must be a 400');
+
+  // And no account may have been created from the forged attempt.
+  const conn = db();
+  const row = conn.prepare('SELECT id FROM users WHERE email = ?').get('attacker@example.test');
+  conn.close();
+  assert.equal(row, undefined, 'forged sign-in must not create a user');
+});
+
 test('logout clears the session', async () => {
   const res = await api('POST', '/api/auth/logout');
   assert.ok([200, 204].includes(res.status), `unexpected logout status ${res.status}`);

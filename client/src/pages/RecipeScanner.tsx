@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Webcam from 'react-webcam';
+import { useNativeCamera, captureNativePhoto, captureFeedback, ensureCameraPermission } from '@/lib/camera';
 import { Camera, AlertTriangle, ArrowLeft, Sparkles, Loader2, Image as ImageIcon, Edit3, ChefHat } from "lucide-react";
 
 // Utility function to convert image to WebP format for optimization
@@ -92,8 +93,19 @@ export default function RecipeScanner() {
   }, [activeTab]);
 
   const requestCameraPermission = async () => {
+    // Native: the Capacitor plugin owns permissions and presents its own UI.
+    // There is no inline stream, so clear the loading state here — nothing
+    // fires onUserMedia and the spinner would never resolve.
+    if (useNativeCamera()) {
+      const granted = await ensureCameraPermission();
+      setCameraReady(granted);
+      setCameraLoading(false);
+      setCameraError(granted ? null : "Camera access denied. Please enable camera permissions in Settings.");
+      return;
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: { exact: 'environment' },
           width: { ideal: 1920, min: 1080 },
@@ -113,11 +125,20 @@ export default function RecipeScanner() {
 
   // Handle image capture
   const handleCapture = async () => {
-    if (!webcamRef.current) return;
-    
     try {
-      setIsAnalyzing(true);
-      const screenshot = webcamRef.current.getScreenshot();
+      // Native uses the system camera UI; the web build keeps <Webcam>.
+      let screenshot: string | null;
+      if (useNativeCamera()) {
+        await captureFeedback();
+        screenshot = await captureNativePhoto('camera');
+        if (!screenshot) return; // user cancelled the native camera
+        setIsAnalyzing(true);
+      } else {
+        if (!webcamRef.current) return;
+        setIsAnalyzing(true);
+        screenshot = webcamRef.current.getScreenshot();
+      }
+
       if (!screenshot) {
         throw new Error("Failed to capture image");
       }
@@ -300,8 +321,9 @@ export default function RecipeScanner() {
   const renderPhotoView = () => {
     return (
       <>
-        {/* Camera Feed */}
-        {cameraReady && (
+        {/* Camera Feed — web only. On native the system camera UI is presented
+            on demand by handleCapture, so there is no inline preview. */}
+        {cameraReady && !useNativeCamera() && (
           <Webcam
             key={webcamKey}
             ref={webcamRef}

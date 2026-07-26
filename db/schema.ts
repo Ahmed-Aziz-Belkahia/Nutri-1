@@ -25,11 +25,15 @@ export const users = sqliteTable("users", {
   isAdmin: integer("is_admin", { mode: 'boolean' }).default(false),
   
   // Google OAuth fields
-  googleId: text("google_id"),
-  googleEmail: text("google_email"),
-  googlePicture: text("google_picture"),
-  authProvider: text("auth_provider").default("local"), // 'local', 'google', or 'both'
-  emailVerifiedVia: text("email_verified_via"), // 'email', 'google'
+  // Sign in with Apple. `appleSub` is the stable per-app user identifier from
+  // the identity token; it is the only field Apple guarantees on every sign-in.
+  // The email may be a private-relay address and is only sent the first time,
+  // so it is stored opportunistically and never used as the join key.
+  appleSub: text("apple_sub"),
+  appleEmail: text("apple_email"),
+  isPrivateRelayEmail: integer("is_private_relay_email", { mode: 'boolean' }).default(false),
+  authProvider: text("auth_provider").default("local"), // 'local', 'apple', or 'both'
+  emailVerifiedVia: text("email_verified_via"), // 'email', 'apple'
   lastLoginAt: integer("last_login_at", { mode: 'timestamp' }),
 });
 
