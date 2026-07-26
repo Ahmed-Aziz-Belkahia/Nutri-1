@@ -497,8 +497,9 @@ export function registerRoutes(app: Express): Server {
         source: 'scanned' as const,
         likesCount: 0,
         commentsCount: 0,
-        createdAt: new Date(log.date * 1000), // Convert Unix timestamp to Date
-        updatedAt: new Date(log.date * 1000),
+        // `date` is a timestamp_ms column, so drizzle already hands back a Date
+        createdAt: log.date,
+        updatedAt: log.date,
         isLiked: false // Scanned recipes don't have likes
       }));
       
@@ -887,9 +888,8 @@ export function registerRoutes(app: Express): Server {
         // Generate ingredients list from components
         ingredients = log.components.map((comp: any) => ({
           name: comp.name,
-          amount: comp.quantity || 1,
-          unit: comp.servingSize || 'portion',
-          notes: comp.details?.preparation || ''
+          quantity: comp.quantity || 1,
+          unit: comp.servingSize || 'portion'
         }));
         
         // Generate simple instructions from components
@@ -1321,10 +1321,11 @@ export function registerRoutes(app: Express): Server {
         .values({
           userId: req.user!.id,
           name: analyzedName, // Use the analyzed name here instead of original name
-          calories: totalCalories.toString(),
-          protein: totalProtein.toString(),
-          carbs: totalCarbs.toString(),
-          fat: totalFat.toString(),
+          // These are real() columns — store numbers, not strings
+          calories: totalCalories,
+          protein: totalProtein,
+          carbs: totalCarbs,
+          fat: totalFat,
           image: image || null,
           date: logDate,
           components: processedComponents,

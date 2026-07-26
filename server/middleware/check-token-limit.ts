@@ -21,11 +21,6 @@ import { TokenLimitService } from '../services/token-limit.service';
 
 export function checkTokenLimit(operation: string, params?: any) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
-    // TEMPORARY: Bypass all token limits for testing/development
-    // TODO: Remove this bypass when ready to enforce limits
-    console.log(`[Token Limit] BYPASSED for operation: ${operation}, user: ${req.user?.id}`);
-    return next();
-    
     try {
       const userId = req.user?.id;
 

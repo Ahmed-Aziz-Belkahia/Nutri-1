@@ -143,7 +143,7 @@ export async function analyzeFoodText(foodDescription: string, userId?: number, 
       let betterName = result.name;
       if (betterName === "Overall food description" || betterName === "Food description" || betterName === "Meal") {
         if (Array.isArray(result.components) && result.components.length > 0) {
-          const componentNames = result.components.map(c => c.name).filter(Boolean);
+          const componentNames = result.components.map((c: any) => c.name).filter(Boolean);
           if (componentNames.length > 0) {
             betterName = componentNames.slice(0, 3).join(' with ');
           } else {
@@ -163,7 +163,7 @@ export async function analyzeFoodText(foodDescription: string, userId?: number, 
         fat: Math.max(0, Math.round(result.fat * 10) / 10),
         confidence: typeof result.confidence === 'number' ? 
           Math.min(1, Math.max(0, result.confidence)) : 0.8,
-        components: Array.isArray(result.components) ? result.components.map(component => ({
+        components: Array.isArray(result.components) ? result.components.map((component: any) => ({
           name: component.name || 'Unknown component',
           calories: Math.max(0, Math.round(component.calories || 0)),
           protein: Math.max(0, Math.round((component.protein || 0) * 10) / 10),

@@ -368,7 +368,7 @@ export default function IngredientsAnalysis() {
             fetch(`/api/recipes/${id}`, { credentials: 'include' }).then(r => r.ok ? 1 : 0)
           );
           const verifyResults = await Promise.all(verifyPromises);
-          const verifiedCount = verifyResults.reduce((a, b) => a + b, 0);
+          const verifiedCount = verifyResults.reduce<number>((a, b) => a + b, 0);
 
           if (verifiedCount > 0) {
             const verifiedRecipes = { length: verifiedCount };

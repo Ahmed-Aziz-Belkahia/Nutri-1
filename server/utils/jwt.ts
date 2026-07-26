@@ -1,19 +1,24 @@
 import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { db } from '@db';
 import { users, refreshTokens, type SelectUser } from '@db/schema';
 import { eq, and, gt, lt } from 'drizzle-orm';
 
-// JWT Configuration — secrets MUST be set via environment variables
-const ACCESS_TOKEN_SECRET = process.env.JWT_SECRET;
-const REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_SECRET;
+// JWT Configuration — secrets MUST be set via environment variables.
+// Read through a helper so the constants are typed `string` rather than
+// `string | undefined`: a module-level `if (!x) throw` guard does not narrow
+// the type inside the function bodies below.
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`FATAL: ${name} environment variable is not set. Cannot start server.`);
+  }
+  return value;
+}
 
-if (!ACCESS_TOKEN_SECRET) {
-  throw new Error('FATAL: JWT_SECRET environment variable is not set. Cannot start server.');
-}
-if (!REFRESH_TOKEN_SECRET) {
-  throw new Error('FATAL: JWT_REFRESH_SECRET environment variable is not set. Cannot start server.');
-}
+const ACCESS_TOKEN_SECRET = requireEnv('JWT_SECRET');
+const REFRESH_TOKEN_SECRET = requireEnv('JWT_REFRESH_SECRET');
 const ACCESS_TOKEN_EXPIRY = '1d'; // 1 day (longer to reduce refresh frequency)
 const REFRESH_TOKEN_EXPIRY = '365d'; // 365 days (1 year for persistent sessions)
 
@@ -25,27 +30,28 @@ export interface TokenPayload {
   exp?: number;
 }
 
-// The authenticated user attached to a request by requireAuth.
-export interface AuthUser {
+// The authenticated user attached to a request.
+//
+// Two shapes flow through here: requireAuth attaches a narrow projection of
+// the user row, while the Google strategy hands passport a full row. Extending
+// Partial<SelectUser> accepts both, while id/email stay required. The snake_case
+// keys are duplicate aliases that requireAuth sets for legacy call sites.
+export interface AuthUser extends Partial<SelectUser> {
   id: number;
   email: string;
   preferredLanguage?: string | null;
-  preferred_language?: string | null;
-  hasCompletedOnboarding?: boolean | null;
   has_completed_onboarding?: boolean | null;
-  profileImage?: string | null;
   profile_image?: string | null;
-  isAdmin?: boolean | null;
   is_admin?: boolean | null;
 }
 
-// Widen Express.User so that a plain Request stays assignable to AuthRequest.
-// This augmentation previously lived in the now-deleted passport-based
-// server/auth.ts; it is ambient, so removing it broke every handler typed
-// against AuthRequest.
+// Align Express.User with AuthUser so a plain Request stays assignable to
+// AuthRequest. This augmentation previously lived in the now-deleted
+// passport-based server/auth.ts; it is ambient, so removing it broke every
+// handler typed against AuthRequest.
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User extends AuthUser {}
   }
 }
 
@@ -80,6 +86,10 @@ export function generateRefreshToken(userId: number, email: string): string {
   };
 
   return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+    // `iat` only has second resolution, so two tokens minted for the same user
+    // within one second are byte-identical and collide on the UNIQUE index over
+    // refresh_tokens.token. A random jti makes every issuance distinct.
+    jwtid: randomUUID(),
     expiresIn: REFRESH_TOKEN_EXPIRY,
     issuer: 'nutri-ai',
     audience: 'nutri-ai-users'
