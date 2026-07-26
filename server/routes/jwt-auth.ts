@@ -1,5 +1,5 @@
 import { Router, Response, Request, NextFunction } from 'express';
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { scrypt, randomBytes, timingSafeEqual, randomInt } from "crypto";
 import { promisify } from "util";
 import rateLimit from 'express-rate-limit';
 import { db } from '@db';
@@ -187,7 +187,7 @@ router.post('/register', registerLimiter, async (req, res: Response) => {
     const hashedPassword = await crypto.hash(password);
 
     // Generate 6-digit verification code
-    const code = String(require('crypto').randomInt(100000, 999999));
+    const code = String(randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     // Store pending registration
@@ -411,7 +411,7 @@ router.post('/resend-verification-code', resendCodeLimiter, async (req, res: Res
     }
 
     // Generate new 6-digit verification code
-    const code = String(require('crypto').randomInt(100000, 999999));
+    const code = String(randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
     // Update pending registration with new code
