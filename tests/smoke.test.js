@@ -362,6 +362,55 @@ test('AI token quota is enforced, not bypassed', async () => {
   assert.equal(allowed.status, 200, 'request must succeed once quota resets');
 });
 
+test('onboarding submit persists the profile, including the new fields', async () => {
+  // The onboarding restructure moved this call to after authentication and
+  // started sending two fields whose columns existed but were never filled:
+  // allergies (always []) and bodyType (never sent at all).
+  const profile = {
+    age: 30,
+    gender: 'male',
+    height: 175,
+    weight: 80,
+    goalWeight: 70,
+    weightGoal: 'loss',
+    activityLevel: 'moderate',
+    calorieGoal: 2100,
+    proteinGoal: 160,
+    carbsGoal: 180,
+    fatGoal: 80,
+    dietaryRestrictions: ['classic'],
+    allergies: ['peanuts', 'shellfish'],
+    bodyType: 'athletic',
+    mealBudget: 'medium',
+    experienceLevel: 'beginner',
+    preferredLanguage: 'en',
+    weightLossSpeed: 0.8
+  };
+
+  // multipart/form-data, because the endpoint runs through multer.
+  const form = new FormData();
+  form.append('profile', JSON.stringify(profile));
+
+  const res = await fetch(`${BASE}/api/register/complete-onboarding`, {
+    method: 'POST',
+    headers: { Cookie: cookie },
+    body: form
+  });
+  assert.equal(res.status, 200, await res.text());
+
+  const conn = db();
+  const row = conn
+    .prepare('SELECT allergies, body_type, weight_loss_speed, daily_calorie_goal FROM user_nutrition_preferences ORDER BY id DESC LIMIT 1')
+    .get();
+  const completed = conn.prepare('SELECT has_completed_onboarding AS c FROM users WHERE email = ?').get(EMAIL);
+  conn.close();
+
+  assert.deepEqual(JSON.parse(row.allergies), ['peanuts', 'shellfish'], 'allergies must persist');
+  assert.equal(row.body_type, 'athletic', 'bodyType must persist');
+  assert.equal(row.weight_loss_speed, 0.8, 'chosen pace must persist');
+  assert.equal(completed.c, 1, 'user should be marked as onboarded');
+});
+
 test('Sign in with Apple rejects unverified identity tokens', async () => {
   // The endpoint must never trust a client-supplied token. A forged JWT with a
   // plausible payload has to fail signature verification against Apple's keys.

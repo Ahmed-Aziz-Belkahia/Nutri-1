@@ -64,27 +64,107 @@ function getActivityMultiplier(activityLevel: string): number {
   return multipliers[activityLevel as keyof typeof multipliers] || 1.2;
 }
 
-// Calculate daily calorie needs
+// 1 kg of body weight ≈ 7700 kcal (Hall et al., 2011)
+const KCAL_PER_KG = 7700;
+
+/**
+ * Absolute floors, below which a target is not safe to present.
+ * NHS and EFSA both treat sustained intake under these levels as requiring
+ * medical supervision, so the app must never generate one on its own.
+ */
+const MIN_CALORIES_MALE = 1500;
+const MIN_CALORIES_FEMALE = 1200;
+
+/** Fastest surplus we will suggest; beyond this the gain is mostly fat. */
+const MAX_SURPLUS_PER_DAY = 500;
+
+export interface CalorieTarget {
+  /** The number to show the user. */
+  calories: number;
+  /** TDEE before any goal adjustment. */
+  maintenance: number;
+  /** Signed daily adjustment actually applied, after clamping. */
+  adjustment: number;
+  /** True when the requested pace was reduced to stay above the floor. */
+  wasFloored: boolean;
+  /** Pace actually achievable after flooring, kg/week. */
+  effectivePacePerWeek: number;
+}
+
+/**
+ * Daily calorie target for a goal and a chosen pace.
+ *
+ * `paceKgPerWeek` is the rate the user picked on the onboarding speed slider.
+ * Previously this was ignored and a flat -500/+300 was applied, so every user
+ * saw the same target no matter which pace they chose — the personalised plan
+ * was not personalised. The deficit is now derived from the pace, then floored
+ * so an aggressive slider can never produce an unsafe number.
+ */
+export function calculateCalorieTarget(
+  age: number,
+  weight: number,
+  height: number,
+  activityLevel: string,
+  goalType: 'maintain' | 'lose' | 'gain' = 'maintain',
+  isMale: boolean = true,
+  paceKgPerWeek: number = 0.5
+): CalorieTarget {
+  const bmr = calculateBMR(age, weight, height, isMale);
+  const maintenance = Math.round(bmr * getActivityMultiplier(activityLevel));
+
+  if (goalType === 'maintain') {
+    return {
+      calories: maintenance,
+      maintenance,
+      adjustment: 0,
+      wasFloored: false,
+      effectivePacePerWeek: 0
+    };
+  }
+
+  const pace = Math.abs(paceKgPerWeek) || 0.5;
+  const requestedDelta = Math.round((pace * KCAL_PER_KG) / 7);
+
+  if (goalType === 'gain') {
+    const surplus = Math.min(requestedDelta, MAX_SURPLUS_PER_DAY);
+    return {
+      calories: maintenance + surplus,
+      maintenance,
+      adjustment: surplus,
+      wasFloored: surplus < requestedDelta,
+      effectivePacePerWeek: (surplus * 7) / KCAL_PER_KG
+    };
+  }
+
+  // Losing: never take the target below the absolute floor, and never below
+  // BMR — eating under your resting requirement is not something to suggest.
+  const floor = Math.max(isMale ? MIN_CALORIES_MALE : MIN_CALORIES_FEMALE, Math.round(bmr));
+  const target = Math.max(maintenance - requestedDelta, floor);
+  const deficit = maintenance - target;
+
+  return {
+    calories: target,
+    maintenance,
+    adjustment: -deficit,
+    wasFloored: deficit < requestedDelta,
+    effectivePacePerWeek: (deficit * 7) / KCAL_PER_KG
+  };
+}
+
+/**
+ * Backwards-compatible wrapper returning just the calorie number.
+ * Existing callers (AuthPage, ProfileNew) keep working unchanged.
+ */
 export function calculateDailyCalories(
   age: number,
   weight: number,
   height: number,
   activityLevel: string,
   goalType: 'maintain' | 'lose' | 'gain' = 'maintain',
-  isMale: boolean = true
+  isMale: boolean = true,
+  paceKgPerWeek: number = 0.5
 ): number {
-  const bmr = calculateBMR(age, weight, height, isMale);
-  const maintenanceCalories = Math.round(bmr * getActivityMultiplier(activityLevel));
-  
-  // Adjust calories based on goal (using WHO recommended deficits/surpluses)
-  switch (goalType) {
-    case 'lose':
-      return Math.round(maintenanceCalories - 500); // 500 kcal deficit for ~0.5kg/week loss
-    case 'gain':
-      return Math.round(maintenanceCalories + 300); // 300 kcal surplus for lean mass gain
-    default:
-      return maintenanceCalories;
-  }
+  return calculateCalorieTarget(age, weight, height, activityLevel, goalType, isMale, paceKgPerWeek).calories;
 }
 
 // Calculate macro splits based on calorie goal and weight goal
@@ -120,6 +200,29 @@ export function calculateMacros(
     carbs: Math.round((dailyCalories * carbRatio) / 4),       // 4 calories per gram
     fat: Math.round((dailyCalories * fatRatio) / 9),          // 9 calories per gram
   };
+}
+
+/**
+ * Projected date of reaching the goal weight at the effective pace.
+ *
+ * The results screen previously hardcoded "today + 84 days" for everyone,
+ * which contradicted both the goal weight and the pace the user chose.
+ * Returns null when there is nothing to project (maintaining, already at
+ * goal, or a pace that was floored to zero).
+ */
+export function calculateGoalDate(
+  currentWeightKg: number,
+  goalWeightKg: number,
+  effectivePacePerWeek: number,
+  from: Date = new Date()
+): { date: Date; weeks: number } | null {
+  const delta = Math.abs(goalWeightKg - currentWeightKg);
+  if (delta < 0.1 || effectivePacePerWeek <= 0) return null;
+
+  const weeks = Math.ceil(delta / effectivePacePerWeek);
+  const date = new Date(from);
+  date.setDate(date.getDate() + weeks * 7);
+  return { date, weeks };
 }
 
 // Calculate time to reach goal weight based on calorie deficit/surplus

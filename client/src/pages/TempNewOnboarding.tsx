@@ -8,7 +8,11 @@ import { useLocation } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { OnboardingLanguageSelector } from '@/components/OnboardingLanguageSelector';
-import { calculateDailyCalories, calculateMacros } from '@/lib/nutrition';
+import { calculateCalorieTarget, calculateMacros, calculateGoalDate } from '@/lib/nutrition';
+import { loadDraft, saveDraft, clearDraft } from '@/lib/onboardingStorage';
+import { signInWithApple, isAppleSignInAvailable } from '@/lib/appleAuth';
+import Paywall from '@/components/Paywall';
+import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/hooks/use-user';
 import {
@@ -35,6 +39,79 @@ ChartJS.register(
   Filler,
   Legend
 );
+
+/**
+ * Step ids are the historical `currentStep` numbers of each render block.
+ * STEP_ORDER is the sequence the user actually walks, so the flow can be
+ * reordered and new screens inserted without renumbering nineteen blocks and
+ * their hardcoded next/back targets.
+ *
+ * Order follows the Cal AI shape: cheap impersonal questions first to build
+ * momentum, personal ones in the middle, attribution last, reward beats
+ * between clusters, then the payoff — plan, save, paywall.
+ */
+const STEP_WELCOME = 0;
+const STEP_GENDER = 1;
+const STEP_HEIGHT_WEIGHT = 2;
+const STEP_BIRTHDATE = 3;
+const STEP_GOAL = 4;
+const STEP_DESIRED_WEIGHT = 5;
+const STEP_MOTIVATION = 6;
+const STEP_SPEED = 7;
+const STEP_COMPARISON = 8;
+const STEP_OBSTACLES = 9;
+const STEP_DIET = 10;
+const STEP_ACCOMPLISHMENTS = 11;
+const STEP_POTENTIAL = 12;
+const STEP_WORKOUT = 13;
+const STEP_REFERRAL = 14;
+const STEP_OTHER_APPS = 15;
+const STEP_CHART = 16;
+const STEP_LOADING = 17;
+const STEP_RESULTS = 18;
+// New screens
+const STEP_ALLERGIES = 19;
+const STEP_PHYSIQUE = 20;
+const STEP_SAVE = 21;
+const STEP_PAYWALL = 22;
+
+const STEP_ORDER: number[] = [
+  STEP_WELCOME,
+  STEP_GENDER,
+  STEP_WORKOUT,          // moved earlier — easy question, builds momentum
+  STEP_HEIGHT_WEIGHT,
+  STEP_BIRTHDATE,
+  STEP_GOAL,
+  STEP_DESIRED_WEIGHT,   // skipped when maintaining
+  STEP_MOTIVATION,       // skipped when maintaining
+  STEP_SPEED,            // skipped when maintaining
+  STEP_COMPARISON,
+  STEP_OBSTACLES,
+  STEP_DIET,
+  STEP_ALLERGIES,
+  STEP_PHYSIQUE,
+  STEP_ACCOMPLISHMENTS,
+  STEP_POTENTIAL,
+  STEP_OTHER_APPS,
+  STEP_REFERRAL,         // attribution last — lowest value to the user
+  STEP_CHART,
+  STEP_LOADING,
+  STEP_RESULTS,
+  STEP_SAVE,
+  STEP_PAYWALL
+];
+
+/** Screens that only make sense when the user is losing or gaining weight. */
+const GOAL_DEPENDENT_STEPS = [STEP_DESIRED_WEIGHT, STEP_MOTIVATION, STEP_SPEED];
+
+/** Screens excluded from the progress bar — welcome and everything post-plan. */
+const UNTRACKED_STEPS = [STEP_WELCOME, STEP_LOADING, STEP_RESULTS, STEP_SAVE, STEP_PAYWALL];
+
+function visibleSteps(goal: string | null): number[] {
+  return STEP_ORDER.filter(
+    (s) => !(goal === 'maintain' && GOAL_DEPENDENT_STEPS.includes(s))
+  );
+}
 
 // Animation variants
 const pageVariants = {
@@ -961,6 +1038,7 @@ const CongratulationsPage = ({
   selectedGoal,
   dailyCalories,
   macros: calculatedMacros,
+  effectivePacePerWeek,
   labels,
   locale = 'en'
 }: { 
@@ -969,6 +1047,7 @@ const CongratulationsPage = ({
   selectedGoal: string | null;
   dailyCalories?: number;
   macros?: { protein: number; carbs: number; fat: number };
+  effectivePacePerWeek?: number;
   labels: {
     title: string;
     subtitle: string;
@@ -1002,10 +1081,13 @@ const CongratulationsPage = ({
   };
   const dateLocale = localeMap[locale] || 'en-US';
   
-  // Calculate the target date (approximately 12 weeks from now)
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + 84);
-  const targetDateStr = targetDate.toLocaleDateString(dateLocale, { month: 'long', day: 'numeric' });
+  // Projected from the pace the user actually chose. This used to be a
+  // hardcoded 84 days for everyone, which contradicted both their goal weight
+  // and the speed slider they had just dragged.
+  const projection = calculateGoalDate(weightKg, desiredWeightKg, effectivePacePerWeek ?? 0);
+  const targetDateStr = projection
+    ? projection.date.toLocaleDateString(dateLocale, { month: 'long', day: 'numeric', year: 'numeric' })
+    : labels.stayHealthy;
   
   // Calculate weight difference
   const weightDiff = Math.abs(weightKg - desiredWeightKg);
@@ -1945,19 +2027,17 @@ export default function TempNewOnboarding() {
     }
   }, [user, isLoading, navigate]);
 
-  // Start authenticated users at step 1 (gender selection) instead of welcome screen
-  const [currentStep, setCurrentStep] = useState(() => {
-    // This will be updated in useEffect once user data is loaded
-    return 0;
+  // Restore a draft synchronously on first render so there is no flash of
+  // step 1 before the resume kicks in.
+  const [currentStep, setCurrentStep] = useState<number>(() => {
+    const draft = loadDraft();
+    if (draft?.stepId != null) {
+      const n = Number(draft.stepId);
+      if (Number.isFinite(n) && STEP_ORDER.includes(n)) return n;
+    }
+    return STEP_WELCOME;
   });
 
-  // Set initial step based on auth status
-  useEffect(() => {
-    if (!isLoading && user && !user.hasCompletedOnboarding) {
-      // Authenticated user who hasn't completed onboarding - skip welcome screen
-      setCurrentStep(1);
-    }
-  }, [user, isLoading]);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [isMetric, setIsMetric] = useState(true);
   const [heightFeet, setHeightFeet] = useState(5);
@@ -1979,6 +2059,125 @@ export default function TempNewOnboarding() {
   const [selectedObstacles, setSelectedObstacles] = useState<string[]>([]);
   const [selectedDiet, setSelectedDiet] = useState<string | null>(null);
   const [selectedAccomplishments, setSelectedAccomplishments] = useState<string[]>([]);
+  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+  const [selectedPhysique, setSelectedPhysique] = useState<string | null>(null);
+
+  // --- Draft restore -------------------------------------------------------
+  // Answers are rehydrated once on mount. Without this, moving auth to the end
+  // of the flow would mean an app kill at question 16 destroys everything —
+  // strictly worse than the old auth-first flow.
+  const restoredRef = useRef(false);
+  if (!restoredRef.current) {
+    restoredRef.current = true;
+    const a = loadDraft()?.answers as Record<string, any> | undefined;
+    if (a) {
+      if (a.selectedGender != null) setSelectedGender(a.selectedGender);
+      if (a.isMetric != null) setIsMetric(a.isMetric);
+      if (a.heightFeet != null) setHeightFeet(a.heightFeet);
+      if (a.heightInches != null) setHeightInches(a.heightInches);
+      if (a.heightCm != null) setHeightCm(a.heightCm);
+      if (a.weightLbs != null) setWeightLbs(a.weightLbs);
+      if (a.weightKg != null) setWeightKg(a.weightKg);
+      if (a.birthMonth != null) setBirthMonth(a.birthMonth);
+      if (a.birthDay != null) setBirthDay(a.birthDay);
+      if (a.birthYear != null) setBirthYear(a.birthYear);
+      if (a.selectedGoal != null) setSelectedGoal(a.selectedGoal);
+      if (a.desiredWeightKg != null) setDesiredWeightKg(a.desiredWeightKg);
+      if (a.desiredWeightLbs != null) setDesiredWeightLbs(a.desiredWeightLbs);
+      if (a.weightLossSpeed != null) setWeightLossSpeed(a.weightLossSpeed);
+      if (a.weightGainSpeed != null) setWeightGainSpeed(a.weightGainSpeed);
+      if (a.workoutFrequency != null) setWorkoutFrequency(a.workoutFrequency);
+      if (a.referralSource != null) setReferralSource(a.referralSource);
+      if (a.hasUsedOtherApps != null) setHasUsedOtherApps(a.hasUsedOtherApps);
+      if (a.selectedObstacles != null) setSelectedObstacles(a.selectedObstacles);
+      if (a.selectedDiet != null) setSelectedDiet(a.selectedDiet);
+      if (a.selectedAccomplishments != null) setSelectedAccomplishments(a.selectedAccomplishments);
+      if (a.selectedAllergies != null) setSelectedAllergies(a.selectedAllergies);
+      if (a.selectedPhysique != null) setSelectedPhysique(a.selectedPhysique);
+    }
+  }
+
+  // Persist on every answer change. Cheap (a few hundred bytes, synchronous)
+  // and it is what makes every resume case below work.
+  useEffect(() => {
+    if (currentStep === STEP_WELCOME) return;
+    saveDraft({
+      stepId: String(currentStep),
+      answers: {
+        selectedGender, isMetric, heightFeet, heightInches, heightCm,
+        weightLbs, weightKg, birthMonth, birthDay, birthYear,
+        selectedGoal, desiredWeightKg, desiredWeightLbs,
+        weightLossSpeed, weightGainSpeed, workoutFrequency,
+        referralSource, hasUsedOtherApps, selectedObstacles,
+        selectedDiet, selectedAccomplishments, selectedAllergies, selectedPhysique
+      }
+    });
+  }, [
+    currentStep, selectedGender, isMetric, heightFeet, heightInches, heightCm,
+    weightLbs, weightKg, birthMonth, birthDay, birthYear, selectedGoal,
+    desiredWeightKg, desiredWeightLbs, weightLossSpeed, weightGainSpeed,
+    workoutFrequency, referralSource, hasUsedOtherApps, selectedObstacles,
+    selectedDiet, selectedAccomplishments, selectedAllergies, selectedPhysique
+  ]);
+
+  // An already-authenticated user with no draft (signed in on a fresh install,
+  // never finished onboarding) has no use for the welcome pitch.
+  useEffect(() => {
+    if (!isLoading && user && !user.hasCompletedOnboarding && currentStep === STEP_WELCOME) {
+      setCurrentStep(STEP_GENDER);
+    }
+  }, [isLoading, user, currentStep]);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const finishOnboarding = () => {
+    clearDraft();
+    navigate('/dashboard');
+  };
+
+  const handleAppleSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      const result = await signInWithApple();
+      if (!result) return; // user dismissed Apple's sheet
+      // The account now exists, so the (auth-required) profile write can run.
+      await mutation.mutateAsync();
+    } catch (err) {
+      console.error('[Onboarding] Apple save failed:', err);
+      setSaveError(
+        err instanceof Error ? err.message : t('save.error', 'Could not save your plan. Please try again.')
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // --- Navigation ----------------------------------------------------------
+  const steps = visibleSteps(selectedGoal);
+  const stepIndex = steps.indexOf(currentStep);
+
+  // `goalOverride` exists because the goal screen advances in the same click
+  // that sets selectedGoal — `steps` above is still computed from the previous
+  // value at that moment, so a maintainer would otherwise walk into the three
+  // screens they should skip.
+  const goNext = (goalOverride?: string) => {
+    const list = goalOverride ? visibleSteps(goalOverride) : steps;
+    const i = list.indexOf(currentStep);
+    if (i >= 0 && i < list.length - 1) setCurrentStep(list[i + 1]);
+  };
+
+  const goBack = () => {
+    const i = steps.indexOf(currentStep);
+    if (i > 0) setCurrentStep(steps[i - 1]);
+  };
+
+  // Progress counts only the question screens, so the bar stays honest for
+  // maintainers (who skip three) instead of the old hardcoded total of 18.
+  const trackedSteps = steps.filter((s) => !UNTRACKED_STEPS.includes(s));
+  const progressTotal = trackedSteps.length;
+  const progressCurrent = Math.max(0, trackedSteps.indexOf(currentStep) + 1);
 
   // Calculate age from birthdate
   const calculateAge = () => {
@@ -2027,27 +2226,28 @@ export default function TempNewOnboarding() {
     return 'maintain';
   };
 
-  // Wrapper function using shared calculateDailyCalories utility
-  const getCalculatedDailyCalories = () => {
-    const weight = getWeightInKg();
-    const height = getHeightInCm();
-    const age = calculateAge();
-    const isMale = selectedGender === 'male';
+  // Full calorie target, including the pace the user chose on the speed slider
+  // and whether that pace had to be floored for safety.
+  const getCalorieTarget = () => {
     const weightGoal = getWeightGoal();
-    
-    // Map to goalType format expected by shared utility
-    const goalType = weightGoal === 'loss' ? 'lose' : 
+    const goalType = weightGoal === 'loss' ? 'lose' :
                      weightGoal === 'gain' ? 'gain' : 'maintain';
+    const pace = goalType === 'lose' ? weightLossSpeed
+               : goalType === 'gain' ? weightGainSpeed
+               : 0;
 
-    return calculateDailyCalories(
-      age,
-      weight,
-      height,
+    return calculateCalorieTarget(
+      calculateAge(),
+      getWeightInKg(),
+      getHeightInCm(),
       getActivityLevel(),
       goalType,
-      isMale
+      selectedGender === 'male',
+      pace
     );
   };
+
+  const getCalculatedDailyCalories = () => getCalorieTarget().calories;
 
   // Wrapper function using shared calculateMacros utility
   const getCalculatedMacros = (calories: number) => {
@@ -2076,10 +2276,13 @@ export default function TempNewOnboarding() {
         carbsGoal: macros.carbs,
         fatGoal: macros.fat,
         dietaryRestrictions: selectedDiet ? [selectedDiet] : [],
-        allergies: [],
+        allergies: selectedAllergies,
+        bodyType: selectedPhysique,
         mealBudget: 'medium',
         experienceLevel: hasUsedOtherApps ? 'intermediate' : 'beginner',
-        preferredLanguage: 'en',
+        // Respect the language the user actually chose rather than clobbering
+        // users.preferred_language with a hardcoded 'en' on every submit.
+        preferredLanguage: i18n.language || 'en',
         // Enhanced onboarding fields
         weightLossSpeed: selectedGoal === 'lose' ? weightLossSpeed : null,
         weightGainSpeed: selectedGoal === 'gain' ? weightGainSpeed : null,
@@ -2116,17 +2319,16 @@ export default function TempNewOnboarding() {
       return response.json();
     },
     onSuccess: () => {
-      console.log('Onboarding completed successfully');
-      
       // Invalidate user query to refresh auth state
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['user'] });
 
       // Set flag to show tutorial overlay on dashboard
       localStorage.setItem('justCompletedOnboarding', 'true');
-      
-      // Move to congratulations page
-      setCurrentStep(18);
+
+      // Answers are on the server now; the local draft has done its job.
+      clearDraft();
+      setCurrentStep(STEP_PAYWALL);
     },
     onError: (error: Error) => {
       console.error('Onboarding completion error:', error);
@@ -2137,6 +2339,23 @@ export default function TempNewOnboarding() {
       });
     },
   });
+
+  // The email path leaves the app for /auth and comes back to /onboarding.
+  // The draft restores the user to the save step, but they now have an
+  // account — so push the profile through without making them tap again.
+  const autoSavedRef = useRef(false);
+  useEffect(() => {
+    if (
+      currentStep === STEP_SAVE &&
+      user &&
+      !user.hasCompletedOnboarding &&
+      !autoSavedRef.current &&
+      !mutation.isPending
+    ) {
+      autoSavedRef.current = true;
+      mutation.mutate();
+    }
+  }, [currentStep, user, mutation]);
 
   // Function to toggle obstacle selection
   const toggleObstacle = (obstacle: string) => {
@@ -2263,11 +2482,13 @@ export default function TempNewOnboarding() {
           subtitle={t('welcome.subtitle')} 
         />
         <div className="space-y-3 mt-auto mb-4">
-          <PrimaryButton onClick={() => navigate('/auth')}>
+          {/* Straight into the questions. Nothing is asked of a stranger until
+              they have seen their plan — the whole point of the restructure. */}
+          <PrimaryButton onClick={goNext}>
             {t('common.getStarted')}
           </PrimaryButton>
-          <SignInLink 
-            onClick={() => navigate('/auth')} 
+          <SignInLink
+            onClick={() => navigate('/auth')}
             alreadyHaveAccountText={t('common.alreadyHaveAccount')}
             signInText={t('common.signIn')}
           />
@@ -2281,8 +2502,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 1) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(0)} />
-        <ProgressBar current={1} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2314,7 +2535,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(2)}
+            onClick={goNext}
             disabled={!selectedGender}
           >
             {t('common.continue')}
@@ -2329,8 +2550,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 2) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(1)} />
-        <ProgressBar current={2} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col mt-16">
           <PageTitle 
@@ -2406,7 +2627,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(3)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2420,8 +2641,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 3) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(2)} />
-        <ProgressBar current={3} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col mt-16">
           <PageTitle 
@@ -2457,7 +2678,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(4)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2471,8 +2692,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 4) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(3)} />
-        <ProgressBar current={4} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2509,9 +2730,9 @@ export default function TempNewOnboarding() {
                 // Skip desired weight and motivational steps - set desired weight to current weight
                 setDesiredWeightKg(weightKg);
                 setDesiredWeightLbs(weightLbs);
-                setCurrentStep(7); // Skip directly to speed step (which will also skip for maintain)
+                goNext('maintain');
               } else {
-                setCurrentStep(5);
+                goNext();
               }
             }}
             disabled={!selectedGoal}
@@ -2542,8 +2763,8 @@ export default function TempNewOnboarding() {
     
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(4)} />
-        <ProgressBar current={5} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2572,7 +2793,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(6)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2588,7 +2809,7 @@ export default function TempNewOnboarding() {
     
     // Back button goes to step 5 (desired weight) for lose/gain
     const handleMotivationBack = () => {
-      setCurrentStep(5);
+      goBack();
     };
     
     // Get appropriate message based on difficulty
@@ -2608,7 +2829,7 @@ export default function TempNewOnboarding() {
     return (
       <OnboardingLayout>
         <BackButton onClick={handleMotivationBack} />
-        <ProgressBar current={6} total={18} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <div className="text-center px-4">
@@ -2624,7 +2845,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(7)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2643,7 +2864,7 @@ export default function TempNewOnboarding() {
     // Skip this page if maintaining weight - use effect to avoid render issues
     if (selectedGoal === 'maintain') {
       // Immediately move to next step without rendering
-      setTimeout(() => setCurrentStep(8), 0);
+      setTimeout(() => goNext(), 0);
       return (
         <OnboardingLayout>
           <div className="flex-1 flex items-center justify-center">
@@ -2677,14 +2898,14 @@ export default function TempNewOnboarding() {
     const speedRange = getSpeedRange();
     
     if (!speedRange) {
-      setTimeout(() => setCurrentStep(8), 0);
+      setTimeout(() => goNext(), 0);
       return null;
     }
     
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(6)} />
-        <ProgressBar current={7} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2709,7 +2930,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(8)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2723,8 +2944,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 8) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => selectedGoal === 'maintain' ? setCurrentStep(4) : setCurrentStep(7)} />
-        <ProgressBar current={8} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2757,7 +2978,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(9)}
+            onClick={goNext}
           >
             Continue
           </PrimaryButton>
@@ -2771,8 +2992,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 9) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(8)} />
-        <ProgressBar current={9} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2815,7 +3036,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(10)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2829,8 +3050,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 10) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(9)} />
-        <ProgressBar current={10} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2867,7 +3088,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(11)}
+            onClick={goNext}
             disabled={!selectedDiet}
           >
             {t('common.continue')}
@@ -2882,8 +3103,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 11) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(10)} />
-        <ProgressBar current={11} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2920,7 +3141,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(12)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2934,8 +3155,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 12) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(11)} />
-        <ProgressBar current={12} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -2956,7 +3177,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(13)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -2970,8 +3191,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 13) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(12)} />
-        <ProgressBar current={13} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -3006,7 +3227,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(14)}
+            onClick={goNext}
             disabled={!workoutFrequency}
           >
             {t('common.continue')}
@@ -3021,8 +3242,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 14) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(13)} />
-        <ProgressBar current={14} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -3065,7 +3286,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(15)}
+            onClick={goNext}
             disabled={!referralSource}
           >
             {t('common.continue')}
@@ -3080,8 +3301,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 15) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(14)} />
-        <ProgressBar current={15} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <PageTitle 
@@ -3106,7 +3327,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(16)}
+            onClick={goNext}
             disabled={hasUsedOtherApps === null}
           >
             {t('common.continue')}
@@ -3121,8 +3342,8 @@ export default function TempNewOnboarding() {
   if (currentStep === 16) {
     return (
       <OnboardingLayout>
-        <BackButton onClick={() => setCurrentStep(15)} />
-        <ProgressBar current={16} total={18} />
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="flex-1 flex flex-col justify-center mt-16">
           <div className="mb-8">
@@ -3152,7 +3373,7 @@ export default function TempNewOnboarding() {
         
         <div className="mt-auto space-y-4">
           <PrimaryButton 
-            onClick={() => setCurrentStep(17)}
+            onClick={goNext}
           >
             {t('common.continue')}
           </PrimaryButton>
@@ -3166,11 +3387,12 @@ export default function TempNewOnboarding() {
   if (currentStep === 17) {
     return (
       <OnboardingLayout>
-        <SetupLoadingPage 
+        <SetupLoadingPage
           onComplete={() => {
-            // Submit onboarding data when loading completes
-            // The mutation's onSuccess handler will move to step 18
-            mutation.mutate();
+            // The plan is computed client-side and shown next. Nothing is sent
+            // to the server yet — there is no account until the save step.
+            saveDraft({ planReady: true });
+            goNext();
           }}
           labels={{
             settingUp: t('loading.settingUp'),
@@ -3191,31 +3413,20 @@ export default function TempNewOnboarding() {
             }
           }}
         />
-        {mutation.isError && (
-          <div className="px-6 pb-4">
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
-              <p className="text-red-600 text-sm text-center">
-                {t('loading.error')}
-              </p>
-            </div>
-            <PrimaryButton onClick={() => mutation.mutate()}>
-              {t('loading.retry')}
-            </PrimaryButton>
-          </div>
-        )}
         <HomeIndicator />
       </OnboardingLayout>
     );
   }
 
   // Page 19: Congratulations Page (Final page)
-  if (currentStep === 18) {
-    const dailyCalories = getCalculatedDailyCalories();
+  if (currentStep === STEP_RESULTS) {
+    const target = getCalorieTarget();
+    const dailyCalories = target.calories;
     const macros = getCalculatedMacros(dailyCalories);
     
     return (
       <OnboardingLayout>
-        <ProgressBar current={18} total={18} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
         
         <div className="mt-16">
           <CongratulationsPage 
@@ -3224,6 +3435,7 @@ export default function TempNewOnboarding() {
             selectedGoal={selectedGoal}
             dailyCalories={dailyCalories}
             macros={macros}
+            effectivePacePerWeek={target.effectivePacePerWeek}
             locale={i18n.language}
             labels={{
               title: t('congratulations.title'),
@@ -3250,15 +3462,177 @@ export default function TempNewOnboarding() {
         </div>
         
         <div className="mt-auto space-y-4">
-          <PrimaryButton 
-            onClick={() => navigate('/dashboard')}
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? t('congratulations.saving') : t('common.getStarted')}
+          <PrimaryButton onClick={goNext}>
+            {t('common.continue')}
           </PrimaryButton>
           <HomeIndicator />
         </div>
       </OnboardingLayout>
+    );
+  }
+
+  // Allergies. The `allergies` column has existed since the schema was written
+  // and was always submitted as an empty array — nothing ever asked.
+  if (currentStep === STEP_ALLERGIES) {
+    const ALLERGENS = [
+      { id: 'peanuts', icon: '🥜', label: t('allergies.peanuts', 'Peanuts') },
+      { id: 'tree_nuts', icon: '🌰', label: t('allergies.treeNuts', 'Tree nuts') },
+      { id: 'dairy', icon: '🥛', label: t('allergies.dairy', 'Dairy') },
+      { id: 'eggs', icon: '🥚', label: t('allergies.eggs', 'Eggs') },
+      { id: 'gluten', icon: '🌾', label: t('allergies.gluten', 'Gluten') },
+      { id: 'shellfish', icon: '🦐', label: t('allergies.shellfish', 'Shellfish') },
+      { id: 'soy', icon: '🫘', label: t('allergies.soy', 'Soy') },
+      { id: 'fish', icon: '🐟', label: t('allergies.fish', 'Fish') }
+    ];
+
+    const toggleAllergy = (id: string) =>
+      setSelectedAllergies((prev) =>
+        prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
+      );
+
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
+
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle
+            title={t('allergies.title', 'Any allergies we should know about?')}
+            subtitle={t('allergies.subtitle', 'We will keep these out of your recipes.')}
+          />
+
+          <div className="space-y-3 mb-6">
+            {ALLERGENS.map((a) => (
+              <ObstacleOption
+                key={a.id}
+                icon={a.icon}
+                label={a.label}
+                selected={selectedAllergies.includes(a.id)}
+                onClick={() => toggleAllergy(a.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-auto space-y-4">
+          <PrimaryButton onClick={goNext}>
+            {selectedAllergies.length === 0
+              ? t('allergies.none', 'None of these')
+              : t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Desired physique. `body_type` also already exists in the schema and was
+  // never collected. Feeds the copy on the results screen.
+  if (currentStep === STEP_PHYSIQUE) {
+    const PHYSIQUES = [
+      { id: 'lean', icon: '🏃', label: t('physique.lean', 'Lean and defined') },
+      { id: 'athletic', icon: '💪', label: t('physique.athletic', 'Athletic and strong') },
+      { id: 'muscular', icon: '🏋️', label: t('physique.muscular', 'Muscular and powerful') },
+      { id: 'healthy', icon: '🌿', label: t('physique.healthy', 'Just healthy and comfortable') }
+    ];
+
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={goBack} />
+        <ProgressBar current={progressCurrent} total={progressTotal} />
+
+        <div className="flex-1 flex flex-col justify-center mt-16">
+          <PageTitle
+            title={t('physique.title', 'What are you working towards?')}
+          />
+
+          <div className="space-y-3 mb-12">
+            {PHYSIQUES.map((p) => (
+              <DietOption
+                key={p.id}
+                icon={p.icon}
+                label={p.label}
+                selected={selectedPhysique === p.id}
+                onClick={() => setSelectedPhysique(p.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-auto space-y-4">
+          <PrimaryButton onClick={goNext} disabled={!selectedPhysique}>
+            {t('common.continue')}
+          </PrimaryButton>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Save your plan — the auth step.
+  //
+  // Deliberately framed as saving the plan the user just earned, not as
+  // "create an account". It sits after the results and before the paywall so
+  // there is a user record to attach an entitlement to, and so an email is
+  // captured even from people who decline to subscribe.
+  if (currentStep === STEP_SAVE) {
+    return (
+      <OnboardingLayout>
+        <BackButton onClick={goBack} />
+        <div className="flex-1 flex flex-col justify-center px-2">
+          <PageTitle
+            title={t('save.title', 'Save your plan')}
+            subtitle={t('save.subtitle', 'Create an account so your plan and meals are always here.')}
+          />
+
+          {saveError && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+              <p className="text-red-600 text-sm text-center">{saveError}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-auto space-y-3">
+          {isAppleSignInAvailable() && (
+            <button
+              type="button"
+              onClick={handleAppleSave}
+              disabled={isSaving}
+              className="w-full h-14 flex items-center justify-center gap-2.5 rounded-2xl bg-black text-white font-medium text-[17px] active:opacity-80 disabled:opacity-60"
+            >
+              {isSaving ? (
+                <Loader2 className="h-5 w-5 animate-spin text-white" />
+              ) : (
+                <svg viewBox="0 0 384 512" aria-hidden="true" className="h-[19px] w-[19px] fill-white">
+                  <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+                </svg>
+              )}
+              {isSaving ? t('save.saving', 'Saving…') : t('save.withApple', 'Sign in with Apple')}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => navigate('/auth')}
+            disabled={isSaving}
+            className="w-full h-12 text-[#64748B] text-sm font-medium disabled:opacity-60"
+          >
+            {t('save.withEmail', 'Use email instead')}
+          </button>
+          <HomeIndicator />
+        </div>
+      </OnboardingLayout>
+    );
+  }
+
+  // Paywall. Rendered after the account exists so the entitlement has a user.
+  if (currentStep === STEP_PAYWALL) {
+    return (
+      <Paywall
+        onSubscribed={finishOnboarding}
+        onRestored={finishOnboarding}
+        onDismiss={finishOnboarding}
+      />
     );
   }
 

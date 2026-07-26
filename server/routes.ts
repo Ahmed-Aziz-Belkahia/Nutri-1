@@ -111,6 +111,10 @@ export function registerRoutes(app: Express): Server {
         fatGoal: Math.min(adjustedFat, 100),
         dietaryRestrictions: profileData.dietaryRestrictions || [],
         allergies: profileData.allergies || [],
+        // Both columns predate the questions that fill them — onboarding only
+        // started collecting allergies and desired physique in the Cal AI
+        // restructure, and previously sent an empty array and nothing.
+        bodyType: profileData.bodyType || null,
         mealBudget: profileData.mealBudget,
         experienceLevel: profileData.experienceLevel,
         // Enhanced onboarding fields

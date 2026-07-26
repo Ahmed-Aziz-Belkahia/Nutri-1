@@ -39,100 +39,6 @@ export default function AuthPage() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
-  // Function to submit pending onboarding data
-  const submitPendingOnboardingData = async () => {
-    const pendingData = sessionStorage.getItem('pendingOnboardingData');
-    if (!pendingData) return false;
-
-    try {
-      const data = JSON.parse(pendingData);
-      const formDataToSend = new FormData();
-      
-      // Map weightGoal to goalType format expected by utility
-      const goalType = data.weightGoal === 'loss' ? 'lose' : 
-                       data.weightGoal === 'gain' ? 'gain' : 'maintain';
-      
-      // Use shared calculation utilities
-      const dailyCalories = calculateDailyCalories(
-        data.age,
-        data.weight,
-        data.height,
-        data.activityLevel,
-        goalType,
-        data.gender === 'male'
-      );
-      const macros = calculateMacros(dailyCalories, goalType);
-      
-      const profileData = {
-        age: data.age,
-        gender: data.gender,
-        height: data.height,
-        weight: data.weight,
-        goalWeight: data.goalWeight,
-        weightGoal: data.weightGoal,
-        activityLevel: data.activityLevel,
-        calorieGoal: dailyCalories,
-        proteinGoal: macros.protein,
-        carbsGoal: macros.carbs,
-        fatGoal: macros.fat,
-        dietaryRestrictions: [],
-        allergies: [],
-        mealBudget: "medium",
-        experienceLevel: "beginner",
-        preferredLanguage: "pl",
-        energyPattern: "morning",
-        flavorPreference: "savory",
-        firstVictory: "energy",
-        motivationLevel: "medium",
-        nutritionGoals: []
-      };
-      
-      formDataToSend.append('profile', JSON.stringify(profileData));
-      
-      const response = await fetch('/api/complete-onboarding', {
-        method: 'POST',
-        body: formDataToSend,
-        credentials: 'include',
-      });
-      
-      if (response.ok) {
-        sessionStorage.removeItem('pendingOnboardingData');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Error submitting onboarding data:', error);
-      return false;
-    }
-  };
-
-  // Fallback for mobile handoff: monitor localStorage for externally injected sessions
-  useEffect(() => {
-    const checkSession = () => {
-      if (localStorage.getItem("nutriai_session_active") === "true") {
-        console.log("[AuthPage] Detected session in storage, navigating...");
-        setLocation('/dashboard'); // Navigation strategy in case polling is stuck
-      }
-    };
-    
-    // Check every second while the page is open
-    const interval = setInterval(checkSession, 1000);
-    window.addEventListener('storage', checkSession);
-    
-    // Immediate check when returning to the app from the system browser
-    window.addEventListener('focus', checkSession);
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') checkSession();
-    });
-    
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', checkSession);
-      window.removeEventListener('focus', checkSession);
-      window.removeEventListener('visibilitychange', checkSession);
-    };
-  }, [setLocation]);
-
   /**
    * Sign in with Apple. Native-only: Apple's sheet is presented by the plugin,
    * and the resulting identity token is verified server-side before we accept
@@ -145,7 +51,6 @@ export default function AuthPage() {
     try {
       const result = await signInWithApple();
       if (!result) return; // user dismissed the Apple sheet
-      // The session now exists; let the auth query pick the user up.
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       setLocation('/');
     } catch (err) {
@@ -182,14 +87,9 @@ export default function AuthPage() {
           // Redirect to email verification page with email parameter
           setLocation(`/verify-email?email=${encodeURIComponent(formData.email)}`);
         } else {
-          // Check for pending onboarding data and submit it
-          const hasPendingData = sessionStorage.getItem('pendingOnboardingData');
-          if (hasPendingData) {
-            await submitPendingOnboardingData();
-            setLocation("/dashboard");
-          } else {
-            setLocation("/onboarding");
-          }
+          // Back to onboarding: the draft restores the user to the save step,
+          // where the profile is submitted now that an account exists.
+          setLocation("/onboarding");
         }
       }
     } catch (error: any) {
