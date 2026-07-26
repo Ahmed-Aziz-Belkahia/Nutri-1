@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { db } from '@db';
-import { users, refreshTokens } from '@db/schema';
+import { users, refreshTokens, type SelectUser } from '@db/schema';
 import { eq, and, gt, lt } from 'drizzle-orm';
 
 // JWT Configuration — secrets MUST be set via environment variables
@@ -25,20 +25,33 @@ export interface TokenPayload {
   exp?: number;
 }
 
+// The authenticated user attached to a request by requireAuth.
+export interface AuthUser {
+  id: number;
+  email: string;
+  preferredLanguage?: string | null;
+  preferred_language?: string | null;
+  hasCompletedOnboarding?: boolean | null;
+  has_completed_onboarding?: boolean | null;
+  profileImage?: string | null;
+  profile_image?: string | null;
+  isAdmin?: boolean | null;
+  is_admin?: boolean | null;
+}
+
+// Widen Express.User so that a plain Request stays assignable to AuthRequest.
+// This augmentation previously lived in the now-deleted passport-based
+// server/auth.ts; it is ambient, so removing it broke every handler typed
+// against AuthRequest.
+declare global {
+  namespace Express {
+    interface User extends SelectUser {}
+  }
+}
+
 // Extended Request interface with user
 export interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    preferredLanguage?: string | null;
-    preferred_language?: string | null;
-    hasCompletedOnboarding?: boolean | null;
-    has_completed_onboarding?: boolean | null;
-    profileImage?: string | null;
-    profile_image?: string | null;
-    isAdmin?: boolean | null;
-    is_admin?: boolean | null;
-  };
+  user?: AuthUser;
 }
 
 /**
