@@ -6,6 +6,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import axios from "axios";
+import { clearTokens, getRefreshToken } from "@/lib/nativeApi";
 import { useToast } from "./use-toast";
 
 type User = {
@@ -138,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       try {
         // First try to refresh the token
-        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        await axios.post("/api/auth/refresh", { refreshToken: await getRefreshToken() }, { withCredentials: true });
         console.log('[Auth] Token refreshed successfully');
         
         // Then fetch user data
@@ -164,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const refreshInterval = setInterval(async () => {
       try {
         console.log('[Auth] Auto-refreshing access token...');
-        await axios.post("/api/auth/refresh", {}, { withCredentials: true });
+        await axios.post("/api/auth/refresh", { refreshToken: await getRefreshToken() }, { withCredentials: true });
         console.log('[Auth] Token auto-refreshed successfully');
       } catch (error) {
         console.error('[Auth] Auto-refresh failed:', error);
@@ -234,7 +235,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Use the new JWT auth endpoint (will be redirected via 307)
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      
+
+      // On native the session lives in the stored bearer token, not a cookie,
+      // so clearing the server session is not enough.
+      await clearTokens();
+
       // Clear local session flags
       localStorage.removeItem('nutriai_session_active');
       localStorage.removeItem('nutriai_user_id');

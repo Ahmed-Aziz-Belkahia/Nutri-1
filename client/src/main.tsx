@@ -7,6 +7,7 @@ import App from './App';
 import "./index.css";
 // Import i18n configuration
 import "./i18n/config";
+import { installNativeApiInterceptor, loadStoredTokens } from "./lib/nativeApi";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element not found");
@@ -20,4 +21,11 @@ const app = (
   </StrictMode>
 );
 
-createRoot(root).render(app);
+// On native, the fetch interceptor must be installed and the persisted bearer
+// token restored before the first request fires — otherwise the initial auth
+// check goes out unauthenticated and bounces the user to the login screen.
+// No-ops on the web.
+installNativeApiInterceptor();
+loadStoredTokens().finally(() => {
+  createRoot(root).render(app);
+});

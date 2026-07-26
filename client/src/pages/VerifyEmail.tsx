@@ -6,6 +6,7 @@ import { Loader2, Mail, CheckCircle2, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { captureTokensFromResponse } from "@/lib/nativeApi";
 import { useTranslation } from "react-i18next";
 
 export default function VerifyEmail() {
@@ -106,6 +107,10 @@ export default function VerifyEmail() {
         setIsVerifying(false);
         return;
       }
+
+      // Verification signs the user straight in. On native there is no usable
+      // session cookie, so persist the bearer tokens the server returned.
+      await captureTokensFromResponse(data);
 
       setIsVerified(true);
       

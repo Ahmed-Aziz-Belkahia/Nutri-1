@@ -36,6 +36,25 @@ import {
 const router = Router();
 const scryptAsync = promisify(scrypt);
 
+/**
+ * Native clients (the Capacitor iOS app) cannot use the httpOnly session
+ * cookies: the WebView serves the bundle from capacitor://localhost, so the
+ * cookies are neither readable from JS nor sent cross-site under SameSite=Lax.
+ * Those clients send `X-Client-Platform` and authenticate with a bearer token
+ * instead, so the tokens have to come back in the response body.
+ *
+ * Gated on the header so browsers keep receiving cookie-only responses and no
+ * token is ever exposed to web JS.
+ */
+const isNativeClient = (req: Request): boolean =>
+  typeof req.headers['x-client-platform'] === 'string';
+
+const withNativeTokens = <T extends object>(
+  req: Request,
+  body: T,
+  tokens: { accessToken: string; refreshToken?: string }
+): T => (isNativeClient(req) ? { ...body, ...tokens } : body);
+
 // Helper to get client IP consistently
 const getClientIp = (req: Request): string => {
   const forwarded = req.headers['x-forwarded-for'];
@@ -365,7 +384,7 @@ router.post('/verify-email-code', verifyCodeLimiter, async (req, res: Response) 
 
     console.log('[JWT Auth] Email verified and account created:', email);
 
-    res.json({
+    res.json(withNativeTokens(req, {
       ok: true,
       message: 'Email verified successfully. Your account has been created!',
       user: {
@@ -373,7 +392,7 @@ router.post('/verify-email-code', verifyCodeLimiter, async (req, res: Response) 
         email: newUser.email,
         hasCompletedOnboarding: newUser.hasCompletedOnboarding
       }
-    });
+    }, { accessToken, refreshToken }));
 
   } catch (error) {
     console.error('[JWT Auth] Email verification error:', error);
@@ -495,7 +514,7 @@ router.post('/login', loginLimiter, async (req, res: Response) => {
     });
 
 
-    res.json({
+    res.json(withNativeTokens(req, {
       ok: true,
       message: 'Login successful',
       user: {
@@ -506,7 +525,7 @@ router.post('/login', loginLimiter, async (req, res: Response) => {
         profileImage: user.profileImage,
         isAdmin: user.isAdmin
       }
-    });
+    }, { accessToken, refreshToken }));
 
   } catch (error) {
     console.error('[JWT Auth] Login error:', error);
@@ -574,7 +593,7 @@ router.post('/refresh', async (req, res: Response) => {
  */
 router.post('/logout', async (req, res: Response) => {
   try {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
 
     if (refreshToken) {
       // Revoke refresh token
