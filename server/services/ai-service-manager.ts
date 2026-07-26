@@ -283,18 +283,6 @@ export async function makeAIRequest<T = any>(options: AIRequestOptions): Promise
 }
 
 /**
- * Quick AI request using fast model (gpt-4o-mini)
- */
-export async function makeQuickAIRequest<T = any>(
-  options: Omit<AIRequestOptions, 'model'>
-): Promise<AIResponse<T>> {
-  return makeAIRequest<T>({
-    ...options,
-    model: AI_MODELS.FAST
-  });
-}
-
-/**
  * Vision AI request for image analysis
  */
 export async function makeVisionRequest<T = any>(
@@ -329,59 +317,3 @@ export async function makeVisionRequest<T = any>(
     useFallback: false // Vision doesn't work with mini model
   });
 }
-
-/**
- * Clear the response cache
- */
-export function clearCache(): void {
-  responseCache.clear();
-  console.log('[AI Manager] Cache cleared');
-}
-
-/**
- * Get cache statistics
- */
-export function getCacheStats(): { size: number; entries: number } {
-  let totalSize = 0;
-  responseCache.forEach(entry => {
-    totalSize += JSON.stringify(entry.response).length;
-  });
-  
-  return {
-    size: totalSize,
-    entries: responseCache.size
-  };
-}
-
-/**
- * Health check for AI service
- */
-export async function checkAIHealth(): Promise<{
-  available: boolean;
-  latencyMs: number;
-  model: string;
-}> {
-  const startTime = Date.now();
-  
-  try {
-    const response = await openai.chat.completions.create({
-      model: AI_MODELS.FAST,
-      messages: [{ role: 'user', content: 'Say "ok"' }],
-      max_tokens: 5
-    });
-    
-    return {
-      available: true,
-      latencyMs: Date.now() - startTime,
-      model: AI_MODELS.FAST
-    };
-  } catch (error) {
-    return {
-      available: false,
-      latencyMs: Date.now() - startTime,
-      model: AI_MODELS.FAST
-    };
-  }
-}
-
-export { openai };
