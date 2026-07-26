@@ -10,43 +10,6 @@ import enProfile from './locales/en/profile.json';
 import enMeals from './locales/en/meals.json';
 import enOnboarding from './locales/en/onboarding.json';
 import enRecipes from './locales/en/recipes.json';
-import enAnalytics from './locales/en/analytics.json';
-
-import arCommon from './locales/ar/common.json';
-import arAuth from './locales/ar/auth.json';
-import arDashboard from './locales/ar/dashboard.json';
-import arProfile from './locales/ar/profile.json';
-import arMeals from './locales/ar/meals.json';
-import arOnboarding from './locales/ar/onboarding.json';
-import arRecipes from './locales/ar/recipes.json';
-import arAnalytics from './locales/ar/analytics.json';
-
-import frCommon from './locales/fr/common.json';
-import frAuth from './locales/fr/auth.json';
-import frDashboard from './locales/fr/dashboard.json';
-import frProfile from './locales/fr/profile.json';
-import frMeals from './locales/fr/meals.json';
-import frOnboarding from './locales/fr/onboarding.json';
-import frRecipes from './locales/fr/recipes.json';
-import frAnalytics from './locales/fr/analytics.json';
-
-import esCommon from './locales/es/common.json';
-import esAuth from './locales/es/auth.json';
-import esDashboard from './locales/es/dashboard.json';
-import esProfile from './locales/es/profile.json';
-import esMeals from './locales/es/meals.json';
-import esOnboarding from './locales/es/onboarding.json';
-import esRecipes from './locales/es/recipes.json';
-import esAnalytics from './locales/es/analytics.json';
-
-import plCommon from './locales/pl/common.json';
-import plAuth from './locales/pl/auth.json';
-import plDashboard from './locales/pl/dashboard.json';
-import plProfile from './locales/pl/profile.json';
-import plMeals from './locales/pl/meals.json';
-import plOnboarding from './locales/pl/onboarding.json';
-import plRecipes from './locales/pl/recipes.json';
-import plAnalytics from './locales/pl/analytics.json';
 
 // Define resources
 const resources = {
@@ -58,47 +21,6 @@ const resources = {
     meals: enMeals,
     onboarding: enOnboarding,
     recipes: enRecipes,
-    analytics: enAnalytics,
-  },
-  ar: {
-    common: arCommon,
-    auth: arAuth,
-    dashboard: arDashboard,
-    profile: arProfile,
-    meals: arMeals,
-    onboarding: arOnboarding,
-    recipes: arRecipes,
-    analytics: arAnalytics,
-  },
-  fr: {
-    common: frCommon,
-    auth: frAuth,
-    dashboard: frDashboard,
-    profile: frProfile,
-    meals: frMeals,
-    onboarding: frOnboarding,
-    recipes: frRecipes,
-    analytics: frAnalytics,
-  },
-  es: {
-    common: esCommon,
-    auth: esAuth,
-    dashboard: esDashboard,
-    profile: esProfile,
-    meals: esMeals,
-    onboarding: esOnboarding,
-    recipes: esRecipes,
-    analytics: esAnalytics,
-  },
-  pl: {
-    common: plCommon,
-    auth: plAuth,
-    dashboard: plDashboard,
-    profile: plProfile,
-    meals: plMeals,
-    onboarding: plOnboarding,
-    recipes: plRecipes,
-    analytics: plAnalytics,
   },
 };
 
@@ -109,8 +31,8 @@ i18n
     resources,
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'dashboard', 'profile', 'meals', 'onboarding', 'recipes', 'analytics'],
-    
+    ns: ['common', 'auth', 'dashboard', 'profile', 'meals', 'onboarding', 'recipes'],
+
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
@@ -129,7 +51,7 @@ i18n
 export default i18n;
 
 // Helper to get RTL languages
-export const RTL_LANGUAGES = ['ar'];
+export const RTL_LANGUAGES: string[] = [];
 
 // Helper to check if language is RTL
 export const isRTL = (language: string): boolean => {
@@ -139,8 +61,4 @@ export const isRTL = (language: string): boolean => {
 // Available languages
 export const AVAILABLE_LANGUAGES = [
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱' },
 ];

@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BaseLayout from "@/components/layouts/BaseLayout";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { calculateDailyCalories, calculateMacros } from "@/lib/nutrition";
 
 export default function Profile() {
@@ -517,24 +516,6 @@ export default function Profile() {
                 <span className="text-purple-500">{t('common:profileNew.macros.fat')}</span>
               </div>
             </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Language & Preferences */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="mb-6"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold gradient-text">{t('common:profileNew.sections.languagePreferences')}</h3>
-        </div>
-        
-        <div className="glass-card">
-          <div className="p-6">
-            <LanguageSwitcher variant="menu" />
           </div>
         </div>
       </motion.div>

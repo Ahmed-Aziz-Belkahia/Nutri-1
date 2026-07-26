@@ -40,12 +40,6 @@ export default function MobileMenu({ isOpen, isClosing, onClose }: MobileMenuPro
               onClick={() => handleNavigation('/profile')}
             />
 
-            <MenuButton
-              icon={<ClipboardIcon />}
-              label="Generate New Meal Plan"
-              onClick={() => handleNavigation('/meal-planning-quiz')}
-            />
-
             <div className="h-px bg-gray-200 my-4" />
 
             <MenuButton

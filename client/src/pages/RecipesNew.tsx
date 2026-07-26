@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import BaseLayout from "@/components/layouts/BaseLayout";
 import MealsSection from "@/components/dashboard/MealsSection";
 import AllRecipesSection from "@/components/recipes/AllRecipesSection";
-import MealPlanViewContent from "@/components/recipes/MealPlanViewContent";
 import { Book, Calendar, Camera, Sparkles, Clock, ChefHat, Store, ArrowRight } from "lucide-react";
 import { useScannedMealsToday, useScannedMeals, useIngredientGeneratedRecipes } from "@/hooks/queries/useFoodLogs";
 import { Card } from "@/components/ui/card";
@@ -36,39 +35,6 @@ export default function RecipesNew() {
   const { user } = useAuth();
   const [location, navigate] = useLocation();
   
-  // Get current tab from URL
-  const getCurrentTab = (): 'recipes' | 'meal-plan' => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
-    return tab === 'meal-plan' ? 'meal-plan' : 'recipes';
-  };
-  
-  const [activeTab, setActiveTab] = useState<'recipes' | 'meal-plan'>(getCurrentTab());
-
-  // Sync tab with URL
-  useEffect(() => {
-    const newTab = getCurrentTab();
-    if (newTab !== activeTab) {
-      setActiveTab(newTab);
-    }
-  }, [location]);
-
-  // Ensure URL reflects current tab
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlTab = params.get('tab');
-    
-    if (!urlTab) {
-      navigate(`/recipes?tab=${activeTab}`, { replace: true });
-    }
-  }, [activeTab, navigate]);
-
-  // Handle tab change
-  const handleTabChange = (tab: 'recipes' | 'meal-plan') => {
-    setActiveTab(tab);
-    navigate(`/recipes?tab=${tab}`, { replace: true });
-  };
-
   // Fetch today's scanned recipes using custom hook
   const { data: todaysRecipes = [], isLoading: todaysLoading } = useScannedMealsToday();
 
@@ -96,36 +62,8 @@ export default function RecipesNew() {
 
   return (
     <BaseLayout>
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => handleTabChange('recipes')}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-            activeTab === 'recipes'
-              ? 'bg-[#26A8FF] text-white shadow-sm'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          <Book className="w-4 h-4" />
-          <span>{t('common:recipesNew.tabs.recipes')}</span>
-        </button>
-        <button
-          onClick={() => handleTabChange('meal-plan')}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
-            activeTab === 'meal-plan'
-              ? 'bg-[#26A8FF] text-white shadow-sm'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-          }`}
-        >
-          <Calendar className="w-4 h-4" />
-          <span>{t('common:recipesNew.tabs.mealPlan')}</span>
-        </button>
-      </div>
-
       {/* Content */}
       <div className="space-y-6">
-        {activeTab === 'recipes' ? (
-          <>
             {/* Scan Ingredients CTA Card - Dashboard Style */}
             <div style={{ marginBottom: '20px' }}>
               <div 
@@ -289,31 +227,11 @@ export default function RecipesNew() {
               </div>
             )}
 
-            {/* Marketplace CTA Banner */}
-            <div 
-              onClick={() => navigate('/meal-plan-marketplace')}
-              className="cursor-pointer bg-gradient-to-r from-[#0E95A7]/10 to-[#26A8FF]/10 border border-[#0E95A7]/20 rounded-2xl p-4 flex items-center gap-3 hover:shadow-md transition-all"
-            >
-              <div className="w-12 h-12 bg-gradient-to-br from-[#0E95A7] to-[#26A8FF] rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#0E95A7]/30">
-                <Store className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-gray-900">Meal Plan Marketplace</h3>
-                <p className="text-xs text-gray-500">Discover meal plans from chefs around the world</p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-[#0E95A7]" />
-            </div>
-
             {/* All Recipes Section */}
-            <AllRecipesSection 
+            <AllRecipesSection
               recipes={allRecipes}
               isLoading={allLoading}
             />
-          </>
-        ) : (
-          /* Meal Plan Tab - Using MealPlanViewContent */
-          <MealPlanViewContent showHeader={true} />
-        )}
       </div>
     </BaseLayout>
   );

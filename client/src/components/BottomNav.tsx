@@ -40,20 +40,6 @@ export default function BottomNav() {
       activeIcon: IoReader,
       testId: "recipes-nav"
     },
-    {
-      path: "/meal-plan-marketplace",
-      label: t('common:navigation.marketplace', 'Market'),
-      icon: IoStorefrontOutline,
-      activeIcon: IoStorefront,
-      testId: "marketplace-nav"
-    },
-    {
-      path: "/progress",
-      label: t('common:navigation.progress'),
-      icon: IoStatsChartOutline,
-      activeIcon: IoStatsChart,
-      testId: "progress-nav"
-    }
   ];
 
   const isActive = (path: string) => {

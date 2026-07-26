@@ -6,13 +6,7 @@ import BaseLayout from "@/components/layouts/BaseLayout";
 import CalendarSelector from "@/components/dashboard/CalendarSelector";
 import MacroCard from "@/components/dashboard/MacroCard";
 import MealsSection from "@/components/dashboard/MealsSection";
-import GeneratedRecipesSection from "@/components/dashboard/GeneratedRecipesSection";
-import GroceryList from "@/components/dashboard/GroceryList";
-import MealPlanSection from "@/components/dashboard/MealPlanSection";
-import StreakCard from "@/components/dashboard/StreakCard";
 import { useFoodLogsByDate, useDailyTotals } from "@/hooks/queries/useFoodLogs";
-import { useAllMealPlans } from "@/hooks/queries/useMealPlans";
-import { useShoppingListByPlanId } from "@/hooks/queries/useShoppingList";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useQueryClient } from "@tanstack/react-query";
 import { createInvalidator } from "@/lib/queryUtils";
@@ -21,18 +15,7 @@ import { useFoodLog } from "@/hooks/use-food-log";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, CheckCircle, Sparkles } from "lucide-react";
-import WeeklyWeightCheckIn from "@/components/WeeklyWeightCheckIn";
 import { analyzeFoodImage } from "@/lib/vision";
-
-interface GroceryItem {
-  id: number;
-  name: string;
-  quantity: number | string;
-  unit: string;
-  category: string;
-  isPurchased?: boolean;
-  purchased?: boolean; // Fallback for older format
-}
 
 // Helper function to get all days from the last 3 months + next 7 days
 function getLast3MonthsPlus7Days() {
@@ -99,55 +82,10 @@ export default function DashboardNew() {
   // Fetch daily totals for selected date using custom hook
   const { data: dailyTotals = { calories: 0, protein: 0, carbs: 0, fat: 0 } } = useDailyTotals(selectedDate);
 
-  // Fetch all meal plans using custom hook
-  const { data: allMealPlans } = useAllMealPlans();
-
-  // Get the meal plan for the selected date from all plans
-  const mealPlan = useMemo(() => {
-    if (!allMealPlans || !selectedDate) {
-      console.log('[MEAL PLAN] No plans available or no date selected');
-      return null;
-    }
-    // allMealPlans is already an array of MealPlan objects
-    const plan = allMealPlans.find((p: any) => p.date === selectedDate);
-    console.log('[MEAL PLAN] Found plan for', selectedDate, ':', plan);
-    return plan || null;
-  }, [allMealPlans, selectedDate]);
-
-  // Fetch shopping list for the meal plan using custom hook
-  const { data: groceryListData, refetch: refetchGroceries } = useShoppingListByPlanId(mealPlan?.id);
-  
-  // Transform shopping list data to match GroceryItem interface
-  const groceryList: GroceryItem[] = useMemo(() => {
-    if (!groceryListData?.items) return [];
-    
-    return groceryListData.items.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      quantity: item.quantity,
-      unit: item.unit,
-      category: item.category || 'Other',
-      isPurchased: item.isChecked || false
-    }));
-  }, [groceryListData]);
-
-  // Debug log for grocery list
-  useEffect(() => {
-    console.log('[DASHBOARD] Grocery list state changed:', {
-      hasData: !!groceryList,
-      isArray: Array.isArray(groceryList),
-      length: groceryList?.length,
-      items: groceryList,
-      mealPlanId: mealPlan?.id,
-      selectedDate
-    });
-  }, [groceryList, mealPlan?.id, selectedDate]);
-
   // Debug log for selected date changes
   useEffect(() => {
     console.log('[DASHBOARD] Selected date changed to:', selectedDate);
-    console.log('[DASHBOARD] Current meal plan:', mealPlan);
-  }, [selectedDate, mealPlan]);
+  }, [selectedDate]);
 
   // Process pending manual food entry
   useEffect(() => {
@@ -349,36 +287,8 @@ export default function DashboardNew() {
     setCurrentMacroIndex(index);
   };
 
-  const toggleGroceryItem = async (itemId: number, currentStatus: boolean) => {
-    try {
-      const response = await fetch(`/api/shopping-list/${itemId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ purchased: !currentStatus })
-      });
-
-      if (response.ok) {
-        // Invalidate shopping list queries using centralized invalidation
-        const invalidator = createInvalidator(queryClient);
-        await invalidator.shoppingList(selectedDate, mealPlan?.id);
-      }
-    } catch (error) {
-      // If API fails, refetch to sync state
-      refetchGroceries();
-    }
-  };
-
   return (
     <BaseLayout>
-      {/* Weekly Weight Check-In Prompt */}
-      <WeeklyWeightCheckIn />
-      
-      {/* Streak Card - Gamification to drive daily engagement */}
-      <div className="mb-4">
-        <StreakCard />
-      </div>
-      
       {/* Manual & AI Food Processing Screen */}
       {(isProcessingManualFood || isAnalyzingFood) && (
         <motion.div
@@ -487,15 +397,9 @@ export default function DashboardNew() {
         userProfile={userProfile}
       />
 
-      <MealsSection 
+      <MealsSection
         foodLogs={foodLogs}
         isLoading={logsLoading}
-      />
-
-      <GeneratedRecipesSection />
-
-      <MealPlanSection 
-        mealPlan={mealPlan as any}
       />
     </BaseLayout>
   );
