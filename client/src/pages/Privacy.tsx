@@ -85,6 +85,9 @@ export default function Privacy() {
                 <h2>{t('common:privacy.section4.title')}</h2>
                 <p>{t('common:privacy.section4.description')}</p>
 
+                <h2>{t('common:privacy.section4b.title')}</h2>
+                <p>{t('common:privacy.section4b.description')}</p>
+
                 <h2>{t('common:privacy.section5.title')}</h2>
                 <h3>{t('common:privacy.section5.accessUpdate.title')}</h3>
                 <p>{t('common:privacy.section5.accessUpdate.description')}</p>

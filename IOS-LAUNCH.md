@@ -36,18 +36,14 @@ rule, so it is still tracked. Removing it from history needs `git filter-repo`.
 Rotating `JWT_SECRET` invalidates every existing session — fine now, disruptive
 after launch. Do it before you have users.
 
-### 1.2 Set `VITE_API_BASE_URL` before building for device
+### 1.2 `VITE_API_BASE_URL` — already set ✅
 
-The native app cannot reach the API without it. See §4 for why. It is read at
-**build time**, not runtime — rebuild after changing it.
+Set in `.env` to `https://app.nutriai.online`. It is read at **build time**,
+not runtime, so rebuild after changing it. The app logs a loud error if it is
+missing rather than failing silently, because that is miserable to debug from
+inside a WebView.
 
-```bash
-# .env
-VITE_API_BASE_URL=https://app.nutriai.online
-```
-
-The app logs a loud error if it is missing rather than failing silently,
-because that is miserable to debug from inside a WebView.
+Your production deploy needs the same value in its own environment.
 
 ### 1.3 The API must be HTTPS with a valid certificate
 
@@ -69,19 +65,16 @@ npm run ios:sync     # vite build && cap sync ios
 npm run ios:open     # opens Xcode
 ```
 
-### 2.1 Register two files in the Xcode target — REQUIRED
+### 2.1 Xcode file registration — already done ✅
 
-`ios/App/App/PrivacyInfo.xcprivacy` and `ios/App/App/App.entitlements` exist on
-disk but are **not** registered in `project.pbxproj`. Editing that file by hand
-is fragile, so it was left for Xcode.
+`PrivacyInfo.xcprivacy` and `App.entitlements` are now registered in
+`project.pbxproj`: the manifest is in the Resources build phase, and
+`CODE_SIGN_ENTITLEMENTS` points at the entitlements file in both build
+configurations. Verified structurally valid and confirmed to survive
+`npx cap sync ios`.
 
-In Xcode: drag both into the **App** target (check "Copy items if needed" is
-*off* — they are already in place).
-
-Consequences of skipping:
-- Privacy manifest silently absent from the bundle → App Store Connect warning,
-  and eventually a rejected upload.
-- Entitlements not applied → **Sign in with Apple fails to sign.**
+Nothing to do — but if Xcode ever complains the project is corrupt, a backup of
+the pre-edit file is the parent of commit `docs: app store connect sheet`.
 
 ### 2.2 Enable Sign in with Apple on the App ID
 
@@ -93,8 +86,9 @@ Mismatch = provisioning failure at signing time.
 
 ### 2.3 Signing & Capabilities
 
-- Set your **Team**.
-- Confirm the bundle identifier: **`online.nutriai.app`**.
+- Set your **Team**. (This is the only signing step left.)
+- Bundle identifier is already `online.nutriai.app` in both
+  `capacitor.config.ts` and the Xcode project — consistent, nothing to change.
 
 ⚠️ **The bundle ID is effectively permanent** once the app exists in App Store
 Connect. It is reverse-DNS of the domain you control. The old Android one
@@ -276,14 +270,22 @@ fails. Two honest caveats recorded in the file:
 | Portrait lock | ✅ |
 | **5.1.1(v)** In-app account deletion | ✅ Endpoint + UI in `ProfileNew` |
 | **4.8** Sign in with Apple | ✅ Implemented — needs App ID enabled (§2.2) |
-| Privacy manifest | ⚠️ File written, **must be added to target** (§2.1) |
-| Entitlements | ⚠️ File written, **must be added to target** (§2.1) |
 | HTTPS / ATS | ⚠️ Depends on your server (§1.3) |
-| App Privacy answers in App Store Connect | ❌ Not done — see below |
-| Screenshots | ❌ Not done — 6.7" and 6.5" required |
-| Support URL, privacy policy URL | ❌ Not done — both mandatory |
+| Privacy manifest registered in target | ✅ Done in `project.pbxproj` |
+| Entitlements wired to build config | ✅ `CODE_SIGN_ENTITLEMENTS` set |
+| CORS allows `capacitor://localhost` | ✅ Hardcoded, not env-dependent |
+| Privacy policy content | ✅ Names OpenAI, states retention + deletion |
+| Privacy policy URL | ✅ `https://app.nutriai.online/privacy` (public route) |
+| App Privacy answers | ⚠️ Written out in `APP-STORE-CONNECT.md` §3 — paste them in |
+| Listing copy, keywords, review notes | ✅ Written in `APP-STORE-CONNECT.md` |
+| Support URL | ❌ **YOU** — Apple requires a working help page |
+| Screenshots | ❌ **YOU** — needs a device; 6.7" and 6.5" |
+| Demo account for review | ❌ **YOU** — must be pre-populated with data |
 
 ### 6.1 App Privacy answers must match the manifest
+
+**The exact answers to enter are in `APP-STORE-CONNECT.md` §3.**
+
 
 `PrivacyInfo.xcprivacy` declares: email address, photos, health & fitness, and
 user content — all linked to the user, none used for tracking. **Your App Store

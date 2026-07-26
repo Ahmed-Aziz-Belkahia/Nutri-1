@@ -16,6 +16,10 @@ export default defineConfig({
     },
   },
   root: path.resolve(__dirname, "client"),
+  // Load .env from the repo root, not from `root`. Vite defaults envDir to
+  // root (client/), where there is no .env — so VITE_* vars were silently
+  // never inlined and the native build could not reach the API.
+  envDir: __dirname,
   server: {
     // Listen on all interfaces and allow your public host
     host: true,

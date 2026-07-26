@@ -52,8 +52,15 @@ app.use(cookieParser());
 // Initialize Passport middleware for Google OAuth
 
 // Parse allowed origins from environment or use permissive setting in development
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
+// The Capacitor iOS app serves its bundle from a custom scheme, so its
+// requests carry Origin: capacitor://localhost. These are always allowed —
+// hardcoded rather than left to ALLOWED_ORIGINS, because forgetting them in a
+// deploy would break every request from the shipped app with an opaque CORS
+// error and no server-side log.
+const NATIVE_ORIGINS = ['capacitor://localhost', 'ionic://localhost'];
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? [...process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()), ...NATIVE_ORIGINS]
   : true; // In development, allow all origins
 
 // CORS configuration
@@ -61,8 +68,10 @@ const isDevMode = process.env.NODE_ENV !== 'production';
 app.use(cors({
   origin: isDevMode ? true : allowedOrigins,
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  // X-Client-Platform is what the native app sends to opt into bearer tokens;
+  // omitting it here fails the preflight before the request is ever made.
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Client-Platform'],
   exposedHeaders: ['Set-Cookie']
 }));
 
