@@ -3,7 +3,7 @@
 What is left to do to take this to TestFlight and the App Store, plus the
 reference material worth having on hand while you do it.
 
-**Current branch:** `mvp-strip` (unmerged into `main`)
+**Current branch:** `main` (the MVP work is merged and pushed)
 **State:** typecheck 0 errors · `vite build` passes · 15/15 smoke tests pass
 
 ---
@@ -27,7 +27,7 @@ Capacitor 8 uses Swift Package Manager, so **there is no CocoaPods step** —
 no `pod install`.
 
 ```bash
-git checkout mvp-strip
+git checkout main
 npm install
 npm run ios:sync     # vite build && cap sync ios
 npm run ios:open     # opens Xcode
