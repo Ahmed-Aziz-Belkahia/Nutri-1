@@ -10,13 +10,23 @@ reference material worth having on hand while you do it.
 
 ## 1. Before the Mac session
 
-### 1.1 The API must be HTTPS with a valid certificate
+### 1.1 HTTPS / ATS — satisfied, but watch the expiry
 
-App Transport Security blocks cleartext. A self-signed or expired cert means
-every request fails on device with no useful error — and it looks identical to
-an app bug, so rule it out before you start debugging anything else.
+`app.nutriai.online` serves a valid Let's Encrypt cert over TLS 1.3, which
+clears App Transport Security. Nothing to issue.
 
-Your production deploy needs `VITE_API_BASE_URL` set in its own environment.
+⚠️ **The cert expires 4 October 2026.** Let's Encrypt is 90-day; if certbot's
+renewal timer is not active, every installed app breaks at once on that date.
+App Transport Security fails closed and gives no useful error on device, so it
+presents as a total app outage with no clue why. Confirm on the VPS:
+
+```bash
+systemctl list-timers | grep certbot
+sudo certbot renew --dry-run
+```
+
+Your production deploy also needs `VITE_API_BASE_URL` set in its own
+environment.
 
 ---
 
@@ -185,7 +195,6 @@ listing copy are all done. What is left:
 
 | Requirement | Status |
 |---|---|
-| HTTPS / ATS | ⚠️ Depends on your server (§1.1) |
 | Sign in with Apple | ⚠️ Implemented — needs App ID enabled (§2.1) |
 | App Privacy answers | ⚠️ Written out in `APP-STORE-CONNECT.md` §3 — paste them in |
 | Support URL | ❌ **YOU** — Apple requires a working help page |
