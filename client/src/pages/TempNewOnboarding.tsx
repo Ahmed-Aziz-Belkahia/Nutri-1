@@ -1039,15 +1039,18 @@ const CongratulationsPage = ({
   dailyCalories,
   macros: calculatedMacros,
   effectivePacePerWeek,
+  wasFloored = false,
   labels,
   locale = 'en'
-}: { 
-  weightKg: number; 
-  desiredWeightKg: number; 
+}: {
+  weightKg: number;
+  desiredWeightKg: number;
   selectedGoal: string | null;
   dailyCalories?: number;
   macros?: { protein: number; carbs: number; fat: number };
   effectivePacePerWeek?: number;
+  /** The chosen pace was reduced to keep the target above the safety floor. */
+  wasFloored?: boolean;
   labels: {
     title: string;
     subtitle: string;
@@ -1062,6 +1065,8 @@ const CongratulationsPage = ({
     lose: string;
     gain: string;
     kgUnit: string;
+    paceAdjusted: string;
+    disclaimer: string;
     macros: {
       calories: string;
       protein: string;
@@ -1241,6 +1246,33 @@ const CongratulationsPage = ({
           ))}
         </div>
       </motion.div>
+
+      {/* The pace the user dragged was capped to keep the target above the
+          BMR/absolute floor. Saying so is honest — otherwise the plan quietly
+          contradicts the slider they just set — and it is also the visible
+          half of the Guideline 1.4.1 mitigation. */}
+      {wasFloored && (
+        <motion.div
+          className="mt-4 flex items-start gap-2 rounded-2xl bg-[#FFA434]/10 px-4 py-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.9 }}
+        >
+          <span className="text-base leading-tight">💛</span>
+          <p className="text-[#8A5A17] text-xs leading-snug">{labels.paceAdjusted}</p>
+        </motion.div>
+      )}
+
+      {/* Guideline 1.4.1: AI-generated nutrition targets need a plain
+          statement that they are estimates and not medical advice. */}
+      <motion.p
+        className="mt-4 px-1 text-center text-[11px] leading-snug text-[#94A3B8]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 1 }}
+      >
+        {labels.disclaimer}
+      </motion.p>
     </motion.div>
   );
 };
@@ -3436,6 +3468,7 @@ export default function TempNewOnboarding() {
             dailyCalories={dailyCalories}
             macros={macros}
             effectivePacePerWeek={target.effectivePacePerWeek}
+            wasFloored={target.wasFloored}
             locale={i18n.language}
             labels={{
               title: t('congratulations.title'),
@@ -3451,6 +3484,14 @@ export default function TempNewOnboarding() {
               lose: t('congratulations.lose'),
               gain: t('congratulations.gain'),
               kgUnit: t('common.kg'),
+              paceAdjusted: t(
+                'congratulations.paceAdjusted',
+                'We eased your pace slightly so your daily calories stay at a level that is safe to sustain.'
+              ),
+              disclaimer: t(
+                'congratulations.disclaimer',
+                'These targets are estimates generated from the details you entered, not medical advice. Talk to a doctor or dietitian before making significant changes to how you eat, especially if you have a health condition, are pregnant, or are under 18.'
+              ),
               macros: {
                 calories: t('congratulations.macros.calories'),
                 protein: t('congratulations.macros.protein'),

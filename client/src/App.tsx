@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import RecipeResults from "./pages/RecipeResults";
 import Privacy from "./pages/Privacy";
+import Support from "./pages/Support";
 import Profile from "./pages/Profile";
 import TempNewOnboarding from "./pages/TempNewOnboarding";
 import { useEffect, useState } from "react";
@@ -156,6 +157,8 @@ function App() {
           <Switch>
           {/* Common routes accessible to all users */}
           <Route path="/privacy" component={Privacy} />
+          {/* Apple's required Support URL. Must render for signed-out visitors. */}
+          <Route path="/support" component={Support} />
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
 

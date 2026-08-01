@@ -12,6 +12,7 @@
     "check": "tsc",
     "db:push": "drizzle-kit push --force",
     "db:reset": "node scripts/reset-db.js",
+    "seed:demo": "node scripts/seed-demo-account.js",
     "test:smoke": "node --test tests/*.test.js",
     "deploy": "npm run setup && npm run build && npm run start",
     "ios:sync": "vite build && cap sync ios",

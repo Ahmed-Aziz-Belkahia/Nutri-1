@@ -465,6 +465,14 @@ export default function MealAnalysis() {
                     <p className="text-sm text-green-700 mt-0.5">{t('common:mealAnalysis.success.addedToLog')}</p>
                   </div>
                 </div>
+                {/* Guideline 1.4.1: the macros above are a model's estimate from
+                    a photo, not a measurement. Say so where they are produced. */}
+                <p className="mt-3 text-xs leading-snug text-green-700/80">
+                  {t(
+                    'common:mealAnalysis.success.estimateNote',
+                    'These values are an AI estimate from your photo, not a precise measurement. Tap the meal in your log to adjust anything that looks off.'
+                  )}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>

@@ -4,7 +4,7 @@ What is left to do to take this to TestFlight and the App Store, plus the
 reference material worth having on hand while you do it.
 
 **Current branch:** `main` (the MVP work is merged and pushed)
-**State:** typecheck 0 errors · `vite build` passes · 15/15 smoke tests pass
+**State:** typecheck 0 errors · `vite build` passes · 16/16 smoke tests pass
 
 ---
 
@@ -168,6 +168,7 @@ npm run dev            # dev server on :5000
 npm run check          # tsc --noEmit (currently 0 errors)
 npm run test:smoke     # 15 end-to-end tests, ~15s
 npm run db:reset       # rebuild local.db from schema (backs up first)
+npm run seed:demo      # create/refresh the App Review demo account + its data
 npm run ios:sync       # vite build && cap sync ios
 npm run ios:open       # open Xcode
 ```
@@ -202,9 +203,9 @@ listing copy are all done. What is left:
 |---|---|
 | Sign in with Apple | ⚠️ Implemented — needs App ID enabled (§2.1) |
 | App Privacy answers | ⚠️ Written out in `APP-STORE-CONNECT.md` §3 — paste them in |
-| Support URL | ❌ **YOU** — Apple requires a working help page |
+| Support URL | ⚠️ Page built at `/support` — **needs a production deploy**, then paste the URL |
+| Demo account for review | ⚠️ `npm run seed:demo` — **run it on the server**, then paste the credentials |
 | Screenshots | ❌ **YOU** — needs a device; 6.7" and 6.5" |
-| Demo account for review | ❌ **YOU** — must be pre-populated with data |
 
 ### 5.1 App Privacy answers must match the manifest
 
@@ -229,16 +230,24 @@ the textbook case. What is already working in your favour:
 If rejected anyway, the usual remedy is more native surface: push
 notifications, widgets, or offline support.
 
-### 5.3 Guideline 1.4.1 — health content
+### 5.3 Guideline 1.4.1 — health content: addressed
 
-**Unresolved, and worth attention before submission.** Onboarding collects
-weight goals and a "weight loss speed." Apple scrutinises weight-loss apps and
-is wary of anything encouraging unhealthy loss rates. AI-generated nutrition
-advice also needs a visible disclaimer.
+Apple scrutinises weight-loss apps and is wary of anything encouraging
+unhealthy loss rates or presenting AI output as medical advice. Both halves are
+now handled:
 
-This is a content decision, not a code one. Suggested: cap the selectable loss
-rate at a medically ordinary figure, and add a short disclaimer that the app
-provides estimates and is not medical advice.
+- **Targets are floored.** `calculateCalorieTarget` derives the deficit from the
+  pace slider, then clamps it to never fall below BMR or below 1,500 kcal
+  (male) / 1,200 kcal (female). A user dragging the slider to its fastest
+  setting cannot generate a starvation target.
+- **The cap is disclosed.** When a pace is reduced, the results screen says so
+  instead of silently contradicting the slider.
+- **Disclaimers are visible** on the onboarding plan screen, on every AI meal
+  estimate, and on the support page — stating these are estimates, not medical
+  advice, and to consult a professional.
+
+Worth a read-through of the wording before submission, since it is the sort of
+thing a reviewer reads closely, but there is no outstanding code work.
 
 ---
 
@@ -286,14 +295,17 @@ board, admin dashboard, barcode scanning, marketplace, 4 of 5 languages.
 
 ## 8. Suggested order from here
 
-1. Mac session — Team, App ID, build, test on device (§2)
-2. Fix whatever Apple sign-in needs after real-device testing
-3. Health-content review (§5.3) and the disclaimer
-4. Support URL, screenshots, App Privacy answers (§5)
-5. TestFlight → internal testing
-6. Backups or Postgres before real users (§6.1)
-7. Repo weight cleanup (§6.2) — any time, isolated commit
-8. The UI overhaul
+1. **Enable Sign in with Apple on the App ID** (§2.1) — blocks the build
+2. **Deploy to production** — this publishes `/support` and lets you run
+   `npm run seed:demo` on the server. Both App Store fields depend on it.
+3. Mac session — Team, build, test on device (§2)
+4. Fix whatever Apple sign-in needs after real-device testing
+5. Screenshots (needs the device from step 3), then the remaining App Store
+   Connect fields (§5)
+6. TestFlight → internal testing
+7. Backups or Postgres before real users (§6.1)
+8. Repo weight cleanup (§6.2) — any time, isolated commit
+9. The UI overhaul
 
 On the UI overhaul: decide what the app *is* in one sentence first. Right now
 it is "scan meals" and "cook from your fridge" — two features that barely share
