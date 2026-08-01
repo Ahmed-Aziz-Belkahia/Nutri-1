@@ -32,12 +32,15 @@ sub-processor and states the retention/deletion rule. **Verify it loads in a
 private browser window before submitting** — a URL that 404s or requires login
 is an instant rejection.
 
-### Support URL — required, **YOU**
-Apple requires a working page where a user can get help. A privacy policy does
-not count. Cheapest acceptable options:
-- A `/support` page on `app.nutriai.online` with an email address and a short FAQ
-- A public Notion page
-- Even a plain `mailto:` landing page
+### Support URL — required
+```
+https://app.nutriai.online/support
+```
+Built and in the repo (`client/src/pages/Support.tsx`): contact address, FAQ,
+health note, privacy link. Public route, no login — App Review opens it signed
+out. **It only exists once production is redeployed**, so verify it loads in a
+private browser window before you paste it in. A URL that 404s is an instant
+rejection.
 
 ### Marketing URL — optional, leave blank if you have no site.
 
@@ -174,12 +177,21 @@ any screenshot showing content the app does not actually produce.
 | Field | Value |
 |---|---|
 | **Sign-in required** | Yes |
-| **Demo account** | **YOU** — create a real one and put credentials here |
+| **Demo account** | `demo@nutriai.online` / `NutriDemo2026!` — after `npm run seed:demo` has been run **on the production server** |
 | **Contact** | **YOU** — your name, phone, email |
 
-Create the demo account **with meals and recipes already in it**. A reviewer
-who logs into an empty app and cannot tell what it does is a common cause of a
-4.2 rejection.
+`npm run seed:demo` creates the account pre-loaded with 12 meals across 4 days,
+2 saved recipes and a completed profile, with the email already verified so no
+code is sent. Re-running refreshes it rather than duplicating, so it can be
+reset before each submission. Override the defaults with
+`--email` / `--password` if you want different credentials.
+
+This matters: a reviewer who logs into an empty app and cannot tell what it
+does is a common cause of a 4.2 rejection.
+
+**Sign in with Apple is not usable by the reviewer** — it needs a real Apple ID
+on a real device — so the email/password account above is the path they will
+take. Confirm it works from a fresh install before submitting.
 
 ### Notes for the reviewer — paste this
 ```
