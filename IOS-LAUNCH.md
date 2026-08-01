@@ -10,20 +10,25 @@ reference material worth having on hand while you do it.
 
 ## 1. Before the Mac session
 
-### 1.1 HTTPS / ATS — satisfied, but watch the expiry
+### 1.1 HTTPS / ATS — satisfied and self-renewing. Nothing to do.
 
 `app.nutriai.online` serves a valid Let's Encrypt cert over TLS 1.3, which
-clears App Transport Security. Nothing to issue.
+clears App Transport Security. Verified on the VPS: **Caddy** owns :80 and :443
+and manages the cert through its own ACME client — it polls Let's Encrypt's
+renewal-info endpoint and has already scheduled this cert's renewal for
+**~4 September 2026**, a month before the 4 October expiry. No certbot, no
+timer, no cron. It just happens.
 
-⚠️ **The cert expires 4 October 2026.** Let's Encrypt is 90-day; if certbot's
-renewal timer is not active, every installed app breaks at once on that date.
-App Transport Security fails closed and gives no useful error on device, so it
-presents as a total app outage with no clue why. Confirm on the VPS:
+(There *is* a certbot install with stale certs in `/etc/letsencrypt/live/`,
+left over from before Caddy. Nothing serves them and no renewal timer exists.
+Ignore them — and do not "fix" them by running certbot, which would fight Caddy
+for port 80.)
 
-```bash
-systemctl list-timers | grep certbot
-sudo certbot renew --dry-run
-```
+The one thing worth knowing: **ATS fails closed.** If TLS on that host ever
+breaks, every installed app dies at once and the device gives no useful error —
+it presents as a total outage with no clue why. So treat the Caddyfile block
+for `app.nutriai.online` as production infrastructure, and if you ever move the
+app off Caddy, re-verify TLS before shipping a build.
 
 Your production deploy also needs `VITE_API_BASE_URL` set in its own
 environment.
